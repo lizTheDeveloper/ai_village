@@ -140,8 +140,14 @@ const universesCapability = defineCapability({
             }),
           });
           if (!response.ok) {
-            const err = await response.json().catch(() => ({}));
-            return { success: false, error: err.error || `HTTP ${response.status}` };
+            let errorMessage = `HTTP ${response.status}`;
+            try {
+              const err = await response.json();
+              errorMessage = err.error || errorMessage;
+            } catch (jsonError) {
+              errorMessage = `HTTP ${response.status} (failed to parse error response: ${jsonError instanceof Error ? jsonError.message : 'unknown'})`;
+            }
+            return { success: false, error: errorMessage };
           }
           const data = await response.json();
           return {
@@ -174,8 +180,14 @@ const universesCapability = defineCapability({
             body: JSON.stringify({ sessionId: params.session }),
           });
           if (!response.ok) {
-            const err = await response.json().catch(() => ({}));
-            return { success: false, error: err.error || `HTTP ${response.status}` };
+            let errorMessage = `HTTP ${response.status}`;
+            try {
+              const err = await response.json();
+              errorMessage = err.error || errorMessage;
+            } catch (jsonError) {
+              errorMessage = `HTTP ${response.status} (failed to parse error response: ${jsonError instanceof Error ? jsonError.message : 'unknown'})`;
+            }
+            return { success: false, error: errorMessage };
           }
           const data = await response.json();
           return {
@@ -202,8 +214,14 @@ const universesCapability = defineCapability({
             method: 'POST',
           });
           if (!response.ok) {
-            const err = await response.json().catch(() => ({}));
-            return { success: false, error: err.error || `HTTP ${response.status}` };
+            let errorMessage = `HTTP ${response.status}`;
+            try {
+              const err = await response.json();
+              errorMessage = err.error || errorMessage;
+            } catch (jsonError) {
+              errorMessage = `HTTP ${response.status} (failed to parse error response: ${jsonError instanceof Error ? jsonError.message : 'unknown'})`;
+            }
+            return { success: false, error: errorMessage };
           }
           const data = await response.json();
           return {

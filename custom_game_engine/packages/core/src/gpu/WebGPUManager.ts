@@ -50,15 +50,6 @@ export class WebGPUManager {
       this.device = await this.adapter.requestDevice();
       this.initialized = true;
 
-      // Log GPU info (basic info only - requestAdapterInfo may not be available)
-      console.info('[WebGPU] Initialized successfully:', {
-        limits: {
-          maxComputeWorkgroupsPerDimension: this.device.limits.maxComputeWorkgroupsPerDimension,
-          maxComputeInvocationsPerWorkgroup: this.device.limits.maxComputeInvocationsPerWorkgroup,
-          maxStorageBufferBindingSize: this.device.limits.maxStorageBufferBindingSize,
-        },
-      });
-
       return true;
     } catch (error) {
       console.error('[WebGPU] Initialization failed:', error);

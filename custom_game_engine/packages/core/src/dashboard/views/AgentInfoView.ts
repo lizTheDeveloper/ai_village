@@ -19,6 +19,13 @@ import type {
   RenderTheme,
 } from '../types.js';
 import { getStatusColor, createProgressBar } from '../theme.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
+import type { AgentComponent } from '../../components/AgentComponent.js';
+import type { IdentityComponent } from '../../components/IdentityComponent.js';
+import type { SkillsComponent } from '../../components/SkillsComponent.js';
+import type { InventoryComponent } from '../../components/InventoryComponent.js';
+import type { PositionComponent } from '../../components/PositionComponent.js';
+import type { NeedsComponent } from '../../components/NeedsComponent.js';
 
 /**
  * Inventory slot data
@@ -152,11 +159,7 @@ export const AgentInfoView: DashboardView<AgentInfoViewData> = {
       }
 
       // Check if this is actually an agent
-      const agent = entity.components.get('agent') as unknown as {
-        currentBehavior?: string;
-        currentAction?: string;
-        age?: number;
-      } | undefined;
+      const agent = entity.getComponent<AgentComponent>(CT.Agent);
 
       if (!agent) {
         emptyData.unavailableReason = 'Selected entity is not an agent';
@@ -164,37 +167,27 @@ export const AgentInfoView: DashboardView<AgentInfoViewData> = {
       }
 
       // Get identity
-      const identity = entity.components.get('identity') as unknown as {
-        name?: string;
-      } | undefined;
+      const identity = entity.getComponent<IdentityComponent>(CT.Identity);
 
       // Get needs
-      const needsComp = entity.components.get('needs') as unknown as {
-        hunger?: number;
-        energy?: number;
-        health?: number;
-        maxHunger?: number;
-        maxEnergy?: number;
-        maxHealth?: number;
-      } | undefined;
+      const needsComp = entity.getComponent<NeedsComponent>(CT.Needs);
 
       const needs: NeedInfo[] = [];
       if (needsComp) {
+        // NeedsComponent values are on 0-1 scale, convert to 0-100 for display
         if (needsComp.hunger !== undefined) {
-          needs.push({ name: 'hunger', value: needsComp.hunger, max: needsComp.maxHunger || 100 });
+          needs.push({ name: 'hunger', value: needsComp.hunger * 100, max: 100 });
         }
         if (needsComp.energy !== undefined) {
-          needs.push({ name: 'energy', value: needsComp.energy, max: needsComp.maxEnergy || 100 });
+          needs.push({ name: 'energy', value: needsComp.energy * 100, max: 100 });
         }
         if (needsComp.health !== undefined) {
-          needs.push({ name: 'health', value: needsComp.health, max: needsComp.maxHealth || 100 });
+          needs.push({ name: 'health', value: needsComp.health * 100, max: 100 });
         }
       }
 
       // Get skills
-      const skillsComp = entity.components.get('skills') as unknown as {
-        skills?: Map<string, { level: number; experience: number }>;
-      } | undefined;
+      const skillsComp = entity.getComponent<SkillsComponent>(CT.Skills);
 
       const skills: SkillInfo[] = [];
       if (skillsComp?.skills) {
@@ -205,10 +198,7 @@ export const AgentInfoView: DashboardView<AgentInfoViewData> = {
       }
 
       // Get inventory
-      const inventoryComp = entity.components.get('inventory') as unknown as {
-        slots?: Array<{ itemId?: string; quantity: number }>;
-        maxSlots?: number;
-      } | undefined;
+      const inventoryComp = entity.getComponent<InventoryComponent>(CT.Inventory);
 
       const inventory: InventorySlot[] = [];
       if (inventoryComp?.slots) {
@@ -220,10 +210,7 @@ export const AgentInfoView: DashboardView<AgentInfoViewData> = {
       }
 
       // Get position
-      const posComp = entity.components.get('position') as unknown as {
-        x?: number;
-        y?: number;
-      } | undefined;
+      const posComp = entity.getComponent<PositionComponent>(CT.Position);
 
       return {
         timestamp: Date.now(),

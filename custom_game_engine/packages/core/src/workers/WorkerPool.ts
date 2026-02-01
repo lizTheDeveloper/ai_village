@@ -126,8 +126,6 @@ export class WorkerPool {
       this.workers.push(worker);
       this.availableWorkers.push(worker);
     }
-
-    console.info(`[WorkerPool] Initialized ${this.poolSize} workers`);
   }
 
   /**
@@ -377,8 +375,6 @@ export class WorkerPool {
     this.availableWorkers = [];
     this.activeTasks.clear();
     this.taskQueue = [];
-
-    console.info('[WorkerPool] Terminated');
   }
 
   /**

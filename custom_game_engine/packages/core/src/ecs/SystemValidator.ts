@@ -119,14 +119,12 @@ export function validateSystemGroup(systems: System[]): {
  */
 export function logValidationResults(result: ValidationResult): void {
   if (result.warnings.length > 0 || result.suggestions.length > 0) {
-    console.group(`[SystemValidator] ${result.systemId}`);
     for (const warning of result.warnings) {
-      console.warn(`⚠️ ${warning}`);
+      console.warn(`[SystemValidator] ${result.systemId} - ⚠️ ${warning}`);
     }
     for (const suggestion of result.suggestions) {
-      console.info(`💡 ${suggestion}`);
+      console.warn(`[SystemValidator] ${result.systemId} - 💡 ${suggestion}`);
     }
-    console.groupEnd();
   }
 }
 

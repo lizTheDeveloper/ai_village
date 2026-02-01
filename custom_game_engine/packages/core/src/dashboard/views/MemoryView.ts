@@ -13,6 +13,13 @@ import type {
   RenderBounds,
   RenderTheme,
 } from '../types.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
+import type { AgentComponent } from '../../components/AgentComponent.js';
+import type { IdentityComponent } from '../../components/IdentityComponent.js';
+import type { EpisodicMemoryComponent } from '../../components/EpisodicMemoryComponent.js';
+import type { SemanticMemoryComponent } from '../../components/SemanticMemoryComponent.js';
+import type { ReflectionComponent } from '../../components/ReflectionComponent.js';
+import type { JournalComponent } from '../../components/JournalComponent.js';
 
 /**
  * A single memory entry
@@ -144,28 +151,42 @@ export const MemoryView: DashboardView<MemoryViewData> = {
         return emptyData;
       }
 
-      // Get components with type assertions
-      const identity = entity.components.get('identity') as unknown as { name?: string } | undefined;
-      const agent = entity.components.get('agent') as unknown as {
-        personalGoal?: string;
-        mediumTermGoal?: string;
-        groupGoal?: string;
-      } | undefined;
-      const episodicMemory = entity.components.get('episodic_memory') as unknown as {
-        episodicMemories?: MemoryEntry[];
-      } | undefined;
-      const semanticMemory = entity.components.get('semantic_memory') as unknown as {
-        beliefs?: Belief[];
-      } | undefined;
-      const reflection = entity.components.get('reflection') as unknown as {
-        reflections?: Reflection[];
-      } | undefined;
-      const journal = entity.components.get('journal') as unknown as {
-        entries?: Array<{ text?: string }>;
-      } | undefined;
+      // Get components with proper typing
+      const identity = entity.getComponent<IdentityComponent>(CT.Identity);
+      const agent = entity.getComponent<AgentComponent>(CT.Agent);
+      const episodicMemory = entity.getComponent<EpisodicMemoryComponent>(CT.EpisodicMemory);
+      const semanticMemory = entity.getComponent<SemanticMemoryComponent>(CT.SemanticMemory);
+      const reflection = entity.getComponent<ReflectionComponent>(CT.Reflection);
+      const journal = entity.getComponent<JournalComponent>(CT.Journal);
 
+      // Get memory arrays from component getters
       const memories = episodicMemory?.episodicMemories || [];
       const journalEntries = journal?.entries || [];
+
+      // Map episodic memories to MemoryEntry interface (subset of fields)
+      const recentMemories: MemoryEntry[] = memories.slice(-5).reverse().map(m => ({
+        eventType: m.eventType,
+        summary: m.summary,
+        importance: m.importance,
+        emotionalValence: m.emotionalValence,
+        emotionalIntensity: m.emotionalIntensity,
+        timestamp: m.timestamp,
+        location: m.location,
+        participants: m.participants ? [...m.participants] : undefined,
+        consolidated: m.consolidated,
+      }));
+
+      // Map semantic beliefs to Belief interface
+      const beliefs: Belief[] = (semanticMemory?.beliefs || []).slice(0, 5).map(b => ({
+        content: b.content,
+        confidence: b.confidence,
+      }));
+
+      // Map reflections to Reflection interface
+      const reflections: Reflection[] = (reflection?.reflections || []).slice(-3).map(r => ({
+        text: r.text,
+        timestamp: r.timestamp,
+      }));
 
       return {
         timestamp: Date.now(),
@@ -174,10 +195,10 @@ export const MemoryView: DashboardView<MemoryViewData> = {
         personalGoal: agent?.personalGoal || null,
         mediumTermGoal: agent?.mediumTermGoal || null,
         groupGoal: agent?.groupGoal || null,
-        recentMemories: memories.slice(-5).reverse(),
+        recentMemories,
         totalMemories: memories.length,
-        beliefs: (semanticMemory?.beliefs || []).slice(0, 5),
-        reflections: (reflection?.reflections || []).slice(-3),
+        beliefs,
+        reflections,
         latestJournalEntry: journalEntries.length > 0
           ? journalEntries[journalEntries.length - 1]?.text || null
           : null,

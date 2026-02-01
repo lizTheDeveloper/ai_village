@@ -41,19 +41,7 @@ export class WorkerMonitorSystem extends BaseSystem {
       return; // No worker pools to monitor
     }
 
-    // Log stats
-    console.info('[WorkerMonitor] Worker Pool Statistics:');
-
     for (const { name, stats: poolStats } of stats) {
-      console.info(`  ${name}:`, {
-        total: poolStats.total,
-        available: poolStats.available,
-        active: poolStats.active,
-        queued: poolStats.queued,
-        completed: poolStats.completed,
-        failed: poolStats.failed,
-      });
-
       // Calculate rates
       const completedSinceLastLog = poolStats.completed - this.previousCompleted;
       const failedSinceLastLog = poolStats.failed - this.previousFailed;

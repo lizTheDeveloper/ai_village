@@ -57,8 +57,9 @@ export class ProxyLLMProvider implements LLMProvider {
     }, 30000);
 
     // Send initial heartbeat
-    this.sendHeartbeat().catch(() => {
-      // Ignore initial heartbeat failure
+    this.sendHeartbeat().catch((err) => {
+      // Initial heartbeat failure is non-critical (server may still be starting)
+      console.warn('[ProxyLLMProvider] Initial heartbeat failed:', err.message);
     });
   }
 
@@ -142,7 +143,13 @@ export class ProxyLLMProvider implements LLMProvider {
         clearTimeout(timeoutId);
 
         if (response.status === 429) {
-          const errorData = await response.json().catch(() => ({}));
+          let errorData: any = {};
+          try {
+            errorData = await response.json();
+          } catch (jsonError) {
+            // If we can't parse the 429 response, use defaults
+            console.warn('[ProxyLLMProvider] Failed to parse 429 response:', jsonError);
+          }
 
           // Extract cooldown time from server response
           const waitMs = errorData.cooldown?.waitMs ||
@@ -166,7 +173,15 @@ export class ProxyLLMProvider implements LLMProvider {
         }
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
+          let errorData: any = {};
+          try {
+            errorData = await response.json();
+          } catch (jsonError) {
+            // If we can't parse error response, construct informative message
+            throw new Error(
+              `Proxy error: ${response.status} ${response.statusText} (failed to parse error response: ${jsonError instanceof Error ? jsonError.message : 'unknown'})`
+            );
+          }
           // If server returns 500 (no providers configured), enable circuit breaker
           if (response.status === 500) {
             this.serverErrorCount++;

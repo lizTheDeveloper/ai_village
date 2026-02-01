@@ -142,8 +142,6 @@ export class GPUProximityQuery {
       size: 16, // 4 floats: queryX, queryY, radiusSquared, count
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
-
-    console.info('[GPUProximityQuery] Initialized');
   }
 
   /**

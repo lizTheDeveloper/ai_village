@@ -742,7 +742,16 @@ function formatRoadmap(data) {
 
 // Sessions/Universes formatter
 function formatSessions(data) {
-  const sessions = data.sessions || data.universes || [];
+  if (data.error) {
+    return '<pre class="error">' + data.error + '</pre>';
+  }
+
+  // Accept either format (sessions or universes), but at least one must be present
+  const sessions = data.sessions || data.universes;
+  if (!sessions) {
+    throw new Error('API response missing required field: sessions or universes');
+  }
+
   if (sessions.length === 0) {
     return '<div style="color: #888;">No active sessions</div>';
   }
@@ -766,7 +775,15 @@ function formatSessions(data) {
 
 // Agents formatter
 function formatAgents(data) {
-  const agents = data.agents || [];
+  if (data.error) {
+    return '<pre class="error">' + data.error + '</pre>';
+  }
+
+  if (!('agents' in data)) {
+    throw new Error('API response missing required field: agents');
+  }
+
+  const agents = data.agents;
   if (agents.length === 0) {
     return '<div style="color: #888;">No agents found</div>';
   }
@@ -794,8 +811,17 @@ function formatAgents(data) {
 
 // Sprite queue formatter
 function formatSpriteQueue(data) {
-  const summary = data.summary || {};
-  const pending = data.pending?.sprites || [];
+  if (data.error) {
+    return '<pre class="error">' + data.error + '</pre>';
+  }
+
+  // summary is required
+  if (!('summary' in data)) {
+    throw new Error('API response missing required field: summary');
+  }
+
+  const summary = data.summary;
+  const pending = data.pending?.sprites || []; // pending is optional
 
   let html = '<div style="display: flex; gap: 2rem; margin-bottom: 1rem;">';
   html += '<div><strong>Pending:</strong> ' + (summary.sprites?.pending || pending.length || 0) + '</div>';
@@ -819,8 +845,16 @@ function formatSpriteQueue(data) {
 
 // Sprite list formatter (for list-sprites query)
 function formatSpriteList(data) {
-  const total = data.total || 0;
-  const sprites = data.sprites || [];
+  if (data.error) {
+    return '<pre class="error">' + data.error + '</pre>';
+  }
+
+  if (!('sprites' in data)) {
+    throw new Error('API response missing required field: sprites');
+  }
+
+  const total = data.total || 0; // total is optional (can be derived from sprites.length)
+  const sprites = data.sprites;
 
   if (total === 0 && sprites.length === 0) {
     return '<div style="color: #888;">No sprites found</div>';
@@ -856,8 +890,16 @@ function formatSpriteList(data) {
 
 // Souls formatter
 function formatSouls(data) {
-  const souls = data.souls || [];
-  const total = data.total || souls.length;
+  if (data.error) {
+    return '<pre class="error">' + data.error + '</pre>';
+  }
+
+  if (!('souls' in data)) {
+    throw new Error('API response missing required field: souls');
+  }
+
+  const souls = data.souls;
+  const total = data.total || souls.length; // total is optional (can be derived from souls.length)
 
   if (souls.length === 0) {
     return '<div style="color: #888;">No souls found</div>';
@@ -869,7 +911,15 @@ function formatSouls(data) {
 
 // Recordings formatter
 function formatRecordings(data) {
-  const recordings = data.recordings || [];
+  if (data.error) {
+    return '<pre class="error">' + data.error + '</pre>';
+  }
+
+  if (!('recordings' in data)) {
+    throw new Error('API response missing required field: recordings');
+  }
+
+  const recordings = data.recordings;
   if (recordings.length === 0) {
     return '<div style="color: #888;">No recordings found</div>';
   }
@@ -885,12 +935,16 @@ function formatSaves(data) {
       '<strong>⚠️ Error:</strong> ' + data.error + '</div>';
   }
 
-  const snapshots = data.snapshots || [];
+  if (!('snapshots' in data)) {
+    throw new Error('API response missing required field: snapshots');
+  }
+
+  const snapshots = data.snapshots;
   if (snapshots.length === 0) {
     return '<div style="color: #888; padding: 1rem;">No snapshots found. Start the game to create saves.</div>';
   }
 
-  // Stats summary
+  // Stats summary (optional - can be computed from snapshots)
   const stats = data.stats || {
     total: snapshots.length,
     canonical: snapshots.filter(s => s.type === 'canonical').length,
@@ -1008,10 +1062,19 @@ function formatSaves(data) {
 
 // LLM Queue formatter
 function formatLLMQueue(data) {
+  if (data.error) {
+    return '<pre class="error">' + data.error + '</pre>';
+  }
+
+  // These fields are required for queue status
+  if (!('pending' in data) || !('processing' in data) || !('completed' in data)) {
+    throw new Error('API response missing required fields: pending, processing, or completed');
+  }
+
   let html = '<div style="display: flex; gap: 2rem; flex-wrap: wrap;">';
-  html += '<div><strong>Pending:</strong> ' + (data.pending || 0) + '</div>';
-  html += '<div><strong>Processing:</strong> ' + (data.processing || 0) + '</div>';
-  html += '<div><strong>Completed:</strong> ' + (data.completed || 0) + '</div>';
+  html += '<div><strong>Pending:</strong> ' + data.pending + '</div>';
+  html += '<div><strong>Processing:</strong> ' + data.processing + '</div>';
+  html += '<div><strong>Completed:</strong> ' + data.completed + '</div>';
   html += '</div>';
 
   if (data.providers) {
@@ -1041,9 +1104,13 @@ function formatLLMProviders(data) {
     return '<pre class="error">' + data.error + '</pre>';
   }
 
+  if (!('summary' in data) || !data.summary) {
+    throw new Error('API response missing required field: summary');
+  }
+
   let html = '<div style="display: flex; gap: 2rem; margin-bottom: 1rem;">';
-  html += '<div><strong>Total Providers:</strong> ' + (data.summary?.totalProviders || 0) + '</div>';
-  html += '<div><strong>Total Requests:</strong> ' + (data.summary?.totalRequests || 0) + '</div>';
+  html += '<div><strong>Total Providers:</strong> ' + (data.summary.totalProviders || 0) + '</div>';
+  html += '<div><strong>Total Requests:</strong> ' + (data.summary.totalRequests || 0) + '</div>';
   html += '</div>';
 
   if (data.queues) {
@@ -1076,14 +1143,15 @@ function formatLLMQueueStats(data) {
     return '<pre class="error">' + data.error + '</pre>';
   }
 
+  // Note: All fields in queue stats are optional as the response structure can vary
   let html = '';
 
-  // Provider summary
+  // Provider summary (optional)
   if (data.providers && data.providers.length > 0) {
     html += '<div style="margin-bottom: 1rem;"><strong>Providers:</strong> ' + data.providers.join(', ') + '</div>';
   }
 
-  // Session stats
+  // Session stats (optional)
   if (data.sessions) {
     html += '<div style="display: flex; gap: 2rem; margin-bottom: 1rem; flex-wrap: wrap;">';
     html += '<div><strong>Total Sessions:</strong> ' + (data.sessions.totalSessions || 0) + '</div>';
@@ -1116,6 +1184,7 @@ function formatSessionCooldowns(data) {
     return '<pre class="error">' + data.error + '</pre>';
   }
 
+  // Note: All fields are optional as cooldown data may not always be available
   let html = '';
 
   if (data.sessions) {
@@ -1138,8 +1207,12 @@ function formatWorkOrders(data) {
     return '<pre class="error">' + data.error + '</pre>';
   }
 
-  const workOrders = data.workOrders || [];
-  const count = data.count || workOrders.length;
+  if (!('workOrders' in data)) {
+    throw new Error('API response missing required field: workOrders');
+  }
+
+  const workOrders = data.workOrders;
+  const count = data.count || workOrders.length; // count is optional (can be derived from workOrders.length)
 
   if (workOrders.length === 0) {
     return '<div style="color: #888;">No work orders found</div>';
@@ -1170,9 +1243,13 @@ function formatPipelineStatus(data) {
     return '<pre class="error">' + data.error + '</pre>';
   }
 
-  const status = data.status || 'unknown';
-  const workOrder = data.workOrder;
-  const timestamp = data.timestamp;
+  if (!('status' in data)) {
+    throw new Error('API response missing required field: status');
+  }
+
+  const status = data.status;
+  const workOrder = data.workOrder; // optional
+  const timestamp = data.timestamp; // optional
 
   let html = '<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">';
 

@@ -154,31 +154,27 @@ function getWebGLDiagnostics(): Record<string, string | number | boolean> {
  * Call this when WebGL fails to understand why.
  */
 export function logWebGLDiagnostics(): void {
-  console.group('[WebGL Diagnostics]');
-
   // Context count
   const contextInfo = countActiveWebGLContexts();
-  console.log(`Active WebGL contexts: ${contextInfo.total}`);
-  console.log('Browser limit: typically 8-16 contexts');
+  console.log(`[WebGL Diagnostics] Active WebGL contexts: ${contextInfo.total}`);
+  console.log('[WebGL Diagnostics] Browser limit: typically 8-16 contexts');
   for (const detail of contextInfo.details) {
-    console.log(`  ${detail}`);
+    console.log(`[WebGL Diagnostics]   ${detail}`);
   }
 
   // GPU info
-  console.log('GPU/WebGL capabilities:');
+  console.log('[WebGL Diagnostics] GPU/WebGL capabilities:');
   const diagnostics = getWebGLDiagnostics();
   for (const [key, value] of Object.entries(diagnostics)) {
-    console.log(`  ${key}: ${value}`);
+    console.log(`[WebGL Diagnostics]   ${key}: ${value}`);
   }
 
   // Memory info (Chrome only)
   if ((performance as Performance & { memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory) {
     const mem = (performance as Performance & { memory: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
-    console.log('Memory:');
-    console.log(`  JS Heap: ${(mem.usedJSHeapSize / 1024 / 1024).toFixed(1)} MB / ${(mem.jsHeapSizeLimit / 1024 / 1024).toFixed(1)} MB`);
+    console.log('[WebGL Diagnostics] Memory:');
+    console.log(`[WebGL Diagnostics]   JS Heap: ${(mem.usedJSHeapSize / 1024 / 1024).toFixed(1)} MB / ${(mem.jsHeapSizeLimit / 1024 / 1024).toFixed(1)} MB`);
   }
-
-  console.groupEnd();
 }
 
 // Make diagnostics available from browser console: window.webglDiagnostics()
@@ -1066,7 +1062,8 @@ export class PixiJSRenderer implements IRenderer {
       }
     }
 
-    // All paths failed
+    // All paths failed - log once and mark as failed
+    console.warn(`[PixiJSRenderer] Failed to load texture for sprite '${spriteId}' - tried ${pathsToTry.length} paths`);
     this.loadingTextures.delete(spriteId);
     this.failedTextures.add(spriteId);
   }
@@ -1323,10 +1320,11 @@ export class PixiJSRenderer implements IRenderer {
    * - Steering (behavior + target)
    */
   debugAgentPositions(): void {
-    console.group('[PixiJSRenderer] Agent Movement Diagnostic');
-    console.log(`Cached agents: ${this._cachedAgentEntities.length}`);
-    console.log(`Entity sprites: ${this.entitySprites.size}`);
-    console.log(`Cache refresh ticks - agents: ${this._agentCacheLastRefresh}`);
+    console.log('[PixiJSRenderer] Agent Debug Info');
+    console.log(`[PixiJSRenderer] Cached agents: ${this._cachedAgentEntities.length}`);
+    console.log(`[PixiJSRenderer] Entity sprites: ${this.entitySprites.size}`);
+    console.log(`[PixiJSRenderer] Visible entities: ${this._visibleEntities.length}`);
+    console.log(`[PixiJSRenderer] Cache refresh ticks - agents: ${this._agentCacheLastRefresh}, renderables: ${this._renderableCacheLastRefresh}`);
 
     // Diagnostic counters
     let hasPosition = 0;
@@ -1359,42 +1357,42 @@ export class PixiJSRenderer implements IRenderer {
     }
 
     const total = this._cachedAgentEntities.length;
-    console.log('\n=== COMPONENT COVERAGE ===');
-    console.log(`Position:  ${hasPosition}/${total} (${((hasPosition/total)*100).toFixed(0)}%)`);
-    console.log(`Velocity:  ${hasVelocity}/${total} (${((hasVelocity/total)*100).toFixed(0)}%) - REQUIRED for SteeringSystem`);
-    console.log(`Movement:  ${hasMovement}/${total} (${((hasMovement/total)*100).toFixed(0)}%) - REQUIRED for MovementSystem`);
-    console.log(`Steering:  ${hasSteering}/${total} (${((hasSteering/total)*100).toFixed(0)}%) - REQUIRED for SteeringSystem`);
-    console.log(`  - with target: ${hasSteeringTarget}/${hasSteering}`);
-    console.log(`Non-zero velocity: ${hasNonZeroVelocity}/${total}`);
+    console.log('[PixiJSRenderer] === COMPONENT COVERAGE ===');
+    console.log(`[PixiJSRenderer] Position:  ${hasPosition}/${total} (${((hasPosition/total)*100).toFixed(0)}%)`);
+    console.log(`[PixiJSRenderer] Velocity:  ${hasVelocity}/${total} (${((hasVelocity/total)*100).toFixed(0)}%) - REQUIRED for SteeringSystem`);
+    console.log(`[PixiJSRenderer] Movement:  ${hasMovement}/${total} (${((hasMovement/total)*100).toFixed(0)}%) - REQUIRED for MovementSystem`);
+    console.log(`[PixiJSRenderer] Steering:  ${hasSteering}/${total} (${((hasSteering/total)*100).toFixed(0)}%) - REQUIRED for SteeringSystem`);
+    console.log(`[PixiJSRenderer]   - with target: ${hasSteeringTarget}/${hasSteering}`);
+    console.log(`[PixiJSRenderer] Non-zero velocity: ${hasNonZeroVelocity}/${total}`);
 
-    console.log('\n=== STEERING BEHAVIORS ===');
+    console.log('[PixiJSRenderer] === STEERING BEHAVIORS ===');
     for (const [behavior, count] of Object.entries(steeringBehaviors)) {
-      console.log(`  ${behavior}: ${count}`);
+      console.log(`[PixiJSRenderer]   ${behavior}: ${count}`);
     }
 
     // DIAGNOSIS
-    console.log('\n=== DIAGNOSIS ===');
+    console.log('[PixiJSRenderer] === DIAGNOSIS ===');
     if (hasVelocity === 0) {
-      console.error('PROBLEM: No agents have Velocity component - SteeringSystem cannot run!');
+      console.error('[PixiJSRenderer] PROBLEM: No agents have Velocity component - SteeringSystem cannot run!');
     }
     if (hasMovement === 0) {
-      console.error('PROBLEM: No agents have Movement component - MovementSystem cannot run!');
+      console.error('[PixiJSRenderer] PROBLEM: No agents have Movement component - MovementSystem cannot run!');
     }
     if (hasSteering === 0) {
-      console.error('PROBLEM: No agents have Steering component - SteeringSystem will skip them!');
+      console.error('[PixiJSRenderer] PROBLEM: No agents have Steering component - SteeringSystem will skip them!');
     }
     if (hasSteering > 0 && hasSteeringTarget === 0) {
-      console.warn('WARNING: Agents have Steering but no targets set - they may be wandering or idle');
+      console.warn('[PixiJSRenderer] WARNING: Agents have Steering but no targets set - they may be wandering or idle');
     }
     if (steeringBehaviors['none'] === hasSteering) {
-      console.error('PROBLEM: All agents have steering.behavior = "none" - no movement calculated!');
+      console.error('[PixiJSRenderer] PROBLEM: All agents have steering.behavior = "none" - no movement calculated!');
     }
     if (hasVelocity > 0 && hasNonZeroVelocity === 0) {
-      console.warn('WARNING: Agents have Velocity component but all values are zero');
+      console.warn('[PixiJSRenderer] WARNING: Agents have Velocity component but all values are zero');
     }
 
     // Sample first 3 agents in detail
-    console.log('\n=== SAMPLE AGENTS (first 3) ===');
+    console.log('[PixiJSRenderer] === SAMPLE AGENTS (first 3) ===');
     for (const entity of this._cachedAgentEntities.slice(0, 3)) {
       const pos = entity.getComponent('position') as { x: number; y: number } | undefined;
       const vel = entity.getComponent('velocity') as { vx: number; vy: number } | undefined;
@@ -1406,29 +1404,28 @@ export class PixiJSRenderer implements IRenderer {
       } | undefined;
       const sprite = this.entitySprites.get(entity.id);
 
-      console.log(`\nAgent ${entity.id.slice(0, 8)}:`);
-      console.log(`  Position: ${pos ? `(${pos.x.toFixed(2)}, ${pos.y.toFixed(2)})` : 'MISSING'}`);
-      console.log(`  Velocity: ${vel ? `vx=${vel.vx.toFixed(3)}, vy=${vel.vy.toFixed(3)}` : 'MISSING'}`);
-      console.log(`  Movement: ${movement ? `vX=${movement.velocityX.toFixed(3)}, vY=${movement.velocityY.toFixed(3)}` : 'MISSING'}`);
-      console.log(`  Steering: ${steering ? `behavior="${steering.behavior}", target=${steering.target ? `(${steering.target.x.toFixed(1)}, ${steering.target.y.toFixed(1)})` : 'none'}, maxSpeed=${steering.maxSpeed}` : 'MISSING'}`);
-      console.log(`  Sprite: ${sprite ? `visible=${sprite.visible}, pos=(${sprite.x.toFixed(1)}, ${sprite.y.toFixed(1)})` : 'no sprite'}`);
+      console.log(`[PixiJSRenderer] Agent ${entity.id.slice(0, 8)}:`);
+      console.log(`[PixiJSRenderer]   Position: ${pos ? `(${pos.x.toFixed(2)}, ${pos.y.toFixed(2)})` : 'MISSING'}`);
+      console.log(`[PixiJSRenderer]   Velocity: ${vel ? `vx=${vel.vx.toFixed(3)}, vy=${vel.vy.toFixed(3)}` : 'MISSING'}`);
+      console.log(`[PixiJSRenderer]   Movement: ${movement ? `vX=${movement.velocityX.toFixed(3)}, vY=${movement.velocityY.toFixed(3)}` : 'MISSING'}`);
+      console.log(`[PixiJSRenderer]   Steering: ${steering ? `behavior="${steering.behavior}", target=${steering.target ? `(${steering.target.x.toFixed(1)}, ${steering.target.y.toFixed(1)})` : 'none'}, maxSpeed=${steering.maxSpeed}` : 'MISSING'}`);
+      console.log(`[PixiJSRenderer]   Sprite: ${sprite ? `visible=${sprite.visible}, pos=(${sprite.x.toFixed(1)}, ${sprite.y.toFixed(1)})` : 'no sprite'}`);
     }
 
-    console.log('\n=== HOW TO FIX ===');
+    console.log('[PixiJSRenderer] === HOW TO FIX ===');
     if (hasVelocity === 0 || hasMovement === 0 || hasSteering === 0) {
-      console.log('Agents are missing required components. Check agent creation code.');
-      console.log('Required components for movement: Position, Velocity, Movement, Steering');
+      console.log('[PixiJSRenderer] Agents are missing required components. Check agent creation code.');
+      console.log('[PixiJSRenderer] Required components for movement: Position, Velocity, Movement, Steering');
     } else if (steeringBehaviors['none'] === hasSteering || hasSteeringTarget === 0) {
-      console.log('Agents have components but no active steering behavior/target.');
-      console.log('Check AgentBrainSystem - it should set steering.behavior and steering.target.');
+      console.log('[PixiJSRenderer] Agents have components but no active steering behavior/target.');
+      console.log('[PixiJSRenderer] Check AgentBrainSystem - it should set steering.behavior and steering.target.');
     } else if (hasNonZeroVelocity === 0) {
-      console.log('SteeringSystem may not be running or not computing velocity.');
-      console.log('Check system registry: window.game.gameLoop.systemRegistry.systems');
+      console.log('[PixiJSRenderer] SteeringSystem may not be running or not computing velocity.');
+      console.log('[PixiJSRenderer] Check system registry: window.game.gameLoop.systemRegistry.systems');
     } else {
-      console.log('Components look OK - check MovementSystem execution.');
+      console.log('[PixiJSRenderer] Components look OK - check MovementSystem execution.');
     }
-
-    console.groupEnd();
+    console.log('[PixiJSRenderer] To check if simulation is running, run: window.game.gameLoop.world.tick');
   }
 
   getEntityAt(screenX: number, screenY: number, world: World): Entity | null {

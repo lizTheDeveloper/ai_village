@@ -159,7 +159,6 @@ if (typeof window !== 'undefined') {
     listBuildings: async () => {
       const response = await fetch('/admin/queries/list_dimensional_buildings');
       const data = await response.json();
-      console.table(data.byDimension);
       return data;
     },
 

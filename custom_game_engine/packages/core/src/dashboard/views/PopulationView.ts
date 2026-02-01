@@ -13,6 +13,9 @@ import type {
   RenderTheme,
 } from '../types.js';
 import { createProgressBar } from '../theme.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
+import type { AgentComponent } from '../../components/AgentComponent.js';
+import type { NeedsComponent } from '../../components/NeedsComponent.js';
 
 /**
  * Data returned by the Population view
@@ -84,26 +87,25 @@ export const PopulationView: DashboardView<PopulationViewData> = {
       let critical = 0;
 
       for (const entity of agents) {
-        const agent = entity.components.get('agent');
-        const needs = entity.components.get('needs');
+        const agent = entity.getComponent<AgentComponent>(CT.Agent);
+        const needs = entity.getComponent<NeedsComponent>(CT.Needs);
 
         if (agent) {
-          // Age tracking - use type assertion for component data
-          const agentData = agent as unknown as { age?: number; currentBehavior?: string };
-          totalAge += agentData.age || 0;
+          // Age tracking
+          totalAge += agent.age || 0;
 
           // Behavior tracking
-          const behavior = agentData.currentBehavior || 'idle';
+          const behavior = agent.behavior || 'idle';
           behaviorBreakdown[behavior] = (behaviorBreakdown[behavior] || 0) + 1;
         }
 
         // Health categorization
+        // NeedsComponent values are 0-1 scale, convert to 0-100 for comparison
         if (needs) {
-          const needsData = needs as unknown as { hunger?: number; energy?: number; health?: number };
           const minNeed = Math.min(
-            needsData.hunger ?? 100,
-            needsData.energy ?? 100,
-            needsData.health ?? 100
+            (needs.hunger ?? 1) * 100,
+            (needs.energy ?? 1) * 100,
+            (needs.health ?? 1) * 100
           );
           if (minNeed >= 50) {
             healthy++;

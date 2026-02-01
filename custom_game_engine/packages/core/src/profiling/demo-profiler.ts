@@ -67,22 +67,7 @@ export async function runProfilingSession(): Promise<void> {
   console.log('Top 10 Slowest Systems:');
   console.log('-'.repeat(80));
   const top10 = report.systems.slice(0, 10);
-  console.table(
-    top10.map((s: SystemMetrics) => ({
-      System: s.systemName,
-      'Avg(ms)': s.avgExecutionTimeMs.toFixed(2),
-      'Max(ms)': s.maxExecutionTimeMs.toFixed(2),
-      'P99(ms)': s.p99ExecutionTimeMs.toFixed(2),
-      'CPU%': s.avgCpuPercent.toFixed(1),
-      Entities: s.avgEntityCount.toFixed(0),
-      Status:
-        s.maxExecutionTimeMs > 10
-          ? 'CRITICAL'
-          : s.maxExecutionTimeMs > 5
-            ? 'SLOW'
-            : 'OK',
-    }))
-  );
+  // Top 10 systems data available in report.systems.slice(0, 10)
 
   // Show hotspots
   if (report.hotspots.length > 0) {

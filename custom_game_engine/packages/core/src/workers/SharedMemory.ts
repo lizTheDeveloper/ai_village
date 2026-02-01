@@ -243,7 +243,5 @@ export function logSharedArrayBufferSupport(): void {
         '3. Restart server\n' +
         'Falling back to postMessage (copy mode).'
     );
-  } else {
-    console.info('[SharedMemory] SharedArrayBuffer supported (zero-copy enabled)');
   }
 }

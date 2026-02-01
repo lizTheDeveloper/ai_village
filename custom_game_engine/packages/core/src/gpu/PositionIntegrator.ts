@@ -160,8 +160,6 @@ export class GPUPositionIntegrator {
       size: 8, // 2 floats: deltaTime (f32), count (u32)
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
-
-    console.info('[GPUPositionIntegrator] Initialized');
   }
 
   /**

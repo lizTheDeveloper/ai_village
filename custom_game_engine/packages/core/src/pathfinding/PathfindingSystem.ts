@@ -42,7 +42,6 @@ export class PathfindingSystem {
       await pathfindingWASM.initialize();
       this.wasmEnabled = true;
       this.wasmInitialized = true;
-      console.info('[PathfindingSystem] WASM module initialized successfully');
     } catch (error) {
       this.wasmEnabled = false;
       this.wasmInitialized = false;

@@ -25,17 +25,7 @@ export class QueryCacheMonitorSystem extends BaseSystem {
   protected readonly throttleInterval = 6000; // Every 5 minutes (6000 ticks @ 20 TPS)
 
   protected onUpdate(ctx: { world: World }): void {
+    // Get query cache statistics (for metrics tracking)
     const stats = ctx.world.queryCache.getStats();
-
-    // Only log if there's meaningful activity
-    if (stats.hits + stats.misses === 0) return;
-
-    console.info('[QueryCache]', {
-      hitRate: (stats.hitRate * 100).toFixed(1) + '%',
-      hits: stats.hits,
-      misses: stats.misses,
-      invalidations: stats.invalidations,
-      size: stats.size,
-    });
   }
 }

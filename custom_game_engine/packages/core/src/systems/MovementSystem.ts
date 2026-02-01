@@ -118,7 +118,6 @@ export class MovementSystem extends BaseSystem {
         this.wasmSIMD = new SIMDOpsWASM();
         await this.wasmSIMD.initialize();
         this.useWASMSIMD = true;
-        console.info('[MovementSystem] WASM SIMD enabled (Tier 4 - 2-4x faster than JS auto-vec)');
       } catch (error) {
         console.warn('[MovementSystem] WASM SIMD initialization failed:', error);
         this.useWASMSIMD = false;
@@ -134,17 +133,7 @@ export class MovementSystem extends BaseSystem {
       if (device) {
         this.gpuIntegrator = new GPUPositionIntegrator(device);
         this.useGPU = true;
-        console.info('[MovementSystem] WebGPU acceleration enabled (Tier 5 - 10-100x faster for large batches)');
       }
-    }
-
-    // Log final optimization tier
-    if (this.useGPU) {
-      console.info('[MovementSystem] Using 3-tier optimization: JS auto-vec (Tier 3) → WASM SIMD (Tier 4) → WebGPU (Tier 5)');
-    } else if (this.useWASMSIMD) {
-      console.info('[MovementSystem] Using 2-tier optimization: JS auto-vec (Tier 3) → WASM SIMD (Tier 4)');
-    } else {
-      console.info('[MovementSystem] Using JS auto-vectorization only (Tier 3)');
     }
   }
 

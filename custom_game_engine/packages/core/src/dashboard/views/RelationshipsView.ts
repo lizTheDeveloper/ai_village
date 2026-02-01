@@ -18,6 +18,11 @@ import type {
   RenderTheme,
 } from '../types.js';
 import { createProgressBar } from '../theme.js';
+import { ComponentType as CT } from '../../types/ComponentType.js';
+import type { AgentComponent } from '../../components/AgentComponent.js';
+import type { RelationshipComponent } from '../../components/RelationshipComponent.js';
+import type { PersonalityComponent } from '../../components/PersonalityComponent.js';
+import type { IdentityComponent } from '../../components/IdentityComponent.js';
 
 /**
  * A single relationship entry
@@ -136,77 +141,81 @@ export const RelationshipsView: DashboardView<RelationshipsViewData> = {
         return emptyData;
       }
 
-      const agent = entity.components.get('agent') as unknown as {
-        name?: string;
-      } | undefined;
+      const agent = entity.getComponent<AgentComponent>(CT.Agent);
 
       if (!agent) {
         emptyData.unavailableReason = 'Selected entity is not an agent';
         return emptyData;
       }
 
-      const social = entity.components.get('social') as unknown as {
-        relationships?: Map<string, {
-          strength: number;
-          type: string;
-          lastInteraction?: number;
-          interactionCount?: number;
-          sharedMemories?: number;
-        }>;
-      } | undefined;
+      // Fix: Use 'relationship' component, not 'social' (which doesn't exist)
+      const relationshipComp = entity.getComponent<RelationshipComponent>(CT.Relationship);
 
-      const personality = entity.components.get('personality') as unknown as {
-        sociability?: number;
-      } | undefined;
+      const personality = entity.getComponent<PersonalityComponent>(CT.Personality);
 
       const relationships: RelationshipEntry[] = [];
       let friendCount = 0;
       let rivalCount = 0;
 
-      if (social?.relationships) {
-        for (const [targetId, rel] of social.relationships) {
+      if (relationshipComp?.relationships) {
+        for (const [targetId, rel] of relationshipComp.relationships) {
           // Try to get target name
           let targetName = 'Unknown';
           try {
             const targetEntity = world.getEntity(targetId);
-            const targetAgent = targetEntity?.components.get('agent') as unknown as { name?: string } | undefined;
-            if (targetAgent?.name) {
-              targetName = targetAgent.name;
+            const targetIdentity = targetEntity?.getComponent<IdentityComponent>(CT.Identity);
+            if (targetIdentity?.name) {
+              targetName = targetIdentity.name;
             }
           } catch {
             // Target may no longer exist
           }
 
+          // Determine relationship type based on affinity and familiarity
+          let type: RelationshipEntry['type'] = 'stranger';
+          if (rel.romantic?.bondType && rel.romantic.bondType !== 'none') {
+            type = 'family'; // Romantic partners are close like family
+          } else if (rel.affinity > 50) {
+            type = 'friend';
+          } else if (rel.affinity < -30) {
+            type = 'rival';
+          } else if (rel.familiarity > 40) {
+            type = 'acquaintance';
+          }
+
           const entry: RelationshipEntry = {
             targetId,
             targetName,
-            strength: rel.strength,
-            type: (rel.type as RelationshipEntry['type']) || 'acquaintance',
-            lastInteraction: rel.lastInteraction || null,
-            interactionCount: rel.interactionCount || 0,
-            sharedMemories: rel.sharedMemories || 0,
+            strength: rel.affinity, // Use affinity as strength
+            type,
+            lastInteraction: rel.lastInteraction,
+            interactionCount: rel.interactionCount,
+            sharedMemories: rel.sharedMemories,
           };
 
           relationships.push(entry);
 
-          if (rel.strength > 50) friendCount++;
-          if (rel.strength < -30) rivalCount++;
+          if (rel.affinity > 50) friendCount++;
+          if (rel.affinity < -30) rivalCount++;
         }
       }
 
       // Sort by strength (strongest relationships first)
       relationships.sort((a, b) => Math.abs(b.strength) - Math.abs(a.strength));
 
+      // Get agent name from identity component
+      const identity = entity.getComponent<IdentityComponent>(CT.Identity);
+
       return {
         timestamp: Date.now(),
         available: true,
         agentId: selectedEntityId,
-        agentName: agent.name || null,
+        agentName: identity?.name || null,
         totalRelationships: relationships.length,
         friendCount,
         rivalCount,
         relationships,
-        sociability: personality?.sociability ?? null,
+        sociability: personality?.extraversion ?? null, // Use extraversion as sociability
         isIsolated: relationships.length === 0,
       };
     } catch (error) {
