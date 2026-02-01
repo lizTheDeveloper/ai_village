@@ -217,7 +217,6 @@ export class WildPlantPopulationSystem extends BaseSystem {
 
   /** Cached world reference for event handlers */
   private lastWorld: World | null = null;
-  }
 
   /**
    * Add a seed to the soil seed bank

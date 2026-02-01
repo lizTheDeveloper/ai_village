@@ -257,8 +257,14 @@ export class PlantDiseaseSystem extends BaseSystem {
 
   /**
    * Get current game day from TimeSystem
+   * PERFORMANCE: Caches result per frame to avoid repeated time entity queries
    */
-  private getCurrentGameDay(world: World): number{
+  private getCurrentGameDay(world: World): number {
+    // Check if already cached for this tick
+    if (world.tick === this.cachedGameDayTick) {
+      return this.cachedGameDay;
+    }
+
     // Query TimeSystem for actual game day
     const timeEntities = world.query().with(CT.Time).executeEntities();
     if (timeEntities.length > 0) {
@@ -266,13 +272,19 @@ export class PlantDiseaseSystem extends BaseSystem {
       if (timeEntity) {
         const timeComp = timeEntity.components.get('time') as { day?: number } | undefined;
         if (timeComp && typeof timeComp.day === 'number') {
-          return timeComp.day;
+          // Cache the result
+          this.cachedGameDay = timeComp.day;
+          this.cachedGameDayTick = world.tick;
+          return this.cachedGameDay;
         }
       }
     }
 
     // Fallback to real-world day if TimeSystem not available (for testing)
-    return Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+    const fallbackDay = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+    this.cachedGameDay = fallbackDay;
+    this.cachedGameDayTick = world.tick;
+    return fallbackDay;
   }
 
   /**
@@ -493,6 +505,10 @@ export class PlantDiseaseSystem extends BaseSystem {
   // PERFORMANCE: Cache for plant queries to avoid repeated queries in same update cycle
   private cachedPlants: ReadonlyArray<Entity> | null = null;
   private cachedPlantsTickStamp: number = -1;
+
+  // PERFORMANCE: Cache getCurrentGameDay result per frame
+  private cachedGameDay: number = 0;
+  private cachedGameDayTick: number = -1;
 
   /**
    * Get cached plants for this update cycle
