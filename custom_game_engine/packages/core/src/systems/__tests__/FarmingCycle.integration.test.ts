@@ -5,6 +5,7 @@ import { PlantSystem } from '@ai-village/botany';
 import { SoilSystem } from '../SoilSystem.js';
 import { WeatherSystem } from '../WeatherSystem.js';
 import { TimeSystem } from '../TimeSystem.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 /**
  * Integration tests for Complete Farming Cycle (plant to harvest)
@@ -27,7 +28,7 @@ describe('Complete Farming Cycle Integration', () => {
   });
 
   it('should plant system process plants over time', () => {
-    const plantSystem = new PlantSystem(harness.world.eventBus);
+    const plantSystem = new PlantSystem(harness.eventBus);
     const timeSystem = new TimeSystem();
 
     harness.registerSystem('PlantSystem', plantSystem);
@@ -49,7 +50,7 @@ describe('Complete Farming Cycle Integration', () => {
   });
 
   it('should soil system manage moisture and nutrients', () => {
-    const soilSystem = new SoilSystem(harness.world.eventBus);
+    const soilSystem = new SoilSystem(harness.eventBus);
     harness.registerSystem('SoilSystem', soilSystem);
 
     harness.clearEvents();
@@ -66,8 +67,8 @@ describe('Complete Farming Cycle Integration', () => {
   });
 
   it('should weather affect soil moisture', () => {
-    const soilSystem = new SoilSystem(harness.world.eventBus);
-    const weatherSystem = new WeatherSystem(harness.world.eventBus);
+    const soilSystem = new SoilSystem(harness.eventBus);
+    const weatherSystem = new WeatherSystem(harness.eventBus);
 
     harness.registerSystem('SoilSystem', soilSystem);
     harness.registerSystem('WeatherSystem', weatherSystem);
@@ -75,7 +76,7 @@ describe('Complete Farming Cycle Integration', () => {
     harness.clearEvents();
 
     // Emit rain event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'weather:rain',
       source: 'system',
       data: {
@@ -94,7 +95,7 @@ describe('Complete Farming Cycle Integration', () => {
   });
 
   it('should time progression trigger plant growth', () => {
-    const plantSystem = new PlantSystem(harness.world.eventBus);
+    const plantSystem = new PlantSystem(harness.eventBus);
     const timeSystem = new TimeSystem();
 
     harness.registerSystem('PlantSystem', plantSystem);
@@ -118,7 +119,7 @@ describe('Complete Farming Cycle Integration', () => {
   });
 
   it('should soil nutrients deplete with plant growth', () => {
-    const soilSystem = new SoilSystem(harness.world.eventBus);
+    const soilSystem = new SoilSystem(harness.eventBus);
     harness.registerSystem('SoilSystem', soilSystem);
 
     harness.clearEvents();
@@ -136,13 +137,13 @@ describe('Complete Farming Cycle Integration', () => {
   });
 
   it('should watering increase soil moisture', () => {
-    const soilSystem = new SoilSystem(harness.world.eventBus);
+    const soilSystem = new SoilSystem(harness.eventBus);
     harness.registerSystem('SoilSystem', soilSystem);
 
     harness.clearEvents();
 
     // Emit watering event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'soil:watered',
       source: 'test-agent',
       data: {
@@ -162,13 +163,13 @@ describe('Complete Farming Cycle Integration', () => {
   });
 
   it('should fertilizing boost soil nutrients', () => {
-    const soilSystem = new SoilSystem(harness.world.eventBus);
+    const soilSystem = new SoilSystem(harness.eventBus);
     harness.registerSystem('SoilSystem', soilSystem);
 
     harness.clearEvents();
 
     // Emit fertilizing event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'soil:fertilized',
       source: 'test-agent',
       data: {
@@ -190,13 +191,13 @@ describe('Complete Farming Cycle Integration', () => {
   });
 
   it('should tilling prepare soil for planting', () => {
-    const soilSystem = new SoilSystem(harness.world.eventBus);
+    const soilSystem = new SoilSystem(harness.eventBus);
     harness.registerSystem('SoilSystem', soilSystem);
 
     harness.clearEvents();
 
     // Emit tilling event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'soil:tilled',
       source: 'test-agent',
       data: {
@@ -215,8 +216,8 @@ describe('Complete Farming Cycle Integration', () => {
   });
 
   it('should harvest cycle complete from seed to harvest', () => {
-    const plantSystem = new PlantSystem(harness.world.eventBus);
-    const soilSystem = new SoilSystem(harness.world.eventBus);
+    const plantSystem = new PlantSystem(harness.eventBus);
+    const soilSystem = new SoilSystem(harness.eventBus);
     const timeSystem = new TimeSystem();
 
     harness.registerSystem('PlantSystem', plantSystem);
@@ -243,7 +244,7 @@ describe('Complete Farming Cycle Integration', () => {
   });
 
   it('should multiple crops grow independently', () => {
-    const plantSystem = new PlantSystem(harness.world.eventBus);
+    const plantSystem = new PlantSystem(harness.eventBus);
     const timeSystem = new TimeSystem();
 
     harness.registerSystem('PlantSystem', plantSystem);
@@ -262,8 +263,8 @@ describe('Complete Farming Cycle Integration', () => {
   });
 
   it('should weather system integrate with farming', () => {
-    const weatherSystem = new WeatherSystem(harness.world.eventBus);
-    const soilSystem = new SoilSystem(harness.world.eventBus);
+    const weatherSystem = new WeatherSystem(harness.eventBus);
+    const soilSystem = new SoilSystem(harness.eventBus);
 
     harness.registerSystem('WeatherSystem', weatherSystem);
     harness.registerSystem('SoilSystem', soilSystem);
@@ -285,8 +286,8 @@ describe('Complete Farming Cycle Integration', () => {
   });
 
   it('should plant health affected by soil conditions', () => {
-    const plantSystem = new PlantSystem(harness.world.eventBus);
-    const soilSystem = new SoilSystem(harness.world.eventBus);
+    const plantSystem = new PlantSystem(harness.eventBus);
+    const soilSystem = new SoilSystem(harness.eventBus);
 
     harness.registerSystem('PlantSystem', plantSystem);
     harness.registerSystem('SoilSystem', soilSystem);

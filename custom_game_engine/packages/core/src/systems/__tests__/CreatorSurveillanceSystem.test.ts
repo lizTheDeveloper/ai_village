@@ -5,6 +5,7 @@ import { SupremeCreatorComponent } from '../../components/SupremeCreatorComponen
 import { DeityComponent } from '../../components/DeityComponent.js';
 import { SpellRegistry } from '../../magic/SpellRegistry.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('CreatorSurveillanceSystem', () => {
   let world: World;
@@ -14,8 +15,8 @@ describe('CreatorSurveillanceSystem', () => {
   let caster: any;
 
   beforeEach(() => {
-    world = new World();
-    eventBus = world.eventBus;
+    eventBus = new EventBusImpl(); world = new World(eventBus);
+    eventBus = eventBus;
     system = new CreatorSurveillanceSystem();
 
     // Reset spell registry

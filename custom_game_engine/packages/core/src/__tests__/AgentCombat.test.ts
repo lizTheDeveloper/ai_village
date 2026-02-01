@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { World } from '../World';
 import { AgentCombatSystem } from '../systems/AgentCombatSystem';
 import type { Entity } from '../ecs/Entity';
+import { EventBusImpl } from '../events/EventBus.js';
 
 /**
  * Tests for AgentCombatSystem - Acceptance Criterion 3
@@ -18,6 +19,7 @@ import type { Entity } from '../ecs/Entity';
  */
 describe('AgentCombatSystem', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let system: AgentCombatSystem;
   let attacker: Entity;
   let defender: Entity;
@@ -25,14 +27,14 @@ describe('AgentCombatSystem', () => {
   let mockLLM: any;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     mockLLM = {
       generateNarrative: vi.fn().mockResolvedValue({
         narrative: 'The two fighters clashed. After a brief struggle, one emerged victorious.',
         memorable_details: ['clashed', 'brief struggle', 'victorious'],
       }),
     };
-    system = new AgentCombatSystem(mockLLM, world.eventBus);
+    system = new AgentCombatSystem(mockLLM, eventBus);
 
     // Create attacker
     attacker = world.createEntity();

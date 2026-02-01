@@ -16,13 +16,15 @@ import { ShipCombatSystem } from '../ShipCombatSystem.js';
 import type { SpaceshipComponent } from '../../navigation/SpaceshipComponent.js';
 import type { ShipCrewComponent } from '../../components/ShipCrewComponent.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('ShipCombatSystem', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let shipCombatSystem: ShipCombatSystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     shipCombatSystem = new ShipCombatSystem();
   });
 
@@ -215,7 +217,7 @@ describe('ShipCombatSystem', () => {
     const defender = createTestShip('Enemy Defender', 1000, 1.0, 20, 0.7);
 
     const events: Array<{ type: string; data: unknown }> = [];
-    world.eventBus.on('*', (event) => {
+    eventBus.on('*', (event) => {
       events.push(event);
     });
 

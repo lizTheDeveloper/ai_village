@@ -475,7 +475,7 @@ export function tameAnimalBehaviorWithContext(ctx: BehaviorContext): ContextBeha
 
     // Attempt taming
     const result = tamingSystem.attemptTaming(
-      world,
+      ctx.world as WorldMutator,
       targetAnimal.animal,
       ctx.entity.id,
       method,

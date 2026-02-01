@@ -16,13 +16,15 @@ import { ComponentType as CT } from '../../types/ComponentType.js';
 import { FederationGovernanceSystem } from '../FederationGovernanceSystem.js';
 import type { FederationGovernanceComponent } from '../../components/FederationGovernanceComponent.js';
 import type { EmpireComponent } from '../../components/EmpireComponent.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('FederationGovernanceSystem', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let system: FederationGovernanceSystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     world.tick = 0;
     system = new FederationGovernanceSystem();
   });
@@ -340,7 +342,7 @@ describe('FederationGovernanceSystem', () => {
 
     // Capture event bus for secession events
     let secessionEvent: any = null;
-    world.eventBus.on('federation:member_seceded', (event: any) => {
+    eventBus.on('federation:member_seceded', (event: any) => {
       secessionEvent = event;
     });
 

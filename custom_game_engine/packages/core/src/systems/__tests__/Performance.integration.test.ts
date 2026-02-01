@@ -13,6 +13,7 @@ import { createCircadianComponent } from '../../components/CircadianComponent.js
 import { createAgentComponent } from '../../components/AgentComponent.js';
 import { createMovementComponent } from '../../components/MovementComponent.js';
 import { ComponentType } from '../../types/ComponentType.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 /**
  * Integration tests for Performance Monitoring
@@ -42,7 +43,7 @@ describe('Performance Monitoring Integration', () => {
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
-    const aiSystem = new AgentBrainSystem(harness.world.eventBus);
+    const aiSystem = new AgentBrainSystem(harness.eventBus);
     const needsSystem = new NeedsSystem();
 
     harness.registerSystem('AgentBrainSystem', aiSystem);
@@ -80,7 +81,7 @@ describe('Performance Monitoring Integration', () => {
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
-    const aiSystem = new AgentBrainSystem(harness.world.eventBus);
+    const aiSystem = new AgentBrainSystem(harness.eventBus);
     const needsSystem = new NeedsSystem();
 
     harness.registerSystem('AgentBrainSystem', aiSystem);
@@ -207,8 +208,8 @@ describe('Performance Monitoring Integration', () => {
     const stateMutator = new StateMutatorSystem();
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
-    const aiSystem = new AgentBrainSystem(harness.world.eventBus);
-    const plantSystem = new PlantSystem(harness.world.eventBus);
+    const aiSystem = new AgentBrainSystem(harness.eventBus);
+    const plantSystem = new PlantSystem(harness.eventBus);
     const animalSystem = new AnimalSystem();
 
     harness.registerSystem('AgentBrainSystem', aiSystem);
@@ -254,7 +255,7 @@ describe('Performance Monitoring Integration', () => {
     const listeners: Array<() => void> = [];
 
     for (let i = 0; i < 10; i++) {
-      const unsubscribe = harness.world.eventBus.subscribe('world:tick:start', () => {
+      const unsubscribe = harness.eventBus.subscribe('world:tick:start', () => {
         // Empty listener
       });
       listeners.push(unsubscribe);
@@ -263,7 +264,7 @@ describe('Performance Monitoring Integration', () => {
     const startTime = performance.now();
 
     // Emit event with many listeners
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'world:tick:start',
       source: 'test',
       data: { tick: 1 },
@@ -352,7 +353,7 @@ describe('Performance Monitoring Integration', () => {
   });
 
   it('should teardown cleanup properly', () => {
-    const aiSystem = new AgentBrainSystem(harness.world.eventBus);
+    const aiSystem = new AgentBrainSystem(harness.eventBus);
     harness.registerSystem('AgentBrainSystem', aiSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });

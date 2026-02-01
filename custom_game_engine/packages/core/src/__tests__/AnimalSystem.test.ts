@@ -405,7 +405,7 @@ describe('Animal System', () => {
       animalSystem.update(world, entities, 86400);
 
       // Flush event queue to dispatch queued events
-      world.eventBus.flush();
+      eventBus.flush();
 
       expect(eventHandler).toHaveBeenCalled();
     });

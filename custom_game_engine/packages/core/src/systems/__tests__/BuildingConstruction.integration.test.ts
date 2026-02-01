@@ -9,6 +9,7 @@ import { createBuildingComponent } from '../../components/BuildingComponent.js';
 
 import { ComponentType } from '../../types/ComponentType.js';
 import { BuildingType } from '../../types/BuildingType.js';
+import { EventBusImpl } from '../events/EventBus.js';
 /**
  * Integration tests for BuildingSystem + ResourceGatheringSystem + InventorySystem
  *
@@ -41,7 +42,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     }));
 
     const buildingSystem = new BuildingSystem();
-    buildingSystem.initialize(harness.world, harness.world.eventBus);
+    buildingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('BuildingSystem', buildingSystem);
 
     const entities = Array.from(harness.world.entities.values());
@@ -68,7 +69,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     }));
 
     const buildingSystem = new BuildingSystem();
-    buildingSystem.initialize(harness.world, harness.world.eventBus);
+    buildingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('BuildingSystem', buildingSystem);
 
     harness.clearEvents();
@@ -95,7 +96,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     }));
 
     const buildingSystem = new BuildingSystem();
-    buildingSystem.initialize(harness.world, harness.world.eventBus);
+    buildingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('BuildingSystem', buildingSystem);
 
     const entities = Array.from(harness.world.entities.values());
@@ -104,7 +105,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     buildingSystem.update(harness.world, entities, 2.0);
 
     // Manually emit completion event to trigger fuel initialization
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'building:complete',
       source: building.id,
       data: {
@@ -277,11 +278,11 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
 
     // Initialize BuildingSystem AFTER agent exists so it can find resources
     const buildingSystem = new BuildingSystem();
-    buildingSystem.initialize(harness.world, harness.world.eventBus);
+    buildingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('BuildingSystem', buildingSystem);
 
     // Emit placement confirmed event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'building:placement:confirmed',
       source: 'test',
       data: {
@@ -292,7 +293,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     });
 
     // Flush the event queue so the event is processed immediately
-    harness.world.eventBus.flush();
+    harness.eventBus.flush();
 
     // Check that a new entity was created
     const finalEntityCount = harness.world.entities.size;
@@ -311,7 +312,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     }));
 
     const buildingSystem = new BuildingSystem();
-    buildingSystem.initialize(harness.world, harness.world.eventBus);
+    buildingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('BuildingSystem', buildingSystem);
 
     const entities = Array.from(harness.world.entities.values());
@@ -333,11 +334,11 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     const building = harness.createTestBuilding('farm_shed', { x: 10, y: 10 });
 
     const buildingSystem = new BuildingSystem();
-    buildingSystem.initialize(harness.world, harness.world.eventBus);
+    buildingSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('BuildingSystem', buildingSystem);
 
     // Emit completion event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'building:complete',
       source: building.id,
       data: {

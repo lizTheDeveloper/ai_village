@@ -15,6 +15,7 @@ import type { World } from '../../ecs/World.js';
 
 import { AgentBrainSystem, createAgentBrainSystem } from '../AgentBrainSystem.js';
 import { BehaviorRegistry } from '../../behavior/BehaviorRegistry.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 // Helper to create a mock agent component
 function createMockAgent(overrides: Partial<AgentComponent> = {}): AgentComponent {
@@ -242,7 +243,7 @@ describe('AgentBrainSystem', () => {
 
       system.update(world, [entity], 0.05);
 
-      expect(world.eventBus.emit).toHaveBeenCalledWith(
+      expect(eventBus.emit).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'agent:queue:interrupted',
           data: expect.objectContaining({

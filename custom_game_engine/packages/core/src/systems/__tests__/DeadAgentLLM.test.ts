@@ -15,13 +15,15 @@ import type { NeedsComponent } from '../../components/NeedsComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { MovementComponent } from '../../components/MovementComponent.js';
 import type { AfterlifeComponent } from '../../components/AfterlifeComponent.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('Dead Agent LLM Prevention', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let system: AgentBrainSystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new AgentBrainSystem();
   });
 

@@ -19,7 +19,7 @@ describe('UpliftBreedingProgramSystem - Initialization', () => {
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new UpliftBreedingProgramSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -42,7 +42,7 @@ describe('UpliftBreedingProgramSystem - Generation Advancement', () => {
   let program: UpliftProgramComponent;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new UpliftBreedingProgramSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -126,7 +126,7 @@ describe('UpliftBreedingProgramSystem - Breeding Selection', () => {
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new UpliftBreedingProgramSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -182,7 +182,7 @@ describe('UpliftBreedingProgramSystem - Stage Transitions', () => {
   let programEntity: Entity;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new UpliftBreedingProgramSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -256,7 +256,7 @@ describe('UpliftBreedingProgramSystem - Technology Effects', () => {
   let wolfIds: string[];
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new UpliftBreedingProgramSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -315,7 +315,7 @@ describe('UpliftBreedingProgramSystem - Breakthrough Events', () => {
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new UpliftBreedingProgramSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -364,7 +364,7 @@ describe('UpliftBreedingProgramSystem - Population Management', () => {
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new UpliftBreedingProgramSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
@@ -411,7 +411,7 @@ describe('UpliftBreedingProgramSystem - Notable Individuals', () => {
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new UpliftBreedingProgramSystem();
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);

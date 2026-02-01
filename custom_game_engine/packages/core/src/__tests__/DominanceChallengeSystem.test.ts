@@ -3,14 +3,16 @@ import { World } from '../World.js';
 import { DominanceChallengeSystem } from '../systems/DominanceChallengeSystem.js';
 import { createConflictComponent } from '../components/ConflictComponent.js';
 import { createDominanceRankComponent } from '../components/DominanceRankComponent.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('DominanceChallengeSystem', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let system: DominanceChallengeSystem;
 
   beforeEach(() => {
-    world = new World();
-    system = new DominanceChallengeSystem(world.eventBus);
+    eventBus = new EventBusImpl(); world = new World(eventBus);
+    system = new DominanceChallengeSystem(eventBus);
   });
 
   describe('Challenge Resolution', () => {
@@ -72,13 +74,13 @@ describe('DominanceChallengeSystem', () => {
 
       // Track events
       const events: any[] = [];
-      world.eventBus.on('dominance:resolved', (data) => events.push({ type: 'resolved', data }));
-      world.eventBus.on('dominance:challenge', (data) => events.push({ type: 'challenge', data }));
+      eventBus.on('dominance:resolved', (data) => events.push({ type: 'resolved', data }));
+      eventBus.on('dominance:challenge', (data) => events.push({ type: 'challenge', data }));
 
       // Run system
       const entities = world.getAllEntities();
       system.update(world, entities, 1000);
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Verify challenge was resolved
       const conflict = world.getComponent(challenger.id, 'conflict');
@@ -149,7 +151,7 @@ describe('DominanceChallengeSystem', () => {
       let challengerWon = false;
       for (let i = 0; i < 20; i++) {
         system.update(world, entities, 1000);
-        world.eventBus.flush();
+        eventBus.flush();
 
         const challengerRank = world.getComponent(challenger.id, 'dominance_rank');
         if (challengerRank && challengerRank.rank === 2) {
@@ -231,7 +233,7 @@ describe('DominanceChallengeSystem', () => {
       // Run system
       const entities = world.getAllEntities();
       system.update(world, entities, 1000);
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Verify challenge was resolved
       const conflict = world.getComponent(challenger.id, 'conflict');
@@ -301,7 +303,7 @@ describe('DominanceChallengeSystem', () => {
       let resolved = false;
       for (let i = 0; i < 20; i++) {
         system.update(world, entities, 1000);
-        world.eventBus.flush();
+        eventBus.flush();
 
         const conflict = world.getComponent(challenger.id, 'conflict');
         if (conflict?.state === 'resolved') {
@@ -513,7 +515,7 @@ describe('DominanceChallengeSystem', () => {
 
       const entities = world.getAllEntities();
       system.update(world, entities, 1000);
-      world.eventBus.flush();
+      eventBus.flush();
 
       const conflict = world.getComponent(challenger.id, 'conflict');
       expect(conflict?.state).toBe('resolved');
@@ -564,7 +566,7 @@ describe('DominanceChallengeSystem', () => {
 
       const entities = world.getAllEntities();
       system.update(world, entities, 1000);
-      world.eventBus.flush();
+      eventBus.flush();
 
       const conflict = world.getComponent(challenger.id, 'conflict');
       expect(conflict?.state).toBe('resolved');

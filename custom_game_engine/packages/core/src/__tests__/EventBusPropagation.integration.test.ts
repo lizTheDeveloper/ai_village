@@ -10,6 +10,7 @@ import { MemoryComponent } from '../components/MemoryComponent.js';
 import { NeedsComponent } from '../components/NeedsComponent.js';
 
 import { ComponentType } from '../types/ComponentType.js';
+import { EventBusImpl } from '../events/EventBus.js';
 /**
  * Integration tests for EventBus event propagation across systems
  *
@@ -41,14 +42,14 @@ describe('EventBus Propagation Integration', () => {
   }));
 
     // Create systems that listen to events - pass eventBus
-    const memorySystem = new MemoryFormationSystem(harness.world.eventBus);
+    const memorySystem = new MemoryFormationSystem(harness.eventBus);
     harness.registerSystem('MemoryFormationSystem', memorySystem);
 
     // Clear setup events
     harness.clearEvents();
 
     // Emit a test event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'resource:gathered',
       source: agent.id,
       data: {
@@ -59,7 +60,7 @@ describe('EventBus Propagation Integration', () => {
     });
 
     // Flush event queue to dispatch events
-    harness.world.eventBus.flush();
+    harness.eventBus.flush();
 
     // Verify event was emitted
     const events = harness.getEmittedEvents('resource:gathered');
@@ -124,7 +125,7 @@ describe('EventBus Propagation Integration', () => {
     // Emit many events rapidly
     const eventCount = 100;
     for (let i = 0; i < eventCount; i++) {
-      harness.world.eventBus.emit({
+      harness.eventBus.emit({
         type: 'test:rapid_event',
         source: 'test',
         data: { index: i },
@@ -146,7 +147,7 @@ describe('EventBus Propagation Integration', () => {
     harness.clearEvents();
 
     // Emit event with full payload
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'action:completed',
       source: 'agent-1',
       data: {
@@ -171,12 +172,12 @@ describe('EventBus Propagation Integration', () => {
     const maxCallCount = 10;
 
     // Subscribe to an event that might trigger itself
-    const unsub = harness.world.eventBus.subscribe('test:chain', () => {
+    const unsub = harness.eventBus.subscribe('test:chain', () => {
       eventHandlerCallCount++;
 
       // Prevent infinite loop in test
       if (eventHandlerCallCount < maxCallCount) {
-        harness.world.eventBus.emit({
+        harness.eventBus.emit({
           type: 'test:chain_response',
           source: 'handler',
           data: { count: eventHandlerCallCount },
@@ -187,7 +188,7 @@ describe('EventBus Propagation Integration', () => {
     harness.clearEvents();
 
     // Trigger the chain
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'test:chain',
       source: 'test',
       data: {},
@@ -211,7 +212,7 @@ describe('EventBus Propagation Integration', () => {
   }));
 
     // Subscribe to event and modify agent
-    const unsub = harness.world.eventBus.subscribe('test:modify_agent', (event: Record<string, unknown>) => {
+    const unsub = harness.eventBus.subscribe('test:modify_agent', (event: Record<string, unknown>) => {
       const targetEntity = harness.world.getEntity(event.data.entityId);
       if (targetEntity) {
         (targetEntity as EntityWithMethods).updateComponent('needs', (current: Record<string, unknown>) => ({
@@ -224,14 +225,14 @@ describe('EventBus Propagation Integration', () => {
     harness.clearEvents();
 
     // Emit event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'test:modify_agent',
       source: 'test',
       data: { entityId: agent.id },
     });
 
     // Flush event queue to dispatch events
-    harness.world.eventBus.flush();
+    harness.eventBus.flush();
 
     // Cleanup
     unsub();
@@ -246,29 +247,29 @@ describe('EventBus Propagation Integration', () => {
     let subscriber2Called = false;
     let subscriber3Called = false;
 
-    const unsub1 = harness.world.eventBus.subscribe('test:multi_sub', () => {
+    const unsub1 = harness.eventBus.subscribe('test:multi_sub', () => {
       subscriber1Called = true;
     });
 
-    const unsub2 = harness.world.eventBus.subscribe('test:multi_sub', () => {
+    const unsub2 = harness.eventBus.subscribe('test:multi_sub', () => {
       subscriber2Called = true;
     });
 
-    const unsub3 = harness.world.eventBus.subscribe('test:multi_sub', () => {
+    const unsub3 = harness.eventBus.subscribe('test:multi_sub', () => {
       subscriber3Called = true;
     });
 
     harness.clearEvents();
 
     // Emit event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'test:multi_sub',
       source: 'test',
       data: {},
     });
 
     // Flush event queue to dispatch events
-    harness.world.eventBus.flush();
+    harness.eventBus.flush();
 
     // Cleanup
     unsub1();
@@ -284,21 +285,21 @@ describe('EventBus Propagation Integration', () => {
   it('should properly unsubscribe event listeners', () => {
     let callCount = 0;
 
-    const unsub = harness.world.eventBus.subscribe('test:unsub', () => {
+    const unsub = harness.eventBus.subscribe('test:unsub', () => {
       callCount++;
     });
 
     harness.clearEvents();
 
     // Emit first event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'test:unsub',
       source: 'test',
       data: {},
     });
 
     // Flush to dispatch the first event
-    harness.world.eventBus.flush();
+    harness.eventBus.flush();
 
     expect(callCount).toBe(1);
 
@@ -306,14 +307,14 @@ describe('EventBus Propagation Integration', () => {
     unsub();
 
     // Emit second event
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'test:unsub',
       source: 'test',
       data: {},
     });
 
     // Flush to dispatch the second event
-    harness.world.eventBus.flush();
+    harness.eventBus.flush();
 
     // Call count should not increase
     expect(callCount).toBe(1);
@@ -339,7 +340,7 @@ describe('EventBus Propagation Integration', () => {
 
     harness.clearEvents();
 
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'test:complex_payload',
       source: 'test',
       data: complexData,

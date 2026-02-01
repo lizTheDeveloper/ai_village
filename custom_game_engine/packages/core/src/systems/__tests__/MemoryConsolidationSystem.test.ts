@@ -3,6 +3,7 @@ import { World } from '../../World';
 import { MemoryConsolidationSystem } from '../MemoryConsolidationSystem';
 import { EpisodicMemoryComponent } from '../../components/EpisodicMemoryComponent';
 import { EventBus } from '../../EventBus';
+import { EventBusImpl } from '../events/EventBus.js';
 
 // Type helpers for testing
 type EntityWithMethods = {
@@ -25,7 +26,7 @@ describe('MemoryConsolidationSystem', () => {
   let agent: any;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     eventBus = new EventBus();
     system = new MemoryConsolidationSystem(eventBus);
     agent = world.createEntity();

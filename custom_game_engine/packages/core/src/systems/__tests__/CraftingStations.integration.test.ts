@@ -7,6 +7,7 @@ import type { BuildingComponent } from '../../components/BuildingComponent.js';
 
 import { ComponentType } from '../../types/ComponentType.js';
 import { BuildingType } from '../../types/BuildingType.js';
+import { EventBusImpl } from '../events/EventBus.js';
 /**
  * Integration tests for Crafting Stations (Phase 10)
  *
@@ -122,8 +123,8 @@ describe('CraftingStations Integration', () => {
       }));
 
       const buildingSystem = new BuildingSystem();
-      // Important: Pass world.eventBus to initialize, same instance used below
-      buildingSystem.initialize(harness.world, harness.world.eventBus);
+      // Important: Pass eventBus to initialize, same instance used below
+      buildingSystem.initialize(harness.world, harness.eventBus);
 
       // Manually initialize fuel properties to test expectations
       // (Event handler subscription is not working in tests - needs investigation)
@@ -160,7 +161,7 @@ describe('CraftingStations Integration', () => {
       }));
 
       const buildingSystem = new BuildingSystem();
-      buildingSystem.initialize(harness.world, harness.world.eventBus);
+      buildingSystem.initialize(harness.world, harness.eventBus);
 
       const initialFuel = (building.getComponent(ComponentType.Building) as BuildingComponent).currentFuel;
 
@@ -191,7 +192,7 @@ describe('CraftingStations Integration', () => {
       }));
 
       const buildingSystem = new BuildingSystem();
-      buildingSystem.initialize(harness.world, harness.world.eventBus);
+      buildingSystem.initialize(harness.world, harness.eventBus);
 
       const initialFuel = (building.getComponent(ComponentType.Building) as BuildingComponent).currentFuel;
 
@@ -222,7 +223,7 @@ describe('CraftingStations Integration', () => {
       }));
 
       const buildingSystem = new BuildingSystem();
-      buildingSystem.initialize(harness.world, harness.world.eventBus);
+      buildingSystem.initialize(harness.world, harness.eventBus);
 
       harness.clearEvents();
 
@@ -258,7 +259,7 @@ describe('CraftingStations Integration', () => {
       }));
 
       const buildingSystem = new BuildingSystem();
-      buildingSystem.initialize(harness.world, harness.world.eventBus);
+      buildingSystem.initialize(harness.world, harness.eventBus);
 
       harness.clearEvents();
 
@@ -295,10 +296,10 @@ describe('CraftingStations Integration', () => {
       }));
 
       const buildingSystem = new BuildingSystem();
-      buildingSystem.initialize(harness.world, harness.world.eventBus);
+      buildingSystem.initialize(harness.world, harness.eventBus);
 
       // Emit building completion event
-      harness.world.eventBus.emit({
+      harness.eventBus.emit({
         type: 'building:complete',
         source: building.id,
         data: {
@@ -330,7 +331,7 @@ describe('CraftingStations Integration', () => {
       }));
 
       const buildingSystem = new BuildingSystem();
-      buildingSystem.initialize(harness.world, harness.world.eventBus);
+      buildingSystem.initialize(harness.world, harness.eventBus);
 
       const entities = Array.from(harness.world.entities.values());
 
@@ -411,11 +412,11 @@ describe('CraftingStations Integration', () => {
 
     it('should not throw when building entity not found on completion', () => {
       const buildingSystem = new BuildingSystem();
-      buildingSystem.initialize(harness.world, harness.world.eventBus);
+      buildingSystem.initialize(harness.world, harness.eventBus);
 
       // Emit completion event with non-existent entity ID should not throw
       expect(() => {
-        harness.world.eventBus.emit({
+        harness.eventBus.emit({
           type: 'building:complete',
           source: 'non-existent-id',
           data: {

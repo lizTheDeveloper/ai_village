@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { EventBus } from '@ai-village/core/events/EventBus';
 import { World } from '@ai-village/core/ecs/World';
 import { Entity } from '@ai-village/core/ecs/Entity';
+import { EventBusImpl } from '@ai-village/core';
 
 // Mock StanceControls - will be implemented
 class StanceControls {
@@ -40,7 +41,7 @@ describe.skip('StanceControls', () => {
 
   beforeEach(() => {
     eventBus = new EventBus();
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     controls = new StanceControls(eventBus, world);
   });
 

@@ -26,6 +26,7 @@ type WorldWithMethods = Record<string, unknown> & {
 describe('DeathBargainSystem', () => {
   let system: DeathBargainSystem;
   let world: World;
+  let eventBus: EventBusImpl;
   let mockLLM: LLMProvider;
 
   beforeEach(() => {
@@ -91,14 +92,14 @@ describe('DeathBargainSystem', () => {
       const events: any[] = [];
 
       // Register event listener BEFORE calling the system
-      (world.eventBus as Record<string, unknown>).on('death:bargain_offered', (event: Record<string, unknown>) => {
+      (eventBus as Record<string, unknown>).on('death:bargain_offered', (event: Record<string, unknown>) => {
         events.push(event);
       });
 
       system.offerDeathBargain(world, entity, { x: 0, y: 0 }, 'starvation');
 
       // Flush event queue to process events
-      (world.eventBus as Record<string, unknown>).flush();
+      (eventBus as Record<string, unknown>).flush();
 
       // Events should now be processed
       expect(events.length).toBeGreaterThan(0);

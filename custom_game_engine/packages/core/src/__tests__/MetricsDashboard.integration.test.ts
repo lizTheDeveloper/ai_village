@@ -3,15 +3,17 @@ import { World } from '../World';
 import { MetricsCollector } from '../metrics/MetricsCollector';
 import { MetricsDashboard } from '../metrics/MetricsDashboard';
 import { MetricsAnalysis } from '../metrics/MetricsAnalysis';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('MetricsDashboard Integration', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let collector: MetricsCollector;
   let analysis: MetricsAnalysis;
   let dashboard: MetricsDashboard;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     collector = new MetricsCollector(world);
     analysis = new MetricsAnalysis(collector);
     dashboard = new MetricsDashboard(collector, analysis);

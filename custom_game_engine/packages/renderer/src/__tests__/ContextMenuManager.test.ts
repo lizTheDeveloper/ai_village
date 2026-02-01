@@ -3,6 +3,7 @@ import { ContextMenuManager } from '../ContextMenuManager';
 import { World, EventBusImpl } from '@ai-village/core';
 import { Camera } from '../Camera';
 import { MenuContext } from '../context-menu/MenuContext';
+import { EventBusImpl } from '@ai-village/core';
 
 describe('ContextMenuManager', () => {
   let manager: ContextMenuManager;
@@ -22,7 +23,7 @@ describe('ContextMenuManager', () => {
 
   beforeEach(() => {
     vi.useFakeTimers();
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     eventBus = new EventBusImpl();
     canvas = document.createElement('canvas');
     canvas.width = 800;

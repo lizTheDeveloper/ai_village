@@ -62,7 +62,7 @@ describe('BuildingSystem', () => {
     });
 
     it('should subscribe to building:placement:confirmed event', () => {
-      const subscribeSpy = vi.spyOn(world.eventBus, 'subscribe');
+      const subscribeSpy = vi.spyOn(eventBus, 'subscribe');
       const newSystem = new BuildingSystem();
       newSystem.initialize(world, eventBus);
 
@@ -70,7 +70,7 @@ describe('BuildingSystem', () => {
     });
 
     it('should subscribe to building:complete event', () => {
-      const subscribeSpy = vi.spyOn(world.eventBus, 'subscribe');
+      const subscribeSpy = vi.spyOn(eventBus, 'subscribe');
       const newSystem = new BuildingSystem();
       newSystem.initialize(world, eventBus);
 
@@ -78,7 +78,7 @@ describe('BuildingSystem', () => {
     });
 
     it('should only initialize once', () => {
-      const subscribeSpy = vi.spyOn(world.eventBus, 'subscribe');
+      const subscribeSpy = vi.spyOn(eventBus, 'subscribe');
       const newSystem = new BuildingSystem();
 
       newSystem.initialize(world, eventBus);
@@ -122,7 +122,7 @@ describe('BuildingSystem', () => {
 
     it('should emit building:complete event when construction finishes', () => {
       const completeHandler = vi.fn();
-      world.eventBus.subscribe('building:complete', completeHandler);
+      eventBus.subscribe('building:complete', completeHandler);
 
       const entity = world.createEntity() as EntityImpl;
       const building = createBuildingComponent(BuildingType.Workbench, 1, 99.5);
@@ -132,7 +132,7 @@ describe('BuildingSystem', () => {
       const entities = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
       system.update(world, entities, 5.0);
 
-      world.eventBus.flush();
+      eventBus.flush();
       expect(completeHandler).toHaveBeenCalled();
       expect(completeHandler.mock.calls[0][0].data.buildingType).toBe('workbench');
     });
@@ -187,12 +187,12 @@ describe('BuildingSystem', () => {
 
     it('should emit building:placement:failed event on unknown building type', () => {
       const failHandler = vi.fn();
-      world.eventBus.subscribe('building:placement:failed', failHandler);
+      eventBus.subscribe('building:placement:failed', failHandler);
 
       // Spy on console.error to detect that an error was logged
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'building:placement:confirmed',
         source: 'test',
         data: {
@@ -204,7 +204,7 @@ describe('BuildingSystem', () => {
 
       // Event handler catches errors internally (per EventBus.dispatchEvent)
       // System should either emit building:placement:failed OR log an error
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Verify that either the fail handler was called OR an error was logged
       const errorWasHandled = failHandler.mock.calls.length > 0 || consoleErrorSpy.mock.calls.length > 0;
@@ -219,7 +219,7 @@ describe('BuildingSystem', () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       expect(() => {
-        world.eventBus.emit({
+        eventBus.emit({
           type: 'building:complete',
           source: 'test',
           data: {
@@ -228,7 +228,7 @@ describe('BuildingSystem', () => {
           },
         });
 
-        world.eventBus.flush();
+        eventBus.flush();
       }).not.toThrow(); // Should not crash
 
       // Error should be logged to console
@@ -244,7 +244,7 @@ describe('BuildingSystem', () => {
       createStorageWithResources(world, { wood: 25 });
       const initialEntityCount = world.query().executeEntities().length;
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'building:placement:confirmed',
         source: 'test',
         data: {
@@ -255,7 +255,7 @@ describe('BuildingSystem', () => {
       });
 
       // Flush events to process placement
-      world.eventBus.flush();
+      eventBus.flush();
 
       const newEntityCount = world.query().executeEntities().length;
       expect(newEntityCount).toBe(initialEntityCount + 1);
@@ -265,7 +265,7 @@ describe('BuildingSystem', () => {
       // Provide resources for workbench (requires 20 wood)
       createStorageWithResources(world, { wood: 25 });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'building:placement:confirmed',
         source: 'test',
         data: {
@@ -276,7 +276,7 @@ describe('BuildingSystem', () => {
       });
 
       // Flush events to process placement
-      world.eventBus.flush();
+      eventBus.flush();
 
       const buildings = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
       const building = buildings[buildings.length - 1]; // Get last added
@@ -291,7 +291,7 @@ describe('BuildingSystem', () => {
       // Provide resources for workbench (requires 20 wood)
       createStorageWithResources(world, { wood: 25 });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'building:placement:confirmed',
         source: 'test',
         data: {
@@ -302,7 +302,7 @@ describe('BuildingSystem', () => {
       });
 
       // Flush events to process placement
-      world.eventBus.flush();
+      eventBus.flush();
 
       const buildings = world.query().with(ComponentType.Building).executeEntities();
       const building = buildings[buildings.length - 1];
@@ -316,9 +316,9 @@ describe('BuildingSystem', () => {
       // Provide resources for workbench (requires 20 wood)
       createStorageWithResources(world, { wood: 25 });
       const startHandler = vi.fn();
-      world.eventBus.subscribe('construction:started', startHandler);
+      eventBus.subscribe('construction:started', startHandler);
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'building:placement:confirmed',
         source: 'test',
         data: {
@@ -330,9 +330,9 @@ describe('BuildingSystem', () => {
 
       // First flush processes building:placement:confirmed
       // Handler emits construction:started which gets queued
-      world.eventBus.flush();
+      eventBus.flush();
       // Second flush processes the cascaded construction:started event
-      world.eventBus.flush();
+      eventBus.flush();
       expect(startHandler).toHaveBeenCalled();
       expect(startHandler.mock.calls[0][0].data.blueprintId).toBe('workbench');
     });
@@ -341,9 +341,9 @@ describe('BuildingSystem', () => {
       // Provide resources for workbench (requires 20 wood)
       createStorageWithResources(world, { wood: 25 });
       const completeHandler = vi.fn();
-      world.eventBus.subscribe('building:placement:complete', completeHandler);
+      eventBus.subscribe('building:placement:complete', completeHandler);
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'building:placement:confirmed',
         source: 'test',
         data: {
@@ -355,9 +355,9 @@ describe('BuildingSystem', () => {
 
       // First flush processes building:placement:confirmed
       // Handler emits building:placement:complete which gets queued
-      world.eventBus.flush();
+      eventBus.flush();
       // Second flush processes the cascaded event
-      world.eventBus.flush();
+      eventBus.flush();
       expect(completeHandler).toHaveBeenCalled();
     });
   });
@@ -370,7 +370,7 @@ describe('BuildingSystem', () => {
       entity.addComponent(createPositionComponent(10, 10));
 
       // Trigger completion
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'building:complete',
         source: entity.id,
         data: {
@@ -379,7 +379,7 @@ describe('BuildingSystem', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       const buildingAfter = entity.getComponent(ComponentType.Building) as BuildingComponent;
       expect(buildingAfter.fuelRequired).toBe(true);
@@ -432,7 +432,7 @@ describe('BuildingSystem', () => {
 
     it('should emit station:fuel_low event when fuel drops below threshold', () => {
       const lowHandler = vi.fn();
-      world.eventBus.subscribe('station:fuel_low', lowHandler);
+      eventBus.subscribe('station:fuel_low', lowHandler);
 
       const entity = world.createEntity() as EntityImpl;
       const building: BuildingComponent = {
@@ -449,13 +449,13 @@ describe('BuildingSystem', () => {
       const entities = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
       system.update(world, entities, 10.0); // Drop below 20%
 
-      world.eventBus.flush();
+      eventBus.flush();
       expect(lowHandler).toHaveBeenCalled();
     });
 
     it('should emit station:fuel_empty event when fuel reaches zero', () => {
       const emptyHandler = vi.fn();
-      world.eventBus.subscribe('station:fuel_empty', emptyHandler);
+      eventBus.subscribe('station:fuel_empty', emptyHandler);
 
       const entity = world.createEntity() as EntityImpl;
       const building: BuildingComponent = {
@@ -472,7 +472,7 @@ describe('BuildingSystem', () => {
       const entities = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
       system.update(world, entities, 5.0);
 
-      world.eventBus.flush();
+      eventBus.flush();
       expect(emptyHandler).toHaveBeenCalled();
     });
 
@@ -504,7 +504,7 @@ describe('BuildingSystem', () => {
       entity.addComponent(createPositionComponent(10, 10));
 
       // Trigger completion
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'building:complete',
         source: entity.id,
         data: {
@@ -513,7 +513,7 @@ describe('BuildingSystem', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       const inventory = entity.getComponent(ComponentType.Inventory);
       expect(inventory).toBeDefined();
@@ -525,7 +525,7 @@ describe('BuildingSystem', () => {
       entity.addComponent(building);
       entity.addComponent(createPositionComponent(10, 10));
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'building:complete',
         source: entity.id,
         data: {
@@ -534,7 +534,7 @@ describe('BuildingSystem', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       const inventory = entity.getComponent(ComponentType.Inventory);
       if (!inventory) throw new Error('Inventory component missing');
@@ -547,7 +547,7 @@ describe('BuildingSystem', () => {
       entity.addComponent(building);
       entity.addComponent(createPositionComponent(10, 10));
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'building:complete',
         source: entity.id,
         data: {
@@ -556,7 +556,7 @@ describe('BuildingSystem', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       const inventory = entity.getComponent(ComponentType.Inventory);
       expect(inventory).toBeUndefined();
@@ -570,7 +570,7 @@ describe('BuildingSystem', () => {
       entity.addComponent(building);
       entity.addComponent(createPositionComponent(10, 10));
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'building:complete',
         source: entity.id,
         data: {
@@ -579,7 +579,7 @@ describe('BuildingSystem', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       const townHall = entity.getComponent(ComponentType.TownHall);
       expect(townHall).toBeDefined();
@@ -591,7 +591,7 @@ describe('BuildingSystem', () => {
       entity.addComponent(building);
       entity.addComponent(createPositionComponent(10, 10));
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'building:complete',
         source: entity.id,
         data: {
@@ -600,7 +600,7 @@ describe('BuildingSystem', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       const census = entity.getComponent(ComponentType.CensusBureau);
       expect(census).toBeDefined();
@@ -612,7 +612,7 @@ describe('BuildingSystem', () => {
       entity.addComponent(building);
       entity.addComponent(createPositionComponent(10, 10));
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'building:complete',
         source: entity.id,
         data: {
@@ -621,7 +621,7 @@ describe('BuildingSystem', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       const weather = entity.getComponent(ComponentType.WeatherStation);
       expect(weather).toBeDefined();
@@ -633,7 +633,7 @@ describe('BuildingSystem', () => {
       entity.addComponent(building);
       entity.addComponent(createPositionComponent(10, 10));
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'building:complete',
         source: entity.id,
         data: {
@@ -642,7 +642,7 @@ describe('BuildingSystem', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       const clinic = entity.getComponent(ComponentType.HealthClinic);
       expect(clinic).toBeDefined();

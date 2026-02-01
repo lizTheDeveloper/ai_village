@@ -8,6 +8,7 @@ import { defineItem } from '../../items/ItemDefinition.js';
 import type { ArmorTrait } from '../../items/traits/ArmorTrait.js';
 import { World } from '../../ecs/World.js';
 import { EntityImpl } from '../../ecs/Entity.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 /**
  * Helper to create a basic BodyComponent for testing
@@ -39,6 +40,7 @@ function createTestBodyComponent(size: SizeCategory = 'medium'): BodyComponent {
 describe('EquipmentSystem', () => {
   let system: EquipmentSystem;
   let world: World;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
     // Reset registry
@@ -46,7 +48,7 @@ describe('EquipmentSystem', () => {
 
     // Create system and world
     system = new EquipmentSystem();
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
 
     // Register test armor items
     itemRegistry.register(

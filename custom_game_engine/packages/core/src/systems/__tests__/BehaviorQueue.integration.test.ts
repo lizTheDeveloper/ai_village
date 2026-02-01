@@ -24,6 +24,7 @@ import { createTemperatureComponent } from '../../components/TemperatureComponen
 
 describe('Behavior Queue System Integration', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let aiSystem: AgentBrainSystem;
   let agent: EntityImpl;
 
@@ -243,7 +244,7 @@ describe('Behavior Queue System Integration', () => {
       let emittedEvent: any = null;
 
       // Listen for queue completion event
-      world.eventBus.subscribe('agent:queue:completed', (event) => {
+      eventBus.subscribe('agent:queue:completed', (event) => {
         emittedEvent = event;
       });
 
@@ -273,7 +274,7 @@ describe('Behavior Queue System Integration', () => {
       for (let i = 0; i < 3; i++) {
         world.advanceTick();
         aiSystem.update(world, [agent], 1);
-        world.eventBus.flush(); // Flush queued events
+        eventBus.flush(); // Flush queued events
       }
 
       // Event should have been emitted

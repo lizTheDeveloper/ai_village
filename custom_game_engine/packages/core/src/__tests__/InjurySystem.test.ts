@@ -3,6 +3,7 @@ import { World } from '../World';
 import { InjurySystem } from '../systems/InjurySystem';
 import type { Entity } from '../ecs/Entity';
 import { createInjuryComponent } from '../components/InjuryComponent';
+import { EventBusImpl } from '../events/EventBus.js';
 
 /**
  * Tests for InjurySystem - Acceptance Criterion 5
@@ -19,11 +20,12 @@ import { createInjuryComponent } from '../components/InjuryComponent';
  */
 describe('InjurySystem', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let system: InjurySystem;
   let agent: Entity;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new InjurySystem();
 
     agent = world.createEntity();

@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { EventBus } from '@ai-village/core/events/EventBus';
 import { World } from '@ai-village/core/ecs/World';
+import { EventBusImpl } from '@ai-village/core';
 
 // Type helpers for testing
 type EntityWithMethods = {
@@ -65,7 +66,7 @@ describe.skip('CombatLogPanel', () => {
 
   beforeEach(() => {
     eventBus = new EventBus();
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     panel = new CombatLogPanel(eventBus, world);
   });
 

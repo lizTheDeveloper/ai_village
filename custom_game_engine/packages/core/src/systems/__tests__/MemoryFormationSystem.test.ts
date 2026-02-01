@@ -3,6 +3,7 @@ import { World } from '../../World';
 import { MemoryFormationSystem } from '../MemoryFormationSystem';
 import { EpisodicMemoryComponent } from '../../components/EpisodicMemoryComponent';
 import { EventBus } from '../../EventBus';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('MemoryFormationSystem', () => {
   let world: World;
@@ -11,7 +12,7 @@ describe('MemoryFormationSystem', () => {
   let agent: any;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     eventBus = new EventBus();
     system = new MemoryFormationSystem(eventBus);
     agent = world.createEntity();

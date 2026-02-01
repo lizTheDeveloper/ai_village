@@ -4,6 +4,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { CraftingPanelUI } from '../CraftingPanelUI';
 import { World, EventBusImpl } from '@ai-village/core';
+import { EventBusImpl } from '@ai-village/core';
 
 // Type helpers for testing
 type EntityWithMethods = {
@@ -103,7 +104,7 @@ describe('CraftingPanelUI (REQ-CRAFT-001)', () => {
     });
 
     it('should emit crafting:panel_opened event when shown', () => {
-      const mockEmit = vi.spyOn(world.eventBus, 'emit');
+      const mockEmit = vi.spyOn(eventBus, 'emit');
       panel.show();
       expect(mockEmit).toHaveBeenCalledWith(expect.objectContaining({
         type: 'crafting:panel_opened',
@@ -112,7 +113,7 @@ describe('CraftingPanelUI (REQ-CRAFT-001)', () => {
     });
 
     it('should emit crafting:panel_closed event when hidden', () => {
-      const mockEmit = vi.spyOn(world.eventBus, 'emit');
+      const mockEmit = vi.spyOn(eventBus, 'emit');
       panel.show();
       panel.hide();
       expect(mockEmit).toHaveBeenCalledWith(expect.objectContaining({
@@ -328,7 +329,7 @@ describe('CraftingPanelUI (REQ-CRAFT-001)', () => {
 
   describe('Recipe Selection (REQ-CRAFT-003)', () => {
     it('should select recipe when clicked', () => {
-      const mockEmit = vi.spyOn(world.eventBus, 'emit');
+      const mockEmit = vi.spyOn(eventBus, 'emit');
       panel.show();
       panel.setActiveAgent(123);
 

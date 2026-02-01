@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { EventBus } from '@ai-village/core/events/EventBus';
 import { World } from '@ai-village/core/ecs/World';
 import { Entity } from '@ai-village/core/ecs/Entity';
+import { EventBusImpl } from '@ai-village/core';
 
 // Mock CombatUnitPanel - will be implemented
 class CombatUnitPanel {
@@ -43,7 +44,7 @@ describe.skip('CombatUnitPanel', () => {
 
   beforeEach(() => {
     eventBus = new EventBus();
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     panel = new CombatUnitPanel(eventBus, world);
   });
 

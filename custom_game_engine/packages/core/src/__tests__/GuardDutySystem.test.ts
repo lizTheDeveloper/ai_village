@@ -2,14 +2,16 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { World } from '../World.js';
 import { GuardDutySystem } from '../systems/GuardDutySystem.js';
 import { createGuardDutyComponent } from '../components/GuardDutyComponent.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('GuardDutySystem', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let system: GuardDutySystem;
 
   beforeEach(() => {
-    world = new World();
-    system = new GuardDutySystem(world.eventBus);
+    eventBus = new EventBusImpl(); world = new World(eventBus);
+    system = new GuardDutySystem(eventBus);
   });
 
   describe('Alertness Decay', () => {
@@ -43,14 +45,14 @@ describe('GuardDutySystem', () => {
       }));
 
       const warnings: any[] = [];
-      world.eventBus.on('guard:alertness_low', (event) => warnings.push(event));
+      eventBus.on('guard:alertness_low', (event) => warnings.push(event));
 
       const entities = world.getAllEntities();
 
       // Run system until alertness drops below threshold
       for (let i = 0; i < 100; i++) {
         system.update(world, entities, 1000);
-        world.eventBus.flush();
+        eventBus.flush();
         if (warnings.length > 0) break;
       }
 
@@ -115,14 +117,14 @@ describe('GuardDutySystem', () => {
 
       // Track threat detections
       const threats: any[] = [];
-      world.eventBus.on('guard:threat_detected', (event) => threats.push(event));
+      eventBus.on('guard:threat_detected', (event) => threats.push(event));
 
       const entities = world.getAllEntities();
 
       // Run system multiple times (threat checks are periodic)
       for (let i = 0; i < 10; i++) {
         system.update(world, entities, 6000); // > 5 second check interval
-        world.eventBus.flush();
+        eventBus.flush();
         if (threats.length > 0) break;
       }
 
@@ -171,14 +173,14 @@ describe('GuardDutySystem', () => {
 
       // Track threat detections
       const threats: any[] = [];
-      world.eventBus.on('guard:threat_detected', (data) => threats.push(data));
+      eventBus.on('guard:threat_detected', (data) => threats.push(data));
 
       const entities = world.getAllEntities();
 
       // Run system
       for (let i = 0; i < 10; i++) {
         system.update(world, entities, 6000);
-        world.eventBus.flush();
+        eventBus.flush();
         if (threats.length > 0) break;
       }
 
@@ -220,14 +222,14 @@ describe('GuardDutySystem', () => {
 
       // Track threat detections
       const threats: any[] = [];
-      world.eventBus.on('guard:threat_detected', (data) => threats.push(data));
+      eventBus.on('guard:threat_detected', (data) => threats.push(data));
 
       const entities = world.getAllEntities();
 
       // Run system
       for (let i = 0; i < 10; i++) {
         system.update(world, entities, 6000);
-        world.eventBus.flush();
+        eventBus.flush();
       }
 
       // Should not detect distant threat
@@ -368,14 +370,14 @@ describe('GuardDutySystem', () => {
 
       // Track threat detections
       const threats: any[] = [];
-      world.eventBus.on('guard:threat_detected', (data) => threats.push(data));
+      eventBus.on('guard:threat_detected', (data) => threats.push(data));
 
       const entities = world.getAllEntities();
 
       // Run system
       for (let i = 0; i < 10; i++) {
         system.update(world, entities, 6000);
-        world.eventBus.flush();
+        eventBus.flush();
         if (threats.length > 0) break;
       }
 
@@ -480,14 +482,14 @@ describe('GuardDutySystem', () => {
 
       // Track responses
       const responses: any[] = [];
-      world.eventBus.on('guard:response', (event) => responses.push(event));
+      eventBus.on('guard:response', (event) => responses.push(event));
 
       const entities = world.getAllEntities();
 
       // Run system
       for (let i = 0; i < 10; i++) {
         system.update(world, entities, 6000);
-        world.eventBus.flush();
+        eventBus.flush();
         if (responses.length > 0) break;
       }
 

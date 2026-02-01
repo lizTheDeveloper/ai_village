@@ -15,14 +15,16 @@ import type { SexualityComponent } from '../SexualityComponent.js';
 import type { PersonalityComponent } from '@ai-village/core';
 import type { RelationshipComponent } from '@ai-village/core';
 import { updateRelationship } from '@ai-village/core';
+import { EventBusImpl } from '@ai-village/core';
 
 describe('Courtship Compatibility Calculations', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let agent1: Entity;
   let agent2: Entity;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     agent1 = world.createEntity();
     agent2 = world.createEntity();
   });

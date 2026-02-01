@@ -12,6 +12,7 @@ import { ActionQueue } from '../actions/ActionQueueClass';
 import { ComponentType } from '../types/ComponentType.js';
 describe('Idle Behaviors Integration', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let idleBehaviorSystem: IdleBehaviorSystem;
   let reflectionSystem: ReflectionSystem;
 
@@ -100,7 +101,7 @@ describe('Idle Behaviors Integration', () => {
 
       let reflectionCount = 0;
       const eventHandler = vi.fn(() => reflectionCount++);
-      world.eventBus.subscribe('agent:reflection_complete', eventHandler);
+      eventBus.subscribe('agent:reflection_complete', eventHandler);
 
       // Simulate 1 game day (assuming 1000 ticks = 1 day)
       for (let i = 0; i < 1000; i++) {
@@ -329,7 +330,7 @@ describe('Idle Behaviors Integration', () => {
       entity.addComponent(new ActionQueue(entity.id));
 
       // Emit action completion event
-      world.eventBus.emit('agent:action_complete', {
+      eventBus.emit('agent:action_complete', {
         agentId: entity.id,
         actionType: 'build',
         buildingType: 'cabin'
@@ -371,7 +372,7 @@ describe('Idle Behaviors Integration', () => {
       entity.addComponent(goals);
 
       const eventHandler = vi.fn();
-      world.eventBus.subscribe('agent:goal_milestone', eventHandler);
+      eventBus.subscribe('agent:goal_milestone', eventHandler);
 
       // Complete the milestone
       goals.completeMilestone('goal-1', 1);
@@ -395,7 +396,7 @@ describe('Idle Behaviors Integration', () => {
       entity.addComponent(goals);
 
       const eventHandler = vi.fn();
-      world.eventBus.subscribe('agent:goal_completed', eventHandler);
+      eventBus.subscribe('agent:goal_completed', eventHandler);
 
       // Complete the goal
       goals.updateGoalProgress('goal-1', 1.0);
@@ -420,7 +421,7 @@ describe('Idle Behaviors Integration', () => {
       entity.addComponent(new ActionQueue(entity.id));
 
       let monologue = '';
-      world.eventBus.subscribe('agent:internal_monologue', (event: any) => {
+      eventBus.subscribe('agent:internal_monologue', (event: any) => {
         monologue = event.monologue;
       });
 
@@ -450,9 +451,9 @@ describe('Idle Behaviors Integration', () => {
       entity.addComponent(queue);
 
       // Verify event infrastructure exists
-      expect(world.eventBus).toBeDefined();
-      expect(typeof world.eventBus.subscribe).toBe('function');
-      expect(typeof world.eventBus.emit).toBe('function');
+      expect(eventBus).toBeDefined();
+      expect(typeof eventBus.subscribe).toBe('function');
+      expect(typeof eventBus.emit).toBe('function');
     });
   });
 

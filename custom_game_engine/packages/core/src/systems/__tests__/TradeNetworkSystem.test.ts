@@ -20,15 +20,17 @@ import type { ShippingLaneComponent } from '../../components/ShippingLaneCompone
 import type { TradeNetworkComponent } from '../../components/TradeNetworkComponent.js';
 import type { BlockadeComponent } from '../../components/BlockadeComponent.js';
 import { createTradeNetworkComponent } from '../../components/TradeNetworkComponent.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('TradeNetworkSystem', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let system: TradeNetworkSystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new TradeNetworkSystem();
-    system.initialize(world, world.eventBus);
+    system.initialize(world, eventBus);
   });
 
   describe('Network Construction', () => {
@@ -522,7 +524,7 @@ describe('TradeNetworkSystem', () => {
 
       // Track shortage events
       let shortageDetected = false;
-      world.eventBus.on('trade:shortage_detected', () => {
+      eventBus.on('trade:shortage_detected', () => {
         shortageDetected = true;
       });
 
@@ -784,7 +786,7 @@ describe('TradeNetworkSystem', () => {
       (networkEntity as EntityImpl).addComponent(network);
 
       let resilienceWarningEmitted = false;
-      world.eventBus.on('trade:network_resilience_low', () => {
+      eventBus.on('trade:network_resilience_low', () => {
         resilienceWarningEmitted = true;
       });
 

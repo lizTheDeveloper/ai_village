@@ -131,7 +131,7 @@ describe('CraftingSystem', () => {
     });
 
     it('should complete job', () => {
-      const emitSpy = vi.spyOn(world.eventBus, 'emit');
+      const emitSpy = vi.spyOn(eventBus, 'emit');
       system.queueJob(agentId, testRecipe, 1);
       system.update(world, [], 5);
 

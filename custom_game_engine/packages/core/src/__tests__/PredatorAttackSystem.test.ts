@@ -1,14 +1,16 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { World } from '../World.js';
 import { PredatorAttackSystem } from '../systems/PredatorAttackSystem.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('PredatorAttackSystem', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let system: PredatorAttackSystem;
 
   beforeEach(() => {
-    world = new World();
-    system = new PredatorAttackSystem(world.eventBus);
+    eventBus = new EventBusImpl(); world = new World(eventBus);
+    system = new PredatorAttackSystem(eventBus);
   });
 
   describe('Predator Attack Flow', () => {
@@ -58,16 +60,16 @@ describe('PredatorAttackSystem', () => {
 
       // Track events
       const events: any[] = [];
-      world.eventBus.on('predator:attack', (data) => events.push({ type: 'attack', data }));
-      world.eventBus.on('predator:repelled', (data) => events.push({ type: 'repelled', data }));
-      world.eventBus.on('injury:inflicted', (data) => events.push({ type: 'injury', data }));
+      eventBus.on('predator:attack', (data) => events.push({ type: 'attack', data }));
+      eventBus.on('predator:repelled', (data) => events.push({ type: 'repelled', data }));
+      eventBus.on('injury:inflicted', (data) => events.push({ type: 'injury', data }));
 
       // Run system
       const entities = world.getAllEntities();
       system.update(world, entities, 1000);
 
       // Flush event queue
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Verify predator attacked
       expect(events.some(e => e.type === 'attack')).toBe(true);
@@ -127,14 +129,14 @@ describe('PredatorAttackSystem', () => {
 
       // Track events
       const events: any[] = [];
-      world.eventBus.on('predator:attack', (data) => events.push(data));
+      eventBus.on('predator:attack', (data) => events.push(data));
 
       // Run system multiple times (detection is probabilistic)
       const entities = world.getAllEntities();
       let attackCount = 0;
       for (let i = 0; i < 10; i++) {
         system.update(world, entities, 1000);
-        world.eventBus.flush();
+        eventBus.flush();
         if (events.length > attackCount) {
           attackCount = events.length;
         }
@@ -194,12 +196,12 @@ describe('PredatorAttackSystem', () => {
 
       // Track events
       const events: any[] = [];
-      world.eventBus.on('predator:attack', (data) => events.push(data));
+      eventBus.on('predator:attack', (data) => events.push(data));
 
       // Run system
       const entities = world.getAllEntities();
       system.update(world, entities, 1000);
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Verify territorial attack
       expect(events.length).toBeGreaterThan(0);
@@ -256,13 +258,13 @@ describe('PredatorAttackSystem', () => {
 
       // Track injury events
       const injuries: any[] = [];
-      world.eventBus.on('injury:inflicted', (event) => injuries.push(event));
+      eventBus.on('injury:inflicted', (event) => injuries.push(event));
 
       // Run system multiple times until injury occurs
       const entities = world.getAllEntities();
       for (let i = 0; i < 20; i++) {
         system.update(world, entities, 1000);
-        world.eventBus.flush();
+        eventBus.flush();
         if (injuries.length > 0) break;
       }
 
@@ -337,12 +339,12 @@ describe('PredatorAttackSystem', () => {
 
       // Track alerts
       const alerts: any[] = [];
-      world.eventBus.on('guard:threat_detected', (data) => alerts.push(data));
+      eventBus.on('guard:threat_detected', (data) => alerts.push(data));
 
       // Run system
       const entities = world.getAllEntities();
       system.update(world, entities, 1000);
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Verify nearby agent was alerted
       expect(alerts.length).toBeGreaterThan(0);

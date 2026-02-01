@@ -3,6 +3,7 @@ import { ContextMenuManager } from '../ContextMenuManager';
 import { World, EventBusImpl } from '@ai-village/core';
 import { Camera } from '../Camera';
 import { InputHandler } from '../InputHandler';
+import { EventBusImpl } from '@ai-village/core';
 
 // Type helpers for testing
 type EntityWithMethods = {
@@ -38,7 +39,7 @@ describe('ContextMenu Integration', () => {
 
   beforeEach(() => {
     vi.useFakeTimers();
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     eventBus = new EventBusImpl();
     canvas = document.createElement('canvas');
     canvas.width = 800;

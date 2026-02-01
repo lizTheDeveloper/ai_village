@@ -22,10 +22,12 @@ import { createPositionComponent } from '../../components/PositionComponent.js';
 import { generateRandomStartingSkills } from '../../components/SkillsComponent.js';
 import { createDeedLedgerComponent, recordDeed } from '../../components/DeedLedgerComponent.js';
 import type { ReincarnationConfig } from '../../divinity/AfterlifePolicy.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('ReincarnationSystem', () => {
   let harness: IntegrationTestHarness;
   let world: World;
+  let eventBus: EventBusImpl;
   let system: ReincarnationSystem;
 
   beforeEach(() => {
@@ -55,7 +57,7 @@ describe('ReincarnationSystem', () => {
       world.addEntity(entity);
 
       // Emit reincarnation queued event
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'soul:reincarnation_queued',
         source: entityId,
         data: {
@@ -70,14 +72,14 @@ describe('ReincarnationSystem', () => {
       });
 
       // Flush event queue to dispatch events
-      world.eventBus.flush();
+      eventBus.flush();
 
       expect(system.getQueuedSoulCount()).toBe(1);
       expect(system.getQueuedSoulIds()).toContain(entityId);
     });
 
     it('should not queue soul if entity not found', () => {
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'soul:reincarnation_queued',
         source: 'nonexistent',
         data: {
@@ -90,7 +92,7 @@ describe('ReincarnationSystem', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       expect(system.getQueuedSoulCount()).toBe(0);
     });
@@ -131,7 +133,7 @@ describe('ReincarnationSystem', () => {
       world.addEntity(entity);
 
       // Queue with full retention
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'soul:reincarnation_queued',
         source: entityId,
         data: {
@@ -144,7 +146,7 @@ describe('ReincarnationSystem', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       expect(system.getQueuedSoulCount()).toBe(1);
     });
@@ -166,7 +168,7 @@ describe('ReincarnationSystem', () => {
 
       world.addEntity(entity);
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'soul:reincarnation_queued',
         source: entityId,
         data: {
@@ -179,7 +181,7 @@ describe('ReincarnationSystem', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       expect(system.getQueuedSoulCount()).toBe(1);
     });
@@ -193,7 +195,7 @@ describe('ReincarnationSystem', () => {
       entity.addComponent(createPositionComponent(10, 20));
       world.addEntity(entity);
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'soul:reincarnation_queued',
         source: entityId,
         data: {
@@ -206,7 +208,7 @@ describe('ReincarnationSystem', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Run update before delay expires (tick is still 0)
       system.update(world, [], 1);
@@ -225,12 +227,12 @@ describe('ReincarnationSystem', () => {
       // Subscribe to reincarnated event
       let reincarnatedEventReceived = false;
       let newEntityId: string | undefined;
-      world.eventBus.subscribe('soul:reincarnated', (event) => {
+      eventBus.subscribe('soul:reincarnated', (event) => {
         reincarnatedEventReceived = true;
         newEntityId = event.data.newEntityId;
       });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'soul:reincarnation_queued',
         source: entityId,
         data: {
@@ -243,7 +245,7 @@ describe('ReincarnationSystem', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Advance world tick past delay
       world.setTick(100);
@@ -251,7 +253,7 @@ describe('ReincarnationSystem', () => {
       // Run update
       system.update(world, [], 1);
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Soul should be removed from queue
       expect(system.getQueuedSoulCount()).toBe(0);
@@ -276,7 +278,7 @@ describe('ReincarnationSystem', () => {
       });
       world.addEntity(entity);
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'soul:reincarnation_queued',
         source: entityId,
         data: {
@@ -289,7 +291,7 @@ describe('ReincarnationSystem', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       expect(system.getQueuedSoulCount()).toBe(1);
     });
@@ -308,7 +310,7 @@ describe('ReincarnationSystem', () => {
 
       world.addEntity(entity);
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'soul:reincarnation_queued',
         source: entityId,
         data: {
@@ -321,7 +323,7 @@ describe('ReincarnationSystem', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       expect(system.getQueuedSoulCount()).toBe(1);
     });
@@ -338,11 +340,11 @@ describe('ReincarnationSystem', () => {
       const deityId = 'nature-goddess';
 
       let reincarnatedDeityId: string | undefined;
-      world.eventBus.subscribe('soul:reincarnated', (event) => {
+      eventBus.subscribe('soul:reincarnated', (event) => {
         reincarnatedDeityId = event.data.deityId;
       });
 
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'soul:reincarnation_queued',
         source: entityId,
         data: {
@@ -356,14 +358,14 @@ describe('ReincarnationSystem', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Advance tick and run update
       world.setTick(100);
 
       system.update(world, [], 1);
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       expect(reincarnatedDeityId).toBe(deityId);
     });
@@ -381,7 +383,7 @@ describe('ReincarnationSystem', () => {
       system.destroy();
 
       // Try to emit event after destroy
-      world.eventBus.emit({
+      eventBus.emit({
         type: 'soul:reincarnation_queued',
         source: entityId,
         data: {
@@ -394,7 +396,7 @@ describe('ReincarnationSystem', () => {
         },
       });
 
-      world.eventBus.flush();
+      eventBus.flush();
 
       // Soul should not be queued since listener was removed
       expect(system.getQueuedSoulCount()).toBe(0);

@@ -21,6 +21,7 @@ import { EventBusImpl } from '../events/EventBus';
  */
 describe('ConflictIntegration', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let huntingSystem: HuntingSystem;
   let predatorSystem: PredatorAttackSystem;
   let combatSystem: AgentCombatSystem;
@@ -32,7 +33,7 @@ describe('ConflictIntegration', () => {
   let mockLLM: any;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
 
     // HuntingSystem expects a function that returns a Promise
     mockLLM = vi.fn().mockResolvedValue({
@@ -48,14 +49,14 @@ describe('ConflictIntegration', () => {
       }),
     };
 
-    huntingSystem = new HuntingSystem(world.eventBus as EventBusImpl, mockLLM);
-    predatorSystem = new PredatorAttackSystem(world.eventBus as EventBusImpl);
-    combatSystem = new AgentCombatSystem(mockLLMObject, world.eventBus as EventBusImpl);
+    huntingSystem = new HuntingSystem(eventBus as EventBusImpl, mockLLM);
+    predatorSystem = new PredatorAttackSystem(eventBus as EventBusImpl);
+    combatSystem = new AgentCombatSystem(mockLLMObject, eventBus as EventBusImpl);
     injurySystem = new InjurySystem();
-    deathSystem = new DeathTransitionSystem(world.eventBus as EventBusImpl);
-    skillSystem = new SkillSystem(world.eventBus as EventBusImpl);
-    needsSystem = new NeedsSystem(world.eventBus as EventBusImpl);
-    memorySystem = new MemoryFormationSystem(world.eventBus as EventBusImpl);
+    deathSystem = new DeathTransitionSystem(eventBus as EventBusImpl);
+    skillSystem = new SkillSystem(eventBus as EventBusImpl);
+    needsSystem = new NeedsSystem(eventBus as EventBusImpl);
+    memorySystem = new MemoryFormationSystem(eventBus as EventBusImpl);
   });
 
   describe('Full conflict flow', () => {
@@ -384,17 +385,17 @@ describe('ConflictIntegration', () => {
       const eventLog: string[] = [];
 
       // Set up listeners first
-      world.eventBus.on(// @ts-expect-error Testing invalid value validation
+      eventBus.on(// @ts-expect-error Testing invalid value validation
       'hunt:started', () => eventLog.push('hunt:started'));
-      world.eventBus.on(// @ts-expect-error Testing invalid value validation
+      eventBus.on(// @ts-expect-error Testing invalid value validation
       'hunt:success', () => eventLog.push('hunt:success'));
-      world.eventBus.on(// @ts-expect-error Testing invalid value validation
+      eventBus.on(// @ts-expect-error Testing invalid value validation
       'combat:started', () => eventLog.push('combat:started'));
-      world.eventBus.on(// @ts-expect-error Testing invalid value validation
+      eventBus.on(// @ts-expect-error Testing invalid value validation
       'combat:ended', () => eventLog.push('combat:ended'));
-      world.eventBus.on(// @ts-expect-error Testing invalid value validation
+      eventBus.on(// @ts-expect-error Testing invalid value validation
       'injury:inflicted', () => eventLog.push('injury:inflicted'));
-      world.eventBus.on(// @ts-expect-error Testing invalid value validation
+      eventBus.on(// @ts-expect-error Testing invalid value validation
       'death:occurred', () => eventLog.push('death:occurred'));
 
       const hunter = world.createEntity();
@@ -407,9 +408,9 @@ describe('ConflictIntegration', () => {
       prey.addComponent('animal', { species: 'deer' });
 
       // Trigger hunt event
-      world.eventBus.emit({ type: // @ts-expect-error Testing invalid value validation
+      eventBus.emit({ type: // @ts-expect-error Testing invalid value validation
       'hunt:started', hunterId: hunter.id, preyId: prey.id });
-      (world.eventBus as Record<string, unknown>).flush?.(); // Process queued events if flush exists
+      (eventBus as Record<string, unknown>).flush?.(); // Process queued events if flush exists
 
       // Verify event was logged
       expect(eventLog).toContain('hunt:started');

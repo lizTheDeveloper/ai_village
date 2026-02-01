@@ -13,6 +13,7 @@ import { createMovementComponent } from '../../../components/MovementComponent.j
 import type { AnimalComponent } from '../../../components/AnimalComponent.js';
 
 import {
+import { EventBusImpl } from '../events/EventBus.js';
   GrazeBehavior,
   FleeBehavior,
   RestBehavior,
@@ -134,7 +135,7 @@ describe('Animal Behavior Integration Tests', () => {
 
     it('emits behavior_changed event when state changes', () => {
       const system = new AnimalBrainSystem();
-      const emitSpy = vi.spyOn(harness.world.eventBus, 'emit');
+      const emitSpy = vi.spyOn(harness.eventBus, 'emit');
 
       // Create an animal that will change state
       const animal = new EntityImpl(createEntityId(), 0);

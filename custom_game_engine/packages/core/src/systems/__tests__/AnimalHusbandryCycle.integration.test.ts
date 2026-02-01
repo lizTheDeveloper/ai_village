@@ -9,6 +9,7 @@ import { TimeSystem } from '../TimeSystem.js';
 import { StateMutatorSystem } from '../StateMutatorSystem.js';
 
 import { ComponentType } from '../../types/ComponentType.js';
+import { EventBusImpl } from '../events/EventBus.js';
 /**
  * Integration tests for Complete Animal Husbandry Cycle
  *
@@ -58,7 +59,7 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
   });
 
   it('should taming system convert wild to domesticated', () => {
-    const tamingSystem = new TamingSystem(harness.world.eventBus);
+    const tamingSystem = new TamingSystem(harness.eventBus);
     harness.registerSystem('TamingSystem', tamingSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -79,7 +80,7 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
   });
 
   it('should housing system manage animal shelter', () => {
-    const housingSystem = new AnimalHousingSystem(harness.world.eventBus);
+    const housingSystem = new AnimalHousingSystem(harness.eventBus);
     harness.registerSystem('AnimalHousingSystem', housingSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -128,7 +129,7 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
   });
 
   it('should animals produce products over time', () => {
-    const productionSystem = new AnimalProductionSystem(harness.world.eventBus);
+    const productionSystem = new AnimalProductionSystem(harness.eventBus);
     const timeSystem = new TimeSystem();
 
     harness.registerSystem('AnimalProductionSystem', productionSystem);
@@ -152,7 +153,7 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
   });
 
   it('should housing cleanliness affect animal health', () => {
-    const housingSystem = new AnimalHousingSystem(harness.world.eventBus);
+    const housingSystem = new AnimalHousingSystem(harness.eventBus);
 
     // Create and wire StateMutatorSystem (required for AnimalSystem)
     const stateMutator = new StateMutatorSystem();
@@ -184,7 +185,7 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
   });
 
   it('should multiple animals in housing tracked', () => {
-    const housingSystem = new AnimalHousingSystem(harness.world.eventBus);
+    const housingSystem = new AnimalHousingSystem(harness.eventBus);
     harness.registerSystem('AnimalHousingSystem', housingSystem);
 
     const coop = harness.createTestBuilding('chicken_coop', { x: 10, y: 10 });
@@ -213,7 +214,7 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     harness.clearEvents();
 
     // Set animal to very old age or low health by emitting events
-    harness.world.eventBus.emit({
+    harness.eventBus.emit({
       type: 'animal_died',
       source: animal.id,
       data: {
@@ -235,7 +236,7 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
   });
 
   it('should taming build trust over multiple interactions', () => {
-    const tamingSystem = new TamingSystem(harness.world.eventBus);
+    const tamingSystem = new TamingSystem(harness.eventBus);
     harness.registerSystem('TamingSystem', tamingSystem);
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
@@ -267,9 +268,9 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     const animalSystem = new AnimalSystem();
     harness.registerSystem('AnimalSystem', animalSystem);
 
-    const tamingSystem = new TamingSystem(harness.world.eventBus);
-    const housingSystem = new AnimalHousingSystem(harness.world.eventBus);
-    const productionSystem = new AnimalProductionSystem(harness.world.eventBus);
+    const tamingSystem = new TamingSystem(harness.eventBus);
+    const housingSystem = new AnimalHousingSystem(harness.eventBus);
+    const productionSystem = new AnimalProductionSystem(harness.eventBus);
     const timeSystem = new TimeSystem();
 
     harness.registerSystem('TamingSystem', tamingSystem);
@@ -327,7 +328,7 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
   });
 
   it('should housing capacity limits enforced', () => {
-    const housingSystem = new AnimalHousingSystem(harness.world.eventBus);
+    const housingSystem = new AnimalHousingSystem(harness.eventBus);
     harness.registerSystem('AnimalHousingSystem', housingSystem);
 
     const coop = harness.createTestBuilding('chicken_coop', { x: 10, y: 10 });

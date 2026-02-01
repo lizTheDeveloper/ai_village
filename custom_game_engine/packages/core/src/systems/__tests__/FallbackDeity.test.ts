@@ -35,7 +35,7 @@ describe('Fallback Deity', () => {
   let eventBus: EventBus;
 
   beforeEach(async () => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     eventBus = new EventBusImpl();
     prayerSystem = new PrayerSystem();
     await prayerSystem.initialize(world, eventBus);

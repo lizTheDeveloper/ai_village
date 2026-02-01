@@ -2,20 +2,22 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { World } from '../World';
 import { HuntingSystem } from '../systems/HuntingSystem';
 import type { Entity } from '../ecs/Entity';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('HuntingSystem', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let system: HuntingSystem;
   let hunter: Entity;
   let prey: Entity;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     const mockLLM = vi.fn().mockResolvedValue({
       narrative: 'The hunter tracked the prey through the forest.',
       memorable_details: ['successful hunt'],
     });
-    system = new HuntingSystem(world.eventBus, mockLLM);
+    system = new HuntingSystem(eventBus, mockLLM);
 
     // Create hunter entity
     hunter = world.createEntity();

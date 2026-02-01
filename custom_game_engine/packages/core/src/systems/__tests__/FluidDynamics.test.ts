@@ -1,13 +1,15 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { World } from '../../World.js';
 import { FluidDynamicsSystem } from '../FluidDynamicsSystem.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('FluidDynamicsSystem', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let system: FluidDynamicsSystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new FluidDynamicsSystem();
   });
 
@@ -59,7 +61,7 @@ describe('FluidDynamicsSystem', () => {
     expect(system.getDebugInfo().dirtyTileCount).toBe(1);
 
     // Mark neighbors via event (simulating digging)
-    const eventBus = world.eventBus;
+    const eventBus = eventBus;
     system.initialize(world, eventBus);
 
     eventBus.emit({

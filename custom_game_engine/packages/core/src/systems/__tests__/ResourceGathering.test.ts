@@ -13,6 +13,7 @@ import type { ResourceComponent } from '../../components/ResourceComponent.js';
 import { ComponentType } from '../../types/ComponentType.js';
 describe('Resource Gathering System', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let agent: EntityImpl;
   let tree: EntityImpl;
   let rock: EntityImpl;
@@ -143,7 +144,7 @@ describe('Resource Gathering System', () => {
 
     it('should emit resource:gathered event when wood is harvested', () => {
       const eventHandler = vi.fn();
-      world.eventBus.subscribe('resource:gathered', eventHandler);
+      eventBus.subscribe('resource:gathered', eventHandler);
 
       // Position agent adjacent to tree
       agent.updateComponent<PositionComponent>('position', (pos) => ({
@@ -275,7 +276,7 @@ describe('Resource Gathering System', () => {
 
     it('should emit resource:gathered event when stone is mined', () => {
       const eventHandler = vi.fn();
-      world.eventBus.subscribe('resource:gathered', eventHandler);
+      eventBus.subscribe('resource:gathered', eventHandler);
 
       // Position agent adjacent to rock
       agent.updateComponent<PositionComponent>('position', (pos) => ({
@@ -363,7 +364,7 @@ describe('Resource Gathering System', () => {
 
     it('should emit inventory:full event when cannot gather', () => {
       const eventHandler = vi.fn();
-      world.eventBus.subscribe('inventory:full', eventHandler);
+      eventBus.subscribe('inventory:full', eventHandler);
 
       // Set inventory to max weight
       agent.updateComponent<InventoryComponent>('inventory', (inv) => ({
@@ -598,7 +599,7 @@ describe('Resource Gathering System', () => {
 
     it('should emit construction:failed when insufficient resources', () => {
       const eventHandler = vi.fn();
-      world.eventBus.subscribe('construction:failed', eventHandler);
+      eventBus.subscribe('construction:failed', eventHandler);
 
       // Agent has insufficient resources
       agent.updateComponent<InventoryComponent>('inventory', (inv) => ({
@@ -712,7 +713,7 @@ describe('Resource Gathering System', () => {
 
     it('should emit resource:regenerated event when regeneration occurs', () => {
       const eventHandler = vi.fn();
-      world.eventBus.subscribe('resource:regenerated', eventHandler);
+      eventBus.subscribe('resource:regenerated', eventHandler);
 
       // Set tree to partial amount
       tree.updateComponent<ResourceComponent>('resource', (r) => ({
@@ -793,7 +794,7 @@ describe('Resource Gathering System', () => {
 
     it('should emit resource:depleted when amount reaches 0', () => {
       const eventHandler = vi.fn();
-      world.eventBus.subscribe('resource:depleted', eventHandler);
+      eventBus.subscribe('resource:depleted', eventHandler);
 
       // Harvest until depleted
       tree.updateComponent<ResourceComponent>('resource', (r) => ({

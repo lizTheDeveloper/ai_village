@@ -20,13 +20,15 @@ import { createSoulLinkComponent } from '../components/SoulLinkComponent.js';
 import type { ConflictComponent } from '../components/ConflictComponent.js';
 import type { CombatStatsComponent } from '../components/CombatStatsComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('HeroProtection', () => {
   let world: World;
+  let eventBus: EventBusImpl;
   let combatSystem: AgentCombatSystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     combatSystem = new AgentCombatSystem();
   });
 

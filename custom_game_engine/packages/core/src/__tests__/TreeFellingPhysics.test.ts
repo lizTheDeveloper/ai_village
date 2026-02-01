@@ -26,7 +26,7 @@ describe('Tree Felling Physics - Integration', () => {
   let treeFellingSystem: TreeFellingSystem;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     eventBus = new EventBusImpl();
     treeFellingSystem = new TreeFellingSystem(eventBus);
   });

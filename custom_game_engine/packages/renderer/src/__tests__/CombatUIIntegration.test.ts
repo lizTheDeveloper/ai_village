@@ -24,7 +24,7 @@ describe('Combat UI System Integration', () => {
   let stanceControls: StanceControls;
 
   beforeEach(() => {
-    world = new World();
+    eventBus = new EventBusImpl(); world = new World(eventBus);
     eventBus = new EventBusImpl();
     canvas = document.createElement('canvas');
     canvas.width = 800;

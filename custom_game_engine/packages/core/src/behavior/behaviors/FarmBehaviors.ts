@@ -17,6 +17,7 @@ import type { MovementComponent } from '../../components/MovementComponent.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { InventoryComponent } from '../../components/InventoryComponent.js';
+import type { PlantComponent } from '../../components/PlantComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { ComponentType } from '../../types/ComponentType.js';
 
