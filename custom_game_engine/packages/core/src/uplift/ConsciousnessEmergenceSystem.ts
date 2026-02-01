@@ -25,6 +25,7 @@ import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.j
 import { SemanticMemoryComponent } from '../components/SemanticMemoryComponent.js';
 import { BeliefComponent } from '../components/BeliefComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
+import { getAnimalSpecies } from '../data/animalSpecies.js';
 
 export class ConsciousnessEmergenceSystem extends BaseSystem {
   readonly id = 'ConsciousnessEmergenceSystem';
@@ -210,7 +211,7 @@ export class ConsciousnessEmergenceSystem extends BaseSystem {
   /**
    * Identify retained instincts
    */
-  private identifyRetainedInstincts(_animal: AnimalComponent, species: SpeciesComponent): string[] {
+  private identifyRetainedInstincts(animal: AnimalComponent, species: SpeciesComponent): string[] {
     const instincts: string[] = [];
 
     // Pack animals retain pack instincts
@@ -218,17 +219,18 @@ export class ConsciousnessEmergenceSystem extends BaseSystem {
       instincts.push('pack_loyalty', 'hierarchical_thinking');
     }
 
-    // TODO: Add diet property to AnimalComponent or retrieve from SpeciesComponent
-    // For now, commented out diet-based instincts
+    // Retrieve diet from AnimalSpecies data
+    const animalSpecies = getAnimalSpecies(animal.speciesId);
+
     // Predators retain hunting instincts
-    // if (animal.diet === 'carnivore') {
-    //   instincts.push('predatory_focus', 'territorial_behavior');
-    // }
+    if (animalSpecies.diet === 'carnivore') {
+      instincts.push('predatory_focus', 'territorial_behavior');
+    }
 
     // Prey animals retain fear responses
-    // if (animal.diet === 'herbivore') {
-    //   instincts.push('heightened_vigilance', 'flight_response');
-    // }
+    if (animalSpecies.diet === 'herbivore') {
+      instincts.push('heightened_vigilance', 'flight_response');
+    }
 
     return instincts;
   }
