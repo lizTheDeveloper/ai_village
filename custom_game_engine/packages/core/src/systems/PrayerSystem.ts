@@ -150,7 +150,7 @@ export class PrayerSystem extends BaseSystem {
         return {
           id: e.id,
           ...deityComp,
-        } as Deity;
+        } as unknown as Deity;
       });
 
     // Use cosmology to resolve where this prayer should go

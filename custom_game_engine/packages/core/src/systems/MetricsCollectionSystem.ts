@@ -711,7 +711,7 @@ export class MetricsCollectionSystem extends BaseSystem {
               type: 'canon_event' as const,
               timestamp: canonEvent.timestamp,
               agentId: canonEvent.agentIds[0],
-              data: canonEvent as Record<string, unknown>,
+              data: canonEvent as unknown as Record<string, unknown>,
               category: 'canon',
             });
           }
@@ -743,7 +743,7 @@ export class MetricsCollectionSystem extends BaseSystem {
               type: 'canon_event',
               timestamp: canonEvent.timestamp,
               agentId: canonEvent.agentIds[0],
-              data: canonEvent as Record<string, unknown>,
+              data: canonEvent as unknown as Record<string, unknown>,
               category: 'canon',
             });
           }
@@ -779,7 +779,7 @@ export class MetricsCollectionSystem extends BaseSystem {
               type: 'canon_event',
               timestamp: canonEvent.timestamp,
               agentId: canonEvent.agentIds[0],
-              data: canonEvent as Record<string, unknown>,
+              data: canonEvent as unknown as Record<string, unknown>,
               category: 'canon',
             });
           }
@@ -929,7 +929,7 @@ export class MetricsCollectionSystem extends BaseSystem {
           day: currentDay,
           tick: world.tick,
           phase: timeComp.phase,
-          season: ('season' in timeComp) ? (timeComp as Record<string, unknown>).season : undefined,
+          season: ('season' in timeComp) ? (timeComp as unknown as Record<string, unknown>).season : undefined,
         },
       }).catch((error) => {
         console.error('[MetricsCollection] Failed to record time milestone canon event:', error);
@@ -952,7 +952,7 @@ export class MetricsCollectionSystem extends BaseSystem {
       }
 
       // Validate structure - cast to unknown first to avoid index signature error
-      const needs = needsComponent as Record<string, unknown>;
+      const needs = needsComponent as unknown as Record<string, unknown>;
 
       if (typeof needs.hunger !== 'number' ||
           typeof needs.thirst !== 'number' ||

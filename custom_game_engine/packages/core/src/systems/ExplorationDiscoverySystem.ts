@@ -720,7 +720,7 @@ export class ExplorationDiscoverySystem extends BaseSystem {
 
     if (phenomenonComp) {
       // Cast through unknown for type safety
-      const compData = phenomenonComp as Record<string, unknown>;
+      const compData = phenomenonComp as unknown as Record<string, unknown>;
 
       // The component has 'type' as component type identifier
       // StellarPhenomenon also has 'type' as phenomenon type

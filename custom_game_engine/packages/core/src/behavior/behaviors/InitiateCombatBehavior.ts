@@ -173,7 +173,7 @@ export function initiateCombatBehaviorWithContext(ctx: BehaviorContext): Context
   }
 
   // Cast to typed state - structure validated by runtime checks above
-  const typedState = state as InitiateCombatState;
+  const typedState = state as unknown as InitiateCombatState;
   const { targetId, cause = 'challenge', lethal = false, surprise = false } = typedState;
 
   // Validate target exists and is an agent

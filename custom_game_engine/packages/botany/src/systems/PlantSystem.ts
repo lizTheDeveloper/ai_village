@@ -254,7 +254,7 @@ export class PlantSystem extends BaseSystem {
     // Filter entities using SimulationScheduler - only process visible plants (if we have hours to process)
     // Note: Planted crops are handled specially below (always simulate)
     const visibleEntities = shouldUpdate && hoursToProcess > 0
-      ? world.simulationScheduler.filterActiveEntities(entities as Entity[], world.tick)
+      ? world.simulationScheduler.filterActiveEntities(entities as unknown as Entity[], world.tick)
       : [];
 
     // Build set of visible entity IDs for quick lookup

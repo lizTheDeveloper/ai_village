@@ -184,7 +184,7 @@ export class VisionDeliverySystem {
    */
   private emitEvent(type: string, source: string, data: Record<string, unknown>): void {
     this.world.eventBus.emit({
-      type,
+      type: type as any,
       source,
       data,
     });

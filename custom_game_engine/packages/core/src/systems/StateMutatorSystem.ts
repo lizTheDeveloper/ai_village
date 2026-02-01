@@ -140,7 +140,7 @@ export class StateMutatorSystem extends BaseSystem {
     // Navigate to the target field and mutate directly
     // We need to treat component as a record for dynamic field access
     // This is safe because we're doing runtime type checks below
-    let current: Record<string, unknown> = component as Record<string, unknown>;
+    let current: Record<string, unknown> = component as unknown as Record<string, unknown>;
     const pathParts = fieldName.split('.');
 
     for (let i = 0; i < pathParts.length - 1; i++) {
