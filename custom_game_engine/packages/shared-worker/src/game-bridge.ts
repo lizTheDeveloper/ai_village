@@ -267,6 +267,11 @@ export class GameBridge {
       }
     }
 
+    // Update globals (time, weather) if included in delta
+    if (delta.globals) {
+      this.syncGlobals({ globals: delta.globals } as any, this.viewWorld);
+    }
+
     // Run path interpolation system to update positions
     // SystemRegistry internally has a private systems Map
     // We need to access it through reflection for now until a proper API is added

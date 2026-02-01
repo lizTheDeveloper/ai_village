@@ -136,6 +136,11 @@ export interface DeltaUpdate {
   }>;
   /** Entities that were removed */
   removed?: string[];
+  /** Global state (time, weather) - periodically synced */
+  globals?: {
+    time?: any;
+    weather?: any;
+  };
 }
 
 /**

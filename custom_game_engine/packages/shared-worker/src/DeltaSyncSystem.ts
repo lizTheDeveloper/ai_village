@@ -31,6 +31,8 @@ export class DeltaSyncSystem extends BaseSystem {
 
   private broadcastCallback: DeltaBroadcastCallback | null = null;
   private lastProcessedEntities = new Set<string>();
+  private GLOBALS_SYNC_INTERVAL = 20; // Sync globals every 20 ticks (1 second at 20 TPS)
+  private lastGlobalsSync = 0;
 
   /**
    * Set the callback for broadcasting delta updates
@@ -74,6 +76,12 @@ export class DeltaSyncSystem extends BaseSystem {
       updates: dirtyEntities.map(entity => this.serializeEntity(entity)),
       removed: removed.length > 0 ? removed : undefined,
     };
+
+    // Periodically include globals (time, weather) in delta updates
+    if (ctx.world.tick - this.lastGlobalsSync >= this.GLOBALS_SYNC_INTERVAL) {
+      delta.globals = this.serializeGlobals(ctx.world);
+      this.lastGlobalsSync = ctx.world.tick;
+    }
 
     // Broadcast delta to all windows
     this.broadcastCallback(delta);
@@ -147,5 +155,32 @@ export class DeltaSyncSystem extends BaseSystem {
     }
 
     return components;
+  }
+
+  /**
+   * Serialize global state (time, weather, etc.)
+   */
+  private serializeGlobals(world: World): { time?: any; weather?: any } {
+    const globals: { time?: any; weather?: any } = {};
+
+    // Serialize time entity
+    const timeEntities = world.query().with('time').executeEntities();
+    if (timeEntities.length > 0) {
+      const timeEntity = timeEntities[0];
+      if (timeEntity) {
+        globals.time = timeEntity.getComponent('time');
+      }
+    }
+
+    // Serialize weather entity
+    const weatherEntities = world.query().with('weather').executeEntities();
+    if (weatherEntities.length > 0) {
+      const weatherEntity = weatherEntities[0];
+      if (weatherEntity) {
+        globals.weather = weatherEntity.getComponent('weather');
+      }
+    }
+
+    return globals;
   }
 }
