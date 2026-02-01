@@ -32,6 +32,10 @@ import type { DeityComponent } from '../components/DeityComponent.js';
 import type { ConversationExchange } from '../divinity/SoulCreationCeremony.js';
 import { FATE_PERSONAS } from '../divinity/SoulCreationCeremony.js';
 import { EpisodicMemoryComponent, type EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
+import type { AngelComponent } from '../components/AngelComponent.js';
+import type { RelationshipComponent } from '../components/RelationshipComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
+import type { GoalsComponent } from '../components/GoalsComponent.js';
 
 /** Ticks per game day (20 TPS * 60 sec * 60 min * 24 hr = 1,728,000 ticks) */
 const TICKS_PER_DAY = 20 * 60 * 60 * 24;
@@ -275,8 +279,26 @@ export class FatesCouncilSystem extends BaseSystem {
       if (thread) allThreads.push(thread);
     }
 
-    // TODO: Gather gods (player-god included here!)
-    // TODO: Gather angels, demons, spirits
+    // Gather angels
+    const angels = world.query().with(CT.Angel).executeEntities();
+    for (const angel of angels) {
+      const thread = this.analyzeAngelThread(angel, world);
+      if (thread) allThreads.push(thread);
+    }
+
+    // Gather spirits (entities with Spirit component)
+    const spirits = world.query().with(CT.Spirit).executeEntities();
+    for (const spirit of spirits) {
+      const thread = this.analyzeSpiritThread(spirit, world);
+      if (thread) allThreads.push(thread);
+    }
+
+    // Gather the Supreme Creator if it exists (the player-god)
+    const creators = world.query().with(CT.SupremeCreator).executeEntities();
+    for (const creator of creators) {
+      const thread = this.analyzeCreatorThread(creator, world);
+      if (thread) allThreads.push(thread);
+    }
 
     // Find story hooks from recent events + entity state
     const potentialHooks = this.findStoryHooks(world, allThreads);
@@ -388,17 +410,137 @@ export class FatesCouncilSystem extends BaseSystem {
   }
 
   /**
+   * Analyze an angel entity as a narrative thread
+   */
+  private analyzeAngelThread(angel: Entity, world: World): EntityThread | null {
+    const angelComp = angel.getComponent<AngelComponent>(CT.Angel);
+    if (!angelComp) return null;
+
+    // Angels can also have plots
+    const plotLines = angel.getComponent<PlotLinesComponent>(CT.PlotLines);
+
+    // Extract recent actions from episodic memory
+    const recentActions = this.extractRecentActions(angel);
+
+    // Determine story potential based on current state
+    let storyPotential = 0.4;  // Angels have moderate baseline potential
+    if (angelComp.state.inCombat) storyPotential += 0.2;
+    if (angelComp.currentOrders) storyPotential += 0.1;
+    if (angelComp.notableDeedIds.length > 5) storyPotential += 0.15;
+
+    return {
+      entityId: angel.id,
+      entityType: 'angel',
+      name: angelComp.name || angel.id,
+      activePlots: plotLines?.active.map(p => p.instance_id) || [],
+      completedPlots: plotLines?.completed.length || 0,
+      wisdom: angelComp.rank === 'archangel' ? 80 : angelComp.rank === 'principality' ? 60 : 40,
+      recentActions,
+      storyPotential,
+      needsChallenge: angelComp.totalServiceTime > 10000 && !angelComp.currentOrders,
+      overwhelmed: (plotLines?.active.length || 0) > 3,
+      context: `${angelComp.angelType} angel of ${angelComp.alignedDomains.join(', ') || 'no domain'}, serving deity ${angelComp.creatorDeityId}`,
+    };
+  }
+
+  /**
+   * Analyze a spirit entity as a narrative thread
+   */
+  private analyzeSpiritThread(spirit: Entity, world: World): EntityThread | null {
+    const identity = spirit.getComponent<IdentityComponent>(CT.Identity);
+    const plotLines = spirit.getComponent<PlotLinesComponent>(CT.PlotLines);
+
+    // Extract recent actions
+    const recentActions = this.extractRecentActions(spirit);
+
+    return {
+      entityId: spirit.id,
+      entityType: 'spirit',
+      name: identity?.name || spirit.id,
+      activePlots: plotLines?.active.map(p => p.instance_id) || [],
+      completedPlots: plotLines?.completed.length || 0,
+      wisdom: 30,  // Spirits have moderate wisdom by default
+      recentActions,
+      storyPotential: 0.5,  // Spirits are always potentially interesting
+      needsChallenge: false,
+      overwhelmed: (plotLines?.active.length || 0) > 2,
+      context: `Spirit entity in the world`,
+    };
+  }
+
+  /**
+   * Analyze the Supreme Creator (player-god) as a narrative thread
+   * The Fates do NOT know this is "the player" - they see it as just another god
+   */
+  private analyzeCreatorThread(creator: Entity, world: World): EntityThread | null {
+    const plotLines = creator.getComponent<PlotLinesComponent>(CT.PlotLines);
+
+    // Count active deities under this creator's influence
+    const deitiesCount = world.query().with(CT.Deity).executeEntities().length;
+
+    // Extract recent divine interventions from memories
+    const recentActions = this.extractRecentActions(creator);
+
+    return {
+      entityId: creator.id,
+      entityType: 'god',
+      name: 'The Creator',  // Generic name - Fates don't know it's the player
+      activePlots: plotLines?.active.map(p => p.instance_id) || [],
+      completedPlots: plotLines?.completed.length || 0,
+      wisdom: 1000,  // Creator-level wisdom
+      recentActions,
+      storyPotential: 0.7,  // High potential - creators make good story subjects
+      needsChallenge: deitiesCount > 5,  // Creator with many deities might need a challenge
+      overwhelmed: (plotLines?.active.length || 0) > 10,
+      context: `The supreme creator overseeing ${deitiesCount} deities in this realm`,
+    };
+  }
+
+  /**
    * Assess how interesting an entity's current situation is (0-1)
    */
   private assessStoryPotential(entity: Entity, world: World): number {
     let potential = 0.3;  // Base potential
 
-    // TODO: Implement sophisticated assessment:
-    // - Recent major events (death, marriage, power gain/loss)
-    // - Relationship tensions
-    // - Unfulfilled goals
-    // - Contradiction between actions and stated values
-    // - Rising/falling trajectory
+    // Check for recent major events via episodic memory
+    const memory = entity.getComponent<EpisodicMemoryComponent>(CT.EpisodicMemory);
+    if (memory && memory.episodicMemories.length > 0) {
+      // Recent high-importance memories increase potential
+      const recentHighImportance = memory.episodicMemories
+        .filter(m => m.importance >= 0.7 && m.timestamp > (this.world?.tick || 0) - 50000)
+        .length;
+      potential += recentHighImportance * 0.05;
+    }
+
+    // Relationship tensions increase potential
+    const relationships = entity.getComponent<RelationshipComponent>(CT.Relationship);
+    if (relationships) {
+      const relMap = relationships.relationships || new Map();
+      let tensionCount = 0;
+      for (const [, rel] of relMap.entries()) {
+        const trust = (rel as { trust?: number }).trust ?? 50;
+        if (trust < 20 || trust > 80) tensionCount++;
+      }
+      potential += tensionCount * 0.03;
+    }
+
+    // Unfulfilled goals increase potential
+    const goals = entity.getComponent<GoalsComponent>(CT.Goals);
+    if (goals && goals.goals) {
+      const unfulfilledCount = goals.goals.filter((g: { completed?: boolean }) => !g.completed).length;
+      potential += Math.min(0.2, unfulfilledCount * 0.04);
+    }
+
+    // Rising/falling trajectory based on plot history
+    const plotLines = entity.getComponent<PlotLinesComponent>(CT.PlotLines);
+    if (plotLines) {
+      // Recently completed many plots = rising, few = might need new challenge
+      const recentCompletions = plotLines.completed.filter(p =>
+        (this.world?.tick || 0) - p.completed_at_personal_tick < 100000
+      ).length;
+      if (recentCompletions > 3) potential += 0.1;  // Rising trajectory
+      else if (recentCompletions === 0 && plotLines.completed.length > 5) potential += 0.15;  // Stagnant, needs challenge
+    }
 
     return Math.min(1, potential);
   }
@@ -407,9 +549,78 @@ export class FatesCouncilSystem extends BaseSystem {
    * Build brief context string for an entity
    */
   private buildEntityContext(entity: Entity, world: World): string {
-    // TODO: Build rich context from entity state
-    // For now, simple placeholder
-    return 'Entity in the world';
+    const contextParts: string[] = [];
+
+    // Get identity for basic info
+    const identity = entity.getComponent<IdentityComponent>(CT.Identity);
+    if (identity) {
+      if (identity.profession) contextParts.push(identity.profession);
+      if (identity.age !== undefined) contextParts.push(`age ${Math.floor(identity.age)}`);
+    }
+
+    // Check for family relationships
+    interface ParentingComponent {
+      type: 'parenting';
+      children?: Array<unknown>;
+    }
+    const parenting = entity.getComponent(CT.Parenting) as ParentingComponent | undefined;
+    if (parenting && parenting.children && parenting.children.length > 0) {
+      contextParts.push(`${parenting.children.length} children`);
+    }
+
+    // Check for deity relationships
+    interface SpiritualComponent {
+      type: 'spiritual';
+      believedDeity?: string;
+      faith?: number;
+    }
+    const spiritual = entity.getComponent(CT.Spiritual) as SpiritualComponent | undefined;
+    if (spiritual && spiritual.believedDeity) {
+      const faithLevel = spiritual.faith || 0;
+      const faithDesc = faithLevel > 80 ? 'devout follower' : faithLevel > 50 ? 'follower' : 'skeptical believer';
+      contextParts.push(`${faithDesc} of deity`);
+    }
+
+    // Check for skills/profession specialization
+    interface SkillsComponent {
+      type: 'skills';
+      levels?: Record<string, number>;
+    }
+    const skills = entity.getComponent(CT.Skills) as SkillsComponent | undefined;
+    if (skills && skills.levels) {
+      const topSkills = Object.entries(skills.levels)
+        .filter(([, level]) => level >= 3)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 2)
+        .map(([skill]) => skill);
+      if (topSkills.length > 0) {
+        contextParts.push(`skilled in ${topSkills.join(', ')}`);
+      }
+    }
+
+    // Check for active plots to mention
+    const plotLines = entity.getComponent<PlotLinesComponent>(CT.PlotLines);
+    if (plotLines && plotLines.active.length > 0) {
+      const plotCount = plotLines.active.length;
+      contextParts.push(`${plotCount} active plot${plotCount > 1 ? 's' : ''}`);
+    }
+
+    // Check relationships for drama potential
+    const relationships = entity.getComponent<RelationshipComponent>(CT.Relationship);
+    if (relationships) {
+      const relMap = relationships.relationships || new Map();
+      let rivalCount = 0;
+      let allyCount = 0;
+      for (const [, rel] of relMap.entries()) {
+        const trust = (rel as { trust?: number }).trust ?? 50;
+        if (trust < 20) rivalCount++;
+        if (trust > 80) allyCount++;
+      }
+      if (rivalCount > 0) contextParts.push(`${rivalCount} rival${rivalCount > 1 ? 's' : ''}`);
+      if (allyCount > 0) contextParts.push(`${allyCount} close ally`);
+    }
+
+    return contextParts.length > 0 ? contextParts.join(', ') : 'Entity in the world';
   }
 
   /**
@@ -517,10 +728,23 @@ export class FatesCouncilSystem extends BaseSystem {
         break;
     }
 
-    // Check wisdom requirements
-    // TODO: Filter based on thread.wisdom and plot requirements
+    // Filter based on thread.wisdom and plot requirements
+    // Exotic plots require minimum wisdom based on their difficulty
+    const wisdomRequirements: Record<string, number> = {
+      'exotic_divine_reckoning': 30,
+      'exotic_from_beyond_veil': 40,
+      'exotic_when_magics_collide': 35,
+      'exotic_what_dwells_between': 50,
+      'exotic_tyrant_you_became': 25,
+      'exotic_price_changing_yesterday': 60,
+      'exotic_prophecy_trap': 20,
+      'exotic_burden_being_chosen': 15,
+    };
 
-    return candidates;
+    return candidates.filter(plotId => {
+      const requiredWisdom = wisdomRequirements[plotId] ?? 0;
+      return thread.wisdom >= requiredWisdom;
+    });
   }
 
   /**
@@ -551,15 +775,80 @@ export class FatesCouncilSystem extends BaseSystem {
    * Detect if there's poetic justice in this event → plot assignment
    */
   private detectPoeticJustice(event: ExoticEvent, thread: EntityThread): string | undefined {
-    // TODO: Implement sophisticated pattern detection
-    // For now, simple examples:
-
-    if (event.type === 'deity_relationship_critical' && thread.completedPlots > 5) {
-      return 'They have ignored the divine throughout their lives; now a god demands their attention';
+    // Pattern 1: Divine relationships
+    if (event.type === 'deity_relationship_critical') {
+      if (thread.completedPlots > 5) {
+        return 'They have ignored the divine throughout their lives; now a god demands their attention';
+      }
+      if (thread.wisdom > 70) {
+        return 'The wise one thought themselves above divine matters - hubris invites reckoning';
+      }
     }
 
-    if (event.type === 'political_elevation' && thread.wisdom < 30) {
-      return 'Power granted to the unprepared - classic hubris setup';
+    // Pattern 2: Political power
+    if (event.type === 'political_elevation') {
+      if (thread.wisdom < 30) {
+        return 'Power granted to the unprepared - classic hubris setup';
+      }
+      if (thread.recentActions.some(a => a.toLowerCase().includes('betray') || a.toLowerCase().includes('deceive'))) {
+        return 'One who rose through treachery may find treachery returns to them';
+      }
+    }
+
+    // Pattern 3: Magic conflicts
+    if (event.type === 'paradigm_conflict') {
+      if (thread.completedPlots === 0) {
+        return 'A novice who reached for too many powers at once - a tale as old as magic itself';
+      }
+      if (thread.wisdom > 50) {
+        return 'Even the wise can be blinded by the allure of forbidden knowledge';
+      }
+    }
+
+    // Pattern 4: Dimensional encounters
+    if (event.type === 'dimensional_encounter') {
+      if (thread.recentActions.some(a => a.toLowerCase().includes('portal') || a.toLowerCase().includes('summon'))) {
+        return 'They who summon beyond the veil must face what answers';
+      }
+    }
+
+    // Pattern 5: Time paradoxes
+    if (event.type === 'time_paradox') {
+      if (thread.completedPlots > 3) {
+        return 'One who has lived many stories now must face the consequence of changing them';
+      }
+    }
+
+    // Pattern 6: Prophecies
+    if (event.type === 'prophecy_given') {
+      if (thread.needsChallenge) {
+        return 'The comfortable life is shattered by destiny\'s call';
+      }
+    }
+
+    // Pattern 7: Being chosen
+    if (event.type === 'champion_chosen') {
+      if (thread.wisdom < 20) {
+        return 'The meek are chosen - but can they bear the weight?';
+      }
+      if (thread.overwhelmed) {
+        return 'Already burdened, now blessed with more - a test of true character';
+      }
+    }
+
+    // Pattern 8: Multiverse invasions
+    if (event.type === 'multiverse_invasion') {
+      return 'When worlds collide, all threads are tested';
+    }
+
+    // Pattern 9: Stale threads (generic)
+    if (event.type === 'stale_thread') {
+      if (thread.wisdom > 60) {
+        return 'Comfort breeds complacency, even in the wise';
+      }
+      if (thread.completedPlots > 10) {
+        return 'A hero who has rested on their laurels - time for the next chapter';
+      }
     }
 
     return undefined;
@@ -578,9 +867,54 @@ export class FatesCouncilSystem extends BaseSystem {
     const activeExoticCount = threads.reduce((sum, t) => sum + t.activePlots.length, 0);
     tension += activeExoticCount * 0.05;
 
-    // TODO: Add world state factors (wars, plagues, divine interventions)
+    // World state factors: Check for active wars
+    interface ConflictComponent {
+      type: 'conflict';
+      conflicts?: Array<{ active?: boolean; severity?: number }>;
+    }
+    const conflictEntities = world.query().with(CT.Conflict).executeEntities();
+    let activeWarCount = 0;
+    for (const entity of conflictEntities) {
+      const conflict = entity.getComponent(CT.Conflict) as ConflictComponent | undefined;
+      if (conflict && conflict.conflicts) {
+        activeWarCount += conflict.conflicts.filter(c => c.active).length;
+      }
+    }
+    tension += activeWarCount * 0.15;
 
-    return Math.min(1, tension);
+    // Check for active invasions
+    const invasionEntities = world.query().with(CT.Invasion).executeEntities();
+    tension += invasionEntities.length * 0.2;
+
+    // Check deity count - many active deities can mean more divine drama
+    const deityCount = world.query().with(CT.Deity).executeEntities().length;
+    if (deityCount > 3) {
+      tension += (deityCount - 3) * 0.03;  // Each deity above 3 adds tension
+    }
+
+    // Check for angels in combat
+    const angels = world.query().with(CT.Angel).executeEntities();
+    const combatAngels = angels.filter(a => {
+      const angel = a.getComponent<AngelComponent>(CT.Angel);
+      return angel && angel.state.inCombat;
+    });
+    tension += combatAngels.length * 0.1;
+
+    // Check for dimensional rifts
+    const riftEntities = world.query().with(CT.DimensionalRift).executeEntities();
+    tension += riftEntities.length * 0.15;
+
+    // Check for power vacuums (vacant positions of authority)
+    const powerVacuums = world.query().with(CT.PowerVacuum).executeEntities();
+    tension += powerVacuums.length * 0.1;
+
+    // Check thread states - many overwhelmed or challenged threads increase tension
+    const overwhelmedCount = threads.filter(t => t.overwhelmed).length;
+    const challengedCount = threads.filter(t => t.needsChallenge).length;
+    tension += overwhelmedCount * 0.02;
+    tension -= challengedCount * 0.01;  // Stagnant world needs drama, so lower tension to encourage plots
+
+    return Math.min(1, Math.max(0, tension));
   }
 
   /**
@@ -980,13 +1314,168 @@ export class FatesCouncilSystem extends BaseSystem {
       });
     });
 
-    // TODO: Subscribe to other exotic events:
-    // - magic:paradigm_conflict_detected
-    // - companion:dimensional_encounter
-    // - governance:political_elevation
-    // - time:paradox_detected
-    // - divinity:prophecy_given
-    // - divinity:champion_chosen
+    // Subscribe to magic paradigm conflicts
+    this.events.onGeneric('magic:paradigm_conflict_detected', (data: unknown) => {
+      interface ParadigmConflictData {
+        agentId: string;
+        paradigm1: string;
+        paradigm2: string;
+        conflictSeverity: string;
+        tick: number;
+      }
+      if (!data || typeof data !== 'object' || !('agentId' in data) || !('tick' in data)) {
+        console.error('[FatesCouncilSystem] Invalid paradigm_conflict_detected data:', data);
+        return;
+      }
+      const eventData = data as ParadigmConflictData;
+      this.trackExoticEvent({
+        type: 'paradigm_conflict',
+        entityId: eventData.agentId,
+        description: `Magic paradigm conflict between ${eventData.paradigm1} and ${eventData.paradigm2} (${eventData.conflictSeverity})`,
+        tick: eventData.tick,
+        severity: eventData.conflictSeverity === 'catastrophic' ? 0.95 : eventData.conflictSeverity === 'dangerous' ? 0.7 : 0.5,
+      });
+    });
+
+    // Subscribe to dimensional encounters
+    this.events.onGeneric('companion:dimensional_encounter', (data: unknown) => {
+      interface DimensionalEncounterData {
+        agentId: string;
+        soulId: string;
+        creatureType: string;
+        sanityDamage: number;
+        tick: number;
+      }
+      if (!data || typeof data !== 'object' || !('agentId' in data) || !('tick' in data)) {
+        console.error('[FatesCouncilSystem] Invalid dimensional_encounter data:', data);
+        return;
+      }
+      const eventData = data as DimensionalEncounterData;
+      this.trackExoticEvent({
+        type: 'dimensional_encounter',
+        entityId: eventData.agentId,
+        description: `Dimensional encounter with ${eventData.creatureType}, sanity damage ${eventData.sanityDamage}`,
+        tick: eventData.tick,
+        severity: Math.min(1, eventData.sanityDamage / 50),  // Scale severity by sanity damage
+      });
+    });
+
+    // Subscribe to time paradoxes
+    this.events.onGeneric('time:paradox_detected', (data: unknown) => {
+      interface TimeParadoxData {
+        agentId: string;
+        soulId: string;
+        paradoxType: string;
+        alterationMagnitude: number;
+        tick: number;
+      }
+      if (!data || typeof data !== 'object' || !('agentId' in data) || !('tick' in data)) {
+        console.error('[FatesCouncilSystem] Invalid paradox_detected data:', data);
+        return;
+      }
+      const eventData = data as TimeParadoxData;
+      this.trackExoticEvent({
+        type: 'time_paradox',
+        entityId: eventData.agentId,
+        description: `Time paradox detected: ${eventData.paradoxType}, magnitude ${(eventData.alterationMagnitude * 100).toFixed(0)}%`,
+        tick: eventData.tick,
+        severity: Math.min(1, eventData.alterationMagnitude + 0.3),  // Paradoxes are always severe
+      });
+    });
+
+    // Subscribe to divine prophecies
+    this.events.onGeneric('divinity:prophecy_given', (data: unknown) => {
+      interface ProphecyData {
+        recipientId: string;
+        soulId: string;
+        deityId: string;
+        prophecyType: string;
+        inevitability: number;
+        tick: number;
+      }
+      if (!data || typeof data !== 'object' || !('recipientId' in data) || !('tick' in data)) {
+        console.error('[FatesCouncilSystem] Invalid prophecy_given data:', data);
+        return;
+      }
+      const eventData = data as ProphecyData;
+      this.trackExoticEvent({
+        type: 'prophecy_given',
+        entityId: eventData.recipientId,
+        description: `Received ${eventData.prophecyType} prophecy with ${(eventData.inevitability * 100).toFixed(0)}% inevitability`,
+        tick: eventData.tick,
+        severity: eventData.prophecyType === 'doom' ? 0.9 : eventData.prophecyType === 'destiny' ? 0.8 : 0.6,
+      });
+    });
+
+    // Subscribe to divine champion selection
+    this.events.onGeneric('divinity:champion_chosen', (data: unknown) => {
+      interface ChampionData {
+        championId: string;
+        soulId: string;
+        deityId: string;
+        deityName: string;
+        championType: string;
+        powerGranted: number;
+        tick: number;
+      }
+      if (!data || typeof data !== 'object' || !('championId' in data) || !('tick' in data)) {
+        console.error('[FatesCouncilSystem] Invalid champion_chosen data:', data);
+        return;
+      }
+      const eventData = data as ChampionData;
+      this.trackExoticEvent({
+        type: 'champion_chosen',
+        entityId: eventData.championId,
+        description: `Chosen as ${eventData.championType} champion of ${eventData.deityName}, granted power level ${eventData.powerGranted}`,
+        tick: eventData.tick,
+        severity: eventData.championType === 'avatar' ? 0.95 : eventData.championType === 'prophet' ? 0.85 : 0.7,
+      });
+    });
+
+    // Subscribe to political elevation events (using governor appointment)
+    this.events.onGeneric('governor:appointed', (data: unknown) => {
+      interface GovernorAppointedData {
+        governorId: string;
+        tier: string;
+        tick: number;
+      }
+      if (!data || typeof data !== 'object' || !('governorId' in data) || !('tick' in data)) {
+        console.error('[FatesCouncilSystem] Invalid governor_appointed data:', data);
+        return;
+      }
+      const eventData = data as GovernorAppointedData;
+      // Only track significant elevations (city level or higher)
+      if (eventData.tier === 'city' || eventData.tier === 'province' || eventData.tier === 'nation' || eventData.tier === 'empire') {
+        this.trackExoticEvent({
+          type: 'political_elevation',
+          entityId: eventData.governorId,
+          description: `Elevated to ${eventData.tier}-level governor`,
+          tick: eventData.tick,
+          severity: eventData.tier === 'empire' ? 0.95 : eventData.tier === 'nation' ? 0.85 : eventData.tier === 'province' ? 0.7 : 0.6,
+        });
+      }
+    });
+
+    // Subscribe to empire ruler changes
+    this.events.onGeneric('empire:ruler_changed', (data: unknown) => {
+      interface RulerChangedData {
+        empireName: string;
+        newRulerId: string;
+        tick: number;
+      }
+      if (!data || typeof data !== 'object' || !('newRulerId' in data) || !('tick' in data)) {
+        console.error('[FatesCouncilSystem] Invalid ruler_changed data:', data);
+        return;
+      }
+      const eventData = data as RulerChangedData;
+      this.trackExoticEvent({
+        type: 'political_elevation',
+        entityId: eventData.newRulerId,
+        description: `Became ruler of ${eventData.empireName}`,
+        tick: eventData.tick,
+        severity: 0.95,  // Becoming emperor is always significant
+      });
+    });
   }
 
   /**
