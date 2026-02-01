@@ -34,6 +34,25 @@ import { createSoulIdentityComponent } from '../components/SoulIdentityComponent
 import { DeityComponent } from '../components/DeityComponent.js';
 
 /**
+ * Helper to create a properly typed Component from an object literal.
+ * Validates that required fields exist at runtime rather than using unsafe type assertions.
+ *
+ * @param obj - Object with component data including type and version
+ * @returns The object typed as Component
+ * @throws Error if type or version fields are missing
+ */
+function asComponent(obj: { type: string; version?: number; [key: string]: unknown }): Component {
+  if (typeof obj.type !== 'string' || obj.type.length === 0) {
+    throw new Error('Component must have a non-empty type field');
+  }
+  // Default version to 1 if not provided
+  if (obj.version === undefined) {
+    obj.version = 1;
+  }
+  return obj as Component;
+}
+
+/**
  * Chunk information for god-crafted content spawning
  */
 export interface ChunkSpawnInfo {
@@ -266,7 +285,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
     const entity = world.createEntity() as EntityImpl;
 
     // Add riddle component
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'generated_content',
       version: 1,
       contentType: 'riddle',
@@ -281,10 +300,10 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       approved: true,
       rejected: false,
       rejectionReason: null,
-    } as unknown as Component);
+    }));
 
     // Add god-crafted metadata
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'god_crafted_artifact',
       version: 1,
       contentId: content.id,
@@ -292,24 +311,24 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       discoveredAt: Date.now(),
       discoveryMethod: 'random_encounter',
       lore: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add identity for display
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'identity',
       version: 1,
       name: `Riddle of ${content.creator.name}`,
       description: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add position if provided (for chunk-based spawning)
     if (position) {
-      entity.addComponent({
+      entity.addComponent(asComponent({
         type: 'position',
         version: 1,
         x: position.x,
         y: position.y,
-      } as unknown as Component);
+      }));
     }
 
     // Silent spawn - no console spam
@@ -350,7 +369,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
     const entity = world.createEntity() as EntityImpl;
 
     // Add generated content component with spell data
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'generated_content',
       contentType: 'spell',
       content: {
@@ -368,10 +387,10 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       approved: true,
       rejected: false,
       rejectionReason: null,
-    } as unknown as Component);
+    }));
 
     // Add god-crafted metadata
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'god_crafted_artifact',
       version: 1,
       contentId: content.id,
@@ -379,23 +398,23 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       discoveredAt: Date.now(),
       discoveryMethod: 'random_encounter',
       lore: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add identity for display
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'identity',
       name: spellData.name,
       description: spellData.description,
-    } as unknown as Component);
+    }));
 
     // Add position if provided (for chunk-based spawning)
     if (position) {
-      entity.addComponent({
+      entity.addComponent(asComponent({
         type: 'position',
         version: 1,
         x: position.x,
         y: position.y,
-      } as unknown as Component);
+      }));
     }
 
     // Silent spawn - no console spam
@@ -436,7 +455,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
     const entity = world.createEntity() as EntityImpl;
 
     // Add generated content component with recipe data
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'generated_content',
       contentType: 'recipe',
       content: {
@@ -454,10 +473,10 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       approved: true,
       rejected: false,
       rejectionReason: null,
-    } as unknown as Component);
+    }));
 
     // Add god-crafted metadata
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'god_crafted_artifact',
       version: 1,
       contentId: content.id,
@@ -465,23 +484,23 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       discoveredAt: Date.now(),
       discoveryMethod: 'random_encounter',
       lore: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add identity for display
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'identity',
       name: recipeData.name,
       description: `A ${recipeData.type} recipe crafted by ${content.creator.name}`,
-    } as unknown as Component);
+    }));
 
     // Add position if provided (for chunk-based spawning)
     if (position) {
-      entity.addComponent({
+      entity.addComponent(asComponent({
         type: 'position',
         version: 1,
         x: position.x,
         y: position.y,
-      } as unknown as Component);
+      }));
     }
 
     // Silent spawn - no console spam
@@ -522,7 +541,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
     const entity = world.createEntity() as EntityImpl;
 
     // Add generated content component with item data
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'generated_content',
       version: 1,
       contentType: 'legendary_item',
@@ -539,10 +558,10 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       approved: true,
       rejected: false,
       rejectionReason: null,
-    } as unknown as Component);
+    }));
 
     // Add god-crafted metadata
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'god_crafted_artifact',
       version: 1,
       contentId: content.id,
@@ -550,24 +569,24 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       discoveredAt: Date.now(),
       discoveryMethod: 'random_encounter',
       lore: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add identity for display
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'identity',
       version: 1,
       name: itemData.displayName,
       description: itemData.legendary.lore,
-    } as unknown as Component);
+    }));
 
     // Add position if provided
     if (position) {
-      entity.addComponent({
+      entity.addComponent(asComponent({
         type: 'position',
         version: 1,
         x: position.x,
         y: position.y,
-      } as unknown as Component);
+      }));
     }
 
     // Emit discovery event
@@ -620,10 +639,10 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       incarnationHistory: [],
     });
 
-    entity.addComponent(soulIdentity as unknown as Component);
+    entity.addComponent(asComponent(soulIdentity));
 
     // Add generated content component with full soul data
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'generated_content',
       version: 1,
       contentType: 'soul',
@@ -637,10 +656,10 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       approved: true,
       rejected: false,
       rejectionReason: null,
-    } as unknown as Component);
+    }));
 
     // Add god-crafted metadata
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'god_crafted_artifact',
       version: 1,
       contentId: content.id,
@@ -648,24 +667,24 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       discoveredAt: Date.now(),
       discoveryMethod: 'random_encounter',
       lore: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add identity for display
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'identity',
       version: 1,
       name: soulData.identity.name,
       description: soulData.backstory,
-    } as unknown as Component);
+    }));
 
     // Add position if provided
     if (position) {
-      entity.addComponent({
+      entity.addComponent(asComponent({
         type: 'position',
         version: 1,
         x: position.x,
         y: position.y,
-      } as unknown as Component);
+      }));
     }
 
     // Emit discovery event
@@ -701,7 +720,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
     const entity = world.createEntity() as EntityImpl;
 
     // Store as generated content
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'generated_content',
       version: 1,
       contentType: 'quest',
@@ -709,10 +728,10 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       approved: true,
       rejected: false,
       rejectionReason: null,
-    } as unknown as Component);
+    }));
 
     // Add god-crafted metadata
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'god_crafted_artifact',
       version: 1,
       contentId: content.id,
@@ -720,24 +739,24 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       discoveredAt: Date.now(),
       discoveryMethod: 'random_encounter',
       lore: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add identity
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'identity',
       version: 1,
       name: `Quest from ${content.creator.name}`,
       description: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add position if provided
     if (position) {
-      entity.addComponent({
+      entity.addComponent(asComponent({
         type: 'position',
         version: 1,
         x: position.x,
         y: position.y,
-      } as unknown as Component);
+      }));
     }
 
     // Emit discovery event
@@ -773,7 +792,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
     const entity = world.createEntity() as EntityImpl;
 
     // Store as generated content
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'generated_content',
       version: 1,
       contentType: 'alien_species',
@@ -781,10 +800,10 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       approved: true,
       rejected: false,
       rejectionReason: null,
-    } as unknown as Component);
+    }));
 
     // Add god-crafted metadata
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'god_crafted_artifact',
       version: 1,
       contentId: content.id,
@@ -792,24 +811,24 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       discoveredAt: Date.now(),
       discoveryMethod: 'random_encounter',
       lore: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add identity
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'identity',
       version: 1,
       name: `Species from ${content.creator.name}`,
       description: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add position if provided
     if (position) {
-      entity.addComponent({
+      entity.addComponent(asComponent({
         type: 'position',
         version: 1,
         x: position.x,
         y: position.y,
-      } as unknown as Component);
+      }));
     }
 
     // Emit discovery event
@@ -845,7 +864,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
     const entity = world.createEntity() as EntityImpl;
 
     // Store as generated content
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'generated_content',
       version: 1,
       contentType: 'magic_paradigm',
@@ -853,10 +872,10 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       approved: true,
       rejected: false,
       rejectionReason: null,
-    } as unknown as Component);
+    }));
 
     // Add god-crafted metadata
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'god_crafted_artifact',
       version: 1,
       contentId: content.id,
@@ -864,24 +883,24 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       discoveredAt: Date.now(),
       discoveryMethod: 'random_encounter',
       lore: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add identity
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'identity',
       version: 1,
       name: `Magic Paradigm from ${content.creator.name}`,
       description: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add position if provided
     if (position) {
-      entity.addComponent({
+      entity.addComponent(asComponent({
         type: 'position',
         version: 1,
         x: position.x,
         y: position.y,
-      } as unknown as Component);
+      }));
     }
 
     // Emit discovery event
@@ -917,7 +936,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
     const entity = world.createEntity() as EntityImpl;
 
     // Store as generated content
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'generated_content',
       version: 1,
       contentType: 'building',
@@ -925,10 +944,10 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       approved: true,
       rejected: false,
       rejectionReason: null,
-    } as unknown as Component);
+    }));
 
     // Add god-crafted metadata
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'god_crafted_artifact',
       version: 1,
       contentId: content.id,
@@ -936,24 +955,24 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       discoveredAt: Date.now(),
       discoveryMethod: 'random_encounter',
       lore: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add identity
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'identity',
       version: 1,
       name: `Building from ${content.creator.name}`,
       description: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add position if provided
     if (position) {
-      entity.addComponent({
+      entity.addComponent(asComponent({
         type: 'position',
         version: 1,
         x: position.x,
         y: position.y,
-      } as unknown as Component);
+      }));
     }
 
     // Emit discovery event
@@ -989,7 +1008,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
     const entity = world.createEntity() as EntityImpl;
 
     // Store as generated content
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'generated_content',
       version: 1,
       contentType: 'technology',
@@ -997,10 +1016,10 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       approved: true,
       rejected: false,
       rejectionReason: null,
-    } as unknown as Component);
+    }));
 
     // Add god-crafted metadata
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'god_crafted_artifact',
       version: 1,
       contentId: content.id,
@@ -1008,24 +1027,24 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       discoveredAt: Date.now(),
       discoveryMethod: 'random_encounter',
       lore: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add identity
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'identity',
       version: 1,
       name: `Technology from ${content.creator.name}`,
       description: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add position if provided
     if (position) {
-      entity.addComponent({
+      entity.addComponent(asComponent({
         type: 'position',
         version: 1,
         x: position.x,
         y: position.y,
-      } as unknown as Component);
+      }));
     }
 
     // Emit discovery event
@@ -1066,10 +1085,10 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       'dormant' // Start as dormant until believers emerge
     );
 
-    entity.addComponent(deityComponent as unknown as Component);
+    entity.addComponent(asComponent(deityComponent));
 
     // Store god-crafted data as generated content
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'generated_content',
       version: 1,
       contentType: 'deity',
@@ -1077,10 +1096,10 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       approved: true,
       rejected: false,
       rejectionReason: null,
-    } as unknown as Component);
+    }));
 
     // Add god-crafted metadata
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'god_crafted_artifact',
       version: 1,
       contentId: content.id,
@@ -1088,24 +1107,24 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       discoveredAt: Date.now(),
       discoveryMethod: 'random_encounter',
       lore: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add identity
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'identity',
       version: 1,
       name: `${content.creator.name}'s Deity`,
       description: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add position if provided
     if (position) {
-      entity.addComponent({
+      entity.addComponent(asComponent({
         type: 'position',
         version: 1,
         x: position.x,
         y: position.y,
-      } as unknown as Component);
+      }));
     }
 
     // Emit discovery event
@@ -1141,7 +1160,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
     const entity = world.createEntity() as EntityImpl;
 
     // Store as generated content
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'generated_content',
       version: 1,
       contentType: 'religion',
@@ -1149,10 +1168,10 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       approved: true,
       rejected: false,
       rejectionReason: null,
-    } as unknown as Component);
+    }));
 
     // Add god-crafted metadata
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'god_crafted_artifact',
       version: 1,
       contentId: content.id,
@@ -1160,24 +1179,24 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       discoveredAt: Date.now(),
       discoveryMethod: 'random_encounter',
       lore: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add identity
-    entity.addComponent({
+    entity.addComponent(asComponent({
       type: 'identity',
       version: 1,
       name: `Religion from ${content.creator.name}`,
       description: content.lore,
-    } as unknown as Component);
+    }));
 
     // Add position if provided
     if (position) {
-      entity.addComponent({
+      entity.addComponent(asComponent({
         type: 'position',
         version: 1,
         x: position.x,
         y: position.y,
-      } as unknown as Component);
+      }));
     }
 
     // Emit discovery event
