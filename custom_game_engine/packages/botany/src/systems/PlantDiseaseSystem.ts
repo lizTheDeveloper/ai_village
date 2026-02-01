@@ -183,19 +183,41 @@ export class PlantDiseaseSystem extends BaseSystem {
    * Handle treatment event (internal)
    */
   private applyTreatmentFromEvent(
-    _entityId: string,
-    _treatmentId: string,
+    entityId: string,
+    treatmentId: string,
     _treatmentType: string
   ): void {
-    // TODO: Implement proper event-driven treatment application
-    // Should look up the entity by entityId and call applyTreatment()
-    // This would look up the entity and apply treatment
-    // For now this is a placeholder - actual treatment is done via applyTreatment()
+    // Look up the entity in the world
+    // Note: We need world access for this - will need to be called from onUpdate context
+    // For now, store the pending treatment and apply it in the next update cycle
+    if (!this.pendingTreatments) {
+      this.pendingTreatments = new Map();
+    }
+
+    this.pendingTreatments.set(entityId, treatmentId);
   }
+
+  /** Pending treatments to apply in next update cycle */
+  private pendingTreatments: Map<string, string> | null = null;
 
   protected onUpdate(ctx: SystemContext): void {
     const world = ctx.world;
     const activeEntities = ctx.activeEntities;
+
+    // Apply pending treatments from events
+    if (this.pendingTreatments && this.pendingTreatments.size > 0) {
+      for (const [entityId, treatmentId] of this.pendingTreatments) {
+        const entity = world.getEntity(entityId);
+        if (entity) {
+          const impl = entity as EntityImpl;
+          const plant = impl.getComponent<PlantComponent>(CT.Plant);
+          if (plant) {
+            this.applyTreatment(plant, entityId, treatmentId);
+          }
+        }
+      }
+      this.pendingTreatments.clear();
+    }
 
     // Get current game day for tracking
     const gameDay = this.getCurrentGameDay(world);
@@ -234,12 +256,22 @@ export class PlantDiseaseSystem extends BaseSystem {
   }
 
   /**
-   * Get current game day (simplified)
+   * Get current game day from TimeSystem
    */
-  private getCurrentGameDay(_world: World): number{
-    // TODO: Query actual game day from TimeSystem instead of using real-world Date.now()
-    // This causes issues with time travel, save/load, and time speed multipliers
-    // In a real implementation, this would query the time system
+  private getCurrentGameDay(world: World): number{
+    // Query TimeSystem for actual game day
+    const timeEntities = world.query().with(CT.Time).executeEntities();
+    if (timeEntities.length > 0) {
+      const timeEntity = timeEntities[0];
+      if (timeEntity) {
+        const timeComp = timeEntity.components.get('time') as { day?: number } | undefined;
+        if (timeComp && typeof timeComp.day === 'number') {
+          return timeComp.day;
+        }
+      }
+    }
+
+    // Fallback to real-world day if TimeSystem not available (for testing)
     return Math.floor(Date.now() / (1000 * 60 * 60 * 24));
   }
 

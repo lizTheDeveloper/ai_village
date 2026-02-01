@@ -423,30 +423,109 @@ export class PlantSystem extends BaseSystem {
   private getEnvironment(position: { x: number; y: number }, world: World): Environment {
     const temperature = this.getTemperature(position, world);
     const moisture = this.getMoisture(position, world);
-    // TODO: Get actual soil nutrient data from SoilSystem instead of hardcoded default
-    const nutrients = 80; // Default from soil
-    // TODO: Get actual season from TimeSystem instead of hardcoded default
-    const season = 'spring'; // Default
-    // TODO: Implement light level calculation based on time of day, weather, and surrounding terrain
-    const lightLevel = 100; // Default
+
+    // Get actual soil nutrient data from tile
+    let nutrients = 80; // Default fallback
+    const worldWithTiles = world as { getTileAt?: (x: number, y: number) => any };
+    if (typeof worldWithTiles.getTileAt === 'function') {
+      const tile = worldWithTiles.getTileAt(position.x, position.y);
+      if (tile && tile.nutrients) {
+        // Calculate average nutrient level from N-P-K values
+        const avgNutrients = (
+          tile.nutrients.nitrogen +
+          tile.nutrients.phosphorus +
+          tile.nutrients.potassium
+        ) / 3;
+        nutrients = avgNutrients;
+      } else if (tile && tile.fertility !== undefined) {
+        // Fallback to fertility if nutrients not available
+        nutrients = tile.fertility;
+      }
+    }
+
+    // Get actual season from TimeSystem
+    let season: string = 'spring'; // Default fallback
+    if (this.timeEntityId && world.getEntity(this.timeEntityId)) {
+      const timeEntity = world.getEntity(this.timeEntityId)!;
+      const timeComp = timeEntity.components.get('time') as { season?: string } | undefined;
+      if (timeComp && timeComp.season) {
+        season = timeComp.season;
+      }
+    } else {
+      // Query for time entity if not cached
+      const timeEntities = world.query().with(CT.Time).executeEntities();
+      if (timeEntities.length > 0) {
+        const timeEntity = timeEntities[0];
+        if (timeEntity) {
+          const timeComp = timeEntity.components.get('time') as { season?: string } | undefined;
+          if (timeComp && timeComp.season) {
+            season = timeComp.season;
+          }
+        }
+      }
+    }
+
+    // Get actual light level from TimeSystem (0-1 scale)
+    let lightLevel = 1.0; // Default full light
+    if (this.timeEntityId && world.getEntity(this.timeEntityId)) {
+      const timeEntity = world.getEntity(this.timeEntityId)!;
+      const timeComp = timeEntity.components.get('time') as { lightLevel?: number } | undefined;
+      if (timeComp && typeof timeComp.lightLevel === 'number') {
+        lightLevel = timeComp.lightLevel;
+      }
+    }
+    // Convert to 0-100 scale for environment
+    const lightLevel100 = lightLevel * 100;
 
     return {
       temperature,
       moisture,
       nutrients,
       season,
-      lightLevel
+      lightLevel: lightLevel100
     };
   }
 
   /**
    * Get temperature at position from TemperatureSystem
    */
-  private getTemperature(_position: { x: number; y: number }, _world: World): number {
-    // TODO: Implement position-specific temperature based on biome, altitude, time of day
-    // Currently only uses global weather temperature, ignoring local variations
-    // Use weather temperature
-    return this.weatherTemperature;
+  private getTemperature(position: { x: number; y: number }, world: World): number {
+    // Start with global weather temperature
+    let temperature = this.weatherTemperature;
+
+    // Apply biome-specific temperature modifiers
+    const worldWithTiles = world as { getTileAt?: (x: number, y: number) => any };
+    if (typeof worldWithTiles.getTileAt === 'function') {
+      const tile = worldWithTiles.getTileAt(position.x, position.y);
+      if (tile && tile.biome) {
+        // Apply biome temperature modifiers
+        switch (tile.biome) {
+          case 'tundra':
+          case 'arctic':
+            temperature -= 10; // Very cold biomes
+            break;
+          case 'mountain':
+          case 'snowy_peaks':
+            temperature -= 5; // Cold high-altitude biomes
+            break;
+          case 'desert':
+          case 'savanna':
+            temperature += 8; // Hot dry biomes
+            break;
+          case 'tropical_rainforest':
+          case 'jungle':
+            temperature += 5; // Warm humid biomes
+            break;
+          case 'swamp':
+          case 'wetland':
+            temperature += 2; // Slightly warmer due to moisture
+            break;
+          // forest, plains, grassland use default temperature
+        }
+      }
+    }
+
+    return temperature;
   }
 
   /**

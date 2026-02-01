@@ -157,20 +157,66 @@ export class WildPlantPopulationSystem extends BaseSystem {
       }
     });
 
-    // Listen for plant death events
-    this.events.subscribe('plant:died', (event: unknown) => {
-      const e = event as { data: { speciesId: string } };
-      const { speciesId } = e.data;
-      // TODO: Implement seed bank addition when plants die
-      // Need to extract position from event data and add seeds based on species.seedsPerPlant
-      // Consider plant maturity stage when determining how many seeds to add to bank
-      // When plants die, their seeds may enter the seed bank
-      const species = this.speciesLookup?.(speciesId);
-      if (species) {
-        // Add some seeds to bank based on species
-        // Position would come from the event data
+    // Listen for plant death events (using plant:dead which includes position)
+    this.events.subscribe('plant:dead', (event: unknown) => {
+      const e = event as {
+        data?: {
+          entityId?: string;
+          position?: { x: number; y: number };
+        };
+      };
+
+      if (!e.data || !e.data.position) return; // Guard against missing data
+
+      const { entityId, position } = e.data;
+
+      // Look up the plant entity to get species and seed data
+      if (entityId && this.lastWorld) {
+        const entity = this.lastWorld.getEntity(entityId);
+        if (entity) {
+          const plant = entity.components.get('plant') as {
+            speciesId?: string;
+            seedsProduced?: number;
+            stage?: string;
+          } | undefined;
+
+          if (plant && plant.speciesId) {
+            const species = this.speciesLookup?.(plant.speciesId);
+            if (species) {
+              // Add seeds to bank based on plant maturity and seeds produced
+              let seedsToAdd = 0;
+
+              // Mature plants drop their produced seeds
+              if (plant.stage === 'mature' || plant.stage === 'seeding') {
+                seedsToAdd = plant.seedsProduced || 0;
+              }
+              // Even immature plants might drop a small amount of seeds
+              else if (plant.stage === 'flowering' || plant.stage === 'fruiting') {
+                const baseSeedsPerPlant = species.seedsPerPlant ?? 5;
+                seedsToAdd = Math.floor(baseSeedsPerPlant * 0.3); // 30% of potential
+              }
+
+              // Add seeds to bank
+              for (let i = 0; i < seedsToAdd; i++) {
+                this.addToSeedBank(plant.speciesId, position);
+              }
+            }
+          }
+        }
       }
     });
+
+    // Store world reference for event handlers
+    this.events.subscribe('world:ready', (event: unknown) => {
+      const e = event as { data?: { world?: World } };
+      if (e.data && e.data.world) {
+        this.lastWorld = e.data.world;
+      }
+    });
+  }
+
+  /** Cached world reference for event handlers */
+  private lastWorld: World | null = null;
   }
 
   /**
@@ -213,6 +259,9 @@ export class WildPlantPopulationSystem extends BaseSystem {
   protected onUpdate(ctx: SystemContext): void {
     const world = ctx.world;
     const deltaTime = ctx.deltaTime;
+
+    // Store world reference for event handlers
+    this.lastWorld = world;
 
     // Accumulate time (assuming game runs at ~60fps with deltaTime in seconds)
     this.accumulatedTime += deltaTime;
@@ -409,17 +458,22 @@ export class WildPlantPopulationSystem extends BaseSystem {
   }
 
   /**
-   * Get biome at position (simplified)
+   * Get biome at position from world terrain system
    */
   private getBiomeAtPosition(
-    _position: { x: number; y: number },
-    _world: World
+    position: { x: number; y: number },
+    world: World
   ): string | null {
-    // TODO: Implement proper biome detection from world terrain/biome system
-    // Should query the tile at position and return its biome type
-    // This will enable biome-specific plant spawning (forest plants in forests, wetland plants in wetlands, etc.)
-    // In a full implementation, this would query the terrain/biome data
-    // For now, return a default biome
+    // Query tile for biome data
+    const worldWithTiles = world as { getTileAt?: (x: number, y: number) => any };
+    if (typeof worldWithTiles.getTileAt === 'function') {
+      const tile = worldWithTiles.getTileAt(position.x, position.y);
+      if (tile && tile.biome) {
+        return tile.biome;
+      }
+    }
+
+    // Fallback to default biome if tile access not available or biome not set
     return 'plains';
   }
 
