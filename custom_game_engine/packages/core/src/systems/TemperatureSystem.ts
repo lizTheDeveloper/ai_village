@@ -2,13 +2,13 @@ import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World, ITile } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import { EntityImpl } from '../ecs/Entity.js';
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { TemperatureComponent } from '../components/TemperatureComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { WeatherComponent } from '../components/WeatherComponent.js';
+import type { TimeComponent } from './TimeSystem.js';
 import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
 import {
   HEALTH_DAMAGE_RATE,
@@ -185,7 +185,7 @@ export class TemperatureSystem extends BaseSystem {
     if (this.timeEntityId) {
       const timeEntity = world.getEntity(this.timeEntityId);
       if (timeEntity) {
-        const timeComp = (timeEntity as EntityImpl).getComponent<any>('time');
+        const timeComp = timeEntity.getComponent<TimeComponent>(CT.Time);
         if (timeComp) {
           timeOfDay = timeComp.timeOfDay;
         }
@@ -220,7 +220,7 @@ export class TemperatureSystem extends BaseSystem {
     if (this.weatherEntityId) {
       const weatherEntity = world.getEntity(this.weatherEntityId);
       if (weatherEntity) {
-        const weather = (weatherEntity as EntityImpl).getComponent<WeatherComponent>(CT.Weather);
+        const weather = weatherEntity.getComponent<WeatherComponent>(CT.Weather);
         if (weather) {
           return weather.tempModifier;
         }
@@ -241,9 +241,8 @@ export class TemperatureSystem extends BaseSystem {
     const buildingEntities = world.query().with(CT.Building).with(CT.Position).executeEntities();
 
     for (const entity of buildingEntities) {
-      const impl = entity as EntityImpl;
-      const buildingComp = impl.getComponent<BuildingComponent>(CT.Building);
-      const posComp = impl.getComponent<PositionComponent>(CT.Position);
+      const buildingComp = entity.getComponent<BuildingComponent>(CT.Building);
+      const posComp = entity.getComponent<PositionComponent>(CT.Position);
 
       if (buildingComp && posComp) {
         this.buildingCache.push({

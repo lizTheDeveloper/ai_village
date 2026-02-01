@@ -546,27 +546,28 @@ export function delegateDirective(
   if (directive.requiresAcknowledgment) {
     // Use AcknowledgmentTrackingSystem to track acknowledgments
     // The system will monitor timeouts and escalate as needed
-    try {
-      // Import is deferred to avoid circular dependencies
-      const { getAcknowledgmentTrackingSystem } = await import('../systems/AcknowledgmentTrackingSystem.js');
-      const ackSystem = getAcknowledgmentTrackingSystem();
-      ackSystem.trackDirective(
-        world,
-        fromGovernor.id,
-        directive.id || `directive-${uuidv4()}`,
-        directive.directive,
-        directive.origin,
-        directive.targetTier,
-        toEntities.map(e => e.id),
-        directive.priority
-      );
-    } catch (error) {
-      // Fallback: log warning if system not available
-      console.warn(
-        `[DecisionProtocols] Directive ${directive.id} requires acknowledgment from ${toEntities.length} entities. ` +
-        `AcknowledgmentTrackingSystem not available: ${error}`
-      );
-    }
+    // Use .then() instead of await since this is a non-async function and tracking is non-blocking
+    import('../systems/AcknowledgmentTrackingSystem.js')
+      .then(({ getAcknowledgmentTrackingSystem }) => {
+        const ackSystem = getAcknowledgmentTrackingSystem();
+        ackSystem.trackDirective(
+          world,
+          fromGovernor.id,
+          directive.id || `directive-${uuidv4()}`,
+          directive.directive,
+          directive.origin,
+          directive.targetTier,
+          toEntities.map(e => e.id),
+          directive.priority
+        );
+      })
+      .catch((error) => {
+        // Fallback: log warning if system not available
+        console.warn(
+          `[DecisionProtocols] Directive ${directive.id} requires acknowledgment from ${toEntities.length} entities. ` +
+          `AcknowledgmentTrackingSystem not available: ${error}`
+        );
+      });
   }
 
   // Emit event for directive issued
