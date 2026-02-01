@@ -15,33 +15,23 @@ The `core` package is **largely well-implemented** with solid foundations in ECS
 - Save/load with time travel support
 - Most game mechanics (AI, physics, needs, combat, magic, etc.)
 
-**Critical Issues Found:** 3
-**Missing Integrations:** 8
+**Critical Issues Found:** 0 (all fixed!)
+**Missing Integrations:** 3
 **Future Enhancements:** 35+ (documented as TODOs)
 **Dead Code:** Minimal
 
-## Critical Issues
+## Critical Issues (ALL RESOLVED)
 
-### 1. World.clear() Method Missing
-**Priority:** HIGH
-**File:** `/Users/annhoward/src/ai_village/custom_game_engine/packages/core/src/ecs/World.ts:423`
+### 1. World.clear() Method ✅ FIXED (2026-02-01)
+**Status:** COMPLETE
+**File:** `src/ecs/World.ts`
 
-```typescript
-// SaveLoadService uses internal API to clear world
-const worldImpl = world as any;  // TODO: Add clear() to World interface
-worldImpl._entities.clear();
-```
+The `clear()` method is now implemented in:
+- `World` interface (line 462)
+- `WorldMutator` interface
+- `WorldImpl` class (lines 1730-1739)
 
-**Impact:** SaveLoadService must use private API (`_entities`) to clear the world during load operations. This breaks encapsulation and makes the code brittle.
-
-**Fix Required:**
-- Add `clear(): void` method to `World` interface (line 123)
-- Add `clear(): void` method to `WorldMutator` interface (line 243)
-- Implement `clear()` in `WorldImpl` class to properly reset all internal state
-
-**Files Affected:**
-- `/Users/annhoward/src/ai_village/custom_game_engine/packages/core/src/ecs/World.ts`
-- `/Users/annhoward/src/ai_village/custom_game_engine/packages/core/src/persistence/SaveLoadService.ts:423`
+SaveLoadService now uses the public `world.clear()` API instead of private `_entities`.
 
 ---
 
@@ -70,98 +60,63 @@ createEntity(_archetype?: string): Entity {
 
 ---
 
-### 3. Passage Restoration Not Implemented (Multiverse)
-**Priority:** MEDIUM
-**File:** `/Users/annhoward/src/ai_village/custom_game_engine/packages/core/src/persistence/SaveLoadService.ts:429`
+### 3. Passage Restoration ✅ FIXED (2026-02-01)
+**Status:** COMPLETE
+**File:** `src/persistence/SaveLoadService.ts`
 
-```typescript
-// TODO: Restore passages (need to recreate passage connections)
-// For now, passages are stored but not restored
-```
+Passage restoration is now fully implemented (lines 447-498):
+- Iterates through all passages in save file
+- Creates passage connections in MultiverseCoordinator
+- Creates passage entities in source universe
+- Adds PassageComponent and PassageExtendedComponent
+- Restores active/dormant state from snapshot
 
-**Impact:** When loading a save file, multiverse passages (connections between universes) are lost. Players cannot travel between universes after reload.
-
-**Fix Required:**
-- Implement passage connection restoration in `SaveLoadService.load()`
-- Hook into `MultiverseCoordinator` to recreate passage entities
-- Test save/load with active passages
-
-**Related Files:**
-- `/Users/annhoward/src/ai_village/custom_game_engine/packages/core/src/multiverse/MultiverseNetworkManager.ts`
+---
 
 ## Missing Integrations
 
-### 4. City Spawner Building Integration
-**Priority:** HIGH
-**File:** `/Users/annhoward/src/ai_village/custom_game_engine/packages/core/src/city/CitySpawner.ts:614`
+### 4. City Spawner Building Integration ✅ FIXED (2026-02-01)
+**Status:** COMPLETE
+**File:** `src/city/CitySpawner.ts`
 
-```typescript
-// TODO: Implement proper building spawning with buildingSpec.type and position
-// Position would be calculated based on grid: row/col from buildingIndex
-// For now, create basic entity - this needs to integrate with building system
-const buildingEntity = world.createEntity();
-spawnedBuildingIds.push(buildingEntity.id);
-```
-
-**Impact:** `CitySpawner.spawnCity()` creates empty entities instead of actual buildings with proper types, positions, and components. Cities spawn with placeholder buildings.
-
-**Fix Required:**
-- Integrate with `BuildingBlueprintRegistry` to spawn proper buildings
-- Calculate grid positions based on city layout
-- Add building components (type, position, inventory, etc.)
+City building spawning is now fully implemented (lines 830-877):
+- Creates building entities with proper BuildingComponent
+- Calculates grid positions based on layout
+- Adds PositionComponent, RenderableComponent, InventoryComponent
+- Maps building types correctly
 
 ---
 
-### 5. City Spawner Agent Integration
-**Priority:** HIGH
-**File:** `/Users/annhoward/src/ai_village/custom_game_engine/packages/core/src/city/CitySpawner.ts:645`
+### 5. City Spawner Agent Integration ✅ FIXED (2026-02-01)
+**Status:** COMPLETE
+**File:** `src/city/CitySpawner.ts`
 
-```typescript
-// TODO: Implement proper agent spawning with profession, position, and LLM settings
-// Position would be distributed in circle: angle/radius calculated from i
-// For now, create basic entity - this needs to integrate with agent spawner system
-const agentEntity = world.createEntity();
-spawnedAgentIds.push(agentEntity.id);
-```
-
-**Impact:** Cities spawn with empty agent entities instead of fully-formed agents with professions, skills, and AI.
-
-**Fix Required:**
-- Integrate with agent spawner system
-- Calculate circular distribution for agent positions
-- Apply profession-specific components and skills
-- Configure LLM settings per agent
+Agent spawning is now fully implemented (lines 882-968):
+- Uses DI container's AgentFactory
+- Creates LLM or wandering agents based on config
+- Calculates circular position distribution
+- Adds profession components with workplace assignment
+- Spawns with appropriate starting items
 
 ---
 
-### 6. GodCraftedDiscoverySystem Content Spawning
-**Priority:** MEDIUM
-**File:** `/Users/annhoward/src/ai_village/custom_game_engine/packages/core/src/microgenerators/GodCraftedDiscoverySystem.ts:217`
+### 6. GodCraftedDiscoverySystem Content Spawning ✅ FIXED (2026-02-01)
+**Status:** COMPLETE
+**File:** `src/microgenerators/GodCraftedDiscoverySystem.ts`
 
-```typescript
-case 'legendary_item':
-case 'soul':
-case 'quest':
-case 'alien_species':
-case 'magic_paradigm':
-case 'building':
-case 'technology':
-case 'deity':
-case 'religion':
-  // TODO: Implement spawning for these content types
-  console.warn(`[GodCraftedDiscovery] Spawning not yet implemented for: ${content.type}`);
-  return {
-    success: false,
-    error: `Spawning not implemented for ${content.type}`,
-  };
-```
-
-**Impact:** LLM-generated content for 9 types cannot be spawned into the world. Only riddles, spells, and recipes work.
-
-**Fix Required:**
-- Implement spawning logic for each content type
-- Integrate with relevant systems (item registry, quest system, etc.)
-- Add validation and error handling
+All 12 content types now have spawn methods implemented:
+- `spawnRiddle` (lines 277-356)
+- `spawnSpell` (lines 361-442)
+- `spawnRecipe` (lines 447-528)
+- `spawnLegendaryItem` (lines 533-612)
+- `spawnSoul` (lines 617-710)
+- `spawnQuest` (lines 715-782)
+- `spawnAlienSpecies` (lines 787-854)
+- `spawnMagicParadigm` (lines 859-926)
+- `spawnBuilding` (lines 931-998)
+- `spawnTechnology` (lines 1003-1070)
+- `spawnDeity` (lines 1075-1150)
+- `spawnReligion` (lines 1155-1222)
 
 ---
 
@@ -390,6 +345,11 @@ Multiple tests have TODOs indicating system/test mismatch:
 These are not bugs or missing integrations, but planned future features:
 
 ### Plot System
+- ✅ `src/plot/FatesCouncilSystem.ts` - Narrative connections IMPLEMENTED (2026-02-01)
+  - `generateDecisionExtractionPrompt` now asks LLM for narrative connections
+  - `parseFatesDecisions` parses narrative connections from LLM response
+  - `weaveNarrativeConnection` links plots and emits `fates:narrative_connection_woven` event
+  - `findEntityWithPlot` helper finds entities with specific plot instances
 - `/Users/annhoward/src/ai_village/custom_game_engine/packages/core/src/plot/PlotTypes.ts:651,663` - Full template lookup for plot scaling
 - `/Users/annhoward/src/ai_village/custom_game_engine/packages/core/src/plot/PlotProgressionSystem.ts:288` - Trigger follow-up plot assignment
 - `/Users/annhoward/src/ai_village/custom_game_engine/packages/core/src/plot/PlotNarrativePressure.ts:210` - Stage-specific action guidance
