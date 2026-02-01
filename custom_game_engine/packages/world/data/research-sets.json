@@ -4681,5 +4681,173 @@
         ]
       }
     ]
+  },
+  {
+    "setId": "communication_systems_i",
+    "name": "Telegraph to Radio Broadcasting",
+    "description": "Early electrical communication systems from telegraph to radio",
+    "field": "communication",
+    "allPapers": [
+      "electrical_telegraphy",
+      "morse_code_theory",
+      "telegraph_networks",
+      "telephone_invention",
+      "voice_transmission_theory",
+      "switchboard_technology",
+      "electromagnetic_wave_theory",
+      "radio_wave_propagation",
+      "amplitude_modulation",
+      "frequency_modulation",
+      "radio_transmitter_design",
+      "radio_receiver_design",
+      "antenna_theory",
+      "broadcast_systems",
+      "frequency_allocation",
+      "wireless_communication_regulation"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "telegraph_systems",
+        "papersRequired": 4,
+        "mandatoryPapers": ["electrical_telegraphy", "telegraph_networks"],
+        "grants": [
+          { "type": "building", "buildingId": "telegraph_station" },
+          { "type": "ability", "abilityId": "send_telegrams" }
+        ]
+      },
+      {
+        "technologyId": "telephone_networks",
+        "papersRequired": 7,
+        "mandatoryPapers": ["telephone_invention", "switchboard_technology"],
+        "grants": [
+          { "type": "building", "buildingId": "telephone_exchange" },
+          { "type": "item", "itemId": "telephone" },
+          { "type": "ability", "abilityId": "voice_communication" }
+        ]
+      },
+      {
+        "technologyId": "radio_broadcasting",
+        "papersRequired": 12,
+        "mandatoryPapers": ["radio_transmitter_design", "broadcast_systems", "frequency_modulation"],
+        "grants": [
+          { "type": "building", "buildingId": "radio_tower" },
+          { "type": "building", "buildingId": "radio_station" },
+          { "type": "item", "itemId": "radio_receiver" },
+          { "type": "ability", "abilityId": "broadcast_radio" }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "communication_systems_ii",
+    "name": "Television Broadcasting",
+    "description": "Visual broadcasting technology from cathode ray tubes to digital television",
+    "field": "communication",
+    "allPapers": [
+      "cathode_ray_tube_principles",
+      "electron_beam_scanning",
+      "video_signal_encoding",
+      "television_transmitter_design",
+      "broadcast_television_standards",
+      "color_television_theory",
+      "ntsc_pal_encoding",
+      "television_production_techniques",
+      "studio_camera_systems",
+      "video_recording_technology",
+      "television_network_infrastructure",
+      "cable_television_systems",
+      "satellite_television_broadcasting",
+      "digital_television_encoding",
+      "high_definition_video",
+      "television_content_scheduling"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "basic_television",
+        "papersRequired": 6,
+        "mandatoryPapers": ["cathode_ray_tube_principles", "video_signal_encoding", "television_transmitter_design"],
+        "grants": [
+          { "type": "building", "buildingId": "tv_station" },
+          { "type": "item", "itemId": "television_set" },
+          { "type": "ability", "abilityId": "broadcast_television" }
+        ]
+      },
+      {
+        "technologyId": "television_production",
+        "papersRequired": 10,
+        "mandatoryPapers": ["television_production_techniques", "studio_camera_systems", "video_recording_technology"],
+        "grants": [
+          { "type": "building", "buildingId": "television_studio" },
+          { "type": "ability", "abilityId": "produce_tv_shows" },
+          { "type": "ability", "abilityId": "record_video" }
+        ]
+      },
+      {
+        "technologyId": "advanced_television",
+        "papersRequired": 14,
+        "mandatoryPapers": ["digital_television_encoding", "high_definition_video", "satellite_television_broadcasting"],
+        "grants": [
+          { "type": "building", "buildingId": "satellite_uplink" },
+          { "type": "item", "itemId": "hdtv" },
+          { "type": "ability", "abilityId": "satellite_broadcast" }
+        ]
+      }
+    ]
+  },
+  {
+    "setId": "communication_systems_iii",
+    "name": "Mobile and Cellular Communications",
+    "description": "Wireless personal communication from pagers to smartphones",
+    "field": "communication",
+    "allPapers": [
+      "cellular_network_theory",
+      "frequency_reuse_patterns",
+      "handoff_protocols",
+      "mobile_switching_centers",
+      "gsm_protocol_design",
+      "cdma_technology",
+      "cellular_tower_placement",
+      "mobile_device_miniaturization",
+      "battery_technology_portable",
+      "touchscreen_interface_design",
+      "mobile_operating_systems",
+      "mobile_app_ecosystems",
+      "3g_data_networks",
+      "4g_lte_architecture",
+      "5g_network_technology",
+      "mobile_payment_systems"
+    ],
+    "unlocks": [
+      {
+        "technologyId": "basic_cellular",
+        "papersRequired": 6,
+        "mandatoryPapers": ["cellular_network_theory", "frequency_reuse_patterns", "mobile_switching_centers"],
+        "grants": [
+          { "type": "building", "buildingId": "cell_tower" },
+          { "type": "item", "itemId": "cell_phone" },
+          { "type": "ability", "abilityId": "mobile_communication" }
+        ]
+      },
+      {
+        "technologyId": "smartphone_technology",
+        "papersRequired": 11,
+        "mandatoryPapers": ["touchscreen_interface_design", "mobile_operating_systems", "mobile_app_ecosystems"],
+        "grants": [
+          { "type": "item", "itemId": "smartphone" },
+          { "type": "ability", "abilityId": "use_mobile_apps" },
+          { "type": "ability", "abilityId": "mobile_internet" }
+        ]
+      },
+      {
+        "technologyId": "advanced_mobile_networks",
+        "papersRequired": 14,
+        "mandatoryPapers": ["4g_lte_architecture", "5g_network_technology"],
+        "grants": [
+          { "type": "building", "buildingId": "5g_tower" },
+          { "type": "ability", "abilityId": "high_speed_mobile_data" },
+          { "type": "ability", "abilityId": "iot_connectivity" }
+        ]
+      }
+    ]
   }
 ]

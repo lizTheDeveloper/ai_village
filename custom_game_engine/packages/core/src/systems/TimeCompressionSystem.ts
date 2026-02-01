@@ -549,10 +549,45 @@ export class TimeCompressionSystem extends BaseSystem {
    * Used for calculating life expectancy during time jumps
    */
   private estimateTechnologyLevel(world: World): number {
-    // TODO: Implement based on actual technology tracking
-    // For now, estimate based on building types, skills, etc.
+    // Try to get the TechnologyUnlockComponent for accurate tech level
+    const techUnlockEntities = world.query().with(CT.TechnologyUnlock).executeEntities();
 
-    // Count advanced buildings as proxy for tech level
+    if (techUnlockEntities.length > 0) {
+      const techUnlock = techUnlockEntities[0]!.components.get(CT.TechnologyUnlock) as {
+        unlockedBuildings: Map<string, { era: string }>;
+        unlockedTechnologies: Map<string, unknown>;
+        internetResearchBoostEnabled: boolean;
+        universityCollaborationEnabled: boolean;
+      } | undefined;
+
+      if (techUnlock) {
+        // Calculate tech level based on highest era unlocked
+        let maxEraLevel = 0;
+
+        for (const [, unlock] of techUnlock.unlockedBuildings) {
+          const eraLevel = this.getEraLevel(unlock.era);
+          if (eraLevel > maxEraLevel) {
+            maxEraLevel = eraLevel;
+          }
+        }
+
+        // Boost for special unlocks
+        if (techUnlock.universityCollaborationEnabled) {
+          maxEraLevel = Math.max(maxEraLevel, 7);
+        }
+        if (techUnlock.internetResearchBoostEnabled) {
+          maxEraLevel = Math.max(maxEraLevel, 9);
+        }
+
+        // Additional boost based on number of technologies unlocked
+        const techCount = techUnlock.unlockedTechnologies.size;
+        const techBoost = Math.min(2, Math.floor(techCount / 5));
+
+        return Math.min(10, maxEraLevel + techBoost);
+      }
+    }
+
+    // Fallback: estimate based on building types if no TechnologyUnlockComponent
     const buildings = world.query().with(CT.Building).executeEntities();
     const buildingCount = buildings.length;
 
@@ -564,12 +599,20 @@ export class TimeCompressionSystem extends BaseSystem {
     if (buildingCount < 100) return 6; // Medieval
     if (buildingCount < 200) return 8; // Renaissance
     return 10; // Industrial/Modern
+  }
 
-    // Better implementation would check:
-    // - TechnologyUnlockComponent
-    // - Building types (forge = higher tech than hut)
-    // - Agent skill levels (advanced crafting = higher tech)
-    // - Population density (cities = higher tech)
+  /**
+   * Convert technology era to numeric level
+   */
+  private getEraLevel(era: string): number {
+    switch (era) {
+      case 'primitive': return 1;
+      case 'agricultural': return 3;
+      case 'industrial': return 5;
+      case 'modern': return 7;
+      case 'information': return 9;
+      default: return 0;
+    }
   }
 
   /**

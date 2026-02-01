@@ -803,8 +803,11 @@ export class NationSystem extends BaseSystem {
   }
 
   /**
-   * Process research projects
-   * TODO: Implement actual research mechanics with tech tree
+   * Process research projects with tech tree integration
+   * Research progress is affected by:
+   * - Research budget allocation
+   * - Global research multiplier (from TechnologyUnlockComponent)
+   * - University collaboration bonuses
    */
   private processResearch(
     world: World,
@@ -812,6 +815,9 @@ export class NationSystem extends BaseSystem {
     nation: NationComponent
   ): void {
     if (nation.researchProjects.length === 0) return;
+
+    // Get global research multiplier from TechnologyUnlockComponent
+    const researchMultiplier = this.getGlobalResearchMultiplier(world);
 
     const updatedProjects: ResearchProject[] = [];
     let researchCompleted = false;
@@ -822,12 +828,24 @@ export class NationSystem extends BaseSystem {
         continue;
       }
 
-      // Progress based on research budget
-      const progressRate = nation.economy.researchBudget * 0.0001;
-      project.progress = Math.min(1, project.progress + progressRate);
+      // Progress based on research budget with global multiplier
+      const baseProgressRate = nation.economy.researchBudget * 0.0001;
+      const adjustedProgressRate = baseProgressRate * researchMultiplier;
+      project.progress = Math.min(1, project.progress + adjustedProgressRate);
+
+      // Update estimated completion tick
+      if (adjustedProgressRate > 0) {
+        const remainingProgress = 1 - project.progress;
+        const ticksRemaining = Math.ceil(remainingProgress / adjustedProgressRate);
+        project.estimatedCompletionTick = world.tick + ticksRemaining;
+      }
 
       if (project.progress >= 1) {
         researchCompleted = true;
+
+        // Apply research benefits based on field
+        this.applyResearchBenefits(world, entity, nation, project);
+
         world.eventBus.emit({
           type: 'nation:research_completed',
           source: entity.id,
@@ -838,6 +856,7 @@ export class NationSystem extends BaseSystem {
             projectName: project.name,
             field: project.field,
             tick: world.tick,
+            researchMultiplier,
           },
         });
       }
@@ -850,6 +869,105 @@ export class NationSystem extends BaseSystem {
         ...current,
         researchProjects: updatedProjects,
       }));
+    }
+  }
+
+  /**
+   * Get global research multiplier from TechnologyUnlockComponent
+   */
+  private getGlobalResearchMultiplier(world: World): number {
+    const techUnlockEntities = world.query().with(CT.TechnologyUnlock).executeEntities();
+
+    if (techUnlockEntities.length > 0) {
+      const techUnlock = techUnlockEntities[0]!.components.get(CT.TechnologyUnlock) as {
+        globalResearchMultiplier: number;
+        universityCollaborationEnabled: boolean;
+        internetResearchBoostEnabled: boolean;
+      } | undefined;
+
+      if (techUnlock) {
+        return techUnlock.globalResearchMultiplier;
+      }
+    }
+
+    return 1.0; // Default multiplier
+  }
+
+  /**
+   * Apply benefits when a research project completes
+   */
+  private applyResearchBenefits(
+    world: World,
+    entity: EntityImpl,
+    nation: NationComponent,
+    project: ResearchProject
+  ): void {
+    // Apply bonuses based on research field via events
+    // Other systems can listen to these events to apply the appropriate effects
+    switch (project.field) {
+      case 'military':
+        // Emit event for military research completion - 5% boost to military effectiveness
+        world.eventBus.emit({
+          type: 'nation:military_research_bonus',
+          source: entity.id,
+          data: {
+            nationId: entity.id,
+            nationName: nation.nationName,
+            projectId: project.id,
+            bonusPercent: 5,
+            tick: world.tick,
+          },
+        });
+        break;
+
+      case 'economic':
+        // Emit event for economic research completion - 5% boost to GDP/trade
+        world.eventBus.emit({
+          type: 'nation:economic_research_bonus',
+          source: entity.id,
+          data: {
+            nationId: entity.id,
+            nationName: nation.nationName,
+            projectId: project.id,
+            bonusPercent: 5,
+            tick: world.tick,
+          },
+        });
+        break;
+
+      case 'scientific':
+        // Emit event for scientific research completion - 10% boost to research speed
+        world.eventBus.emit({
+          type: 'nation:scientific_research_bonus',
+          source: entity.id,
+          data: {
+            nationId: entity.id,
+            nationName: nation.nationName,
+            projectId: project.id,
+            bonusPercent: 10,
+            tick: world.tick,
+          },
+        });
+        break;
+
+      case 'cultural':
+        // Directly boost stability and legitimacy
+        updateStability(nation, 5);
+        updateLegitimacy(nation, 5);
+
+        world.eventBus.emit({
+          type: 'nation:cultural_research_bonus',
+          source: entity.id,
+          data: {
+            nationId: entity.id,
+            nationName: nation.nationName,
+            projectId: project.id,
+            stabilityBonus: 5,
+            legitimacyBonus: 5,
+            tick: world.tick,
+          },
+        });
+        break;
     }
   }
 
