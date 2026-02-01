@@ -29,6 +29,7 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 import type { MovementComponent } from '../components/MovementComponent.js';
 import type { RenderableComponent } from '../components/RenderableComponent.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../behavior/BehaviorContext.js';
 
 /** Safe distance from dangerous targets (aliens, battles) */
 const DEFAULT_SAFE_DISTANCE = 80;
@@ -137,6 +138,236 @@ export function followReportingTargetBehavior(entity: EntityImpl, world: World):
       ...current,
       lastThought: `Perfect vantage point for ${purpose}`,
     }));
+  }
+}
+
+/**
+ * Modern version using BehaviorContext.
+ * @example registerBehaviorWithContext('follow_reporting_target', followReportingTargetBehaviorWithContext);
+ */
+export function followReportingTargetBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  if (!ctx.movement) {
+    return; // No movement component
+  }
+
+  // Check if we have a target entity
+  const targetEntityId = ctx.getState<string>('targetEntityId');
+  if (!targetEntityId) {
+    // No target - switch to idle
+    ctx.setThought('I lost track of what I was supposed to cover');
+    return ctx.switchTo('idle', {});
+  }
+
+  const safeDistance = ctx.getState<number>('safeDistance') ?? DEFAULT_SAFE_DISTANCE;
+  const purpose = ctx.getState<string>('purpose') ?? 'covering a story';
+
+  // Try to find target entity
+  const target = ctx.getEntity(targetEntityId);
+
+  if (!target) {
+    // Target lost - initiate search
+    handleLostTargetWithContext(ctx, purpose);
+    return;
+  }
+
+  const targetImpl = target as EntityImpl;
+  const targetPos = targetImpl.getComponent<PositionComponent>(CT.Position);
+  if (!targetPos) {
+    // Target has no position - give up
+    ctx.setThought('The subject I was covering disappeared');
+    return ctx.switchTo('idle', {});
+  }
+
+  // Calculate distance to target
+  const distance = ctx.distanceTo(targetPos);
+
+  // Clear search state if we found target again
+  const searchStartTick = ctx.getState<number>('searchStartTick');
+  if (searchStartTick !== undefined) {
+    ctx.updateState({ searchStartTick: undefined });
+  }
+
+  // ============================================================================
+  // DISTANCE MANAGEMENT
+  // ============================================================================
+
+  if (distance < MINIMUM_DISTANCE) {
+    // TOO CLOSE - emergency backup!
+    moveAwayFromTargetWithContext(ctx, targetPos, safeDistance);
+    ctx.setThought('This is too dangerous, backing away!');
+    return;
+  }
+
+  if (distance > safeDistance + 20) {
+    // TOO FAR - move closer
+    const approachDistance = Math.max(safeDistance, distance - 50);
+    moveTowardTargetWithContext(ctx, targetPos, distance, approachDistance);
+
+    // Orient camera toward target
+    orientTowardTargetWithContext(ctx, targetPos);
+
+  } else if (distance < safeDistance - 20) {
+    // TOO CLOSE - back up to safe distance
+    moveAwayFromTargetWithContext(ctx, targetPos, safeDistance);
+
+  } else {
+    // PERFECT DISTANCE - maintain position and orient camera
+    maintainPositionWithContext(ctx);
+    orientTowardTargetWithContext(ctx, targetPos);
+    ctx.setThought(`Perfect vantage point for ${purpose}`);
+  }
+}
+
+/**
+ * Move toward target (but stop at approach distance) - Context version
+ */
+function moveTowardTargetWithContext(
+  ctx: BehaviorContext,
+  targetPos: PositionComponent,
+  currentDistance: number,
+  approachDistance: number
+): void {
+  if (!ctx.movement) return;
+
+  const dx = targetPos.x - ctx.position.x;
+  const dy = targetPos.y - ctx.position.y;
+
+  // Normalize direction
+  const dirX = dx / currentDistance;
+  const dirY = dy / currentDistance;
+
+  // Slow down as we approach
+  const distanceToApproach = currentDistance - approachDistance;
+  const speedFactor = Math.min(1.0, distanceToApproach / SLOWDOWN_DISTANCE);
+
+  // Set velocity toward target
+  const speed = ctx.movement.speed * speedFactor;
+  ctx.setVelocity(dirX * speed, dirY * speed);
+}
+
+/**
+ * Move away from target (to safe distance) - Context version
+ */
+function moveAwayFromTargetWithContext(
+  ctx: BehaviorContext,
+  targetPos: PositionComponent,
+  _safeDistance: number
+): void {
+  if (!ctx.movement) return;
+
+  const dx = ctx.position.x - targetPos.x; // Reversed - move AWAY
+  const dy = ctx.position.y - targetPos.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (distance === 0) {
+    // Exactly on top of target - move in random direction
+    const angle = Math.random() * Math.PI * 2;
+    ctx.setVelocity(
+      Math.cos(angle) * ctx.movement.speed,
+      Math.sin(angle) * ctx.movement.speed
+    );
+    return;
+  }
+
+  // Normalize direction (away from target)
+  const dirX = dx / distance;
+  const dirY = dy / distance;
+
+  // Move away at full speed
+  ctx.setVelocity(dirX * ctx.movement.speed, dirY * ctx.movement.speed);
+}
+
+/**
+ * Maintain current position (stop moving) - Context version
+ */
+function maintainPositionWithContext(ctx: BehaviorContext): void {
+  if (!ctx.movement) return;
+
+  // Gradual slow down
+  ctx.updateComponent<MovementComponent>(CT.Movement, (current) => ({
+    ...current,
+    velocityX: current.velocityX * 0.8,
+    velocityY: current.velocityY * 0.8,
+  }));
+}
+
+/**
+ * Orient agent to face target (for camera direction) - Context version
+ */
+function orientTowardTargetWithContext(
+  ctx: BehaviorContext,
+  targetPos: PositionComponent
+): void {
+  const dx = targetPos.x - ctx.position.x;
+  const dy = targetPos.y - ctx.position.y;
+
+  // Calculate angle to target (radians)
+  const angle = Math.atan2(dy, dx);
+
+  // Store facing direction in agent state for recording system
+  ctx.updateState({
+    facingAngle: angle,
+    facingTarget: true,
+  });
+
+  // Also update renderable facing if it exists
+  const renderable = ctx.getComponent<RenderableComponent>(CT.Renderable);
+  if (renderable) {
+    // Calculate cardinal direction for sprite rendering
+    const cardinalDirection = getCardinalDirection(angle);
+    ctx.updateComponent<RenderableComponent>(CT.Renderable, (current) => ({
+      ...current,
+      animationState: cardinalDirection,
+    }));
+  }
+}
+
+/**
+ * Handle lost target - initiate search pattern - Context version
+ */
+function handleLostTargetWithContext(
+  ctx: BehaviorContext,
+  purpose: string
+): void {
+  const searchStartTick = ctx.getState<number>('searchStartTick') ?? ctx.tick;
+
+  // Check if search timeout exceeded
+  if (ctx.tick - searchStartTick > SEARCH_TIMEOUT) {
+    // Give up search
+    ctx.setThought(`I couldn't find the subject for ${purpose}. Heading back to the newsroom.`);
+
+    // Emit event that reporter gave up
+    ctx.emit<'reporter:search_failed'>({
+      type: 'reporter:search_failed',
+      data: {
+        reporterId: ctx.entity.id,
+        purpose,
+      },
+    });
+
+    return ctx.switchTo('idle', {});
+  }
+
+  // Continue searching - spiral outward from last known position
+  const lastKnownPos = ctx.getState<{ x: number; y: number }>('lastKnownTargetPos');
+
+  if (lastKnownPos) {
+    // Search in expanding circle
+    const searchPhase = ((ctx.tick - searchStartTick) / 100) % 8; // Change direction every 5 seconds
+    const angle = (searchPhase / 8) * Math.PI * 2;
+    const searchDistance = 50 + ((ctx.tick - searchStartTick) / 200) * 10; // Expand search radius
+
+    const searchX = lastKnownPos.x + Math.cos(angle) * searchDistance;
+    const searchY = lastKnownPos.y + Math.sin(angle) * searchDistance;
+
+    // Navigate to search point
+    ctx.setThought('Looking for the subject... it was around here somewhere');
+    ctx.switchTo('navigate', {
+      target: { x: searchX, y: searchY },
+      searchStartTick,
+      lastKnownTargetPos: lastKnownPos,
+      purpose: `searching for subject: ${purpose}`,
+    });
   }
 }
 

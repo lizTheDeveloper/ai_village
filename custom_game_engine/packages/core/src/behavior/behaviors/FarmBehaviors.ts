@@ -20,6 +20,7 @@ import type { InventoryComponent } from '../../components/InventoryComponent.js'
 import type { PlantComponent } from '../../components/PlantComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { ComponentType } from '../../types/ComponentType.js';
+import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
 
 /**
  * ChunkSpatialQuery is now available via world.spatialQuery
@@ -752,9 +753,31 @@ export function harvestBehavior(entity: EntityImpl, world: World): void {
 
 /**
  * Modern versions using BehaviorContext
- * @example registerBehaviorWithContext('till', tillBehaviorWithContext);
+ * @example registerBehaviorWithContext('farm', farmBehaviorWithContext);
  */
 
+/**
+ * Farm behavior using BehaviorContext
+ *
+ * Agent stops moving and waits for farming action to complete.
+ * The actual farming actions (till, plant, water, harvest) are handled by:
+ * 1. ActionQueue processes queued actions each tick
+ * 2. TillActionHandler, PlantActionHandler, etc. validate and execute
+ * 3. Agent remains in 'farm' behavior until action completes
+ *
+ * @example registerBehaviorWithContext('farm', farmBehaviorWithContext);
+ */
+export function farmBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
+  // Stop moving - agent is working on farming task
+  ctx.stopMovement();
+
+  // The ActionQueue handles the actual farming work
+  // This behavior just holds the agent in a farming state
+}
+
+/**
+ * @example registerBehaviorWithContext('till', tillBehaviorWithContext);
+ */
 export function tillBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {
   const { inventory } = ctx;
 

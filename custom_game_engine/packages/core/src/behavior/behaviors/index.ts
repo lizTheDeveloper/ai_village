@@ -67,6 +67,7 @@ export {
   plantBehavior,
   waterBehavior,
   harvestBehavior,
+  farmBehaviorWithContext,
   tillBehaviorWithContext,
   plantBehaviorWithContext,
   waterBehaviorWithContext,

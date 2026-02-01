@@ -56,52 +56,52 @@ import { PerceptionProcessor } from '../perception/index.js';
 import { DecisionProcessor, ScheduledDecisionProcessor, getBehaviorPriority } from '../decision/index.js';
 
 // Behavior module
-import { BehaviorRegistry, type BehaviorHandler } from '../behavior/BehaviorRegistry.js';
+import { BehaviorRegistry, type BehaviorHandler, type ContextBehaviorHandler } from '../behavior/BehaviorRegistry.js';
 
-// Extracted behaviors
+// Extracted behaviors (WithContext versions)
 import {
-  wanderBehavior,
-  idleBehavior,
-  seekSleepBehavior,
-  forcedSleepBehavior,
-  fleeToHomeBehavior,
-  gatherBehavior,
-  depositItemsBehavior,
-  seekFoodBehavior,
-  followAgentBehavior,
-  talkBehavior,
-  callMeetingBehavior,
-  attendMeetingBehavior,
-  initiateCombatBehavior,
-  initiateHuntBehavior,
-  butcherBehavior,
-  farmBehavior,
-  tillBehavior,
-  plantBehavior,
-  waterBehavior,
-  buildBehavior,
-  craftBehavior,
-  researchBehavior,
-  tradeBehavior,
-  castSpellBehavior,
-  seekWarmthBehavior,
-  seekCoolingBehavior,
-  navigateBehavior,
-  exploreFrontierBehavior,
-  exploreSpiralBehavior,
-  followGradientBehavior,
-  materialTransportBehavior,
-  tileBuildBehavior,
-  tameAnimalBehavior,
-  houseAnimalBehavior,
-  prayBehavior,
+  wanderBehaviorWithContext,
+  idleBehaviorWithContext,
+  seekSleepBehaviorWithContext,
+  forcedSleepBehaviorWithContext,
+  fleeToHomeBehaviorWithContext,
+  gatherBehaviorWithContext,
+  depositItemsBehaviorWithContext,
+  seekFoodBehaviorWithContext,
+  followAgentBehaviorWithContext,
+  talkBehaviorWithContext,
+  callMeetingBehaviorWithContext,
+  attendMeetingBehaviorWithContext,
+  initiateCombatBehaviorWithContext,
+  initiateHuntBehaviorWithContext,
+  butcherBehaviorWithContext,
+  farmBehaviorWithContext,
+  tillBehaviorWithContext,
+  plantBehaviorWithContext,
+  waterBehaviorWithContext,
+  buildBehaviorWithContext,
+  craftBehaviorWithContext,
+  researchBehaviorWithContext,
+  tradeBehaviorWithContext,
+  castSpellBehaviorWithContext,
+  seekWarmthBehaviorWithContext,
+  seekCoolingBehaviorWithContext,
+  navigateBehaviorWithContext,
+  exploreFrontierBehaviorWithContext,
+  exploreSpiralBehaviorWithContext,
+  followGradientBehaviorWithContext,
+  materialTransportBehaviorWithContext,
+  tileBuildBehaviorWithContext,
+  tameAnimalBehaviorWithContext,
+  houseAnimalBehaviorWithContext,
+  prayBehaviorWithContext,
 } from '../behavior/behaviors/index.js';
 
 // Reporter-specific behaviors
-import { followReportingTargetBehavior } from '../behaviors/FollowReportingTargetBehavior.js';
+import { followReportingTargetBehaviorWithContext } from '../behaviors/FollowReportingTargetBehavior.js';
 
 // Exploration behaviors
-import { exploreBehavior } from '../behaviors/ExploreBehavior.js';
+import { exploreBehaviorWithContext } from '../behaviors/ExploreBehavior.js';
 
 // LLM types
 import type { LLMDecisionQueue, PromptBuilder } from '../decision/LLMDecisionProcessor.js';
@@ -213,81 +213,81 @@ export class AgentBrainSystem extends BaseSystem {
    */
   private registerDefaultBehaviors(): void {
     // Simple behaviors
-    this.behaviors.register('wander', wanderBehavior, { description: 'Random wandering with home bias' });
-    this.behaviors.register('idle', idleBehavior, { description: 'Stand still' });
+    this.behaviors.registerWithContext('wander', wanderBehaviorWithContext, { description: 'Random wandering with home bias' });
+    this.behaviors.registerWithContext('idle', idleBehaviorWithContext, { description: 'Stand still' });
 
     // Sleep behaviors
-    this.behaviors.register('seek_sleep', seekSleepBehavior, { description: 'Find bed and sleep' });
-    this.behaviors.register('forced_sleep', forcedSleepBehavior, { description: 'Collapse from exhaustion' });
-    this.behaviors.register('flee_to_home', fleeToHomeBehavior, { description: 'Return to assigned bed when hurt or frightened' });
+    this.behaviors.registerWithContext('seek_sleep', seekSleepBehaviorWithContext, { description: 'Find bed and sleep' });
+    this.behaviors.registerWithContext('forced_sleep', forcedSleepBehaviorWithContext, { description: 'Collapse from exhaustion' });
+    this.behaviors.registerWithContext('flee_to_home', fleeToHomeBehaviorWithContext, { description: 'Return to assigned bed when hurt or frightened' });
 
     // Resource behaviors
-    this.behaviors.register('gather', gatherBehavior, { description: 'Gather resources or seeds' });
-    this.behaviors.register('deposit_items', depositItemsBehavior, { description: 'Deposit items to storage' });
+    this.behaviors.registerWithContext('gather', gatherBehaviorWithContext, { description: 'Gather resources or seeds' });
+    this.behaviors.registerWithContext('deposit_items', depositItemsBehaviorWithContext, { description: 'Deposit items to storage' });
 
     // Social behaviors
-    this.behaviors.register('follow_agent', followAgentBehavior, { description: 'Follow another agent' });
-    this.behaviors.register('talk', talkBehavior, { description: 'Engage in conversation' });
-    this.behaviors.register('call_meeting', callMeetingBehavior, { description: 'Call a meeting' });
-    this.behaviors.register('attend_meeting', attendMeetingBehavior, { description: 'Attend a meeting' });
+    this.behaviors.registerWithContext('follow_agent', followAgentBehaviorWithContext, { description: 'Follow another agent' });
+    this.behaviors.registerWithContext('talk', talkBehaviorWithContext, { description: 'Engage in conversation' });
+    this.behaviors.registerWithContext('call_meeting', callMeetingBehaviorWithContext, { description: 'Call a meeting' });
+    this.behaviors.registerWithContext('attend_meeting', attendMeetingBehaviorWithContext, { description: 'Attend a meeting' });
 
     // Combat behaviors
-    this.behaviors.register('initiate_combat', initiateCombatBehavior, { description: 'Initiate combat with target' });
+    this.behaviors.registerWithContext('initiate_combat', initiateCombatBehaviorWithContext, { description: 'Initiate combat with target' });
 
     // Hunting behaviors
-    this.behaviors.register('hunt', initiateHuntBehavior, { description: 'Hunt wild animals for food and resources' });
-    this.behaviors.register('butcher', butcherBehavior, { description: 'Butcher tame animals for meat and resources' });
+    this.behaviors.registerWithContext('hunt', initiateHuntBehaviorWithContext, { description: 'Hunt wild animals for food and resources' });
+    this.behaviors.registerWithContext('butcher', butcherBehaviorWithContext, { description: 'Butcher tame animals for meat and resources' });
 
     // Animal husbandry behaviors
-    this.behaviors.register('tame_animal', tameAnimalBehavior, { description: 'Approach and tame a wild animal' });
-    this.behaviors.register('house_animal', houseAnimalBehavior, { description: 'Lead a tamed animal to its housing' });
+    this.behaviors.registerWithContext('tame_animal', tameAnimalBehaviorWithContext, { description: 'Approach and tame a wild animal' });
+    this.behaviors.registerWithContext('house_animal', houseAnimalBehaviorWithContext, { description: 'Lead a tamed animal to its housing' });
 
     // Farm behaviors
-    this.behaviors.register('farm', farmBehavior, { description: 'Farm action state' });
-    this.behaviors.register('till', tillBehavior, { description: 'Till soil for farming' });
-    this.behaviors.register(CT.Plant, plantBehavior, { description: 'Plant seeds in tilled soil' });
-    this.behaviors.register('water', waterBehavior, { description: 'Water dry plants' });
+    this.behaviors.registerWithContext('farm', farmBehaviorWithContext, { description: 'Farm action state' });
+    this.behaviors.registerWithContext('till', tillBehaviorWithContext, { description: 'Till soil for farming' });
+    this.behaviors.registerWithContext(CT.Plant, plantBehaviorWithContext, { description: 'Plant seeds in tilled soil' });
+    this.behaviors.registerWithContext('water', waterBehaviorWithContext, { description: 'Water dry plants' });
 
     // Build behaviors
-    this.behaviors.register('build', buildBehavior, { description: 'Construct a building' });
-    this.behaviors.register('material_transport', materialTransportBehavior, { description: 'Transport materials to construction site' });
-    this.behaviors.register('tile_build', tileBuildBehavior, { description: 'Place tiles at construction site' });
+    this.behaviors.registerWithContext('build', buildBehaviorWithContext, { description: 'Construct a building' });
+    this.behaviors.registerWithContext('material_transport', materialTransportBehaviorWithContext, { description: 'Transport materials to construction site' });
+    this.behaviors.registerWithContext('tile_build', tileBuildBehaviorWithContext, { description: 'Place tiles at construction site' });
 
     // Crafting behaviors
-    this.behaviors.register('craft', craftBehavior, { description: 'Craft items at stations' });
+    this.behaviors.registerWithContext('craft', craftBehaviorWithContext, { description: 'Craft items at stations' });
 
     // Research behaviors
-    this.behaviors.register('research', researchBehavior, { description: 'Conduct research at research buildings' });
+    this.behaviors.registerWithContext('research', researchBehaviorWithContext, { description: 'Conduct research at research buildings' });
 
     // Trade behaviors
-    this.behaviors.register('trade', tradeBehavior, { description: 'Buy or sell items at shops' });
+    this.behaviors.registerWithContext('trade', tradeBehaviorWithContext, { description: 'Buy or sell items at shops' });
 
     // Magic behaviors
-    this.behaviors.register('cast_spell', castSpellBehavior, { description: 'Cast a spell' });
+    this.behaviors.registerWithContext('cast_spell', castSpellBehaviorWithContext, { description: 'Cast a spell' });
 
     // Survival behaviors
-    this.behaviors.register('seek_warmth', seekWarmthBehavior, { description: 'Find heat source' });
-    this.behaviors.register('seek_cooling', seekCoolingBehavior, { description: 'Find cooling/shade' });
+    this.behaviors.registerWithContext('seek_warmth', seekWarmthBehaviorWithContext, { description: 'Find heat source' });
+    this.behaviors.registerWithContext('seek_cooling', seekCoolingBehaviorWithContext, { description: 'Find cooling/shade' });
 
     // Spiritual behaviors
-    this.behaviors.register('pray', prayBehavior, { description: 'Pray to deity' });
+    this.behaviors.registerWithContext('pray', prayBehaviorWithContext, { description: 'Pray to deity' });
 
     // Navigation & Exploration behaviors
-    this.behaviors.register('navigate', navigateBehavior, { description: 'Navigate to coordinates' });
-    this.behaviors.register('follow_reporting_target', followReportingTargetBehavior, { description: 'Follow entity at safe distance (reporters)' });
-    this.behaviors.register('explore', exploreBehavior, { description: 'Explore unvisited/ungenerated chunks' });
-    this.behaviors.register('explore_frontier', exploreFrontierBehavior, { description: 'Explore frontier areas' });
-    this.behaviors.register('explore_spiral', exploreSpiralBehavior, { description: 'Spiral exploration pattern' });
-    this.behaviors.register('follow_gradient', followGradientBehavior, { description: 'Follow social gradients' });
+    this.behaviors.registerWithContext('navigate', navigateBehaviorWithContext, { description: 'Navigate to coordinates' });
+    this.behaviors.registerWithContext('follow_reporting_target', followReportingTargetBehaviorWithContext, { description: 'Follow entity at safe distance (reporters)' });
+    this.behaviors.registerWithContext('explore', exploreBehaviorWithContext, { description: 'Explore unvisited/ungenerated chunks' });
+    this.behaviors.registerWithContext('explore_frontier', exploreFrontierBehaviorWithContext, { description: 'Explore frontier areas' });
+    this.behaviors.registerWithContext('explore_spiral', exploreSpiralBehaviorWithContext, { description: 'Spiral exploration pattern' });
+    this.behaviors.registerWithContext('follow_gradient', followGradientBehaviorWithContext, { description: 'Follow social gradients' });
 
     // Food/hunger behavior
-    this.behaviors.register('seek_food', seekFoodBehavior, { description: 'Find and eat food' });
+    this.behaviors.registerWithContext('seek_food', seekFoodBehaviorWithContext, { description: 'Find and eat food' });
 
     // Aliases for backward compatibility
-    this.behaviors.register('pick', gatherBehavior, { description: 'Alias for gather' });
-    this.behaviors.register('harvest', gatherBehavior, { description: 'Alias for gather' });
-    this.behaviors.register('gather_seeds', gatherBehavior, { description: 'Alias for gather' });
-    this.behaviors.register('rest', idleBehavior, { description: 'Alias for idle (rest is recovery-focused idle)' });
+    this.behaviors.registerWithContext('pick', gatherBehaviorWithContext, { description: 'Alias for gather' });
+    this.behaviors.registerWithContext('harvest', gatherBehaviorWithContext, { description: 'Alias for gather' });
+    this.behaviors.registerWithContext('gather_seeds', gatherBehaviorWithContext, { description: 'Alias for gather' });
+    this.behaviors.registerWithContext('rest', idleBehaviorWithContext, { description: 'Alias for idle (rest is recovery-focused idle)' });
   }
 
   /**
