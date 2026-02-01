@@ -12,8 +12,9 @@ import { createInventoryComponent, type InventorySlot } from '../components/Inve
 import { EntityImpl } from '../ecs/Entity.js';
 import { createBuildingComponent, BuildingType } from '../components/BuildingComponent.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
-import { createRenderableComponent } from '../components/RenderableComponent.js';
+import { createRenderableComponent, type RenderableComponent } from '../components/RenderableComponent.js';
 import { createProfessionComponent, type ProfessionRole } from '../components/ProfessionComponent.js';
+import { isRenderableComponent } from '../components/typeGuards.js';
 
 // Agent creation functions - lazy loaded to avoid circular dependency with @ai-village/agents
 type AgentModule = { createLLMAgent: (world: WorldMutator, x: number, y: number, speed: number) => string; createWanderingAgent: (world: WorldMutator, x: number, y: number, speed: number) => string };
@@ -117,10 +118,10 @@ function buildBuildingLookupTable(
     const building = world.getEntity(buildingId);
     if (!building) continue;
 
-    const renderable = building.getComponent('renderable') as { sprite: string } | undefined;
-    if (!renderable) continue;
+    const renderable = building.getComponent('renderable');
+    if (!renderable || !isRenderableComponent(renderable)) continue;
 
-    const buildingType = renderable.sprite;
+    const buildingType = renderable.spriteId;
     if (!lookup.has(buildingType)) {
       lookup.set(buildingType, []);
     }
