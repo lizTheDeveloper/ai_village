@@ -5,6 +5,8 @@
  * Users can join an existing planet or create a new one.
  */
 
+import { planetClient, type PlanetMetadata } from '@ai-village/persistence';
+
 export interface ServerPlanetInfo {
   id: string;
   universeId: string;
@@ -91,7 +93,7 @@ export class PlanetListScreen {
     this.render();
 
     try {
-      // Load universe details
+      // Load universe details from multiverse API
       const universeRes = await fetch(`${this.API_BASE}/multiverse/universe/${this.universeId}`, {
         signal: AbortSignal.timeout(5000),
       });
@@ -105,25 +107,21 @@ export class PlanetListScreen {
         cosmicDeities: universeData.universe.cosmicDeities || [],
       };
 
-      // Load planets
-      const planetsRes = await fetch(`${this.API_BASE}/multiverse/universe/${this.universeId}/planets`, {
-        signal: AbortSignal.timeout(5000),
-      });
-      if (!planetsRes.ok) throw new Error('Failed to load planets');
-      const planetsData = await planetsRes.json();
-      this.planets = (planetsData.planets || []).map((p: any) => ({
+      // Load planets from PlanetClient (port 8766)
+      const planetMetadata = await planetClient.listPlanetsByUniverse(this.universeId);
+      this.planets = planetMetadata.map((p: PlanetMetadata) => ({
         id: p.id,
-        universeId: p.universeId,
+        universeId: p.universeId || this.universeId,
         name: p.name,
         type: p.type || 'terrestrial',
         artStyle: p.artStyle || 'unknown',
-        speciesCount: p.speciesCount || 0,
-        playerCount: p.playerCount || 0,
+        speciesCount: 0, // Not tracked in PlanetMetadata yet
+        playerCount: p.saveCount || 0,
         biomes: p.biomes || [],
         createdAt: p.createdAt,
         createdBy: p.createdBy || 'Unknown',
-        isGenerating: p.isGenerating || false,
-        generationProgress: p.generationProgress,
+        isGenerating: false, // Could check hasBiosphere
+        generationProgress: undefined,
       }));
 
       // Sort by creation date, newest first

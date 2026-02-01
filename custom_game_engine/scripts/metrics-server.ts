@@ -163,7 +163,9 @@ const gunzip = promisify(zlib.gunzip);
 
 // API keys from environment
 const groqApiKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY;
+const groqModel = process.env.GROQ_MODEL || 'qwen/qwen3-32b';
 const cerebrasApiKey = process.env.CEREBRAS_API_KEY || process.env.VITE_CEREBRAS_API_KEY;
+const cerebrasModel = process.env.CEREBRAS_MODEL || 'llama-3.3-70b';
 
 const llmProvidersConfigured: string[] = [];
 const llmModelsConfigured: { model: string; provider: string; tier: IntelligenceTier; rpm: number }[] = [];
@@ -7659,6 +7661,11 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
           chunkCount: 0,
           hasBiosphere: false,
           config: params.config || { seed: params.seed, type: params.type },
+          // New fields for universe-planet association
+          universeId: params.universeId,
+          artStyle: params.artStyle,
+          createdBy: params.createdBy,
+          biomes: params.biomes,
         };
 
         await planetStorage.createPlanet(metadata);

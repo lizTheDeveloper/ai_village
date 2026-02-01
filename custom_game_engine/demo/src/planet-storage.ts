@@ -52,6 +52,14 @@ export interface PlanetMetadata {
   hasBiosphere: boolean;
   /** Planet configuration parameters */
   config: PlanetConfig;
+  /** Universe this planet belongs to (optional for legacy planets) */
+  universeId?: string;
+  /** Art style for sprites and rendering */
+  artStyle?: string;
+  /** ID of player who created this planet */
+  createdBy?: string;
+  /** Biome types present on this planet */
+  biomes?: string[];
 }
 
 export interface PlanetConfig {

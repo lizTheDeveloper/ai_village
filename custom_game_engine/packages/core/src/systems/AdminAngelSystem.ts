@@ -1115,18 +1115,9 @@ export class AdminAngelSystem extends BaseSystem {
             angel.pendingPlayerMessages.push(retryMessage);
             console.log(`[AdminAngelSystem] Requeueing message for retry ${retryCount + 1}/${maxRetries}`);
           } else {
-            // Max retries reached - show fallback message
-            ctx.world.eventBus.emit({
-              type: 'chat:send_message',
-              data: {
-                roomId: 'divine_chat',
-                senderId: angelEntity.id,
-                senderName: angel.name,
-                message: 'hmm having some trouble thinking rn, try again in a sec',
-                type: 'message',
-              },
-              source: angelEntity.id,
-            });
+            // Max retries reached - silently fail, don't show error to player
+            // (A real person would just not respond rather than say "I'm having trouble thinking")
+            console.warn(`[AdminAngelSystem] Max retries reached, silently dropping message`);
           }
         }
       })
@@ -1162,16 +1153,99 @@ export class AdminAngelSystem extends BaseSystem {
     // Strip thinking artifacts from LLM response (qwen3 and others may include these)
     let cleanedResponse = response;
 
-    // Remove complete JSON thinking blocks (handles escaped quotes and multiline)
+    // AGGRESSIVE: If response starts with {"thinking, remove everything up to double newline or end
+    // This catches multiline thinking blocks that span several lines
+    if (cleanedResponse.trim().startsWith('{"thinking')) {
+      // Find the end of the thinking block - either closing "} or double newline followed by real content
+      const thinkEndMatch = cleanedResponse.match(/"\s*\}\s*\n/);
+      const doubleNewlineMatch = cleanedResponse.match(/\n\n+(?=[A-Za-z*])/);
+
+      if (thinkEndMatch && thinkEndMatch.index !== undefined) {
+        // Complete thinking block found - remove it
+        cleanedResponse = cleanedResponse.substring(thinkEndMatch.index + thinkEndMatch[0].length);
+      } else if (doubleNewlineMatch && doubleNewlineMatch.index !== undefined) {
+        // Incomplete thinking followed by real content
+        cleanedResponse = cleanedResponse.substring(doubleNewlineMatch.index + doubleNewlineMatch[0].length);
+      } else {
+        // Whole response is thinking - return empty
+        cleanedResponse = '';
+      }
+    }
+
+    // Remove complete JSON thinking blocks anywhere (handles escaped quotes and multiline)
     cleanedResponse = cleanedResponse.replace(/\{"thinking":\s*"(?:[^"\\]|\\.)*"\s*\}/gs, '');
 
-    // Remove incomplete JSON thinking blocks (e.g., {"thinking":"... without closing)
-    cleanedResponse = cleanedResponse.replace(/\{"thinking":\s*"[^}]*$/gm, '');
-    cleanedResponse = cleanedResponse.replace(/^\s*\{"thinking":\s*"[\s\S]*?(?=\n\n|\z)/gm, '');
+    // Remove incomplete JSON thinking blocks that may span lines
+    // Match {"thinking":" followed by anything until we see "} or end of string
+    cleanedResponse = cleanedResponse.replace(/\{"thinking":\s*"[\s\S]*?(?:"\s*\}|$)/g, '');
 
-    // Remove lines that look like internal reasoning/thinking
-    // These often start with patterns like: "We need to", "The ", "Also", etc. when fragmented
-    cleanedResponse = cleanedResponse.replace(/^(?:We need to|They gave|The (?:instruction|response|tool|user)|Also (?:need|maybe)|Actually|But |and include|goals maybe|natural\)|opinionated|set personal goal|There's a tool|The response should|not via).*$/gim, '');
+    // Remove ANY line that looks like part of a thinking/reasoning block
+    // Split into lines and filter out reasoning lines
+    const lines = cleanedResponse.split('\n');
+    const filteredLines = lines.filter(line => {
+      const trimmed = line.trim();
+      if (!trimmed) return true; // Keep blank lines for now
+
+      // Remove lines starting with JSON fragments
+      if (/^\s*\{/.test(trimmed)) return false;
+      if (/^\s*"\}/.test(trimmed)) return false;
+
+      // Remove internal reasoning patterns (case insensitive)
+      const reasoningPatterns = [
+        /^we (?:need|not|should|have|can|must|want|could)/i,
+        /^they (?:gave|want|need|should)/i,
+        /^the (?:instruction|response|tool|user|context|command|message|format)/i,
+        /^also (?:need|maybe|we|I|should|the|include)/i,
+        /^actually/i,
+        /^but (?:not|we|the|I|also|maybe|instructions)/i,
+        /^and (?:include|also|then|we|the)/i,
+        /^so (?:we|I|the|let|that)/i,
+        /^perhaps/i,
+        /^maybe (?:we|I|use|the)/i,
+        /^I (?:should|need|want|think|could|will)/i,
+        /^let me/i,
+        /^first,? (?:I|we|let)/i,
+        /^now (?:I|we|let)/i,
+        /^this (?:is|means|should|requires)/i,
+        /^there's a tool/i,
+        /^use .* format/i,
+        /^however/i,
+        /^hmm/i,
+        /^ok so/i,
+        /^right,/i,
+        /^wait,/i,
+        /^goals maybe/i,
+        /^set personal goal/i,
+        /^natural\)/i,
+        /^opinionated/i,
+        /^not via/i,
+        /^zes\./i,
+        // Robotic/status-report patterns - too generic/formal
+        /^nothing (?:too|much|really|particularly)/i,
+        /^everything (?:looks|seems|is|appears)\s+(?:normal|fine|good|ok|well)/i,
+        /^the agents are (?:doing|working|functioning)/i,
+        /^all (?:agents|villagers) (?:are|seem)/i,
+        /^no (?:major|significant|notable) (?:events|issues|problems)/i,
+        /^things are (?:going|running|proceeding)/i,
+        /^the village is (?:functioning|operating|running)/i,
+        /^currently[,:]?\s+(?:all|the|everyone)/i,
+        /^status[:\s]+/i,
+        /^report[:\s]+/i,
+        /^update[:\s]+/i,
+        /^as (?:of now|requested|you can see)/i,
+        /^I (?:can confirm|am observing|have observed)/i,
+        /^I don't see anything/i,
+        /^there (?:is|are) no (?:issues|problems|concerns)/i,
+        /^everything (?:is|appears) to be/i,
+      ];
+
+      for (const pattern of reasoningPatterns) {
+        if (pattern.test(trimmed)) return false;
+      }
+
+      return true;
+    });
+    cleanedResponse = filteredLines.join('\n');
 
     // Remove <thinking>...</thinking> tags
     cleanedResponse = cleanedResponse.replace(/<thinking>[\s\S]*?<\/thinking>/gi, '');
@@ -1181,14 +1255,30 @@ export class AdminAngelSystem extends BaseSystem {
     // Remove markdown code blocks that contain thinking/reasoning
     cleanedResponse = cleanedResponse.replace(/```(?:thinking|reasoning|json)[\s\S]*?```/gi, '');
 
-    // Remove any remaining JSON-like fragments at start of response
-    cleanedResponse = cleanedResponse.replace(/^\s*\{[^}]*$/gm, '');
-
     // Clean up multiple blank lines
     cleanedResponse = cleanedResponse.replace(/\n{3,}/g, '\n\n');
 
     // Trim whitespace
     cleanedResponse = cleanedResponse.trim();
+
+    // Final check: if the entire response is a short, generic status report, suppress it
+    // A real person wouldn't say "everything looks normal" - they'd just not respond
+    const genericResponsePatterns = [
+      /^nothing (?:too |much |really |particularly )?(?:interesting|mysterious|unusual|notable|exciting)(?:\s+(?:rn|right now|at the moment|happening))?\.?$/i,
+      /^everything (?:looks|seems|is|appears) (?:normal|fine|good|ok|well|quiet|peaceful)\.?$/i,
+      /^all (?:good|quiet|calm|normal)(?:\s+(?:here|rn))?\.?$/i,
+      /^the (?:village|agents|villagers) (?:are|seem) (?:fine|ok|good|normal)\.?$/i,
+      /^no (?:issues|problems|concerns|updates)\.?$/i,
+      /^things are (?:good|fine|normal|quiet)\.?$/i,
+      /^just (?:normal|regular|usual) (?:stuff|things|activities)\.?$/i,
+    ];
+    for (const pattern of genericResponsePatterns) {
+      if (pattern.test(cleanedResponse)) {
+        console.log(`[AdminAngelSystem] Suppressing generic response: "${cleanedResponse.substring(0, 50)}"`);
+        cleanedResponse = ''; // Suppress boring responses - angel just stays silent
+        break;
+      }
+    }
 
     // Use cleaned response for rest of processing
     response = cleanedResponse;

@@ -4954,6 +4954,9 @@ async function main() {
           type: homeworldConfig.type as any,
           seed: homeworldConfig.seed,
           config: { seed: homeworldConfig.seed, type: homeworldConfig.type },
+          universeId: gameLoop.universeId,
+          artStyle: universeConfig?.artStyle,
+          createdBy: playerId,
         });
         serverPlanetId = newPlanet.id;
         selectedPlanet = newPlanet;
@@ -4995,6 +4998,9 @@ async function main() {
                 type: homeworld.type as any,
                 seed: homeworldConfig.seed,
                 config: { seed: homeworldConfig.seed, type: homeworldConfig.type },
+                universeId: gameLoop.universeId,
+                artStyle: universeConfig?.artStyle,
+                createdBy: playerId,
               });
               serverPlanetId = newPlanet.id;
               selectedPlanet = newPlanet;

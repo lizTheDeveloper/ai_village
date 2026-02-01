@@ -34,6 +34,14 @@ export interface PlanetMetadata {
   hasBiosphere: boolean;
   /** Planet configuration parameters */
   config: PlanetConfig;
+  /** Universe this planet belongs to (optional for legacy planets) */
+  universeId?: string;
+  /** Art style for sprites and rendering */
+  artStyle?: string;
+  /** ID of player who created this planet */
+  createdBy?: string;
+  /** Biome types present on this planet */
+  biomes?: string[];
 }
 
 export interface PlanetConfig {
@@ -219,6 +227,14 @@ export class PlanetClient {
     seed: string;
     config?: Partial<PlanetConfig>;
     id?: string;
+    /** Universe this planet belongs to */
+    universeId?: string;
+    /** Art style for rendering */
+    artStyle?: string;
+    /** Player who created this planet */
+    createdBy?: string;
+    /** Biome types on this planet */
+    biomes?: string[];
   }): Promise<PlanetMetadata> {
     const response = await fetch(`${this.baseUrl}/api/planets`, {
       method: 'POST',
@@ -229,6 +245,10 @@ export class PlanetClient {
         type: options.type,
         seed: options.seed,
         config: options.config || { seed: options.seed, type: options.type },
+        universeId: options.universeId,
+        artStyle: options.artStyle,
+        createdBy: options.createdBy,
+        biomes: options.biomes,
       }),
     });
 
@@ -275,6 +295,14 @@ export class PlanetClient {
 
     const data = await response.json();
     return data.planets ?? [];
+  }
+
+  /**
+   * List planets belonging to a specific universe
+   */
+  async listPlanetsByUniverse(universeId: string): Promise<PlanetMetadata[]> {
+    const allPlanets = await this.listPlanets();
+    return allPlanets.filter(p => p.universeId === universeId);
   }
 
   /**
