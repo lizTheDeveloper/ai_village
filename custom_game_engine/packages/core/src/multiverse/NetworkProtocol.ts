@@ -4,6 +4,8 @@
 
 import type { Position } from '../types.js';
 import type { VersionedEntity } from '../persistence/types.js';
+import type { GameEvent } from '../events/GameEvent.js';
+import type { UniverseDivineConfig } from '../divinity/UniverseConfig.js';
 
 // ============================================================================
 // Core Types
@@ -180,7 +182,8 @@ export interface UniverseSnapshotMessage {
 export interface ComponentDelta {
   componentType: ComponentType;
   operation: 'add' | 'update' | 'remove';
-  data?: Partial<any>;
+  /** Component data - uses Record<string, unknown> for type safety */
+  data?: Record<string, unknown>;
 }
 
 export interface EntityUpdate {
@@ -197,7 +200,8 @@ export interface UniverseTickUpdate {
   entitiesUpdated: EntityUpdate[];
   entitiesRemoved: EntityId[];
 
-  events: any[]; // GameEvent[]
+  /** Game events that occurred during this tick */
+  events: GameEvent[];
 }
 
 /**
@@ -207,7 +211,8 @@ export interface RemoteInteraction {
   type: 'click' | 'spell' | 'command';
   position?: Position;
   entityId?: EntityId;
-  data?: any;
+  /** Interaction-specific data payload */
+  data?: Record<string, unknown>;
 }
 
 export interface RemoteInteractionMessage {
@@ -227,7 +232,8 @@ export interface UniverseConfigRequest {
 export interface UniverseConfigResponse {
   type: 'universe_config_response';
   universeId: UniverseId;
-  config: any; // UniverseDivineConfig
+  /** Universe divine configuration */
+  config: UniverseDivineConfig;
 }
 
 /**
