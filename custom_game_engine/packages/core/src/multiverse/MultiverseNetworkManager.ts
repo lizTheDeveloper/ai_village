@@ -12,6 +12,7 @@ import type { MultiverseCoordinator } from './MultiverseCoordinator.js';
 import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { VersionedEntity } from '../persistence/types.js';
+import type { Entity } from '../ecs/Entity.js';
 import type {
   NetworkMessage,
   RemotePassage,
@@ -26,63 +27,28 @@ import type {
   PassageId,
   UniverseId,
   EntityId,
+  StreamConfiguration,
+  Bounds,
+  ComponentDelta,
 } from './NetworkProtocol.js';
-import { worldSerializer } from '../persistence/WorldSerializer.js';
+import { worldSerializer, WorldSerializer } from '../persistence/WorldSerializer.js';
 import { computeChecksumSync } from '../persistence/utils.js';
 import type { UniverseConfig } from './MultiverseCoordinator.js';
 import type { UniversePhysicsConfig } from '../config/UniversePhysicsConfig.js';
 import type { UniverseDivineConfig } from '../divinity/UniverseConfig.js';
-
-// WebSocket type (works in both browser and Node.js)
-// Using structural typing to avoid direct dependency on ws package
-interface WebSocketLike {
-  send(data: string): void;
-  close(): void;
-  on?(event: string, handler: (...args: unknown[]) => void): void;
-  onopen?: ((event: unknown) => void) | null;
-  onclose?: ((event: unknown) => void) | null;
-  onerror?: ((error: unknown) => void) | null;
-  onmessage?: ((event: { data: string }) => void) | null;
-}
-
-interface WebSocketServerLike {
-  close(): void;
-  on(event: string, handler: (...args: unknown[]) => void): void;
-}
-
-/**
- * Universe compatibility information
- */
-interface UniverseCompatibility {
-  /** Overall compatibility score (0-1, where 1 = fully compatible) */
-  compatibilityScore: number;
-
-  /** Individual factor scores */
-  factors: {
-    timeRateCompatibility: number;
-    physicsCompatibility: number;
-    realityStability: number;
-    divergenceLevel: number;
-  };
-
-  /** Warnings about compatibility issues */
-  warnings: string[];
-
-  /** Whether passage creation is recommended */
-  recommended: boolean;
-
-  /** Estimated traversal cost multiplier (1.0 = normal) */
-  traversalCostMultiplier: number;
-}
-
-/**
- * Pending operations (for request/response pattern)
- */
-interface PendingOperation<T> {
-  resolve: (value: T) => void;
-  reject: (error: Error) => void;
-  timeout: ReturnType<typeof setTimeout>;
-}
+import type { WorldMutator } from '../ecs/World.js';
+import type {
+  WebSocketLike,
+  WebSocketServerLike,
+  MutableEntity,
+  PlayerControlComponent,
+  DeityComponent,
+  AvatarComponent,
+  AgentComponent,
+  UniverseCompatibility,
+  PendingOperation,
+} from './MultiverseTypes.js';
+import { isMutableEntity } from './MultiverseTypes.js';
 
 /**
  * Active universe subscription state
@@ -91,24 +57,10 @@ interface UniverseSubscription {
   passageId: PassageId;
   peerId: PeerId;
   universeId: UniverseId;
-  config: import('./NetworkProtocol.js').StreamConfiguration;
-  viewport?: import('./NetworkProtocol.js').Bounds;
+  config: StreamConfiguration;
+  viewport?: Bounds;
   lastSentTick: bigint;
   updateInterval: ReturnType<typeof setInterval>;
-}
-
-/**
- * Entity with updateComponent method (for mutation operations)
- */
-interface UpdateableEntity {
-  updateComponent<T>(type: string, updater: ((current: T) => T) | Partial<T>): void;
-}
-
-/**
- * Entity with an id property
- */
-interface EntityWithId {
-  id: string;
 }
 
 export class MultiverseNetworkManager {
@@ -131,7 +83,7 @@ export class MultiverseNetworkManager {
   private activeSubscriptions: Map<PassageId, UniverseSubscription> = new Map();
 
   // Cached entity states for delta compression (passageId -> entityId -> last sent state)
-  private entityCache: Map<PassageId, Map<string, unknown>> = new Map();
+  private entityCache: Map<PassageId, Map<string, VersionedEntity>> = new Map();
 
   // My peer ID
   private myPeerId: PeerId;
@@ -368,9 +320,21 @@ export class MultiverseNetworkManager {
       throw new Error(`Failed to get remote universe config for ${config.remoteUniverseId}`);
     }
 
+    // Extract the universe config from the response
+    // Note: remoteConfigResponse.config is UniverseDivineConfig, but we need to
+    // construct a compatible UniverseConfig for compatibility calculation
+    const remoteConfig: UniverseConfig = {
+      id: config.remoteUniverseId,
+      name: remoteConfigResponse.config.name,
+      timeScale: remoteConfigResponse.config.coreParams?.divineTimeScale ?? 1.0,
+      multiverseId: remoteConfigResponse.config.universeId,
+      creatorId: config.creatorId,
+      paused: false,
+    };
+
     const compatibility = this.calculateUniverseCompatibility(
       localUniverse.config,
-      remoteConfigResponse
+      remoteConfig
     );
 
     // Log compatibility warnings
@@ -520,9 +484,8 @@ export class MultiverseNetworkManager {
       );
     }
 
-    // Serialize entity
-    type WorldSerializerWithEntity = { serializeEntity(entity: unknown): Promise<unknown> };
-    const serializedEntity = await (worldSerializer as unknown as WorldSerializerWithEntity).serializeEntity(entity);
+    // Serialize entity using WorldSerializer's private method via prototype
+    const serializedEntity = await this.serializeEntityForTransfer(entity);
 
     // Compute checksum
     const checksum = computeChecksumSync(serializedEntity);
@@ -561,11 +524,9 @@ export class MultiverseNetworkManager {
       const playerControl = deityEntity.components.get('player_control');
       const deity = deityEntity.components.get('deity');
 
-      type PlayerControlComponent = { isPossessed?: boolean; possessedAgentId?: string | null };
-      type DeityComponent = { origin?: string; controller?: string };
-
-      const typedPlayerControl = playerControl as PlayerControlComponent | undefined;
-      const typedDeity = deity as DeityComponent | undefined;
+      // Use type guards instead of unsafe casts
+      const typedPlayerControl = this.asPlayerControlComponent(playerControl);
+      const typedDeity = this.asDeityComponent(deity);
 
       if (typedPlayerControl?.isPossessed && typedPlayerControl.possessedAgentId === entityId) {
         // Check if entity is an avatar (deity's physical manifestation)
@@ -587,17 +548,9 @@ export class MultiverseNetworkManager {
             );
 
             // Update avatar component with multiverse origin
-            const avatarComp = entity.components.get('avatar');
-            if (avatarComp && typeof avatarComp === 'object') {
-              type AvatarComponent = {
-                originMultiverseId?: string;
-                currentMultiverseId?: string;
-                divinePowersSuppressed?: boolean;
-                suppressionReason?: string;
-              };
-              (entity as unknown as { updateComponent<T>(type: string, updater: (current: T) => T): void }).updateComponent<AvatarComponent & { type: string }>('avatar', (current) => ({
+            if (isMutableEntity(entity)) {
+              entity.updateComponent<AvatarComponent>('avatar', (current) => ({
                 ...current,
-                ...avatarComp,
                 originMultiverseId: sourceMultiverseId,
                 currentMultiverseId: this.multiverseCoordinator.getMultiverseId(
                   passage.to.universeId
@@ -622,20 +575,19 @@ export class MultiverseNetworkManager {
             // Auto jack-out: weak deity OR crossing to foreign multiverse
 
             // Force jack-out
-            type UpdateableEntity = { updateComponent<T>(type: string, component: T): void };
-            (deityEntity as unknown as UpdateableEntity).updateComponent('player_control', {
-              ...(typedPlayerControl || {}),
-              isPossessed: false,
-              possessedAgentId: null,
-              possessionStartTick: null,
-            });
+            if (isMutableEntity(deityEntity)) {
+              deityEntity.updateComponent<PlayerControlComponent>('player_control', (current) => ({
+                ...current,
+                isPossessed: false,
+                possessedAgentId: null,
+                possessionStartTick: null,
+              }));
+            }
 
             // Emit event for UI notification
             const events = this.getOrCreateEventManager(passage.from.universeId, sourceUniverse.world);
-            const agentComp = entity.components.get('agent');
-            const agentName = (agentComp && typeof agentComp === 'object' && 'name' in agentComp)
-              ? (agentComp as { name?: string }).name || 'Unknown'
-              : 'Unknown';
+            const agentComp = this.asAgentComponent(entity.components.get('agent'));
+            const agentName = agentComp?.name || 'Unknown';
 
             events.emitGeneric('possession:cross_universe_jackout', {
               deityId: deityEntity.id,
@@ -654,29 +606,23 @@ export class MultiverseNetworkManager {
               passage.to.universeId
             );
 
-            type CrossUniversePlayerControl = PlayerControlComponent & {
-              deityUniverseId?: string;
-              deityMultiverseId?: string;
-              possessedUniverseId?: string;
-              possessedMultiverseId?: string;
-            };
-            (deityEntity as unknown as UpdateableEntity).updateComponent<CrossUniversePlayerControl>('player_control', {
-              ...(typedPlayerControl || {}),
-              deityUniverseId: passage.from.universeId,
-              deityMultiverseId: sourceMultiverseId,
-              possessedUniverseId: passage.to.universeId,
-              possessedMultiverseId: targetMultiverseId,
-            });
+            if (isMutableEntity(deityEntity)) {
+              deityEntity.updateComponent<PlayerControlComponent>('player_control', (current) => ({
+                ...current,
+                deityUniverseId: passage.from.universeId,
+                deityMultiverseId: sourceMultiverseId,
+                possessedUniverseId: passage.to.universeId,
+                possessedMultiverseId: targetMultiverseId,
+              }));
+            }
           }
         }
       }
     }
 
     // Remove entity from source universe
-    // Cast to WorldMutator to access destroyEntity method
-    type WorldMutator = { destroyEntity(entityId: string, reason: string): void };
-    const worldMutator = sourceUniverse.world as unknown as WorldMutator;
-    worldMutator.destroyEntity(entityId, 'Transferred to remote universe');
+    // The world is a WorldMutator which has destroyEntity method
+    (sourceUniverse.world as WorldMutator).destroyEntity(entityId, 'Transferred to remote universe');
 
 
     return ack.newEntityId!;
@@ -838,7 +784,7 @@ export class MultiverseNetworkManager {
   private async requestUniverseConfig(
     peerId: PeerId,
     universeId: UniverseId
-  ): Promise<any> {
+  ): Promise<UniverseConfigResponse> {
     const request: UniverseConfigRequest = {
       type: 'universe_config_request',
       universeId,
@@ -866,10 +812,38 @@ export class MultiverseNetworkManager {
       return;
     }
 
+    // Get divine config from world, or construct a minimal one from universe config
+    const divineConfig = (universe.world as WorldMutator).divineConfig ?? {
+      universeId: message.universeId,
+      name: universe.config.name,
+      description: '',
+      coreParams: {
+        divinePresence: 0.5,
+        divineReliability: 0.5,
+        mortalSignificance: 0.5,
+        faithVolatility: 0.5,
+        permanentDivineDeathPossible: false,
+        intentionalDeityCreation: false,
+        maxActiveDeities: 10,
+        playerGodAdvantage: 1.0,
+        divineTimeScale: universe.config.timeScale,
+      },
+      beliefEconomy: {} as UniverseDivineConfig['beliefEconomy'],
+      powers: {} as UniverseDivineConfig['powers'],
+      avatars: {} as UniverseDivineConfig['avatars'],
+      angels: {} as UniverseDivineConfig['angels'],
+      pantheons: {} as UniverseDivineConfig['pantheons'],
+      religion: {} as UniverseDivineConfig['religion'],
+      emergence: {} as UniverseDivineConfig['emergence'],
+      chat: {} as UniverseDivineConfig['chat'],
+      domainModifiers: new Map(),
+      restrictions: {} as UniverseDivineConfig['restrictions'],
+    };
+
     const response: UniverseConfigResponse = {
       type: 'universe_config_response',
       universeId: message.universeId,
-      config: universe.config, // TODO: May need to transform this
+      config: divineConfig as UniverseDivineConfig,
     };
 
     this.send(peerId, response);
@@ -920,24 +894,16 @@ export class MultiverseNetworkManager {
         );
       }
 
-      // Deserialize entity
-      type WorldSerializerWithDeserialize = { deserializeEntity(data: unknown): Promise<{ id: string }> };
-      const entity = await (worldSerializer as unknown as WorldSerializerWithDeserialize).deserializeEntity(message.entity);
-
-      // Add entity to target world
-      type WorldWithEntities = { _entities: Map<string, unknown> };
-      const worldImpl = targetUniverse.world as unknown as WorldWithEntities;
+      // Deserialize entity using helper method
+      const entity = await this.deserializeEntityForTransfer(message.entity);
       const oldEntityId = entity.id;
 
       // Generate new entity ID for this universe
       const newEntityId = `${message.targetUniverseId}-entity-${Date.now()}-${Math.random().toString(36).substring(7)}`;
 
-      // Update entity ID
-      type MutableEntity = { id: string };
-      (entity as MutableEntity).id = newEntityId;
-
-      // Add to world
-      worldImpl._entities.set(newEntityId, entity);
+      // Add entity to target world with new ID
+      // Use WorldMutator's internal entity registration
+      this.addEntityToWorld(targetUniverse.world as WorldMutator, entity, newEntityId);
 
 
       // Send acknowledgment
@@ -1113,15 +1079,13 @@ export class MultiverseNetworkManager {
     );
 
     // Serialize entities
-    type EntityWithId = { id: string };
-    type WorldSerializerWithSerialize = { serializeEntity(entity: unknown): Promise<unknown> };
     const serializedEntities = await Promise.all(
       entities.map(async (entity) => {
-        const serialized = await (worldSerializer as unknown as WorldSerializerWithSerialize).serializeEntity(entity);
+        const serialized = await this.serializeEntityForTransfer(entity);
         // Cache for delta compression
         const cache = this.entityCache.get(passageId);
-        if (cache && typeof entity === 'object' && entity !== null && 'id' in entity) {
-          cache.set((entity as EntityWithId).id, serialized);
+        if (cache) {
+          cache.set(entity.id, serialized);
         }
         return serialized;
       })
@@ -1177,28 +1141,26 @@ export class MultiverseNetworkManager {
     const entitiesUpdated: import('./NetworkProtocol.js').EntityUpdate[] = [];
     const entitiesRemoved: string[] = [];
 
-    const currentEntityIds = new Set(currentEntities.map((e) => (e as EntityWithId).id));
+    const currentEntityIds = new Set(currentEntities.map((e) => e.id));
     const cachedEntityIds = new Set(cache.keys());
 
     // Find added entities
-    type WorldSerializerWithSerialize = { serializeEntity(entity: unknown): Promise<unknown> };
     for (const entity of currentEntities) {
-      const entityWithId = entity as EntityWithId;
-      if (!cache.has(entityWithId.id)) {
-        const serialized = await (worldSerializer as unknown as WorldSerializerWithSerialize).serializeEntity(entity);
+      if (!cache.has(entity.id)) {
+        const serialized = await this.serializeEntityForTransfer(entity);
         entitiesAdded.push(serialized);
-        cache.set(entityWithId.id, serialized);
+        cache.set(entity.id, serialized);
       } else if (subscription.config.deltaUpdatesOnly) {
         // Check for updates
-        const deltas = this.computeEntityDeltas(entity, cache.get(entityWithId.id)!);
+        const deltas = this.computeEntityDeltas(entity, cache.get(entity.id)!);
         if (deltas.length > 0) {
           entitiesUpdated.push({
-            entityId: entityWithId.id,
+            entityId: entity.id,
             deltas,
           });
           // Update cache
-          const serialized = await (worldSerializer as unknown as WorldSerializerWithSerialize).serializeEntity(entity);
-          cache.set(entityWithId.id, serialized);
+          const serialized = await this.serializeEntityForTransfer(entity);
+          cache.set(entity.id, serialized);
         }
       }
     }
@@ -1238,24 +1200,18 @@ export class MultiverseNetworkManager {
    * Filter entities by viewport bounds
    */
   private filterEntitiesByViewport(
-    entities: readonly unknown[],
-    viewport: import('./NetworkProtocol.js').Bounds
-  ): unknown[] {
-    type EntityWithComponents = { getComponent(type: string): unknown };
-    type PositionComponent = { x: number; y: number };
-
+    entities: readonly Entity[],
+    viewport: Bounds
+  ): Entity[] {
     return entities.filter((entity) => {
-      if (typeof entity !== 'object' || entity === null || !('getComponent' in entity)) return false;
+      const pos = entity.components.get('position') as { x?: number; y?: number } | undefined;
+      if (!pos || typeof pos.x !== 'number' || typeof pos.y !== 'number') return false;
 
-      const pos = (entity as EntityWithComponents).getComponent('position');
-      if (!pos || typeof pos !== 'object' || !('x' in pos) || !('y' in pos)) return false;
-
-      const typedPos = pos as PositionComponent;
       return (
-        typedPos.x >= viewport.x &&
-        typedPos.x < viewport.x + viewport.width &&
-        typedPos.y >= viewport.y &&
-        typedPos.y < viewport.y + viewport.height
+        pos.x >= viewport.x &&
+        pos.x < viewport.x + viewport.width &&
+        pos.y >= viewport.y &&
+        pos.y < viewport.y + viewport.height
       );
     });
   }
@@ -1264,16 +1220,10 @@ export class MultiverseNetworkManager {
    * Apply entity filter from stream config
    */
   private applyEntityFilter(
-    entities: readonly unknown[],
-    config: import('./NetworkProtocol.js').StreamConfiguration
-  ): unknown[] {
+    entities: readonly Entity[],
+    config: StreamConfiguration
+  ): Entity[] {
     let filtered = [...entities];
-
-    type EntityWithComponents = {
-      hasComponent(type: string): boolean;
-      getComponent(type: string): unknown;
-    };
-    type TagsComponent = { tags?: string[] };
 
     if (config.entityFilter) {
       const filter = config.entityFilter;
@@ -1281,18 +1231,16 @@ export class MultiverseNetworkManager {
       // Filter by types
       if (filter.types && filter.types.length > 0) {
         filtered = filtered.filter((entity) => {
-          if (typeof entity !== 'object' || entity === null || !('hasComponent' in entity)) return false;
-          return filter.types!.some((type) => (entity as EntityWithComponents).hasComponent(type));
+          return filter.types!.some((type) => entity.hasComponent(type));
         });
       }
 
       // Filter by tags
       if (filter.tags && filter.tags.length > 0) {
         filtered = filtered.filter((entity) => {
-          if (typeof entity !== 'object' || entity === null || !('getComponent' in entity)) return false;
-          const tags = (entity as EntityWithComponents).getComponent('tags');
-          if (!tags || typeof tags !== 'object' || !('tags' in tags)) return false;
-          return filter.tags!.some((tag) => (tags as TagsComponent).tags?.includes(tag));
+          const tagsComp = entity.components.get('tags') as { tags?: string[] } | undefined;
+          if (!tagsComp?.tags) return false;
+          return filter.tags!.some((tag) => tagsComp.tags?.includes(tag));
         });
       }
     }
@@ -1309,36 +1257,26 @@ export class MultiverseNetworkManager {
    * Compute deltas between current and cached entity state
    */
   private computeEntityDeltas(
-    entity: unknown,
-    cachedState: unknown
-  ): import('./NetworkProtocol.js').ComponentDelta[] {
-    const deltas: import('./NetworkProtocol.js').ComponentDelta[] = [];
-
-    // Type guards
-    if (typeof entity !== 'object' || entity === null || !('components' in entity)) return deltas;
-    if (typeof cachedState !== 'object' || cachedState === null || !('components' in cachedState)) return deltas;
-
-    type EntityWithComponents = { components: Map<string, unknown>; getComponent(type: string): unknown };
-    type CachedStateWithComponents = { components: Array<{ type: string; data: unknown }> };
-
-    const typedEntity = entity as EntityWithComponents;
-    const typedCached = cachedState as CachedStateWithComponents;
+    entity: Entity,
+    cachedState: VersionedEntity
+  ): ComponentDelta[] {
+    const deltas: ComponentDelta[] = [];
 
     const currentComponents = new Set<string>(
-      Array.from(typedEntity.components.keys())
+      Array.from(entity.components.keys())
     );
     const cachedComponents = new Set<string>(
-      typedCached.components.map((c) => c.type)
+      cachedState.components.map((c) => c.type)
     );
 
     // Added components
     for (const type of currentComponents) {
       if (!cachedComponents.has(type)) {
-        const component = typedEntity.getComponent(type);
+        const component = entity.components.get(type);
         deltas.push({
           componentType: type,
           operation: 'add',
-          data: component as Partial<any> | undefined,
+          data: component as Record<string, unknown> | undefined,
         });
       }
     }
@@ -1356,15 +1294,15 @@ export class MultiverseNetworkManager {
     // Updated components (simplified - check if serialized form differs)
     for (const type of currentComponents) {
       if (cachedComponents.has(type)) {
-        const current = typedEntity.getComponent(type);
-        const cached = typedCached.components.find((c) => c.type === type);
+        const current = entity.components.get(type);
+        const cached = cachedState.components.find((c) => c.type === type);
 
         // Simple deep comparison via JSON
         if (JSON.stringify(current) !== JSON.stringify(cached?.data)) {
           deltas.push({
             componentType: type,
             operation: 'update',
-            data: current as Partial<any> | undefined,
+            data: current as Record<string, unknown> | undefined,
           });
         }
       }
@@ -1380,15 +1318,10 @@ export class MultiverseNetworkManager {
   /**
    * Get or create event manager for a universe
    */
-  private getOrCreateEventManager(universeId: string, world: unknown): SystemEventManager {
+  private getOrCreateEventManager(universeId: string, world: WorldMutator): SystemEventManager {
     let events = this.eventManagers.get(universeId);
     if (!events) {
-      // Type guard for world with eventBus
-      if (typeof world !== 'object' || world === null || !('eventBus' in world)) {
-        throw new Error('World does not have eventBus property');
-      }
-      type WorldWithEventBus = { eventBus: EventBus };
-      events = new SystemEventManager((world as WorldWithEventBus).eventBus, `multiverse_network_${universeId}`);
+      events = new SystemEventManager(world.eventBus, `multiverse_network_${universeId}`);
       this.eventManagers.set(universeId, events);
     }
     return events;
@@ -1408,7 +1341,7 @@ export class MultiverseNetworkManager {
    * Wait for acknowledgment
    */
   private async waitForAck(peerId: PeerId, id: string): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const key = `${peerId}:${id}`;
 
       const timeout = setTimeout(() => {
@@ -1416,11 +1349,13 @@ export class MultiverseNetworkManager {
         reject(new Error('Acknowledgment timeout'));
       }, this.ACK_TIMEOUT_MS);
 
-      this.pendingAcks.set(key, {
-        resolve: resolve as unknown as (value: unknown) => void,
-        reject: reject as (error: Error) => void,
+      // Store operation with typed resolve wrapper
+      const operation: PendingOperation<unknown> = {
+        resolve: () => resolve(),
+        reject,
         timeout
-      });
+      };
+      this.pendingAcks.set(key, operation);
     });
   }
 
@@ -1431,7 +1366,7 @@ export class MultiverseNetworkManager {
     peerId: PeerId,
     id: string
   ): Promise<T> {
-    return new Promise((resolve, reject) => {
+    return new Promise<T>((resolve, reject) => {
       const key = `${peerId}:${id}`;
 
       const timeout = setTimeout(() => {
@@ -1439,11 +1374,13 @@ export class MultiverseNetworkManager {
         reject(new Error('Response timeout'));
       }, this.ACK_TIMEOUT_MS);
 
-      this.pendingAcks.set(key, {
-        resolve: resolve as unknown as (value: unknown) => void,
-        reject: reject as (error: Error) => void,
+      // Store operation with typed resolve wrapper
+      const operation: PendingOperation<unknown> = {
+        resolve: (value: unknown) => resolve(value as T),
+        reject,
         timeout
-      });
+      };
+      this.pendingAcks.set(key, operation);
     });
   }
 
@@ -1686,6 +1623,90 @@ export class MultiverseNetworkManager {
    */
   getConnectedPeers(): PeerId[] {
     return Array.from(this.wsConnections.keys());
+  }
+
+  // ============================================================================
+  // Entity Serialization Helpers
+  // ============================================================================
+
+  /**
+   * Serialize an entity for network transfer.
+   * Uses WorldSerializer's internal serialization.
+   */
+  private async serializeEntityForTransfer(entity: Entity): Promise<VersionedEntity> {
+    // Access WorldSerializer's private serializeEntity method via prototype
+    // This is necessary because the method is private but we need it for network transfer
+    const serializeEntity = (worldSerializer as unknown as {
+      serializeEntity(entity: Entity): Promise<VersionedEntity>;
+    }).serializeEntity.bind(worldSerializer);
+
+    return serializeEntity(entity);
+  }
+
+  /**
+   * Deserialize an entity from network transfer.
+   * Uses WorldSerializer's internal deserialization.
+   */
+  private async deserializeEntityForTransfer(data: VersionedEntity): Promise<Entity> {
+    // Access WorldSerializer's private deserializeEntity method via prototype
+    const deserializeEntity = (worldSerializer as unknown as {
+      deserializeEntity(data: VersionedEntity): Promise<Entity>;
+    }).deserializeEntity.bind(worldSerializer);
+
+    return deserializeEntity(data);
+  }
+
+  /**
+   * Add a deserialized entity to the world with a new ID.
+   * Handles the internal mutation required for entity transfer.
+   */
+  private addEntityToWorld(world: WorldMutator, entity: Entity, newEntityId: string): void {
+    // Access the internal entities map to set the entity with new ID
+    // This is necessary because we need to change the entity's ID during transfer
+    interface WorldWithEntitiesMap {
+      _entities: Map<string, Entity>;
+    }
+
+    // Update entity ID via mutable reference
+    (entity as unknown as { id: string }).id = newEntityId;
+
+    // Add to world's entity map
+    const worldImpl = world as unknown as WorldWithEntitiesMap;
+    worldImpl._entities.set(newEntityId, entity);
+  }
+
+  // ============================================================================
+  // Component Type Guards
+  // ============================================================================
+
+  /**
+   * Type guard for PlayerControlComponent
+   */
+  private asPlayerControlComponent(component: unknown): PlayerControlComponent | undefined {
+    if (!component || typeof component !== 'object') return undefined;
+    const comp = component as Record<string, unknown>;
+    if (comp.type !== 'player_control') return undefined;
+    return component as PlayerControlComponent;
+  }
+
+  /**
+   * Type guard for DeityComponent
+   */
+  private asDeityComponent(component: unknown): DeityComponent | undefined {
+    if (!component || typeof component !== 'object') return undefined;
+    const comp = component as Record<string, unknown>;
+    if (comp.type !== 'deity') return undefined;
+    return component as DeityComponent;
+  }
+
+  /**
+   * Type guard for AgentComponent
+   */
+  private asAgentComponent(component: unknown): AgentComponent | undefined {
+    if (!component || typeof component !== 'object') return undefined;
+    const comp = component as Record<string, unknown>;
+    if (comp.type !== 'agent') return undefined;
+    return component as AgentComponent;
   }
 }
 
