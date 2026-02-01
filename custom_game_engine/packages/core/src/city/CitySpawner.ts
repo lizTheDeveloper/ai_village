@@ -19,7 +19,7 @@ import { isRenderableComponent } from '../components/typeGuards.js';
 import { calculateGuaranteedResearchers, type SkillId, type SkillLevel } from '../components/SkillsComponent.js';
 
 // Agent factory from DI container - avoids circular dependency
-import { getAgentFactory } from '../ecs/Container.js';
+import { getAgentFactory } from '../di/Container.js';
 
 // Agent creation functions - lazy loaded to avoid circular dependency with @ai-village/agents
 // WanderingAgentOptions matches the type exported from @ai-village/agents
