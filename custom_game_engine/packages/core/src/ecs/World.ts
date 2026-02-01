@@ -47,6 +47,21 @@ import { NeedsComponent } from '../components/NeedsComponent.js';
 
 // ChunkManager is defined via IChunkManager interface to avoid circular dependency
 
+/**
+ * Performance statistics for the game loop.
+ * Updated by GameLoop every tick.
+ */
+export interface PerformanceStats {
+  /** Current ticks per second (calculated from avgTickTime) */
+  readonly tps: number;
+  /** Average tick time in milliseconds (exponential moving average) */
+  readonly avgTickTimeMs: number;
+  /** Maximum tick time in milliseconds (decays over time) */
+  readonly maxTickTimeMs: number;
+  /** Total number of ticks executed */
+  readonly tickCount: number;
+}
+
 // Re-export for backwards compatibility
 export type { TerrainType, BiomeType };
 
@@ -571,6 +586,21 @@ export interface World {
    */
   readonly divineConfig?: Partial<UniverseDivineConfig>;
 
+  /**
+   * Performance statistics for the game loop.
+   * Updated by GameLoop every tick with TPS and timing information.
+   *
+   * Use this for performance-aware throttling (e.g., BackgroundChunkGenerator).
+   *
+   * Example:
+   * ```typescript
+   * if (world.performanceStats.tps < 18) {
+   *   // Pause expensive operations
+   * }
+   * ```
+   */
+  readonly performanceStats: PerformanceStats;
+
   // ===========================================================================
   // Planet System
   // ===========================================================================
@@ -648,6 +678,13 @@ export interface WorldMutator extends World {
    * Controls how divine powers, belief economy, avatars, angels, etc. work.
    */
   setDivineConfig(config: Partial<UniverseDivineConfig>): void;
+
+  /**
+   * Update performance statistics.
+   * Called by GameLoop every tick to expose TPS and timing data.
+   * @internal Only GameLoop should call this
+   */
+  updatePerformanceStats(stats: PerformanceStats): void;
 
   // ===========================================================================
   // Planet Mutation
@@ -926,6 +963,14 @@ export class WorldImpl implements WorldMutator {
   private _planets = new Map<string, IPlanet>();
   private _activePlanetId?: string;
 
+  // Performance stats - updated by GameLoop
+  private _performanceStats: PerformanceStats = {
+    tps: 20, // Target TPS
+    avgTickTimeMs: 50, // Target 50ms per tick (20 TPS)
+    maxTickTimeMs: 0,
+    tickCount: 0,
+  };
+
   constructor(eventBus: EventBus, chunkManager?: IChunkManager, systemRegistry?: import('./SystemRegistry.js').ISystemRegistry) {
     this._eventBus = eventBus;
     this._chunkManager = chunkManager;
@@ -964,6 +1009,10 @@ export class WorldImpl implements WorldMutator {
 
   getEventBus(): EventBus {
     return this._eventBus;
+  }
+
+  get performanceStats(): PerformanceStats {
+    return this._performanceStats;
   }
 
   get simulationScheduler(): SimulationScheduler {
@@ -1615,6 +1664,10 @@ export class WorldImpl implements WorldMutator {
    */
   setDivineConfig(config: Partial<UniverseDivineConfig>): void {
     this._divineConfig = config;
+  }
+
+  updatePerformanceStats(stats: PerformanceStats): void {
+    this._performanceStats = stats;
   }
 
   // ===========================================================================
