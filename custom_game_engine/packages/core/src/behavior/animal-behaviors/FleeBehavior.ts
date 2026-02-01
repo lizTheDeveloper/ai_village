@@ -39,6 +39,11 @@ export class FleeBehavior extends BaseAnimalBehavior {
 
   private readonly fleeSpeed: number;
 
+  // Performance: Cache query results per tick to avoid query-in-loop pattern
+  private agentQueryCache: Entity[] | null = null;
+  private animalQueryCache: Entity[] | null = null;
+  private queryCacheTick: number = -1;
+
   constructor(fleeSpeed: number = 1.5) {
     super();
     this.fleeSpeed = fleeSpeed;
@@ -165,6 +170,7 @@ export class FleeBehavior extends BaseAnimalBehavior {
   /**
    * Find nearest threat to the animal.
    * Threats include: predator animals, aggressive agents, loud noises
+   * Performance: Caches query results per tick to avoid query-in-loop pattern.
    */
   private findNearestThreat(
     self: EntityImpl,
@@ -172,17 +178,22 @@ export class FleeBehavior extends BaseAnimalBehavior {
     position: PositionComponent,
     animal: AnimalComponent
   ): Entity | null {
+    // Cache query results per tick (avoids O(N*M) when N animals search for threats)
+    if (this.queryCacheTick !== world.tick) {
+      this.agentQueryCache = world.query().with('agent').with('position').executeEntities();
+      this.animalQueryCache = world.query().with('animal').with('position').executeEntities();
+      this.queryCacheTick = world.tick;
+    }
+
     let nearest: Entity | null = null;
     let nearestDist = Infinity;
 
+    // PERFORMANCE: Pre-compute squared threshold
+    const THREAT_DETECTION_RANGE_SQUARED = THREAT_DETECTION_RANGE * THREAT_DETECTION_RANGE;
+
     // Check for threatening agents (humans)
     if (animal.wild && animal.trustLevel < 50) {
-      const agents = world.query().with('agent').with('position').executeEntities();
-
-      // PERFORMANCE: Pre-compute squared threshold
-      const THREAT_DETECTION_RANGE_SQUARED = THREAT_DETECTION_RANGE * THREAT_DETECTION_RANGE;
-
-      for (const agentEntity of agents) {
+      for (const agentEntity of this.agentQueryCache!) {
         const agentPos = (agentEntity as EntityImpl).getComponent<PositionComponent>('position');
         if (!agentPos) continue;
 
@@ -198,9 +209,7 @@ export class FleeBehavior extends BaseAnimalBehavior {
     }
 
     // Check for predator animals (different species that are predatory)
-    const animals = world.query().with('animal').with('position').executeEntities();
-
-    for (const otherAnimal of animals) {
+    for (const otherAnimal of this.animalQueryCache!) {
       if (otherAnimal.id === self.id) continue;
 
       const otherAnimalComp = (otherAnimal as EntityImpl).getComponent<AnimalComponent>('animal');
@@ -213,7 +222,6 @@ export class FleeBehavior extends BaseAnimalBehavior {
         const dx = position.x - otherPos.x;
         const dy = position.y - otherPos.y;
         const distSquared = dx * dx + dy * dy;
-        const THREAT_DETECTION_RANGE_SQUARED = THREAT_DETECTION_RANGE * THREAT_DETECTION_RANGE;
 
         if (distSquared <= THREAT_DETECTION_RANGE_SQUARED && distSquared < nearestDist) {
           nearest = otherAnimal;

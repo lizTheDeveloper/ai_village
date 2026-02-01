@@ -56,8 +56,9 @@ describe('Animal Behavior Integration Tests', () => {
   });
 
   describe('AnimalBrainSystem with World', () => {
-    it('updates animal state based on needs', () => {
+    it('updates animal state based on needs', async () => {
       const system = new AnimalBrainSystem();
+      await system.initialize(harness.world, harness.world.eventBus);
 
       // Create a hungry animal
       const animal = new EntityImpl(createEntityId(), 0);
@@ -77,8 +78,9 @@ describe('Animal Behavior Integration Tests', () => {
       expect(updatedAnimal.state).toBe('foraging');
     });
 
-    it('prioritizes fleeing over grazing when stressed', () => {
+    it('prioritizes fleeing over grazing when stressed', async () => {
       const system = new AnimalBrainSystem();
+      await system.initialize(harness.world, harness.world.eventBus);
 
       // Create a stressed and hungry wild animal with low trust (so it will perceive agents as threats)
       const animal = new EntityImpl(createEntityId(), 0);
@@ -111,8 +113,9 @@ describe('Animal Behavior Integration Tests', () => {
       expect(updatedAnimal.state).toBe('fleeing');
     });
 
-    it('tired animal rests', () => {
+    it('tired animal rests', async () => {
       const system = new AnimalBrainSystem();
+      await system.initialize(harness.world, harness.world.eventBus);
 
       // Create a tired animal
       const animal = new EntityImpl(createEntityId(), 0);
@@ -132,8 +135,9 @@ describe('Animal Behavior Integration Tests', () => {
       expect(updatedAnimal.state).toBe('sleeping');
     });
 
-    it('emits behavior_changed event when state changes', () => {
+    it('emits behavior_changed event when state changes', async () => {
       const system = new AnimalBrainSystem();
+      await system.initialize(harness.world, harness.world.eventBus);
       const emitSpy = vi.spyOn(harness.world.eventBus, 'emit');
 
       // Create an animal that will change state
@@ -162,8 +166,9 @@ describe('Animal Behavior Integration Tests', () => {
   });
 
   describe('Multiple Animals', () => {
-    it('processes each animal independently', () => {
+    it('processes each animal independently', async () => {
       const system = new AnimalBrainSystem();
+      await system.initialize(harness.world, harness.world.eventBus);
 
       // Create animals with different needs
       const hungryAnimal = new EntityImpl(createEntityId(), 0);
@@ -200,18 +205,20 @@ describe('Animal Behavior Integration Tests', () => {
   });
 
   describe('Factory Function', () => {
-    it('createAnimalBrainSystem returns working system', () => {
+    it('createAnimalBrainSystem returns working system', async () => {
       const system = createAnimalBrainSystem();
+      await system.initialize(harness.world, harness.world.eventBus);
 
       expect(system).toBeInstanceOf(AnimalBrainSystem);
       expect(system.id).toBe('animal-brain');
     });
 
-    it('createAnimalBrainSystem accepts custom behaviors', () => {
+    it('createAnimalBrainSystem accepts custom behaviors', async () => {
       const customBehavior = new IdleBehavior();
       const customBehaviors = new Map([['drinking' as const, customBehavior]]);
 
       const system = createAnimalBrainSystem(customBehaviors);
+      await system.initialize(harness.world, harness.world.eventBus);
       const behaviors = system.getBehaviors();
 
       expect(behaviors.has('drinking')).toBe(true);
@@ -219,8 +226,9 @@ describe('Animal Behavior Integration Tests', () => {
   });
 
   describe('Behavior Transitions', () => {
-    it('animal returns to idle after fleeing with no threat', () => {
+    it('animal returns to idle after fleeing with no threat', async () => {
       const system = new AnimalBrainSystem();
+      await system.initialize(harness.world, harness.world.eventBus);
 
       // Animal in fleeing state but no actual threat
       const animal = new EntityImpl(createEntityId(), 0);
@@ -240,8 +248,9 @@ describe('Animal Behavior Integration Tests', () => {
       expect(updatedAnimal.state).toBe('idle');
     });
 
-    it('fully rested animal becomes idle', () => {
+    it('fully rested animal becomes idle', async () => {
       const system = new AnimalBrainSystem();
+      await system.initialize(harness.world, harness.world.eventBus);
 
       // Animal that was sleeping but now fully rested
       const animal = new EntityImpl(createEntityId(), 0);
@@ -261,8 +270,9 @@ describe('Animal Behavior Integration Tests', () => {
       expect(updatedAnimal.state).toBe('idle');
     });
 
-    it('full animal becomes idle after eating', () => {
+    it('full animal becomes idle after eating', async () => {
       const system = new AnimalBrainSystem();
+      await system.initialize(harness.world, harness.world.eventBus);
 
       // Animal that was eating but now full
       const animal = new EntityImpl(createEntityId(), 0);

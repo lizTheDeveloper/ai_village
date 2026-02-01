@@ -38,6 +38,10 @@ export class GrazeBehavior extends BaseAnimalBehavior {
   private readonly detectionRange: number;
   private readonly eatRate: number;
 
+  // Performance: Cache plant query results per tick
+  private plantQueryCache: EntityImpl[] | null = null;
+  private plantQueryCacheTick: number = -1;
+
   constructor(detectionRange: number = 20, eatRate: number = 5) {
     super();
     this.detectionRange = detectionRange;
@@ -112,18 +116,24 @@ export class GrazeBehavior extends BaseAnimalBehavior {
 
   /**
    * Find nearest edible plant within detection range.
+   * Performance: Caches query results per tick to avoid query-in-loop pattern.
    */
   private findNearestEdiblePlant(
     world: World,
     position: PositionComponent
   ): EntityImpl | null {
-    const plants = world.query().with('plant').with('position').executeEntities();
+    // Cache query results per tick (avoids O(N*M) when N animals search M plants)
+    if (this.plantQueryCacheTick !== world.tick) {
+      this.plantQueryCache = world.query().with('plant').with('position').executeEntities() as EntityImpl[];
+      this.plantQueryCacheTick = world.tick;
+    }
+
+    const plants = this.plantQueryCache!;
 
     let nearest: EntityImpl | null = null;
     let nearestDist = Infinity;
 
-    for (const plantEntity of plants) {
-      const plant = plantEntity as EntityImpl;
+    for (const plant of plants) {
       const plantComp = plant.getComponent<PlantComponent>('plant');
       const plantPos = plant.getComponent<PositionComponent>('position');
 
