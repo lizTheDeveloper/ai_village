@@ -294,9 +294,33 @@ export class GameBridge {
    * the worker for execution.
    */
   private forwardQueuedActions(): void {
-    // TODO: ActionQueue doesn't have dequeueAll method
-    // For now, this is a no-op - actions would need to be processed differently
-    // Possibly via getPending() and iterating entities
+    // Query entities with action_queue components
+    const entities = this.viewWorld.query().with(ComponentType.ActionQueue).executeEntities();
+
+    for (const entity of entities) {
+      const actionQueueComponent = entity.components.get(ComponentType.ActionQueue) as any;
+      if (!actionQueueComponent) continue;
+
+      // Handle both class instances (with dequeueAll method) and plain objects (with queue array)
+      let actions: Array<{ type: string; [key: string]: any }> = [];
+
+      if (typeof actionQueueComponent.dequeueAll === 'function') {
+        // Class instance with dequeueAll method
+        actions = actionQueueComponent.dequeueAll();
+      } else if (Array.isArray(actionQueueComponent.queue) && actionQueueComponent.queue.length > 0) {
+        // Plain object with queue array (from serialized data)
+        actions = [...actionQueueComponent.queue];
+        actionQueueComponent.queue = [];
+      }
+
+      // Forward each action to the worker
+      for (const action of actions) {
+        this.dispatchAction(action.type, 'village', {
+          entityId: entity.id,
+          ...action,
+        });
+      }
+    }
   }
 
   /**
