@@ -19,7 +19,7 @@ import { isRenderableComponent } from '../components/typeGuards.js';
 import { calculateGuaranteedResearchers, type SkillId, type SkillLevel } from '../components/SkillsComponent.js';
 
 // Agent factory from DI container - avoids circular dependency
-import { getAgentFactory } from '../di/Container.js';
+import { container } from '../di/Container.js';
 
 // Agent creation functions - lazy loaded to avoid circular dependency with @ai-village/agents
 // WanderingAgentOptions matches the type exported from @ai-village/agents
@@ -897,7 +897,7 @@ export async function spawnCity(
 
     // Create agent using agent factory from DI container
     // Use LLM agents if configured, otherwise use wandering agents (scripted)
-    const agentFactory = getAgentFactory();
+    const agentFactory = container.getAgentFactory();
     if (!agentFactory) {
       console.warn('[CitySpawner] Agent factory not registered - cannot spawn agents');
       break;

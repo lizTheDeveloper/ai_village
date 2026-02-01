@@ -50,7 +50,7 @@ const app = express();
 const PORT = 3001;
 
 app.use(cors());
-app.use(express.json({ limit: '100mb' })); // Increase limit for large snapshots and base64 images
+app.use(express.json({ limit: '500mb' })); // Increase limit for large snapshots and base64 images
 
 // Log all requests to /api/ for debugging
 app.use('/api', (req, res, next) => {

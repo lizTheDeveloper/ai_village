@@ -4111,6 +4111,51 @@ async function main() {
         });
       });
     }
+  } else if (browserResult && browserResult.action === 'join_universe' && browserResult.universeId) {
+    // Join an existing universe from the server (possibly on a specific planet)
+    console.log(`[Demo] Joining universe ${browserResult.universeId}${browserResult.planetId ? ` on planet ${browserResult.planetId}` : ''}`);
+    try {
+      const API_BASE = 'http://localhost:3001/api';
+      const response = await fetch(`${API_BASE}/multiverse/universe/${browserResult.universeId}/snapshot/latest`);
+      if (!response.ok) throw new Error('Failed to fetch latest snapshot from server');
+      const data = await response.json();
+
+      if (data.snapshot) {
+        // Apply the snapshot to the world
+        const worldImpl = gameLoop.world as any;
+        worldImpl._entities.clear();
+
+        // Import worldSerializer for deserialization
+        const { worldSerializer } = await import('@ai-village/core');
+        for (const universeSnapshot of data.snapshot.universes || []) {
+          await worldSerializer.deserializeWorld(universeSnapshot, gameLoop.world);
+        }
+
+        loadedCheckpoint = true;
+        universeSelection = { type: 'load', checkpointKey: `server:${browserResult.universeId}:latest` };
+        console.log(`[Demo] Joined universe ${browserResult.universeId} successfully`);
+
+        // Clear any stale creation state since we successfully joined
+        await creationStateManager.clearCreationState();
+
+        // Store planet ID for potential use later (e.g., focusing camera)
+        if (browserResult.planetId) {
+          (gameLoop.world as any)._joinedPlanetId = browserResult.planetId;
+        }
+      } else {
+        throw new Error('No snapshot data in response');
+      }
+    } catch (error) {
+      console.error('[Demo] Failed to join universe from server:', error);
+      // Fall back to showing universe creation screen
+      universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
+        universeConfigScreen = new UniverseConfigScreen();
+        universeConfigScreen.show((config) => {
+          universeConfig = config;
+          resolve({ type: 'new', magicParadigm: config.magicParadigmId || 'none' });
+        });
+      });
+    }
   } else if (!creationResumeState) {
     // Fallback - shouldn't happen but just in case (only if not resuming)
     universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
