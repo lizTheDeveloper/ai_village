@@ -18,6 +18,9 @@ import { isRenderableComponent } from '../components/typeGuards.js';
 
 import { calculateGuaranteedResearchers, type SkillId, type SkillLevel } from '../components/SkillsComponent.js';
 
+// Agent factory from DI container - avoids circular dependency
+import { getAgentFactory } from '../ecs/Container.js';
+
 // Agent creation functions - lazy loaded to avoid circular dependency with @ai-village/agents
 // WanderingAgentOptions matches the type exported from @ai-village/agents
 type WanderingAgentOptions = {
@@ -37,6 +40,16 @@ async function getAgentModule(): Promise<AgentModule> {
     _agentModule = module as AgentModule;
   }
   return _agentModule!;
+=======
+import { container, type AgentFactory } from '../di/index.js';
+
+/**
+ * Get agent factory from DI container.
+ * Returns null if agents package hasn't been registered yet.
+ */
+function getAgentFactory(): AgentFactory | null {
+  return container.getAgentFactory();
+>>>>>>> origin/claude/fix-circular-dependencies-g2hpq
 }
 
 /**
@@ -892,20 +905,30 @@ export async function spawnCity(
     const agentX = config.x + Math.cos(angle) * spawnRadius;
     const agentY = config.y + Math.sin(angle) * spawnRadius;
 
-    // Create agent using existing agent creation functions (lazy-loaded)
+    // Create agent using agent factory from DI container
     // Use LLM agents if configured, otherwise use wandering agents (scripted)
+    const agentFactory = getAgentFactory();
+    if (!agentFactory) {
+      console.warn('[CitySpawner] Agent factory not registered - cannot spawn agents');
+      break;
+    }
+
     // First N agents get guaranteed research skill for viable tech progression
     const isGuaranteedResearcher = i < guaranteedResearchers;
+
     let agentId: string;
     if (useLLM) {
-      agentId = agentModule.createLLMAgent(world, agentX, agentY, 2.0);
+      agentId = agentFactory.createLLMAgent(world, agentX, agentY, { name: undefined, profession });
     } else {
-      agentId = agentModule.createWanderingAgent(
+      agentId = agentFactory.createWanderingAgent(
         world,
         agentX,
         agentY,
-        2.0,
-        isGuaranteedResearcher ? { guaranteedSkills: { research: 1 } } : undefined
+        {
+          name: undefined,
+          profession,
+          guaranteedSkills: isGuaranteedResearcher ? { research: 1 } : undefined
+        }
       );
     }
 

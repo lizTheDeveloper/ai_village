@@ -212,15 +212,52 @@ import {
   ProxyLLMProvider,
   FallbackProvider,
   LLMDecisionQueue,
+  GovernorPromptBuilder,
   StructuredPromptBuilder,
   TalkerPromptBuilder,
   ExecutorPromptBuilder,
   promptLogger,
   type LLMProvider,
 } from '@ai-village/llm';
-import { TerrainGenerator, ChunkManager, ServerBackedChunkManager, createBerryBush, getPlantSpecies, ChunkSpatialQuery, initializePlanet, generateRandomPlanetConfig } from '@ai-village/world';
+import { TerrainGenerator, ChunkManager, ServerBackedChunkManager, createBerryBush, getPlantSpecies, ChunkSpatialQuery, initializePlanet, generateRandomPlanetConfig, chunkSerializer, ChunkNameRegistry } from '@ai-village/world';
 import { createLLMAgent, createWanderingAgent } from '@ai-village/agents';
 import { getLanguageRegistry } from '@ai-village/language';
+
+// ============================================================================
+// DEPENDENCY INJECTION SETUP
+// Register external package implementations in the DI container.
+// This breaks circular dependencies by allowing core to access these
+// implementations without direct imports.
+// ============================================================================
+import { container } from '@ai-village/core';
+import { chunkSerializer, ChunkNameRegistry } from '@ai-village/world';
+
+// Register agent factory (createLLMAgent/createWanderingAgent already imported above)
+container.registerAgentFactory({
+  createLLMAgent: (world, x, y, options) => {
+    const speed = 2.0; // Default speed
+    return createLLMAgent(world, x, y, speed, options?.name, options);
+  },
+  createWanderingAgent: (world, x, y, options) => {
+    const speed = 2.0; // Default speed
+    return createWanderingAgent(world, x, y, speed, options);
+  },
+});
+
+// Register LLM services
+container.registerLLMServices({
+  LLMDecisionQueue: LLMDecisionQueue as any,
+  GovernorPromptBuilder: GovernorPromptBuilder as any,
+  OpenAICompatProvider: OpenAICompatProvider as any,
+});
+
+// Register world services
+container.registerWorldServices({
+  chunkSerializer: chunkSerializer as any,
+  ChunkNameRegistry: ChunkNameRegistry as any,
+});
+
+console.log('[Demo] DI container initialized:', container.getInitializationStatus());
 
 // ============================================================================
 // TYPE DEFINITIONS

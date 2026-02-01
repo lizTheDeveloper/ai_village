@@ -20,6 +20,7 @@
     "validate:components": "tsx src/scripts/validate-components.ts"
   },
   "dependencies": {
+    "@ai-village/types": "*",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

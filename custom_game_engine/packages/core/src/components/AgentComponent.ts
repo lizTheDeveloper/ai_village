@@ -1,5 +1,9 @@
 import type { Component } from '../ecs/Component.js';
 import type { SkillsComponent, SkillId } from './SkillsComponent.js';
+import type { CustomLLMConfig } from '@ai-village/types';
+
+// Re-export CustomLLMConfig for backward compatibility
+export type { CustomLLMConfig };
 
 export type AgentBehavior =
   | 'wander'
@@ -252,23 +256,6 @@ export interface ActiveMandate {
   deadline: number;
   /** Whether this mandate has been fulfilled */
   fulfilled: boolean;
-}
-
-/**
- * Custom LLM configuration for per-agent LLM provider overrides.
- * If set, this agent will use these settings instead of global LLM settings.
- */
-export interface CustomLLMConfig {
-  /** Custom API base URL (e.g., https://api.anthropic.com/v1) */
-  baseUrl?: string;
-  /** Custom model name (e.g., claude-3-5-sonnet-20241022) */
-  model?: string;
-  /** Custom API key */
-  apiKey?: string;
-  /** Custom headers as key-value pairs (e.g., {"anthropic-version": "2023-06-01"}) */
-  customHeaders?: Record<string, string>;
-  /** Intelligence tier: 'simple', 'default', 'high', 'agi' - determines which LLM model to use */
-  tier?: string;
 }
 
 export interface AgentComponent extends Component {

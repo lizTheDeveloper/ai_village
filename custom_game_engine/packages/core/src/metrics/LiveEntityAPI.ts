@@ -13,8 +13,7 @@ import { EntityImpl } from '../ecs/Entity.js';
 import type { MetricsStreamClient, QueryRequest, QueryResponse, ActionRequest, ActionResponse } from './MetricsStreamClient.js';
 import { pendingApprovalRegistry } from '../crafting/PendingApprovalRegistry.js';
 import { spawnCity, getCityTemplates, type CitySpawnConfig, type CityTemplate } from '../city/CitySpawner.js';
-// Note: @ai-village/world imports are done via dynamic import in handleSpawnAgent
-// to break circular dependency: core -> world -> reproduction -> core
+import { container } from '../di/index.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import { createTagsComponent } from '../components/TagsComponent.js';
 import { createIdentityComponent } from '../components/IdentityComponent.js';
@@ -446,12 +445,19 @@ export class LiveEntityAPI {
     const options = believedDeity && typeof believedDeity === 'string' ? { believedDeity } : undefined;
 
     try {
-      // Dynamic import to break circular dependency: core -> agents -> reproduction -> core
-      const agentModule = (await import('@ai-village/agents')) as AgentsModule;
-      const { createLLMAgent, createWanderingAgent } = agentModule;
+      // Get agent factory from DI container
+      const agentFactory = container.getAgentFactory();
+      if (!agentFactory) {
+        return {
+          requestId: action.requestId,
+          success: false,
+          error: 'Agent factory not registered - @ai-village/agents not initialized',
+        };
+      }
+
       const agentId = shouldUseLLM
-        ? createLLMAgent(this.world as unknown as WorldMutator, x, y, agentSpeed, undefined, options)
-        : createWanderingAgent(this.world as unknown as WorldMutator, x, y, agentSpeed, options);
+        ? agentFactory.createLLMAgent(this.world as unknown as WorldMutator, x, y, { name, ...options })
+        : agentFactory.createWanderingAgent(this.world as unknown as WorldMutator, x, y, { name, ...options });
 
       // Optionally set the agent's name if provided
       if (name && typeof name === 'string') {

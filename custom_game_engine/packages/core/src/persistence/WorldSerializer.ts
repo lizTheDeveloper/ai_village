@@ -13,7 +13,7 @@ import type {
 } from './types.js';
 import { componentSerializerRegistry } from './serializers/index.js';
 import { computeChecksumSync } from './utils.js';
-// Note: chunkSerializer is imported dynamically to break circular dependency: core -> world -> reproduction -> core
+import { container } from '../di/index.js';
 import { getZoneManager } from '../navigation/ZoneManager.js';
 
 export class WorldSerializer {
@@ -136,24 +136,21 @@ export class WorldSerializer {
     if (snapshot.worldState.terrain) {
       const chunkManager = world.getChunkManager();
       if (chunkManager) {
-        // Dynamic import to break circular dependency: core -> world -> reproduction -> core
-        const { chunkSerializer } = await import('@ai-village/world');
+        // Get world services from DI container
+        const worldServices = container.getWorldServices();
+        if (!worldServices) {
+          console.warn('[WorldSerializer] World services not registered - terrain not restored');
+        } else {
+          // Validate terrain data structure
+          if (typeof snapshot.worldState.terrain !== 'object' || snapshot.worldState.terrain === null) {
+            throw new Error('Invalid terrain data: must be an object');
+          }
 
-        // Validate terrain data structure
-        if (typeof snapshot.worldState.terrain !== 'object' || snapshot.worldState.terrain === null) {
-          throw new Error('Invalid terrain data: must be an object');
+          await worldServices.chunkSerializer.deserializeChunks(
+            snapshot.worldState.terrain,
+            chunkManager
+          );
         }
-
-        // Import with proper types
-        type ChunkSerializer = {
-          deserializeChunks(data: unknown, chunkManager: unknown): Promise<void>;
-        };
-        type ChunkManager = unknown;
-
-        await (chunkSerializer as ChunkSerializer).deserializeChunks(
-          snapshot.worldState.terrain,
-          chunkManager as ChunkManager
-        );
       } else {
         console.warn('[WorldSerializer] No ChunkManager available - terrain not restored');
       }
@@ -306,22 +303,17 @@ export class WorldSerializer {
    * Serialize world state (terrain, weather, etc.).
    */
   private async serializeWorldState(world: World): Promise<WorldSnapshot> {
-    // Serialize terrain using ChunkSerializer
-    // World is now the implementation class
+    // Serialize terrain using ChunkSerializer from DI container
     const chunkManager = world.getChunkManager();
 
-    // Dynamic import to break circular dependency: core -> world -> reproduction -> core
     let terrain: import('./types.js').TerrainSnapshot | null = null;
     if (chunkManager) {
-      const { chunkSerializer } = await import('@ai-village/world');
-
-      // Type for chunk serializer
-      type ChunkSerializer = {
-        serializeChunks(chunkManager: unknown): import('./types.js').TerrainSnapshot;
-      };
-      type ChunkManager = unknown;
-
-      terrain = (chunkSerializer as ChunkSerializer).serializeChunks(chunkManager as ChunkManager);
+      const worldServices = container.getWorldServices();
+      if (worldServices) {
+        terrain = worldServices.chunkSerializer.serializeChunks(chunkManager) as import('./types.js').TerrainSnapshot;
+      } else {
+        console.warn('[WorldSerializer] World services not registered - terrain not serialized');
+      }
     }
 
     // Serialize zones using ZoneManager

@@ -61,6 +61,17 @@ export { THROTTLE } from './ecs/SystemThrottleConfig.js';
 export * from './factories/index.js';
 
 // ============================================================================
+// Dependency Injection (for breaking circular dependencies)
+// ============================================================================
+export {
+  container,
+  type AgentFactory,
+  type LLMServices,
+  type WorldServices,
+  type DIContainer,
+} from './di/index.js';
+
+// ============================================================================
 // Species, Skills & Abilities
 // ============================================================================
 export * from './species/index.js';

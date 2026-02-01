@@ -21,8 +21,9 @@ import type {
   Vote,
 } from './DecisionProtocols.js';
 import type { NationContext } from './GovernorContextBuilders.js';
+import { container, type LLMServices } from '../di/index.js';
 
-// Import LLM infrastructure - use dynamic import to avoid circular dependencies
+// LLM service instances (initialized via DI container)
 interface LLMDecisionQueue {
   requestDecision(entityId: string, prompt: string, config?: unknown): Promise<string>;
 }
@@ -38,18 +39,21 @@ let governorPromptBuilder: GovernorPromptBuilder | null = null;
 
 /**
  * Initialize LLM integration (call once at startup)
+ * Uses DI container to get LLM services registered by the app entry point.
  */
-export async function initializeGovernorLLM(world: World): Promise<void> {
+export async function initializeGovernorLLM(_world: World): Promise<void> {
   try {
-    // Dynamic import to avoid circular dependencies
-    const llmModule = await import('@ai-village/llm') as {
-      LLMDecisionQueue: new (provider: unknown, maxConcurrent: number) => LLMDecisionQueue;
-      GovernorPromptBuilder: new () => GovernorPromptBuilder;
-      OpenAICompatProvider: new (model: string, baseUrl: string, apiKey: string) => unknown;
-    };
-    const { LLMDecisionQueue, GovernorPromptBuilder, OpenAICompatProvider } = llmModule;
+    // Get LLM services from DI container
+    const llmServices = container.getLLMServices();
+    if (!llmServices) {
+      console.warn('[GovernorLLM] LLM services not registered in DI container');
+      console.warn('[GovernorLLM] Governor decisions will use fallback logic only');
+      return;
+    }
 
-    // Get LLM config from world settings
+    const { LLMDecisionQueue, GovernorPromptBuilder, OpenAICompatProvider } = llmServices;
+
+    // Get LLM config from environment
     const baseUrl = process.env.LLM_BASE_URL || 'http://localhost:11434/v1';
     const model = process.env.LLM_MODEL || 'qwen2.5:latest';
     const apiKey = process.env.LLM_API_KEY || '';
