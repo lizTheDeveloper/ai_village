@@ -519,7 +519,7 @@ export class MaterialTransportBehavior extends BaseBehavior {
   ): void {
     entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
-      behaviorState: state as Record<string, unknown>,
+      behaviorState: state as unknown as Record<string, unknown>,
     }));
   }
 }

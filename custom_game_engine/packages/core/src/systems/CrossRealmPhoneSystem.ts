@@ -504,8 +504,11 @@ export class CrossRealmPhoneSystem extends BaseSystem {
     const timeEntities = world.query().with('time').executeEntities();
     if (timeEntities.length === 0) return 0n;
 
-    const timeComp = timeEntities[0]!.getComponent('time') as { currentTick: bigint };
-    return timeComp.currentTick;
+    const timeComp = timeEntities[0]!.getComponent('time');
+    if (!timeComp || !('currentTick' in timeComp)) {
+      throw new Error('Time component missing currentTick property');
+    }
+    return (timeComp as { currentTick: bigint }).currentTick;
   }
 
   private getCurrentHilbertTime(world: World): HilbertTimeCoordinate {

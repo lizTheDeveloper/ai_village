@@ -488,7 +488,7 @@ export class ReincarnationSystem extends BaseSystem {
       for (const suppressedMemory of soul.preserved.suppressedMemories) {
         // Add directly to suppressed storage (bypassing active memory)
         // Access private field through bracket notation (necessary for reincarnation system)
-        (episodicMemory as { _suppressedMemories: EpisodicMemory[] })._suppressedMemories.push(suppressedMemory);
+        (episodicMemory as unknown as { _suppressedMemories: EpisodicMemory[] })._suppressedMemories.push(suppressedMemory);
       }
     }
 

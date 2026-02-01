@@ -39,7 +39,7 @@ export class InitiateHuntBehavior extends BaseBehavior {
     }
 
     // Read behavior state from agent component
-    const state = agent.behaviorState as InitiateHuntState | undefined;
+    const state = agent.behaviorState as unknown as InitiateHuntState | undefined;
     if (!state || !state.targetId) {
       return {
         complete: true,
@@ -127,7 +127,7 @@ export function initiateHuntBehavior(entity: EntityImpl, world: World): void {
  */
 export function initiateHuntBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
   // Read behavior state
-  const state = ctx.getAllState() as InitiateHuntState | undefined;
+  const state = ctx.getAllState() as unknown as InitiateHuntState | undefined;
   if (!state || !state.targetId) {
     return ctx.complete('Missing hunt target in behaviorState');
   }

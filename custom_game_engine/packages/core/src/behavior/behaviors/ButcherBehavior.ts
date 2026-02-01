@@ -48,7 +48,7 @@ export class ButcherBehavior extends BaseBehavior {
     }
 
     // Read behavior state from agent component
-    const state = agent.behaviorState as ButcherState | undefined;
+    const state = agent.behaviorState as unknown as ButcherState | undefined;
     if (!state || !state.targetId) {
       return {
         complete: true,
@@ -272,7 +272,7 @@ function calculateButcheringQuality(
  */
 export function butcherBehaviorWithContext(ctx: BehaviorContext): ContextBehaviorResult | void {
   // Read behavior state
-  const state = ctx.getAllState() as ButcherState | undefined;
+  const state = ctx.getAllState() as unknown as ButcherState | undefined;
   if (!state || !state.targetId) {
     return ctx.complete('Missing butcher target in behaviorState');
   }

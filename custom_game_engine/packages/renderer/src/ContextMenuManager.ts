@@ -267,7 +267,7 @@ export class ContextMenuManager {
       this.eventBus.emit({ type: 'ui:contextmenu:closed', source: 'world', data: {} });
 
       this.cleanupTimeoutId = null;
-    }, this.config.animationDuration) as number;
+    }, this.config.animationDuration) as unknown as number;
   }
 
   /**

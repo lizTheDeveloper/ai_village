@@ -318,7 +318,7 @@ export class DivineChatPanel implements IWindowPanel {
   private findChatEntity(world: World): any {
     const chatEntities = world.query().with(CT.ChatRoom).executeEntities();
     for (const entity of chatEntities) {
-      const chatComp = entity.components.get('chat_room') as ChatRoomComponent;
+      const chatComp = entity.components.get('chat_room') as unknown as ChatRoomComponent;
       if (chatComp.config.id === 'divine_chat') {
         return entity;
       }
