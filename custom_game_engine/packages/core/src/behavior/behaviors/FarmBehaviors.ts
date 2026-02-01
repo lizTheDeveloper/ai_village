@@ -26,11 +26,31 @@ import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '.
  * ChunkSpatialQuery is now available via world.spatialQuery
  */
 
+// ============================================================================
+// Type Guards for World Extensions
+// ============================================================================
+
+/**
+ * Type for World with optional getTileAt method.
+ * Some World implementations have tile access, others don't.
+ */
+interface WorldWithGetTileAt extends World {
+  getTileAt: (x: number, y: number) => { terrain?: string; tilled?: boolean; plantability?: number } | undefined;
+}
+
+/**
+ * Type guard to check if a World has getTileAt method.
+ * Used for safe runtime narrowing instead of unsafe type assertions.
+ */
+function hasGetTileAt(world: World): world is WorldWithGetTileAt {
+  return typeof (world as WorldWithGetTileAt).getTileAt === 'function';
+}
+
 /** Search radius for tillable tiles */
 const TILL_SEARCH_RADIUS = 10;
 
-/** Maximum distance for tilling (must be adjacent) */
-const MAX_TILL_DISTANCE = Math.sqrt(2);
+/** Maximum distance for tilling (must be adjacent) - squared for performance */
+const MAX_TILL_DISTANCE_SQ = 2; // sqrt(2)^2 = 2
 
 /**
  * FarmBehavior - Base farming state
@@ -87,14 +107,15 @@ export class TillBehavior extends BaseBehavior {
       return { complete: true, reason: 'No tillable tiles found' };
     }
 
-    // Check if agent is adjacent to the target tile
+    // Check if agent is adjacent to the target tile (use squared distance for comparison)
     const dx = nearestGrassTile.x - position.x;
     const dy = nearestGrassTile.y - position.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const distanceSq = dx * dx + dy * dy;
 
-    if (distance > MAX_TILL_DISTANCE) {
+    if (distanceSq > MAX_TILL_DISTANCE_SQ) {
       // Agent is too far - move towards tile
-
+      // Only compute sqrt when needed for velocity normalization
+      const distance = Math.sqrt(distanceSq);
       const speed = 1.0;
       const velocityX = (dx / distance) * speed;
       const velocityY = (dy / distance) * speed;
@@ -135,32 +156,31 @@ export class TillBehavior extends BaseBehavior {
   private findNearestTillableTile(
     world: World,
     position: PositionComponent
-  ): { x: number; y: number; distance: number } | null {
-    interface WorldWithTiles extends World {
-      getTileAt?: (x: number, y: number) => { terrain: string; tilled?: boolean } | undefined;
-    }
-    const worldWithTiles = world as WorldWithTiles;
-    if (typeof worldWithTiles.getTileAt !== 'function') {
+  ): { x: number; y: number; distanceSq: number } | null {
+    // Type guard: Check if world has getTileAt method at runtime
+    if (!hasGetTileAt(world)) {
       console.warn('[TillBehavior] World does not have getTileAt - cannot find tiles to till');
       return null;
     }
+    // After type guard, world is narrowed to WorldWithGetTileAt
 
-    let nearestGrassTile: { x: number; y: number; distance: number } | null = null;
+    let nearestGrassTile: { x: number; y: number; distanceSq: number } | null = null;
 
     for (let dx = -TILL_SEARCH_RADIUS; dx <= TILL_SEARCH_RADIUS; dx++) {
       for (let dy = -TILL_SEARCH_RADIUS; dy <= TILL_SEARCH_RADIUS; dy++) {
         const checkX = Math.floor(position.x) + dx;
         const checkY = Math.floor(position.y) + dy;
 
-        const tile = worldWithTiles.getTileAt(checkX, checkY);
+        const tile = world.getTileAt(checkX, checkY);
         if (!tile) continue;
 
         // Check if this is untilled grass
         if ((tile.terrain === 'grass' || tile.terrain === 'dirt') && !tile.tilled) {
-          const distance = Math.sqrt(dx * dx + dy * dy);
+          // Use squared distance for comparisons (avoid sqrt in hot path)
+          const distanceSq = dx * dx + dy * dy;
 
-          if (!nearestGrassTile || distance < nearestGrassTile.distance) {
-            nearestGrassTile = { x: checkX, y: checkY, distance };
+          if (!nearestGrassTile || distanceSq < nearestGrassTile.distanceSq) {
+            nearestGrassTile = { x: checkX, y: checkY, distanceSq };
           }
         }
       }
@@ -213,15 +233,16 @@ export class PlantBehavior extends BaseBehavior {
       return { complete: true, reason: 'No plantable tiles found - switching to till' };
     }
 
-    // Check if agent is adjacent to the target tile
+    // Check if agent is adjacent to the target tile (use squared distance for comparison)
     const dx = nearestTilledTile.x - position.x;
     const dy = nearestTilledTile.y - position.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const MAX_PLANT_DISTANCE = Math.sqrt(2);
+    const distanceSq = dx * dx + dy * dy;
+    const MAX_PLANT_DISTANCE_SQ = 2; // sqrt(2)^2 = 2
 
-    if (distance > MAX_PLANT_DISTANCE) {
+    if (distanceSq > MAX_PLANT_DISTANCE_SQ) {
       // Agent is too far - move towards tile
-
+      // Only compute sqrt when needed for velocity normalization
+      const distance = Math.sqrt(distanceSq);
       const speed = 1.0;
       const velocityX = (dx / distance) * speed;
       const velocityY = (dy / distance) * speed;
@@ -265,17 +286,15 @@ export class PlantBehavior extends BaseBehavior {
   private findNearestPlantableTile(
     world: World,
     position: PositionComponent
-  ): { x: number; y: number; distance: number } | null {
-    interface WorldWithTiles {
-      getTileAt?: (x: number, y: number) => { tilled?: boolean; plantability?: number } | undefined;
-    }
-    const worldWithTiles = world as unknown as WorldWithTiles;
-    if (typeof worldWithTiles.getTileAt !== 'function') {
+  ): { x: number; y: number; distanceSq: number } | null {
+    // Type guard: Check if world has getTileAt method at runtime
+    if (!hasGetTileAt(world)) {
       console.warn('[PlantBehavior] World does not have getTileAt - cannot find tiles to plant');
       return null;
     }
+    // After type guard, world is narrowed to WorldWithGetTileAt
 
-    let nearestTilledTile: { x: number; y: number; distance: number } | null = null;
+    let nearestTilledTile: { x: number; y: number; distanceSq: number } | null = null;
 
     // Search in a radius around the agent
     const PLANT_SEARCH_RADIUS = 10;
@@ -285,7 +304,7 @@ export class PlantBehavior extends BaseBehavior {
         const checkX = Math.floor(position.x) + dx;
         const checkY = Math.floor(position.y) + dy;
 
-        const tile = worldWithTiles.getTileAt(checkX, checkY);
+        const tile = world.getTileAt(checkX, checkY);
         if (!tile) continue;
 
         // Check if this tile is tilled and has plantability
@@ -294,10 +313,11 @@ export class PlantBehavior extends BaseBehavior {
           const existingPlant = this.hasPlantAt(world, checkX, checkY);
           if (existingPlant) continue;
 
-          const distance = Math.sqrt(dx * dx + dy * dy);
+          // Use squared distance for comparisons (avoid sqrt in hot path)
+          const distanceSq = dx * dx + dy * dy;
 
-          if (!nearestTilledTile || distance < nearestTilledTile.distance) {
-            nearestTilledTile = { x: checkX, y: checkY, distance };
+          if (!nearestTilledTile || distanceSq < nearestTilledTile.distanceSq) {
+            nearestTilledTile = { x: checkX, y: checkY, distanceSq };
           }
         }
       }
@@ -793,22 +813,21 @@ export function tillBehaviorWithContext(ctx: import('../BehaviorContext.js').Beh
 
   // Delegate to class for tile finding logic
   const behavior = new TillBehavior();
-  interface WorldWithTiles {
+  // Use type guard to safely access getTileAt if available
+  const getTileAtFn = hasGetTileAt(ctx.world) ? ctx.world.getTileAt.bind(ctx.world) : undefined;
+  interface WorldProxy {
     tick: number;
-    getTileAt?: (x: number, y: number) => { terrain: string; tilled?: boolean } | undefined;
+    getTileAt?: (x: number, y: number) => { terrain?: string; tilled?: boolean; plantability?: number } | undefined;
     eventBus: {
       emit: (event: unknown) => void;
     };
   }
-  interface CtxWorldWithTiles extends World {
-    getTileAt?: (x: number, y: number) => { terrain: string; tilled?: boolean } | undefined;
-  }
-  const world: WorldWithTiles = {
+  const worldProxy: WorldProxy = {
     tick: ctx.tick,
-    getTileAt: (ctx.world as CtxWorldWithTiles).getTileAt,
+    getTileAt: getTileAtFn,
     eventBus: { emit: (e: unknown) => ctx.emit(e) }
   };
-  return behavior.execute(ctx.entity, world as World);
+  return behavior.execute(ctx.entity, worldProxy as World);
 }
 
 export function plantBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {
@@ -818,25 +837,24 @@ export function plantBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
 
   // Delegate to class implementation which uses spatial queries
   const behavior = new PlantBehavior();
-  interface WorldWithTiles {
+  // Use type guard to safely access getTileAt if available
+  const getTileAtFn = hasGetTileAt(ctx.world) ? ctx.world.getTileAt.bind(ctx.world) : undefined;
+  interface WorldProxy {
     tick: number;
-    getTileAt?: (x: number, y: number) => { tilled?: boolean; plantability?: number } | undefined;
+    getTileAt?: (x: number, y: number) => { terrain?: string; tilled?: boolean; plantability?: number } | undefined;
     getEntity: (id: string) => import('../../ecs/Entity.js').Entity | undefined;
     eventBus: {
       emit: (event: unknown) => void;
     };
   }
-  interface CtxWorldWithTiles extends World {
-    getTileAt?: (x: number, y: number) => { tilled?: boolean; plantability?: number } | undefined;
-  }
-  const world: WorldWithTiles = {
+  const worldProxy: WorldProxy = {
     tick: ctx.tick,
-    getTileAt: (ctx.world as CtxWorldWithTiles).getTileAt,
+    getTileAt: getTileAtFn,
     getEntity: (id: string) => ctx.getEntity(id),
     eventBus: { emit: (e: unknown) => ctx.emit(e) },
   };
 
-  return behavior.execute(ctx.entity, world as World);
+  return behavior.execute(ctx.entity, worldProxy as World);
 }
 
 export function waterBehaviorWithContext(ctx: import('../BehaviorContext.js').BehaviorContext): import('../BehaviorContext.js').BehaviorResult | void {

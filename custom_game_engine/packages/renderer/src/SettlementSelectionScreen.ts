@@ -416,8 +416,6 @@ export class SettlementSelectionScreen {
         color: `hsl(${hue}, 70%, 50%)`,
       });
 
-      console.log('[SettlementSelection] Created settlement:', settlement);
-
       // Join the newly created settlement
       this.creatingSettlement = false;
       this.newSettlementName = '';

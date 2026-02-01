@@ -6,7 +6,7 @@
  */
 
 import { Planet } from './Planet.js';
-import { BiosphereGenerator, type ProgressCallback } from '../biosphere/BiosphereGenerator.js';
+import { BiosphereGenerator, isArtStyle, type ProgressCallback } from '../biosphere/BiosphereGenerator.js';
 import { queueBiosphereSprites } from '../biosphere/queueBiosphereSprites.js';
 import type { PlanetConfig } from './PlanetTypes.js';
 import type { LLMProvider, GodCraftedDiscoverySystem } from '@ai-village/core';
@@ -115,7 +115,7 @@ export async function initializePlanet(
     try {
       const biosphereGenerator = new BiosphereGenerator(llmProvider, config, onProgress, {
         maxSpecies,
-        artStyle: artStyle as any,  // Cast to ArtStyle type (validated at runtime by BiosphereGenerator)
+        artStyle: isArtStyle(artStyle) ? artStyle : undefined,
       });
       const biosphere = await biosphereGenerator.generateBiosphere();
 

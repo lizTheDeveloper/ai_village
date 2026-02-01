@@ -17,11 +17,27 @@ import type {
 } from './BiosphereTypes.js';
 import type { LLMProvider } from '@ai-village/core';
 // Art styles available (from deterministic-sprite-generator)
-type ArtStyle = 'nes' | 'snes' | 'ps1' | 'gba' | 'gameboy' | 'neogeo' |
+export type ArtStyle = 'nes' | 'snes' | 'ps1' | 'gba' | 'gameboy' | 'neogeo' |
   'genesis' | 'mastersystem' | 'turbografx' | 'n64' | 'dreamcast' | 'saturn' |
   'c64' | 'amiga' | 'atarist' | 'zxspectrum' | 'cga' | 'ega' | 'vga' | 'msx' | 'pc98' |
   'atari2600' | 'atari7800' | 'wonderswan' | 'ngpc' | 'virtualboy' | '3do' |
   'celeste' | 'undertale' | 'stardew' | 'terraria';
+
+/** Valid art styles for type guard validation */
+const VALID_ART_STYLES: ReadonlySet<string> = new Set<ArtStyle>([
+  'nes', 'snes', 'ps1', 'gba', 'gameboy', 'neogeo',
+  'genesis', 'mastersystem', 'turbografx', 'n64', 'dreamcast', 'saturn',
+  'c64', 'amiga', 'atarist', 'zxspectrum', 'cga', 'ega', 'vga', 'msx', 'pc98',
+  'atari2600', 'atari7800', 'wonderswan', 'ngpc', 'virtualboy', '3do',
+  'celeste', 'undertale', 'stardew', 'terraria'
+]);
+
+/**
+ * Type guard to check if a string is a valid ArtStyle.
+ */
+export function isArtStyle(value: unknown): value is ArtStyle {
+  return typeof value === 'string' && VALID_ART_STYLES.has(value);
+}
 
 export type ProgressCallback = (message: string) => void;
 

@@ -332,9 +332,8 @@ export class ChunkSerializer {
 
         const chunk = this.deserializeChunk(serializedChunk);
 
-        // Add to chunk manager (access internal Map directly)
-        // ChunkManager.chunks is private Map<string, Chunk>
-        (chunkManager as unknown as { chunks: Map<string, Chunk> }).chunks.set(key, chunk);
+        // Add to chunk manager using public method
+        chunkManager.setChunk(key, chunk);
 
       } catch (error) {
         console.error(
@@ -350,7 +349,7 @@ export class ChunkSerializer {
           error as Error
         );
 
-        (chunkManager as unknown as { chunks: Map<string, Chunk> }).chunks.set(key, corruptedChunk);
+        chunkManager.setChunk(key, corruptedChunk);
       }
     }
   }

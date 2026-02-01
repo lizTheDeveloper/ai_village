@@ -82,8 +82,7 @@ export class SteeringSystem extends BaseSystem {
     }
   }
 
-  private _updateSteering(entity: Entity, world: World, deltaTime: number): void {
-    const impl = entity as EntityImpl;
+  private _updateSteering(entity: EntityImpl, world: World, deltaTime: number): void {
 
     // Get typed components using helpers
     const steering = getSteering(entity);
@@ -157,12 +156,12 @@ export class SteeringSystem extends BaseSystem {
     if (speedSquared > maxSpeedSquared) {
       const speed = Math.sqrt(speedSquared); // Only compute sqrt when needed
       const scale = steering.maxSpeed / speed;
-      setComponentProperties<VelocityComponent>(impl, CT.Velocity, {
+      setComponentProperties<VelocityComponent>(entity, CT.Velocity, {
         vx: newVx * scale,
         vy: newVy * scale,
       });
     } else {
-      setComponentProperties<VelocityComponent>(impl, CT.Velocity, {
+      setComponentProperties<VelocityComponent>(entity, CT.Velocity, {
         vx: newVx,
         vy: newVy,
       });

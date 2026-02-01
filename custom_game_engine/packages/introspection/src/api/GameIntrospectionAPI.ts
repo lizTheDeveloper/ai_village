@@ -679,11 +679,8 @@ export class GameIntrospectionAPI {
     const history: MutationHistoryEntry[] = [];
 
     // Access the private instance to get undo/redo stacks
-    // We need to access the internal state, which requires reflection
-    const mutationServiceWithGetter = this.mutationService as unknown as {
-      getInstance?: () => MutationServiceInstanceLike;
-    };
-    const mutationServiceInstance = mutationServiceWithGetter.getInstance?.();
+    // We need to access the internal state through a type-safe getter pattern
+    const mutationServiceInstance = this.getMutationServiceInstance();
     if (!mutationServiceInstance) {
       // If we can't access the instance, return empty history
       return history;
@@ -1583,7 +1580,7 @@ export class GameIntrospectionAPI {
 
       // Get old value before mutation
       const component = entity.getComponent(mutation.componentType);
-      const oldValue = component ? (component as unknown as Record<string, unknown>)[mutation.field] : undefined;
+      const oldValue = component ? this.getComponentFieldValue(component, mutation.field) : undefined;
 
       // Count caches before invalidation
       const cacheStatsBefore = this.cache.getStats();
@@ -2761,5 +2758,52 @@ export class GameIntrospectionAPI {
       'getTile' in system &&
       typeof system.getTile === 'function'
     );
+  }
+
+  /**
+   * Safely get the MutationService instance if available.
+   * Uses a type-safe check pattern instead of unsafe type assertions.
+   */
+  private getMutationServiceInstance(): MutationServiceInstanceLike | undefined {
+    // Check if MutationService has a getInstance method through property detection
+    const service = this.mutationService;
+    if (
+      typeof service === 'object' &&
+      service !== null &&
+      'getInstance' in service &&
+      typeof (service as { getInstance: unknown }).getInstance === 'function'
+    ) {
+      const getInstance = (service as { getInstance: () => unknown }).getInstance;
+      const instance = getInstance();
+      if (this.isMutationServiceInstance(instance)) {
+        return instance;
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * Type guard for MutationServiceInstance
+   */
+  private isMutationServiceInstance(instance: unknown): instance is MutationServiceInstanceLike {
+    return (
+      typeof instance === 'object' &&
+      instance !== null
+    );
+  }
+
+  /**
+   * Safely get a field value from a component by name.
+   * Uses type-safe property access.
+   */
+  private getComponentFieldValue(component: unknown, fieldName: string): unknown {
+    if (
+      typeof component === 'object' &&
+      component !== null &&
+      fieldName in component
+    ) {
+      return (component as Record<string, unknown>)[fieldName];
+    }
+    return undefined;
   }
 }

@@ -15,7 +15,7 @@
  * const response = await pool.execute('groq', request, 'agent123');
  */
 
-import { ProviderQueue } from './ProviderQueue.js';
+import { ProviderQueue, type RateLimitError } from './ProviderQueue.js';
 import type { LLMProvider, LLMRequest, LLMResponse } from './LLMProvider.js';
 
 export interface ProviderConfig {

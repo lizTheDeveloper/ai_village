@@ -45,6 +45,20 @@ export class ChunkManager {
   }
 
   /**
+   * Set a chunk directly (used during deserialization).
+   * Also creates associated chunk cache if needed.
+   */
+  setChunk(key: string, chunk: Chunk): void {
+    this.chunks.set(key, chunk);
+
+    // Also create chunk cache if not exists
+    if (!this.chunkCaches.has(key)) {
+      const cache = createChunkCache(chunk.x, chunk.y);
+      this.chunkCaches.set(key, cache);
+    }
+  }
+
+  /**
    * Get chunk cache for spatial queries.
    */
   getChunkCache(chunkX: number, chunkY: number): ChunkCache | undefined {

@@ -29,8 +29,27 @@ interface PlanetPresetsData {
   presets: Record<PlanetType, PlanetPreset>;
 }
 
+/**
+ * Type guard to validate that imported JSON has the expected RawPlanetPresetsData shape.
+ */
+function isRawPlanetPresetsData(data: unknown): data is RawPlanetPresetsData {
+  if (typeof data !== 'object' || data === null) {
+    return false;
+  }
+  const obj = data as Record<string, unknown>;
+  return (
+    typeof obj.biome_sets === 'object' &&
+    obj.biome_sets !== null &&
+    typeof obj.presets === 'object' &&
+    obj.presets !== null
+  );
+}
+
 function loadPlanetPresets(): Record<PlanetType, PlanetPreset> {
-  const rawData = planetPresetsData as unknown as RawPlanetPresetsData;
+  if (!isRawPlanetPresetsData(planetPresetsData)) {
+    throw new Error('Invalid planet presets data: missing required biome_sets or presets');
+  }
+  const rawData = planetPresetsData;
   if (!rawData || !rawData.presets || !rawData.biome_sets) {
     throw new Error('Failed to load planet presets from JSON');
   }
