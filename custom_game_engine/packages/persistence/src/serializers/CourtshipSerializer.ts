@@ -103,9 +103,30 @@ export class CourtshipSerializer extends BaseComponentSerializer<CourtshipCompon
     if (typeof data !== 'object' || data === null) {
       throw new Error('CourtshipComponent data must be object');
     }
+    const d = data as Record<string, unknown>;
 
-    // Don't require paradigm - older saves may not have it
-    // The deserializeData method will provide a default
+    // Validate required fields (that should always be present)
+    if (!d.state) {
+      throw new Error('CourtshipComponent missing required state field');
+    }
+    if (!Array.isArray(d.preferredTactics)) {
+      throw new Error('CourtshipComponent missing required preferredTactics array');
+    }
+    if (!Array.isArray(d.dislikedTactics)) {
+      throw new Error('CourtshipComponent missing required dislikedTactics array');
+    }
+    if (!Array.isArray(d.activeCourtships)) {
+      throw new Error('CourtshipComponent missing required activeCourtships array');
+    }
+    if (!Array.isArray(d.receivedCourtships)) {
+      throw new Error('CourtshipComponent missing required receivedCourtships array');
+    }
+    if (!Array.isArray(d.pastCourtships)) {
+      throw new Error('CourtshipComponent missing required pastCourtships array');
+    }
+
+    // Don't require paradigm or rejectionCooldown - older saves may not have them
+    // The deserializeData method will provide defaults
 
     return true;
   }

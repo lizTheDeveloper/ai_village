@@ -24,11 +24,12 @@ export class SpellKnowledgeSerializer extends BaseComponentSerializer<SpellKnowl
   protected deserializeData(data: unknown): SpellKnowledgeComponent {
     const d = data as Record<string, unknown>;
     const comp = createSpellKnowledgeComponent();
-    comp.knownSpells = (d.knownSpells as Array<{ spellId: string; proficiency: number; timesCast: number; lastCast?: number }>) || [];
-    comp.knownParadigmIds = (d.knownParadigmIds as string[]) || [];
-    comp.activeEffects = (d.activeEffects as string[]) || [];
-    comp.techniqueProficiency = (d.techniqueProficiency as SpellKnowledgeComponent['techniqueProficiency']) || {};
-    comp.formProficiency = (d.formProficiency as SpellKnowledgeComponent['formProficiency']) || {};
+    // Validation already ensures these arrays exist - no fallbacks needed
+    comp.knownSpells = d.knownSpells as Array<{ spellId: string; proficiency: number; timesCast: number; lastCast?: number }>;
+    comp.knownParadigmIds = d.knownParadigmIds as string[];
+    comp.activeEffects = d.activeEffects as string[];
+    comp.techniqueProficiency = d.techniqueProficiency as SpellKnowledgeComponent['techniqueProficiency'];
+    comp.formProficiency = d.formProficiency as SpellKnowledgeComponent['formProficiency'];
     return comp;
   }
 
@@ -42,6 +43,15 @@ export class SpellKnowledgeSerializer extends BaseComponentSerializer<SpellKnowl
     }
     if (!Array.isArray(d.knownParadigmIds)) {
       throw new Error('SpellKnowledgeComponent missing required knownParadigmIds array');
+    }
+    if (!Array.isArray(d.activeEffects)) {
+      throw new Error('SpellKnowledgeComponent missing required activeEffects array');
+    }
+    if (typeof d.techniqueProficiency !== 'object' || d.techniqueProficiency === null) {
+      throw new Error('SpellKnowledgeComponent missing required techniqueProficiency object');
+    }
+    if (typeof d.formProficiency !== 'object' || d.formProficiency === null) {
+      throw new Error('SpellKnowledgeComponent missing required formProficiency object');
     }
     return true;
   }

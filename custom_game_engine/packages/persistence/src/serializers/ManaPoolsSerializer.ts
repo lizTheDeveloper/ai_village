@@ -22,8 +22,9 @@ export class ManaPoolsSerializer extends BaseComponentSerializer<ManaPoolsCompon
   protected deserializeData(data: unknown): ManaPoolsComponent {
     const d = data as Record<string, unknown>;
     const comp = createManaPoolsComponent();
-    comp.manaPools = (d.manaPools as ManaPool[]) || [];
-    comp.resourcePools = (d.resourcePools as Partial<Record<string, ResourcePool>>) || {};
+    // Validation already ensures these fields exist - no fallbacks needed
+    comp.manaPools = d.manaPools as ManaPool[];
+    comp.resourcePools = d.resourcePools as Partial<Record<string, ResourcePool>>;
     comp.primarySource = d.primarySource as ManaPoolsComponent['primarySource'];
     return comp;
   }

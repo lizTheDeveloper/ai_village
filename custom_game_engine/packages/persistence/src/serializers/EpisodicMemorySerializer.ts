@@ -16,8 +16,12 @@ export class EpisodicMemorySerializer extends BaseComponentSerializer<EpisodicMe
   }
 
   protected serializeData(component: EpisodicMemoryComponent): SerializedEpisodicMemory {
+    const maxMemories = (component as { _maxMemories: number })._maxMemories;
+    if (typeof maxMemories !== 'number') {
+      throw new Error('EpisodicMemoryComponent missing _maxMemories field during serialization');
+    }
     return {
-      maxMemories: (component as { _maxMemories: number })._maxMemories ?? 1000,
+      maxMemories,
       memories: [...component.episodicMemories],
     };
   }
@@ -31,8 +35,9 @@ export class EpisodicMemorySerializer extends BaseComponentSerializer<EpisodicMe
     });
 
     // Restore memories by accessing private field
+    // Validation already ensures memories array exists - no fallback needed
     const componentAny = component as { _episodicMemories: EpisodicMemory[] };
-    componentAny._episodicMemories = serialized.memories ?? [];
+    componentAny._episodicMemories = serialized.memories;
 
     return component;
   }
@@ -40,6 +45,13 @@ export class EpisodicMemorySerializer extends BaseComponentSerializer<EpisodicMe
   validate(data: unknown): data is EpisodicMemoryComponent {
     if (typeof data !== 'object' || data === null) {
       throw new Error('EpisodicMemoryComponent data must be object');
+    }
+    const d = data as Record<string, unknown>;
+    if (typeof d.maxMemories !== 'number') {
+      throw new Error('EpisodicMemoryComponent missing required maxMemories field');
+    }
+    if (!Array.isArray(d.memories)) {
+      throw new Error('EpisodicMemoryComponent missing required memories array');
     }
     return true;
   }

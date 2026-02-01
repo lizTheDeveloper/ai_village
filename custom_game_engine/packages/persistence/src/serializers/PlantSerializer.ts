@@ -16,9 +16,18 @@ export class PlantSerializer extends BaseComponentSerializer<PlantComponent> {
       return component.toJSON();
     }
 
-    // Fallback for plain objects (corrupted or legacy data)
-    // Extract fields manually - use type assertion since we know the shape
+    // Fallback for plain objects (legacy data from old saves)
+    // Extract fields manually - validate required arrays exist
     const plainObj = component as Record<string, unknown>;
+
+    // Validate required arrays exist (empty array is valid, but must be array)
+    if (!Array.isArray(plainObj.diseases)) {
+      throw new Error('PlantComponent serialization: diseases must be an array');
+    }
+    if (!Array.isArray(plainObj.companionBonuses)) {
+      throw new Error('PlantComponent serialization: companionBonuses must be an array');
+    }
+
     return {
       speciesId: plainObj.speciesId,
       position: plainObj.position || plainObj._position,
@@ -29,8 +38,8 @@ export class PlantSerializer extends BaseComponentSerializer<PlantComponent> {
       nutrition: plainObj.nutrition ?? plainObj._nutrition ?? 50,
       genetics: plainObj.genetics,
       diseaseResistance: plainObj.diseaseResistance ?? 0.5,
-      diseases: plainObj.diseases || [],
-      companionBonuses: plainObj.companionBonuses || [],
+      diseases: plainObj.diseases,
+      companionBonuses: plainObj.companionBonuses,
       yield: plainObj.yield ?? 1,
       quality: plainObj.quality ?? 0.5,
       seedsProduced: plainObj.seedsProduced ?? 0,
@@ -56,6 +65,12 @@ export class PlantSerializer extends BaseComponentSerializer<PlantComponent> {
     }
     if (!d.position) {
       throw new Error('PlantComponent requires position');
+    }
+    if (!Array.isArray(d.diseases)) {
+      throw new Error('PlantComponent requires diseases array');
+    }
+    if (!Array.isArray(d.companionBonuses)) {
+      throw new Error('PlantComponent requires companionBonuses array');
     }
     return true;
   }
