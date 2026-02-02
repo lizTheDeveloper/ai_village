@@ -10,6 +10,7 @@ import { UndoStack, type MutationCommand } from './UndoStack.js';
 import type {
   MutationEvent,
   MutationEventHandler,
+  MutationFailedEventHandler,
   MutationSource,
   MutationFailedEvent,
 } from './MutationEvent.js';
@@ -66,12 +67,14 @@ export class MutationService {
 
   private undoStack: UndoStack;
   private eventHandlers: Map<string, Set<MutationEventHandler>>;
+  private failedEventHandlers: Set<MutationFailedEventHandler>;
   private isDev: boolean = false;
   private renderCaches: Set<SchedulerRenderCache<any>> = new Set();
 
   private constructor() {
     this.undoStack = new UndoStack(50);
     this.eventHandlers = new Map();
+    this.failedEventHandlers = new Set();
   }
 
   /**
@@ -155,11 +158,23 @@ export class MutationService {
         // Use custom mutator
         const mutatorFn = schema.mutators[field.mutateVia];
         if (mutatorFn) {
-          mutatorFn(entity, value);
+          const undoCmd = mutatorFn(entity, value);
+
+          // If mutator returned an undo command, add it to the undo stack
+          if (undoCmd && typeof undoCmd.undo === 'function' && typeof undoCmd.redo === 'function') {
+            const command: MutationCommand = {
+              entityId: entity.id,
+              componentType,
+              fieldName,
+              oldValue: undefined, // Custom mutators manage their own state
+              newValue: value,
+              execute: undoCmd.redo,
+              undo: undoCmd.undo,
+            };
+            instance.undoStack.push(command);
+          }
         }
 
-        // Custom mutators handle their own undo/redo and events
-        // TODO: In the future, we could make custom mutators return undo commands
         return { success: true };
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
@@ -351,6 +366,26 @@ export class MutationService {
   }
 
   /**
+   * Subscribe to mutation failed events
+   *
+   * @param handler - Handler function to call when a mutation fails
+   */
+  static onFailed(handler: MutationFailedEventHandler): void {
+    const instance = MutationService.getInstance();
+    instance.failedEventHandlers.add(handler);
+  }
+
+  /**
+   * Unsubscribe from mutation failed events
+   *
+   * @param handler - Handler function to remove
+   */
+  static offFailed(handler: MutationFailedEventHandler): void {
+    const instance = MutationService.getInstance();
+    instance.failedEventHandlers.delete(handler);
+  }
+
+  /**
    * Emit a mutation event to all subscribers
    */
   private emitMutatedEvent(event: MutationEvent): void {
@@ -390,8 +425,14 @@ export class MutationService {
     // Log the failure
     console.warn('[MutationService] Mutation failed:', event);
 
-    // TODO: In the future, we could emit 'mutation_failed' events
-    // For now, just log them
+    // Emit mutation_failed events to all subscribers
+    for (const handler of this.failedEventHandlers) {
+      try {
+        handler(event);
+      } catch (error) {
+        console.error('[MutationService] Error in failed event handler:', error);
+      }
+    }
   }
 
   /**

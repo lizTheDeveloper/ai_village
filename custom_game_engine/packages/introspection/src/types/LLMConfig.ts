@@ -100,7 +100,7 @@ export interface LLMConfig<T = any> {
  *
  * Controls how individual fields appear in prompts
  */
-export interface FieldLLMConfig {
+export interface FieldLLMConfig<T = any> {
   /**
    * Custom label for this field in prompts
    * Overrides the field name
@@ -125,4 +125,31 @@ export interface FieldLLMConfig {
    * @example (val) => val === 0 // Hide if zero
    */
   hideIf?: (value: any) => boolean;
+
+  /**
+   * Summarization function for array/complex fields
+   * Returns a concise text representation for LLM context
+   * Return null to omit this field from the prompt
+   *
+   * @param value - The field value to summarize
+   * @returns Human-readable summary text or null to omit
+   *
+   * @example
+   * ```typescript
+   * summarize: (visions) => {
+   *   if (!visions || visions.length === 0) return null;
+   *   return visions.slice(0, 3).map(v =>
+   *     `Vision (clarity: ${(v.clarity * 100).toFixed(0)}%): "${v.content}"`
+   *   ).join('\n');
+   * }
+   * ```
+   */
+  summarize?: (value: T) => string | null;
+
+  /**
+   * Priority in prompt (lower = earlier in prompt)
+   * Controls order of fields in the final prompt
+   * @default 100
+   */
+  priority?: number;
 }

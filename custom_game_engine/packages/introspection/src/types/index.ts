@@ -32,7 +32,7 @@ export type { FieldSchema } from './FieldSchema.js';
 export type { FieldType } from './FieldTypes.js';
 
 // Component schema (core)
-export type { Component, ComponentSchema, DevConfig, MutatorFunction, CanvasRenderable } from './ComponentSchema.js';
+export type { Component, ComponentSchema, DevConfig, MutatorFunction, MutatorUndoCommand, CanvasRenderable } from './ComponentSchema.js';
 export { defineComponent } from './ComponentSchema.js';
 
 // Introspection API types (note: MutationResult, CacheStats, MutationSource

@@ -39,6 +39,11 @@ export interface MutationEvent {
 export type MutationEventHandler = (event: MutationEvent) => void;
 
 /**
+ * Handler function for mutation failed events
+ */
+export type MutationFailedEventHandler = (event: MutationFailedEvent) => void;
+
+/**
  * Event types that can be listened to
  */
 export type MutationEventType = 'mutated' | 'mutation_failed';

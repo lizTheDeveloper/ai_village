@@ -26,9 +26,20 @@ export interface DevConfig {
 }
 
 /**
- * Mutator function type for component mutations
+ * Undo command returned by custom mutators
  */
-export type MutatorFunction<T> = (entity: any, ...args: any[]) => void;
+export interface MutatorUndoCommand {
+  /** Execute the undo (restore previous state) */
+  undo: () => void;
+  /** Re-execute the mutation (for redo) */
+  redo: () => void;
+}
+
+/**
+ * Mutator function type for component mutations
+ * Can optionally return an undo command for undo/redo support
+ */
+export type MutatorFunction<T> = (entity: any, ...args: any[]) => MutatorUndoCommand | void;
 
 /**
  * Renderable types for different consumers

@@ -325,17 +325,16 @@ export const SpiritualSchema = autoRegister(
           group: 'visions',
           order: 12,
         },
-        // TODO: llm configuration needs to be moved to ComponentSchema level
-        // llm: {
-        //   summarize: (visions: Vision[]) => {
-        //     if (!visions || visions.length === 0) return null;
-        //     const recent = visions.slice(0, 3); // Last 3 visions
-        //     return recent.map(v =>
-        //       `Vision (clarity: ${(v.clarity * 100).toFixed(0)}%): "${v.content}"`
-        //     ).join('\n');
-        //   },
-        //   priority: 8, // High priority - divine messages matter!
-        // },
+        llm: {
+          summarize: (visions: Vision[]) => {
+            if (!visions || visions.length === 0) return null;
+            const recent = visions.slice(0, 3); // Last 3 visions
+            return recent.map(v =>
+              `Vision (clarity: ${(v.clarity * 100).toFixed(0)}%): "${v.content}"`
+            ).join('\n');
+          },
+          priority: 8, // High priority - divine messages matter!
+        },
         mutable: true,
       },
 
@@ -357,18 +356,17 @@ export const SpiritualSchema = autoRegister(
           group: 'prayers',
           order: 25,
         },
-        // TODO: llm configuration needs to be moved to ComponentSchema level
-        // llm: {
-        //   summarize: (prayers: Prayer[]) => {
-        //     if (!prayers || prayers.length === 0) return null;
-        //     const recent = prayers.slice(0, 5).reverse(); // Last 5, oldest first
-        //     return recent.map(p => {
-        //       const status = p.answered ? `✓ ${p.responseType}` : 'unanswered';
-        //       return `${p.type} (${status}): "${p.content}"`;
-        //     }).join('\n');
-        //   },
-        //   priority: 7,
-        // },
+        llm: {
+          summarize: (prayers: Prayer[]) => {
+            if (!prayers || prayers.length === 0) return null;
+            const recent = prayers.slice(0, 5).reverse(); // Last 5, oldest first
+            return recent.map(p => {
+              const status = p.answered ? `✓ ${p.responseType}` : 'unanswered';
+              return `${p.type} (${status}): "${p.content}"`;
+            }).join('\n');
+          },
+          priority: 7,
+        },
         mutable: true,
       },
 
@@ -390,18 +388,17 @@ export const SpiritualSchema = autoRegister(
           group: 'faith',
           order: 7,
         },
-        // TODO: llm configuration needs to be moved to ComponentSchema level
-        // llm: {
-        //   summarize: (doubts: Doubt[]) => {
-        //     if (!doubts || doubts.length === 0) return null;
-        //     const active = doubts.filter(d => !d.resolved);
-        //     if (active.length === 0) return null;
-        //     return active.map(d =>
-        //       `Doubt (severity: ${(d.severity * 100).toFixed(0)}%): ${d.reason}`
-        //     ).join('\n');
-        //   },
-        //   priority: 6,
-        // },
+        llm: {
+          summarize: (doubts: Doubt[]) => {
+            if (!doubts || doubts.length === 0) return null;
+            const active = doubts.filter(d => !d.resolved);
+            if (active.length === 0) return null;
+            return active.map(d =>
+              `Doubt (severity: ${(d.severity * 100).toFixed(0)}%): ${d.reason}`
+            ).join('\n');
+          },
+          priority: 6,
+        },
         mutable: true,
       },
     },

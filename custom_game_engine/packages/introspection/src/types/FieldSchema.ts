@@ -1,4 +1,5 @@
 import type { FieldType, Visibility, UIHints } from './FieldTypes.js';
+import type { FieldLLMConfig } from './LLMConfig.js';
 
 /**
  * Complete schema definition for a single component field
@@ -54,4 +55,8 @@ export interface FieldSchema {
 
   /** Use this mutator instead of direct set */
   readonly mutateVia?: string;
+
+  // LLM configuration
+  /** Field-level LLM prompt configuration */
+  readonly llm?: FieldLLMConfig;
 }

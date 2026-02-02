@@ -163,7 +163,13 @@ export class ValidationService {
             error: `Expected array, got ${typeof value}`,
           };
         }
-        // TODO: Validate array item types if itemType is specified
+        // Validate array item types if itemType is specified
+        if (field.itemType && value.length > 0) {
+          const itemValidation = this.validateArrayItems(field.itemType, value);
+          if (!itemValidation.valid) {
+            return itemValidation;
+          }
+        }
         break;
 
       case 'object':
@@ -178,6 +184,78 @@ export class ValidationService {
 
       default:
         // Unknown type - allow it for now
+        break;
+    }
+
+    return { valid: true };
+  }
+
+  /**
+   * Validate that all items in an array match the expected item type
+   */
+  private static validateArrayItems(
+    itemType: string,
+    items: unknown[]
+  ): ValidationResult {
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      const itemValid = this.validateItemType(itemType, item);
+      if (!itemValid.valid) {
+        return {
+          valid: false,
+          error: `Array item at index ${i}: ${itemValid.error}`,
+        };
+      }
+    }
+    return { valid: true };
+  }
+
+  /**
+   * Validate that a single value matches the expected type
+   */
+  private static validateItemType(
+    expectedType: string,
+    value: unknown
+  ): ValidationResult {
+    switch (expectedType) {
+      case 'string':
+        if (!isString(value)) {
+          return {
+            valid: false,
+            error: `Expected string, got ${typeof value}`,
+          };
+        }
+        break;
+
+      case 'number':
+        if (!isNumber(value)) {
+          return {
+            valid: false,
+            error: `Expected number, got ${typeof value}`,
+          };
+        }
+        break;
+
+      case 'boolean':
+        if (!isBoolean(value)) {
+          return {
+            valid: false,
+            error: `Expected boolean, got ${typeof value}`,
+          };
+        }
+        break;
+
+      case 'object':
+        if (!isObject(value)) {
+          return {
+            valid: false,
+            error: `Expected object, got ${typeof value}`,
+          };
+        }
+        break;
+
+      default:
+        // Unknown type - allow it
         break;
     }
 
