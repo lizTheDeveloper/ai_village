@@ -39,22 +39,40 @@ export class BeltSystem extends BaseSystem {
   /**
    * Build position cache for O(1) entity lookups
    * Only rebuilds if tick has changed
+   *
+   * PERFORMANCE: Only caches entities with Belt or MachineConnection components,
+   * since those are the only entities belts can transfer to. This reduces the
+   * cache from potentially 200k+ entities to just automation-relevant ones.
    */
   private buildPositionCache(world: World): void {
     if (this.positionCacheTick === world.tick) return;
 
     this.positionCache.clear();
-    const entities = world.query().with(CT.Position).executeEntities();
-    for (const entity of entities) {
+
+    // Cache belts (entities that can receive items from other belts)
+    const belts = world.query().with(CT.Belt, CT.Position).executeEntities();
+    for (const entity of belts) {
       const pos = (entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
       if (pos) {
         const key = `${Math.floor(pos.x)},${Math.floor(pos.y)}`;
-        // Store first entity at position (belts/machines shouldn't overlap)
         if (!this.positionCache.has(key)) {
           this.positionCache.set(key, entity);
         }
       }
     }
+
+    // Cache machines with connections (entities that can receive items from belts)
+    const machines = world.query().with(CT.MachineConnection, CT.Position).executeEntities();
+    for (const entity of machines) {
+      const pos = (entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
+      if (pos) {
+        const key = `${Math.floor(pos.x)},${Math.floor(pos.y)}`;
+        if (!this.positionCache.has(key)) {
+          this.positionCache.set(key, entity);
+        }
+      }
+    }
+
     this.positionCacheTick = world.tick;
   }
 

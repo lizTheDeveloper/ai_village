@@ -257,10 +257,22 @@ export class CityBuildingGenerationSystem extends BaseSystem {
     const bounds = cityDirector.bounds;
 
     // Get all occupied positions in the city
+    // PERFORMANCE: Only query buildings and agents, not all positioned entities
+    // This reduces query scope from potentially 200k+ entities to ~100-1000
     const occupiedPositions = new Set<string>();
-    const entities = world.query().with(CT.Position).executeEntities();
 
-    for (const entity of entities) {
+    // Buildings occupy space
+    const buildings = world.query().with(CT.Building, CT.Position).executeEntities();
+    for (const entity of buildings) {
+      const pos = (entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
+      if (pos && isAgentInCity(pos.x, pos.y, bounds)) {
+        occupiedPositions.add(`${Math.floor(pos.x)},${Math.floor(pos.y)}`);
+      }
+    }
+
+    // Agents occupy space temporarily (don't build on them)
+    const agents = world.query().with(CT.Agent, CT.Position).executeEntities();
+    for (const entity of agents) {
       const pos = (entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
       if (pos && isAgentInCity(pos.x, pos.y, bounds)) {
         occupiedPositions.add(`${Math.floor(pos.x)},${Math.floor(pos.y)}`);
