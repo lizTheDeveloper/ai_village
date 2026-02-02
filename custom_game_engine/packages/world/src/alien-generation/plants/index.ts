@@ -11,15 +11,15 @@ export * from './GrowthPatterns.js';
 export * from './EnergyMethods.js';
 export * from './DefenseMechanisms.js';
 export * from './ReproductionMethods.js';
+export * from './EnvironmentalAdaptations.js';
+export * from './UnusualProperties.js';
+export * from './AppearancePatterns.js';
 
 // Re-export for convenience
 export { GROWTH_PATTERNS } from './GrowthPatterns.js';
 export { ENERGY_METHODS } from './EnergyMethods.js';
 export { DEFENSE_MECHANISMS } from './DefenseMechanisms.js';
 export { REPRODUCTION_METHODS } from './ReproductionMethods.js';
-
-// TODO: Add more component categories:
-// - EnvironmentalAdaptations
-// - UnusualProperties
-// - AppearancePatterns
-// - Complete example plants
+export { ENVIRONMENTAL_ADAPTATIONS } from './EnvironmentalAdaptations.js';
+export { UNUSUAL_PROPERTIES } from './UnusualProperties.js';
+export { APPEARANCE_PATTERNS } from './AppearancePatterns.js';

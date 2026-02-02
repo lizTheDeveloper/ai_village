@@ -322,8 +322,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'excellent',
     byproducts: ['Chitin fragments', 'Waste'],
     flavorText: 'Eat bugs. Abundant. Protein rich. Crunchy. Everywhere. Easy hunting.',
-    relatedItems: [], // TODO: Add insect items to game
-    ecologicalWeight: 0.85, // Should be very common once insects exist
+    relatedItems: ['cricket', 'beetle', 'grub', 'ant', 'caterpillar', 'locust'],
+    ecologicalWeight: 0.85, // Very common - insects are abundant
   },
   'frugivore': {
     name: 'Fruit Consumer',

@@ -229,6 +229,177 @@
       "isGatherable": false,
       "baseValue": 10,
       "rarity": "common"
+    },
+    {
+      "id": "cricket",
+      "name": "Cricket",
+      "category": "food",
+      "weight": 0.05,
+      "stackSize": 100,
+      "baseMaterial": "organic",
+      "traits": {
+        "edible": {
+          "hungerRestored": 8,
+          "quality": 35,
+          "flavors": ["umami"],
+          "spoilRate": 0.05
+        }
+      },
+      "isEdible": true,
+      "hungerRestored": 8,
+      "quality": 35,
+      "flavors": ["umami"],
+      "isGatherable": true,
+      "gatherSources": ["tall_grass", "meadow", "forest_floor"],
+      "baseValue": 2,
+      "rarity": "common"
+    },
+    {
+      "id": "beetle",
+      "name": "Beetle",
+      "category": "food",
+      "weight": 0.08,
+      "stackSize": 80,
+      "baseMaterial": "organic",
+      "traits": {
+        "edible": {
+          "hungerRestored": 10,
+          "quality": 30,
+          "flavors": ["bitter", "umami"],
+          "spoilRate": 0.04
+        }
+      },
+      "isEdible": true,
+      "hungerRestored": 10,
+      "quality": 30,
+      "flavors": ["bitter", "umami"],
+      "isGatherable": true,
+      "gatherSources": ["dead_tree", "log", "rock"],
+      "baseValue": 3,
+      "rarity": "common"
+    },
+    {
+      "id": "grub",
+      "name": "Grub",
+      "category": "food",
+      "weight": 0.1,
+      "stackSize": 60,
+      "baseMaterial": "organic",
+      "traits": {
+        "edible": {
+          "hungerRestored": 15,
+          "quality": 25,
+          "flavors": ["savory"],
+          "spoilRate": 0.08
+        }
+      },
+      "isEdible": true,
+      "hungerRestored": 15,
+      "quality": 25,
+      "flavors": ["savory"],
+      "isGatherable": true,
+      "gatherSources": ["log", "dead_tree", "soil"],
+      "baseValue": 4,
+      "rarity": "common"
+    },
+    {
+      "id": "ant",
+      "name": "Ant",
+      "category": "food",
+      "weight": 0.01,
+      "stackSize": 200,
+      "baseMaterial": "organic",
+      "traits": {
+        "edible": {
+          "hungerRestored": 3,
+          "quality": 20,
+          "flavors": ["sour"],
+          "spoilRate": 0.03
+        }
+      },
+      "isEdible": true,
+      "hungerRestored": 3,
+      "quality": 20,
+      "flavors": ["sour"],
+      "isGatherable": true,
+      "gatherSources": ["ant_hill", "forest_floor", "dead_tree"],
+      "baseValue": 1,
+      "rarity": "common"
+    },
+    {
+      "id": "caterpillar",
+      "name": "Caterpillar",
+      "category": "food",
+      "weight": 0.03,
+      "stackSize": 80,
+      "baseMaterial": "organic",
+      "traits": {
+        "edible": {
+          "hungerRestored": 12,
+          "quality": 40,
+          "flavors": ["sweet", "savory"],
+          "spoilRate": 0.06
+        }
+      },
+      "isEdible": true,
+      "hungerRestored": 12,
+      "quality": 40,
+      "flavors": ["sweet", "savory"],
+      "isGatherable": true,
+      "gatherSources": ["tree", "bush", "plant"],
+      "baseValue": 5,
+      "rarity": "common"
+    },
+    {
+      "id": "locust",
+      "name": "Locust",
+      "category": "food",
+      "weight": 0.06,
+      "stackSize": 100,
+      "baseMaterial": "organic",
+      "traits": {
+        "edible": {
+          "hungerRestored": 10,
+          "quality": 45,
+          "flavors": ["umami", "savory"],
+          "spoilRate": 0.05
+        }
+      },
+      "isEdible": true,
+      "hungerRestored": 10,
+      "quality": 45,
+      "flavors": ["umami", "savory"],
+      "isGatherable": true,
+      "gatherSources": ["wheat_plant", "grass", "meadow"],
+      "baseValue": 4,
+      "rarity": "common"
+    },
+    {
+      "id": "roasted_insects",
+      "name": "Roasted Insects",
+      "category": "food",
+      "weight": 0.2,
+      "stackSize": 50,
+      "baseMaterial": "organic",
+      "traits": {
+        "edible": {
+          "hungerRestored": 30,
+          "quality": 60,
+          "flavors": ["savory", "umami"],
+          "spoilRate": 0.02
+        }
+      },
+      "isEdible": true,
+      "hungerRestored": 30,
+      "quality": 60,
+      "flavors": ["savory", "umami"],
+      "isGatherable": false,
+      "craftedFrom": [
+        { "itemId": "cricket", "amount": 5 },
+        { "itemId": "beetle", "amount": 3 }
+      ],
+      "baseValue": 20,
+      "rarity": "common"
     }
   ],
   "materialItems": [
