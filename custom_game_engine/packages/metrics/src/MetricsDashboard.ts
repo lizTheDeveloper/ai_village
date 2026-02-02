@@ -838,16 +838,334 @@ export class MetricsDashboard {
   /**
    * Export a chart
    */
-  exportChart(_chart: ChartData, format: 'png' | 'svg' | 'json'): Buffer {
-    // Simplified implementation - would use actual chart rendering library
-    if (format === 'png' || format === 'svg') {
-      // Return empty buffer as placeholder
-      return Buffer.from('chart-data');
-    } else if (format === 'json') {
-      return Buffer.from(JSON.stringify(_chart, null, 2));
+  exportChart(chart: ChartData, format: 'png' | 'svg' | 'json'): Buffer {
+    if (format === 'json') {
+      return Buffer.from(JSON.stringify(chart, null, 2));
+    } else if (format === 'svg') {
+      return Buffer.from(this.generateChartSVG(chart));
+    } else if (format === 'png') {
+      // PNG export requires canvas library which has native dependencies
+      // For server-side PNG generation, consider using the SVG and converting with a library like sharp
+      throw new Error('PNG export requires a canvas library. Use SVG format or convert SVG to PNG using sharp/canvas.');
     }
 
     throw new Error(`Unsupported chart export format: ${format}`);
+  }
+
+  /**
+   * Generate SVG markup for a chart
+   */
+  private generateChartSVG(chart: ChartData): string {
+    const width = 800;
+    const height = 400;
+    const padding = 60;
+    const chartWidth = width - padding * 2;
+    const chartHeight = height - padding * 2;
+
+    switch (chart.type) {
+      case 'line':
+        return this.generateLineSVG(chart, width, height, padding, chartWidth, chartHeight);
+      case 'bar':
+        return this.generateBarSVG(chart, width, height, padding, chartWidth, chartHeight);
+      case 'heatmap':
+        return this.generateHeatmapSVG(chart, width, height, padding);
+      case 'graph':
+        return this.generateGraphSVG(chart, width, height, padding);
+      default:
+        // For unsupported types, return a basic SVG with data as text
+        return this.generateFallbackSVG(chart, width, height);
+    }
+  }
+
+  /**
+   * Generate line chart SVG
+   */
+  private generateLineSVG(
+    chart: ChartData,
+    width: number,
+    height: number,
+    padding: number,
+    chartWidth: number,
+    chartHeight: number
+  ): string {
+    const datasets = chart.data.datasets ?? [];
+    const colors = ['#4285f4', '#ea4335', '#fbbc04', '#34a853', '#9c27b0'];
+
+    // Find data range
+    let minVal = Infinity;
+    let maxVal = -Infinity;
+    let maxPoints = 0;
+
+    for (const dataset of datasets) {
+      for (const val of dataset.data) {
+        if (val < minVal) minVal = val;
+        if (val > maxVal) maxVal = val;
+      }
+      if (dataset.data.length > maxPoints) maxPoints = dataset.data.length;
+    }
+
+    if (minVal === Infinity) minVal = 0;
+    if (maxVal === -Infinity) maxVal = 100;
+    if (maxVal === minVal) maxVal = minVal + 1;
+
+    const range = maxVal - minVal;
+    const scaleY = (val: number) => padding + chartHeight - ((val - minVal) / range) * chartHeight;
+    const scaleX = (idx: number) => padding + (idx / Math.max(maxPoints - 1, 1)) * chartWidth;
+
+    let paths = '';
+    let legendItems = '';
+
+    for (let i = 0; i < datasets.length; i++) {
+      const dataset = datasets[i];
+      if (!dataset) continue;
+      const color = colors[i % colors.length];
+      const points = dataset.data.map((val, idx) => `${scaleX(idx)},${scaleY(val)}`).join(' ');
+
+      paths += `<polyline fill="none" stroke="${color}" stroke-width="2" points="${points}"/>`;
+
+      // Add legend item
+      const legendY = padding + i * 20;
+      legendItems += `
+        <rect x="${width - padding - 100}" y="${legendY - 10}" width="12" height="12" fill="${color}"/>
+        <text x="${width - padding - 82}" y="${legendY}" fill="#333" font-size="12">${dataset.label ?? `Series ${i + 1}`}</text>
+      `;
+    }
+
+    // Add axes
+    const axisPath = `
+      <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${height - padding}" stroke="#333" stroke-width="1"/>
+      <line x1="${padding}" y1="${height - padding}" x2="${width - padding}" y2="${height - padding}" stroke="#333" stroke-width="1"/>
+    `;
+
+    // Add Y-axis labels
+    const yLabels = [0, 0.25, 0.5, 0.75, 1].map(pct => {
+      const val = minVal + range * pct;
+      const y = scaleY(val);
+      return `<text x="${padding - 10}" y="${y + 4}" text-anchor="end" fill="#666" font-size="10">${val.toFixed(1)}</text>`;
+    }).join('');
+
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+  <style>text { font-family: sans-serif; }</style>
+  <rect width="100%" height="100%" fill="white"/>
+  ${axisPath}
+  ${yLabels}
+  ${paths}
+  ${legendItems}
+</svg>`;
+  }
+
+  /**
+   * Generate bar chart SVG
+   */
+  private generateBarSVG(
+    chart: ChartData,
+    width: number,
+    height: number,
+    padding: number,
+    chartWidth: number,
+    chartHeight: number
+  ): string {
+    const datasets = chart.data.datasets ?? [];
+    const colors = ['#4285f4', '#ea4335', '#fbbc04', '#34a853', '#9c27b0'];
+
+    // Find data range
+    let maxVal = 0;
+    let maxPoints = 0;
+
+    for (const dataset of datasets) {
+      for (const val of dataset.data) {
+        if (val > maxVal) maxVal = val;
+      }
+      if (dataset.data.length > maxPoints) maxPoints = dataset.data.length;
+    }
+
+    if (maxVal === 0) maxVal = 100;
+
+    const barGroupWidth = chartWidth / Math.max(maxPoints, 1);
+    const barWidth = barGroupWidth / (datasets.length + 1);
+    const scaleY = (val: number) => (val / maxVal) * chartHeight;
+
+    let bars = '';
+    let legendItems = '';
+
+    for (let i = 0; i < datasets.length; i++) {
+      const dataset = datasets[i];
+      if (!dataset) continue;
+      const color = colors[i % colors.length];
+
+      for (let j = 0; j < dataset.data.length; j++) {
+        const val = dataset.data[j] ?? 0;
+        const barHeight = scaleY(val);
+        const x = padding + j * barGroupWidth + i * barWidth + barWidth / 2;
+        const y = height - padding - barHeight;
+
+        bars += `<rect x="${x}" y="${y}" width="${barWidth * 0.9}" height="${barHeight}" fill="${color}"/>`;
+      }
+
+      // Add legend item
+      const legendY = padding + i * 20;
+      legendItems += `
+        <rect x="${width - padding - 100}" y="${legendY - 10}" width="12" height="12" fill="${color}"/>
+        <text x="${width - padding - 82}" y="${legendY}" fill="#333" font-size="12">${dataset.label ?? `Series ${i + 1}`}</text>
+      `;
+    }
+
+    // Add axes
+    const axisPath = `
+      <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${height - padding}" stroke="#333" stroke-width="1"/>
+      <line x1="${padding}" y1="${height - padding}" x2="${width - padding}" y2="${height - padding}" stroke="#333" stroke-width="1"/>
+    `;
+
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+  <style>text { font-family: sans-serif; }</style>
+  <rect width="100%" height="100%" fill="white"/>
+  ${axisPath}
+  ${bars}
+  ${legendItems}
+</svg>`;
+  }
+
+  /**
+   * Generate heatmap SVG
+   */
+  private generateHeatmapSVG(
+    chart: ChartData,
+    width: number,
+    height: number,
+    padding: number
+  ): string {
+    const heatmap = chart.data.heatmap ?? {};
+    const chartWidth = width - padding * 2;
+    const chartHeight = height - padding * 2;
+
+    // Find bounds and max value
+    let minX = Infinity, maxX = -Infinity;
+    let minY = Infinity, maxY = -Infinity;
+    let maxVal = 0;
+
+    for (const [xStr, row] of Object.entries(heatmap)) {
+      const x = Number(xStr);
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      for (const [yStr, val] of Object.entries(row as Record<number, number>)) {
+        const y = Number(yStr);
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+        if (val > maxVal) maxVal = val;
+      }
+    }
+
+    if (minX === Infinity) { minX = 0; maxX = 10; }
+    if (minY === Infinity) { minY = 0; maxY = 10; }
+    if (maxVal === 0) maxVal = 1;
+
+    const rangeX = maxX - minX || 1;
+    const rangeY = maxY - minY || 1;
+    const cellWidth = chartWidth / (rangeX + 1);
+    const cellHeight = chartHeight / (rangeY + 1);
+
+    let cells = '';
+    for (const [xStr, row] of Object.entries(heatmap)) {
+      const x = Number(xStr);
+      for (const [yStr, val] of Object.entries(row as Record<number, number>)) {
+        const y = Number(yStr);
+        const intensity = val / maxVal;
+        const red = Math.round(255 * intensity);
+        const green = Math.round(255 * (1 - intensity * 0.5));
+        const blue = Math.round(255 * (1 - intensity));
+        const color = `rgb(${red},${green},${blue})`;
+
+        const cx = padding + ((x - minX) / rangeX) * chartWidth;
+        const cy = padding + ((y - minY) / rangeY) * chartHeight;
+
+        cells += `<rect x="${cx}" y="${cy}" width="${cellWidth}" height="${cellHeight}" fill="${color}"/>`;
+      }
+    }
+
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+  <style>text { font-family: sans-serif; }</style>
+  <rect width="100%" height="100%" fill="white"/>
+  ${cells}
+</svg>`;
+  }
+
+  /**
+   * Generate network graph SVG
+   */
+  private generateGraphSVG(
+    chart: ChartData,
+    width: number,
+    height: number,
+    padding: number
+  ): string {
+    const nodes = chart.data.nodes ?? [];
+    const edges = chart.data.edges ?? [];
+    const chartWidth = width - padding * 2;
+    const chartHeight = height - padding * 2;
+
+    // Simple circular layout
+    const nodePositions = new Map<string, { x: number; y: number }>();
+    const centerX = padding + chartWidth / 2;
+    const centerY = padding + chartHeight / 2;
+    const radius = Math.min(chartWidth, chartHeight) / 2 - 30;
+
+    for (let i = 0; i < nodes.length; i++) {
+      const angle = (2 * Math.PI * i) / nodes.length;
+      nodePositions.set(nodes[i]!.id, {
+        x: centerX + radius * Math.cos(angle),
+        y: centerY + radius * Math.sin(angle),
+      });
+    }
+
+    // Draw edges
+    let edgePaths = '';
+    for (const edge of edges) {
+      const from = nodePositions.get(edge.from);
+      const to = nodePositions.get(edge.to);
+      if (from && to) {
+        edgePaths += `<line x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}" stroke="#999" stroke-width="1"/>`;
+      }
+    }
+
+    // Draw nodes
+    let nodePaths = '';
+    for (const node of nodes) {
+      const pos = nodePositions.get(node.id);
+      if (pos) {
+        nodePaths += `
+          <circle cx="${pos.x}" cy="${pos.y}" r="8" fill="#4285f4"/>
+          <text x="${pos.x}" y="${pos.y + 20}" text-anchor="middle" fill="#333" font-size="10">${node.label ?? node.id.slice(0, 8)}</text>
+        `;
+      }
+    }
+
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+  <style>text { font-family: sans-serif; }</style>
+  <rect width="100%" height="100%" fill="white"/>
+  ${edgePaths}
+  ${nodePaths}
+</svg>`;
+  }
+
+  /**
+   * Generate fallback SVG for unsupported chart types
+   */
+  private generateFallbackSVG(chart: ChartData, width: number, height: number): string {
+    const dataJson = JSON.stringify(chart.data, null, 2).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+  <style>text { font-family: monospace; font-size: 10px; }</style>
+  <rect width="100%" height="100%" fill="white"/>
+  <text x="20" y="30" fill="#333">Chart Type: ${chart.type}</text>
+  <text x="20" y="50" fill="#666">SVG visualization not implemented for this chart type.</text>
+  <text x="20" y="70" fill="#666">Data (JSON):</text>
+  <text x="20" y="90" fill="#333"><tspan>${dataJson.slice(0, 500)}${dataJson.length > 500 ? '...' : ''}</tspan></text>
+</svg>`;
   }
 
   /**

@@ -178,8 +178,18 @@ export function handleSpawnEntity(
   const entity = ctx.world.createEntity();
   const entityId = entity.id;
 
-  // Set position via component (assuming PositionComponent exists)
-  // TODO: Add proper position component initialization
+  // Set position via component
+  entity.addComponent({
+    type: 'position',
+    x,
+    y,
+  });
+
+  // Add a type tag for the entity
+  entity.addComponent({
+    type: 'tags',
+    tags: [type],
+  });
 
   if (!entity) {
     return {

@@ -230,13 +230,19 @@ export class MetricsAPI {
       }
       centralAgents.sort((a, b) => b.centrality - a.centrality);
 
+      // Calculate average path length using BFS from each node
+      const avgPathLength = this.calculateAveragePathLength(adjacency);
+
+      // Count connected components using DFS
+      const components = this.countConnectedComponents(adjacency);
+
       return {
         success: true,
         data: {
           density,
           clustering: socialMetrics?.socialNetworkDensity ?? 0,
-          avgPathLength: 0, // Would need full graph traversal
-          components: 1, // Simplified
+          avgPathLength,
+          components,
           nodeCount,
           edgeCount,
           centralAgents: centralAgents.slice(0, 10),
@@ -563,6 +569,77 @@ export class MetricsAPI {
         timestamp: Date.now(),
       };
     }
+  }
+
+  /**
+   * Helper: Calculate average path length using BFS from each node
+   */
+  private calculateAveragePathLength(adjacency: Map<string, Set<string>>): number {
+    if (adjacency.size < 2) return 0;
+
+    let totalDistance = 0;
+    let count = 0;
+
+    for (const source of adjacency.keys()) {
+      // BFS from source to find shortest paths to all other nodes
+      const distances = new Map<string, number>();
+      const queue: string[] = [source];
+      distances.set(source, 0);
+
+      while (queue.length > 0) {
+        const current = queue.shift()!;
+        const currentDist = distances.get(current)!;
+        const neighbors = adjacency.get(current);
+
+        if (neighbors) {
+          for (const neighbor of neighbors) {
+            if (!distances.has(neighbor)) {
+              distances.set(neighbor, currentDist + 1);
+              queue.push(neighbor);
+            }
+          }
+        }
+      }
+
+      // Sum up distances to all reachable nodes
+      for (const [target, distance] of distances) {
+        if (target !== source) {
+          totalDistance += distance;
+          count++;
+        }
+      }
+    }
+
+    return count > 0 ? totalDistance / count : 0;
+  }
+
+  /**
+   * Helper: Count connected components using DFS
+   */
+  private countConnectedComponents(adjacency: Map<string, Set<string>>): number {
+    const visited = new Set<string>();
+    let components = 0;
+
+    const dfs = (node: string): void => {
+      visited.add(node);
+      const neighbors = adjacency.get(node);
+      if (neighbors) {
+        for (const neighbor of neighbors) {
+          if (!visited.has(neighbor)) {
+            dfs(neighbor);
+          }
+        }
+      }
+    };
+
+    for (const node of adjacency.keys()) {
+      if (!visited.has(node)) {
+        dfs(node);
+        components++;
+      }
+    }
+
+    return components;
   }
 
   /**
