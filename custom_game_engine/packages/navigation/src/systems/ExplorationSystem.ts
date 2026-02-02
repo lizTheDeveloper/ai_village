@@ -70,9 +70,6 @@ export class ExplorationSystem extends BaseSystem {
     const currentSector = this.worldToSector(position);
     explorationState.markSectorExplored(currentSector.x, currentSector.y, currentTick);
 
-    // Update exploration radius based on settlement size - removed getGlobalState (doesn't exist)
-    // This can be added later if needed via a proper global state system
-
     // Check for coverage milestones
     this._checkCoverageMilestones(entity, world);
 
@@ -294,7 +291,7 @@ export class ExplorationSystem extends BaseSystem {
    * Check and emit coverage milestone events
    */
   private _checkCoverageMilestones(entity: Entity, _world: SystemContext['world']): void {
-    const coverage = this.calculateCoverage(entity);
+    const coverage = this.calculateCoverage(entity as EntityImpl);
     const lastMilestone = this.lastCoverageMilestone.get(entity.id) ?? 0;
 
     for (const milestone of this.MILESTONES) {

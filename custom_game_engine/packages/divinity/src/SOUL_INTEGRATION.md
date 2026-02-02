@@ -12,10 +12,12 @@ The soul system is now architecturally complete with three core components:
 
 ✅ **Complete:**
 - Soul creation ceremony system (SoulCreationSystem)
-- Three Fates LLM conversation (placeholder responses)
+- Three Fates LLM conversation with full LLM integration
 - Soul component architecture
 - Event types: `soul:ceremony_started`, `soul:fate_speaks`, `soul:ceremony_complete`
 - Observable divine ceremonies (disembodied voices)
+- LLM integration via LLMVisionGenerator for vision/response generation
+- Template-based fallbacks when LLM unavailable
 
 🚧 **Pending Integration:**
 - Linking souls to agents at birth
@@ -161,14 +163,15 @@ if (soulLink) {
 
 ## LLM Integration
 
-### Replace Placeholder Responses
+### LLM Integration (Implemented)
 
-Currently, `SoulCreationSystem.getPlaceholderResponse()` returns static text. To enable true LLM-powered soul creation:
+The divinity package has full LLM integration via `LLMVisionGenerator` and related systems:
 
-1. Import the LLM provider in SoulCreationSystem
-2. Use `generateFatePrompt()` from SoulCreationCeremony to create prompts
-3. Call LLM API with the prompt
-4. Parse the response and add to transcript
+- **LLMVisionGenerator** (`LLMVisionGenerator.ts`) - Generates visions, meditation experiences, and prayer responses using LLM providers
+- **RiddleGenerator** (`RiddleGenerator.ts`) - Generates personalized riddles and judges answers via LLM
+- **Template fallbacks** - When LLM is unavailable, systems use pre-defined templates
+
+To configure LLM for soul creation ceremonies:
 
 ```typescript
 import { generateFatePrompt } from '../divinity/SoulCreationCeremony.js';
@@ -181,8 +184,8 @@ private async conductCeremonyTurn(world: World, ceremony: ActiveCeremony): Promi
     ceremony.transcript
   );
 
-  // TODO: Call LLM API
-  const response = await callLLM(prompt);
+  // Call LLM API (implemented via LLMVisionGenerator pattern)
+  const response = await this.llmProvider.generate(prompt);
 
   // Add to transcript
   const exchange: ConversationExchange = {
@@ -262,7 +265,7 @@ if (soulLink && Math.random() < 0.3) { // 30% chance of soul dream
 1. **Integrate with ReproductionSystem**: Create souls for newborn agents
 2. **Update DeathTransitionSystem**: Persist souls when agents die
 3. **Modify ReincarnationSystem**: Link existing souls to new bodies
-4. **LLM Integration**: Replace placeholder Fate responses with actual LLM calls
+4. ~~**LLM Integration**: Replace placeholder Fate responses with actual LLM calls~~ ✅ Complete
 5. **Soul-Driven Behavior**: Use soul purpose/interests in agent decision-making
 6. **Dream System**: Implement soul-conscious mind communication
 
