@@ -36,7 +36,7 @@ import { ParticleRenderer } from './ParticleRenderer.js';
 import { BedOwnershipRenderer } from './BedOwnershipRenderer.js';
 import { HealthBarRenderer } from './HealthBarRenderer.js';
 import { ThreatIndicatorRenderer } from './ThreatIndicatorRenderer.js';
-// ContextMenuManager import removed - files deleted
+// ContextMenuManager was removed - keeping method signature for backwards compatibility
 import { Renderer3D } from './Renderer3D.js';
 import { TerrainRenderer } from './terrain/index.js';
 import { SideViewTerrainRenderer } from './terrain/index.js';

@@ -24,6 +24,8 @@
     "@ai-village/divinity": "*"
   },
   "devDependencies": {
-    "@ai-village/core": "*"
+    "@ai-village/core": "*",
+    "@ai-village/world": "*",
+    "@types/node": "^20.10.0"
   }
 }

@@ -77,13 +77,16 @@ import type { Entity } from '@ai-village/core';
 // Register agent factory in DI container (city-simulator only uses wandering agents,
 // but we register both for consistency with demo)
 container.registerAgentFactory({
-  createLLMAgent: (world, x, y, options) => {
+  createLLMAgent: (world: WorldMutator, x: number, y: number, options?: { name?: string; profession?: string; startingGold?: number; personality?: unknown; customLLM?: unknown }) => {
     const speed = 2.0;
-    return createLLMAgent(world, x, y, speed, options?.name, options);
+    // The actual createLLMAgent expects (world, x, y, speed, dungeonMasterPrompt?, options?)
+    // where options is { believedDeity?: string }
+    return createLLMAgent(world, x, y, speed, options?.name, undefined);
   },
-  createWanderingAgent: (world, x, y, options) => {
+  createWanderingAgent: (world: WorldMutator, x: number, y: number, options?: { name?: string; profession?: string; startingGold?: number; personality?: unknown }) => {
     const speed = 2.0;
-    return createWanderingAgent(world, x, y, speed, options);
+    // The actual createWanderingAgent expects WanderingAgentOptions = { believedDeity?, guaranteedSkills? }
+    return createWanderingAgent(world, x, y, speed, undefined);
   },
 });
 
@@ -94,7 +97,7 @@ console.log('[HeadlessCitySimulator] DI container agent factory registered');
 // =============================================================================
 
 // Internal World API type for _worldEntityId (addEntity is now public)
-interface WorldInternal extends World {
+interface WorldInternal extends WorldMutator {
   _worldEntityId: string;
 }
 
@@ -344,7 +347,7 @@ export class HeadlessCitySimulator {
       // Apply containment bounds if economy enabled
       if (cityBounds) {
         const agent = world.getEntity(agentId) as EntityImpl;
-        agent.updateComponent<SteeringComponent>(CT.Steering, (current) => ({
+        agent.updateComponent<SteeringComponent>(CT.Steering, (current: SteeringComponent) => ({
           ...current,
           containmentBounds: cityBounds,
           containmentMargin: 20,

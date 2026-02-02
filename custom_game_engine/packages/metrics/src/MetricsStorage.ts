@@ -270,7 +270,7 @@ export class MetricsStorage {
 
     try {
       const files = await fs.readdir(sessionsDir);
-      return files.filter(f => f.endsWith('.json')).map(f => f.replace('.json', ''));
+      return files.filter((f: string) => f.endsWith('.json')).map((f: string) => f.replace('.json', ''));
     } catch (error) {
       return [];
     }
@@ -326,7 +326,7 @@ export class MetricsStorage {
 
     try {
       const files = await fs.readdir(archiveDir);
-      return files.filter(f => f.endsWith('.gz')).map(f => f.replace('.gz', ''));
+      return files.filter((f: string) => f.endsWith('.gz')).map((f: string) => f.replace('.gz', ''));
     } catch (error) {
       return [];
     }

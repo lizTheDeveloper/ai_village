@@ -590,12 +590,14 @@ export class PixiJSRenderer implements IRenderer {
 
     // Create particle container for high-performance particle effects
     // ParticleContainer uses WebGL batching for 10-100x better performance than Graphics
-    this.particleContainer = new ParticleContainer(1000, {
-      scale: true,
-      position: true,
-      rotation: false,
-      uvs: false,
-      alpha: true,
+    // PixiJS v8 API: options object with dynamicProperties
+    this.particleContainer = new ParticleContainer({
+      dynamicProperties: {
+        scale: true,
+        position: true,
+        rotation: false,
+        alpha: true,
+      },
     });
     this.overlayContainer.addChild(this.particleContainer);
 

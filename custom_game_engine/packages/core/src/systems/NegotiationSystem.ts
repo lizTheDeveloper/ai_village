@@ -327,9 +327,10 @@ export class NegotiationSystem extends BaseSystem {
 
     // Slow path: query for history entity
     const historyEntities = world.query().with(CT.GovernanceHistory).executeEntities();
-    if (historyEntities.length > 0) {
-      this.cachedHistoryEntityId = historyEntities[0].id;
-      return historyEntities[0] as EntityImpl;
+    const firstEntity = historyEntities[0];
+    if (firstEntity) {
+      this.cachedHistoryEntityId = firstEntity.id;
+      return firstEntity as EntityImpl;
     }
     return null;
   }

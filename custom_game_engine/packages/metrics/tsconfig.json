@@ -2,11 +2,13 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "types": ["node"]
   },
   "include": ["src/**/*"],
   "references": [
     { "path": "../core" },
-    { "path": "../persistence" }
+    { "path": "../persistence" },
+    { "path": "../agents" }
   ]
 }
