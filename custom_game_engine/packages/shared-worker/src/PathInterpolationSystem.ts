@@ -90,8 +90,8 @@ export class PathInterpolationSystem extends BaseSystem {
   /**
    * Interpolate wander movement
    *
-   * For now, uses simple linear velocity.
-   * Full wander simulation would require matching WanderBehavior exactly.
+   * Implements full wander simulation with deterministic RNG to match server behavior.
+   * Uses entity ID as seed for deterministic randomness.
    */
   private interpolateWander(
     interpolator: PathInterpolatorComponent,
@@ -100,12 +100,100 @@ export class PathInterpolationSystem extends BaseSystem {
   ): { x: number; y: number } {
     const wander = interpolator.prediction as WanderPath;
 
-    // Simple approach: use current velocity
-    // TODO: Could implement full wander simulation with deterministic RNG
-    return {
-      x: interpolator.basePosition.x + wander.currentVelocity.x * ticksElapsed,
-      y: interpolator.basePosition.y + wander.currentVelocity.y * ticksElapsed,
-    };
+    // Use seed from prediction if available, otherwise hash entity ID
+    const seed = wander.seed !== undefined ? wander.seed : this.hashString(entityId);
+
+    // Initialize RNG with seed
+    let rngState = seed;
+
+    // Start with current position and velocity
+    let currentPos = { ...interpolator.basePosition };
+    let currentVelocity = { ...wander.currentVelocity };
+
+    // Get wander parameters
+    const wanderRadius = wander.wanderRadius || 5;
+    const wanderDistance = wander.wanderDistance || 10;
+    const wanderJitter = wander.wanderJitter || 0.1;
+
+    // Initialize wander angle from velocity direction
+    let wanderAngle = Math.atan2(currentVelocity.y, currentVelocity.x);
+
+    // Simulate each tick of wander behavior
+    for (let tick = 0; tick < ticksElapsed; tick++) {
+      // Jitter the wander angle using seeded RNG
+      const jitterValue = this.seededRandom(rngState) - 0.5;
+      rngState = this.nextRngState(rngState);
+      wanderAngle += jitterValue * wanderJitter;
+
+      // Calculate speed from current velocity
+      const speed = Math.sqrt(currentVelocity.x * currentVelocity.x + currentVelocity.y * currentVelocity.y);
+
+      // Calculate circle center (ahead of agent)
+      let circleCenterX: number;
+      let circleCenterY: number;
+
+      if (speed > 0) {
+        circleCenterX = currentPos.x + (currentVelocity.x / speed) * wanderDistance;
+        circleCenterY = currentPos.y + (currentVelocity.y / speed) * wanderDistance;
+      } else {
+        circleCenterX = currentPos.x;
+        circleCenterY = currentPos.y + wanderDistance;
+      }
+
+      // Calculate target on circle
+      const targetX = circleCenterX + Math.cos(wanderAngle) * wanderRadius;
+      const targetY = circleCenterY + Math.sin(wanderAngle) * wanderRadius;
+
+      // Calculate desired velocity (seek toward target)
+      const desiredX = targetX - currentPos.x;
+      const desiredY = targetY - currentPos.y;
+      const desiredDist = Math.sqrt(desiredX * desiredX + desiredY * desiredY);
+
+      if (desiredDist > 0) {
+        // Normalize and scale to speed
+        const normalizedDesiredX = (desiredX / desiredDist) * speed;
+        const normalizedDesiredY = (desiredY / desiredDist) * speed;
+
+        // Update velocity (simplified steering - directly use desired velocity)
+        currentVelocity.x = normalizedDesiredX;
+        currentVelocity.y = normalizedDesiredY;
+      }
+
+      // Update position
+      currentPos.x += currentVelocity.x;
+      currentPos.y += currentVelocity.y;
+    }
+
+    return currentPos;
+  }
+
+  /**
+   * Seeded random number generator (Linear Congruential Generator)
+   * Returns a number between 0 and 1
+   */
+  private seededRandom(seed: number): number {
+    const value = ((seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+    return value;
+  }
+
+  /**
+   * Get next RNG state
+   */
+  private nextRngState(seed: number): number {
+    return (seed * 1103515245 + 12345) & 0x7fffffff;
+  }
+
+  /**
+   * Hash a string to a number for use as RNG seed
+   */
+  private hashString(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash);
   }
 
   /**

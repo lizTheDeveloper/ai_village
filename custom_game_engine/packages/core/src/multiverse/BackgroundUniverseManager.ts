@@ -455,15 +455,54 @@ export class BackgroundUniverseManager {
     // Use renormalization engine to get constraints
     // This ensures generated world matches statistical data
 
+    // Extract belief distribution from dominant culture
+    const beliefDistribution = new Map<string, number>();
+    if (planet.civilizationStats.dominantCulture) {
+      // Distribute population across beliefs based on cultural identity
+      const culturesPerBelief = Math.max(1, Math.floor(planet.majorCivilizations.length / 3));
+      planet.majorCivilizations.forEach((civ, index) => {
+        const beliefId = `belief_${civ.culturalIdentity.toLowerCase()}`;
+        const currentFollowers = beliefDistribution.get(beliefId) || 0;
+        beliefDistribution.set(beliefId, currentFollowers + civ.population);
+      });
+    }
+
+    // Extract building distribution from urbanization and industrialization
+    const buildingDistribution = new Map<string, number>();
+    const urbanPopulation = planet.population.total * planet.civilizationStats.urbanization;
+    const industrialCapacity = planet.civilizationStats.industrialization;
+
+    // Estimate building counts based on population and development
+    buildingDistribution.set('house', Math.floor(planet.population.total / 5)); // 5 people per house
+    buildingDistribution.set('farm', Math.floor((planet.population.total - urbanPopulation) / 50)); // Rural farms
+    buildingDistribution.set('factory', Math.floor(industrialCapacity * urbanPopulation / 1000)); // Industrial buildings
+    buildingDistribution.set('market', Math.floor(urbanPopulation / 10000)); // Markets in cities
+    buildingDistribution.set('temple', Math.floor(planet.population.total / 50000)); // Religious buildings
+    buildingDistribution.set('university', Math.floor(planet.tech.level * planet.civilizationStats.nationCount)); // Universities
+
+    // Extract named NPCs from major civilizations
+    const namedNPCs = planet.majorCivilizations.map((civ) => ({
+      id: `${civ.id}_leader`,
+      name: `Leader of ${civ.name}`,
+      role: 'civilization_leader',
+      location: civ.capital,
+    }));
+
+    // Extract major structures from megastructures
+    const majorStructures = planet.megastructures.map((mega) => ({
+      type: mega.type,
+      location: typeof mega.location === 'string' ? { x: 0, y: 0 } : mega.location,
+    }));
+
     return {
       targetPopulation: planet.population.total,
       cityCount: planet.civilizationStats.nationCount,
-      beliefDistribution: new Map(), // TODO: Extract from planet
+      beliefDistribution,
       avgTechLevel: planet.tech.level,
       avgSkillLevel: planet.tech.level / 2,
-      buildingDistribution: new Map(), // TODO: Extract from planet economy
-      namedNPCs: [], // TODO: Extract from planet.majorCivilizations
-      majorStructures: [], // TODO: Extract from planet.megastructures
+      buildingDistribution,
+      namedNPCs,
+      majorStructures,
       factions: planet.majorCivilizations.map((civ: { id: string; name: string; population: number; activeWars: string[] }) => ({
         id: civ.id,
         name: civ.name,
@@ -495,7 +534,62 @@ export class BackgroundUniverseManager {
     }
 
     // Apply cultural traits to civilization stats
-    // TODO: Map cultural traits to civilization properties
+    const culturalTraits = this.mergeCulturalTraits(params.type, params.culturalTraits);
+
+    // Map technophilia to tech level and industrialization
+    if (culturalTraits.technophilia !== undefined) {
+      planet.civilizationStats.avgTechLevel += (culturalTraits.technophilia - 0.5) * 4; // ±2 levels
+      planet.civilizationStats.avgTechLevel = Math.max(0, Math.min(10, planet.civilizationStats.avgTechLevel));
+      planet.tech.level = planet.civilizationStats.avgTechLevel;
+
+      planet.civilizationStats.industrialization += (culturalTraits.technophilia - 0.5) * 4;
+      planet.civilizationStats.industrialization = Math.max(0, Math.min(10, planet.civilizationStats.industrialization));
+    }
+
+    // Map collectivism to government type and nation count
+    if (culturalTraits.collectivism !== undefined) {
+      if (culturalTraits.collectivism > 0.7) {
+        planet.civilizationStats.governmentType = 'unified';
+        planet.civilizationStats.nationCount = Math.max(1, Math.floor(planet.civilizationStats.nationCount / 2));
+      } else if (culturalTraits.collectivism < 0.3) {
+        planet.civilizationStats.governmentType = 'fractured';
+        planet.civilizationStats.nationCount = Math.floor(planet.civilizationStats.nationCount * 1.5);
+      }
+    }
+
+    // Map expansionism to urbanization
+    if (culturalTraits.expansionism !== undefined) {
+      planet.civilizationStats.urbanization += (culturalTraits.expansionism - 0.5) * 0.4; // ±0.2
+      planet.civilizationStats.urbanization = Math.max(0.1, Math.min(1.0, planet.civilizationStats.urbanization));
+    }
+
+    // Map aggressiveness to active wars in civilizations
+    if (culturalTraits.aggressiveness !== undefined && culturalTraits.aggressiveness > 0.6) {
+      const warlikeCount = Math.floor(planet.majorCivilizations.length * culturalTraits.aggressiveness);
+      for (let i = 0; i < warlikeCount && i < planet.majorCivilizations.length; i++) {
+        const civ = planet.majorCivilizations[i];
+        if (civ) {
+          // Add some active wars to warlike civilizations
+          const warCount = Math.floor(Math.random() * 3) + 1;
+          for (let w = 0; w < warCount; w++) {
+            civ.activeWars.push(`war_${civ.id}_${w}`);
+          }
+        }
+      }
+    }
+
+    // Map mysticism to dominant culture
+    if (culturalTraits.mysticism !== undefined) {
+      if (culturalTraits.mysticism > 0.7) {
+        planet.civilizationStats.dominantCulture = 'Mystical';
+      } else if (culturalTraits.technophilia && culturalTraits.technophilia > 0.7) {
+        planet.civilizationStats.dominantCulture = 'Technocratic';
+      } else if (culturalTraits.cooperation !== undefined && culturalTraits.cooperation > 0.7) {
+        planet.civilizationStats.dominantCulture = 'Cooperative';
+      } else if (culturalTraits.xenophobia !== undefined && culturalTraits.xenophobia > 0.7) {
+        planet.civilizationStats.dominantCulture = 'Isolationist';
+      }
+    }
 
     return planet;
   }

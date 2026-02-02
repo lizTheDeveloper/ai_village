@@ -237,8 +237,10 @@ export class EmpireSystem extends BaseSystem {
    * - Autonomy level (higher autonomy = higher loyalty)
    * - Nation stability
    * - Treaty relationships
-   *
-   * TODO: Add more sophisticated loyalty calculation (cultural affinity, historical relations, etc.)
+   * - Cultural affinity (whether cultures match)
+   * - Historical relations (past conflicts/alliances)
+   * - Economic ties (trade relationships, GDP comparisons)
+   * - Religious alignment (matching beliefs)
    */
   private calculateNationLoyalty(
     nation: NationComponent,
@@ -246,28 +248,164 @@ export class EmpireSystem extends BaseSystem {
     autonomy: number
   ): number {
     // Base loyalty from nation's own stability
-    let loyalty = nation.legitimacy * 0.4;
+    let loyalty = nation.legitimacy * 0.25; // Reduced weight to make room for other factors
 
     // Autonomy increases loyalty (nations like independence)
-    loyalty += autonomy * 0.3;
+    loyalty += autonomy * 0.2; // Reduced from 0.3
 
     // Empire's central authority affects loyalty (too much control = resentment)
     const authorityPressure = empire.centralAuthority;
     if (authorityPressure > autonomy) {
       // Empire is too controlling for this nation's autonomy level
-      loyalty -= (authorityPressure - autonomy) * 0.2;
+      loyalty -= (authorityPressure - autonomy) * 0.15; // Reduced from 0.2
     } else {
       // Empire respects nation's autonomy
-      loyalty += 0.1;
+      loyalty += 0.08; // Reduced from 0.1
     }
 
     // Nation at war reduces loyalty (needs imperial protection)
     if (nation.military.warStatus === 'at_war') {
-      loyalty -= 0.1;
+      loyalty -= 0.08;
     }
+
+    // === Cultural Affinity ===
+    // Check if nation's government type aligns with empire's leadership type
+    const governmentAlignment = this.calculateGovernmentAlignment(nation, empire);
+    loyalty += governmentAlignment * 0.15;
+
+    // === Historical Relations ===
+    // Check for past conflicts or alliances
+    const historicalBonus = this.calculateHistoricalRelations(nation, empire);
+    loyalty += historicalBonus * 0.1;
+
+    // === Economic Ties ===
+    // Strong economic ties increase loyalty
+    const economicTies = this.calculateEconomicTies(nation, empire);
+    loyalty += economicTies * 0.15;
+
+    // === Religious Alignment ===
+    // Check if nation's cultural values align with empire
+    // (Using nation stability and empire legitimacy as proxies for shared values)
+    const religiousAlignment = this.calculateReligiousAlignment(nation, empire);
+    loyalty += religiousAlignment * 0.1;
 
     // Clamp to 0-1
     return Math.max(0, Math.min(1, loyalty));
+  }
+
+  /**
+   * Calculate government alignment between nation and empire
+   */
+  private calculateGovernmentAlignment(nation: NationComponent, empire: EmpireComponent): number {
+    const nationGov = nation.leadership.type;
+    const empireGov = empire.leadership.type;
+
+    // Perfect matches
+    if (
+      (nationGov === 'monarchy' && empireGov === 'imperial') ||
+      (nationGov === 'republic' && empireGov === 'federation') ||
+      (nationGov === 'democracy' && empireGov === 'federation')
+    ) {
+      return 1.0;
+    }
+
+    // Partial matches
+    if (
+      (nationGov === 'dictatorship' && empireGov === 'hegemony') ||
+      (nationGov === 'council' && empireGov === 'consortium')
+    ) {
+      return 0.7;
+    }
+
+    // Compatible but different
+    if (
+      (nationGov === 'monarchy' && empireGov === 'hegemony') ||
+      (nationGov === 'republic' && empireGov === 'consortium')
+    ) {
+      return 0.5;
+    }
+
+    // Misaligned (e.g., democracy under dictatorship)
+    if (
+      (nationGov === 'democracy' && (empireGov === 'hegemony' || empireGov === 'imperial')) ||
+      (nationGov === 'dictatorship' && empireGov === 'federation')
+    ) {
+      return 0.2;
+    }
+
+    return 0.5; // Neutral by default
+  }
+
+  /**
+   * Calculate historical relations bonus
+   */
+  private calculateHistoricalRelations(nation: NationComponent, empire: EmpireComponent): number {
+    let bonus = 0;
+
+    // Check for active alliances (positive)
+    const nationAllies = nation.foreignPolicy.allies || [];
+    const empireNations = empire.territory.nations || [];
+    const hasAllies = nationAllies.some((ally: string) => empireNations.includes(ally));
+    if (hasAllies) {
+      bonus += 0.3;
+    }
+
+    // Check for past wars (negative)
+    const hasWarHistory = nation.military.activeWars.some((war) =>
+      war.aggressorNationIds.some((id: string) => empireNations.includes(id)) ||
+      war.defenderNationIds.some((id: string) => empireNations.includes(id))
+    );
+    if (hasWarHistory) {
+      bonus -= 0.4;
+    }
+
+    // Check for treaties (positive)
+    const hasTreaties = nation.foreignPolicy.treaties.some((treaty) =>
+      treaty.signatoryNationIds.some((id: string) => empireNations.includes(id))
+    );
+    if (hasTreaties) {
+      bonus += 0.2;
+    }
+
+    return Math.max(-1, Math.min(1, bonus));
+  }
+
+  /**
+   * Calculate economic ties strength
+   */
+  private calculateEconomicTies(nation: NationComponent, empire: EmpireComponent): number {
+    // Compare GDP to empire's total GDP
+    const nationGDP = nation.economy.gdp;
+    const empireGDP = empire.economy.gdp;
+
+    if (empireGDP === 0) return 0.5; // Neutral if no empire GDP data
+
+    const gdpRatio = nationGDP / empireGDP;
+
+    // Nations with stronger economies relative to empire are less loyal
+    // Nations with weaker economies are more dependent and thus more loyal
+    if (gdpRatio > 0.3) {
+      // Strong independent economy
+      return 0.3;
+    } else if (gdpRatio > 0.1) {
+      // Moderate economy
+      return 0.6;
+    } else {
+      // Weak economy, dependent on empire
+      return 0.9;
+    }
+  }
+
+  /**
+   * Calculate religious/cultural alignment
+   */
+  private calculateReligiousAlignment(nation: NationComponent, empire: EmpireComponent): number {
+    // Use legitimacy as a proxy for shared cultural values
+    // Nations and empires with similar legitimacy levels share values
+    const legitimacyDiff = Math.abs(nation.legitimacy - (empire.stability.imperialLegitimacy / 100));
+
+    // Smaller difference = better alignment
+    return 1.0 - legitimacyDiff;
   }
 
   // ========================================================================

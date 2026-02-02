@@ -362,7 +362,7 @@ Generate the era snapshot now:`;
     }
 
     const totalDuration = identity.incarnationHistory.reduce(
-      (sum, inc) => sum + (inc.duration ?? 0),
+      (sum: number, inc: IncarnationRecord) => sum + (inc.duration ?? 0),
       0
     );
 
@@ -432,10 +432,115 @@ Generate the era snapshot now:`;
   /**
    * Estimate technology level based on world state
    */
-  private estimateTechnologyLevel(_world: World): string {
-    // TODO: Implement based on building types, skills, etc.
-    // For now, return placeholder
-    return 'Early civilization (agriculture, basic crafts)';
+  private estimateTechnologyLevel(world: World): string {
+    // Define building types by era (based on TechnologyUnlockComponent)
+    const buildingsByEra = {
+      primitive: new Set(['tent', 'lean-to', 'campfire', 'bedroll', 'bed', 'storage-box', 'storage-chest', 'workbench']),
+      agricultural: new Set(['farm_shed', 'granary', 'well', 'barn', 'silo', 'mill']),
+      industrial: new Set(['forge', 'workshop', 'loom', 'oven', 'warehouse', 'factory', 'power_plant']),
+      modern: new Set(['library', 'bookstore', 'publishing_company', 'newspaper', 'university', 'research_lab', 'hospital', 'school']),
+      information: new Set(['tv_station', 'radio_station', 'internet_hub', 'data_center', 'telecommunication_tower'])
+    };
+
+    // Query all buildings
+    const buildings = world.query().with('building' as ComponentType).executeEntities();
+
+    // Count buildings by era
+    const eraCounts = {
+      primitive: 0,
+      agricultural: 0,
+      industrial: 0,
+      modern: 0,
+      information: 0
+    };
+
+    for (const building of buildings) {
+      const buildingComp = building.getComponent('building' as ComponentType);
+      if (buildingComp && 'building_type' in buildingComp) {
+        const buildingType = (buildingComp as any).building_type;
+
+        // Check which era this building belongs to
+        for (const [era, types] of Object.entries(buildingsByEra)) {
+          if (types.has(buildingType)) {
+            eraCounts[era as keyof typeof eraCounts]++;
+            break;
+          }
+        }
+      }
+    }
+
+    // Determine highest era with buildings (check from highest to lowest)
+    const eras = ['information', 'modern', 'industrial', 'agricultural', 'primitive'] as const;
+    let highestEra = 'primitive';
+
+    for (const era of eras) {
+      if (eraCounts[era] > 0) {
+        highestEra = era;
+        break;
+      }
+    }
+
+    // Query agents with skills and calculate average skill level
+    const skillfulAgents = world.query().with('skills' as ComponentType).executeEntities();
+    let avgSkillLevel = 0;
+    let totalSkillPoints = 0;
+    let skillCount = 0;
+
+    for (const agent of skillfulAgents) {
+      const skillsComp = agent.getComponent('skills' as ComponentType);
+      if (skillsComp && 'skills' in skillsComp) {
+        const skills = (skillsComp as any).skills;
+        if (typeof skills === 'object') {
+          for (const skillName in skills) {
+            const skillData = skills[skillName];
+            // Skills might be stored as objects with level property or just numbers
+            const skillLevel = typeof skillData === 'number' ? skillData :
+                              (skillData && typeof skillData === 'object' && 'level' in skillData) ? skillData.level : 0;
+            if (typeof skillLevel === 'number' && skillLevel > 0) {
+              totalSkillPoints += skillLevel;
+              skillCount++;
+            }
+          }
+        }
+      }
+    }
+
+    if (skillCount > 0) {
+      avgSkillLevel = totalSkillPoints / skillCount;
+    }
+
+    // Build descriptive string
+    const eraDescriptions: Record<string, string> = {
+      primitive: 'Primitive era (basic shelter, tools)',
+      agricultural: 'Agricultural era (farming, animal husbandry)',
+      industrial: 'Industrial era (crafts, manufacturing)',
+      modern: 'Modern era (education, healthcare, publishing)',
+      information: 'Information age (telecommunications, data networks)'
+    };
+
+    let description = eraDescriptions[highestEra] || 'Early civilization';
+
+    if (buildings.length > 0) {
+      description += ` with ${buildings.length} building${buildings.length !== 1 ? 's' : ''}`;
+
+      // Add specific era building counts if multiple eras are present
+      const presentEras = eras.filter(era => eraCounts[era] > 0);
+      if (presentEras.length > 1) {
+        const eraDetails = presentEras
+          .map(era => `${eraCounts[era]} ${era}`)
+          .join(', ');
+        description += ` (${eraDetails})`;
+      }
+    }
+
+    if (skillfulAgents.length > 0 && avgSkillLevel > 0) {
+      const skillQuality = avgSkillLevel < 20 ? 'novice' :
+                           avgSkillLevel < 50 ? 'apprentice' :
+                           avgSkillLevel < 75 ? 'skilled' : 'master';
+      description += `. Population shows ${skillQuality}-level expertise (avg skill: ${Math.round(avgSkillLevel)})`;
+    }
+
+    return description;
   }
 
   /**

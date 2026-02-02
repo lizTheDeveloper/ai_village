@@ -431,18 +431,32 @@ class UniverseWorker {
   private broadcastDelta(delta: DeltaUpdate): void {
     if (this.connections.size === 0) return;
 
-    // TODO: Apply per-connection viewport filtering to delta updates
-    // For now, broadcast all delta updates to all connections
-
-    const message: WorkerToWindowMessage = {
-      type: 'delta',
-      delta,
-    };
-
     for (const [id, conn] of this.connections) {
       if (!conn.connected) continue;
 
       try {
+        // Filter delta updates by viewport if connection has one
+        let filteredDelta = delta;
+
+        if (conn.viewport) {
+          // Filter entity updates to only include those in viewport
+          const filteredUpdates = delta.updates.filter(update => {
+            // Check if entity position is within viewport
+            return this.isInViewport(update.position, conn.viewport!);
+          });
+
+          // Create filtered delta with only visible entities
+          filteredDelta = {
+            ...delta,
+            updates: filteredUpdates,
+          };
+        }
+
+        const message: WorkerToWindowMessage = {
+          type: 'delta',
+          delta: filteredDelta,
+        };
+
         conn.port.postMessage(message);
         conn.lastActivity = Date.now();
       } catch (error) {
@@ -605,9 +619,63 @@ class UniverseWorker {
       entities[entity.id] = components;
     }
 
-    // Serialize tiles (Note: World doesn't expose tile iteration)
-    // TODO: Use ChunkManager or WorldSerializer for proper tile serialization
+    // Serialize tiles using ChunkManager
     const tiles: any[] = [];
+
+    // Access ChunkManager if available (World may have getChunkManager method)
+    const worldWithChunks = this.gameLoop.world as any;
+    if (typeof worldWithChunks.getChunkManager === 'function') {
+      const chunkManager = worldWithChunks.getChunkManager();
+
+      if (chunkManager) {
+        // Get all loaded chunks
+        const chunks = chunkManager.getLoadedChunks();
+
+        // Serialize tiles from visible chunks (if viewport provided)
+        for (const chunk of chunks) {
+          // Skip chunks outside viewport if viewport filtering is enabled
+          if (viewport) {
+            const chunkWorldX = chunk.x * 32; // CHUNK_SIZE = 32
+            const chunkWorldY = chunk.y * 32;
+            const chunkSize = 32;
+
+            // Check if chunk overlaps with viewport
+            const chunkMinX = chunkWorldX;
+            const chunkMaxX = chunkWorldX + chunkSize;
+            const chunkMinY = chunkWorldY;
+            const chunkMaxY = chunkWorldY + chunkSize;
+
+            const viewportMinX = viewport.x - viewport.width / 2 - (viewport.margin || 50);
+            const viewportMaxX = viewport.x + viewport.width / 2 + (viewport.margin || 50);
+            const viewportMinY = viewport.y - viewport.height / 2 - (viewport.margin || 50);
+            const viewportMaxY = viewport.y + viewport.height / 2 + (viewport.margin || 50);
+
+            // Skip chunk if it doesn't overlap with viewport
+            if (chunkMaxX < viewportMinX || chunkMinX > viewportMaxX ||
+                chunkMaxY < viewportMinY || chunkMinY > viewportMaxY) {
+              continue;
+            }
+          }
+
+          // Serialize tiles from this chunk
+          if (chunk.tiles) {
+            for (let localY = 0; localY < 32; localY++) {
+              for (let localX = 0; localX < 32; localX++) {
+                const tile = chunk.tiles[localY]?.[localX];
+                if (tile) {
+                  tiles.push({
+                    x: chunk.x * 32 + localX,
+                    y: chunk.y * 32 + localY,
+                    type: tile.type,
+                    data: tile,
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+    }
 
     // Extract global state (singletons)
     const globals: Record<string, any> = {};
