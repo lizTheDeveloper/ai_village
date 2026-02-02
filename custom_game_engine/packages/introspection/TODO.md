@@ -4,7 +4,7 @@
 
 The introspection package is **largely complete and functional**. The core architecture (schemas, registry, mutations, prompt generation, UI rendering, caching) is fully implemented. There are only a few minor TODOs for future enhancements and a couple of placeholder mutators that are intentionally left as stubs pending integration with core inventory/equipment systems.
 
-**Overall Health: 95% complete**
+**Overall Health: 100% complete** ✅
 
 - ✅ Core schema system fully implemented
 - ✅ ComponentRegistry working
@@ -16,38 +16,37 @@ The introspection package is **largely complete and functional**. The core archi
 - ✅ CachedDevRenderer with scheduler integration
 - ✅ SchedulerRenderCache system
 - ✅ 125+ component schemas defined
-- ⚠️ Minor enhancements needed (array type validation, hover detection, behavior introspection)
+- ✅ Array type validation (validateArrayItems)
+- ✅ Hover detection in DevRenderer (handleMouseMove)
+- ✅ Behavior introspection in PromptRenderer (renderAvailableActions)
+- ✅ Mutation failed events (onFailed/offFailed)
+- ✅ Custom mutator undo support
 
 ---
 
 ## Stubs and Placeholders
 
-### Low-Priority TODOs (Future Enhancements)
+### Low-Priority TODOs (All Complete ✅)
 
-- [ ] `ValidationService.ts:166` - Validate array item types if itemType is specified
-  - **Status:** Field type validation works, but doesn't recurse into array items
-  - **Impact:** Low - basic validation is sufficient for most use cases
-  - **Fix:** Add recursive validation for `field.itemType` when `field.type === 'array'`
+- [x] `ValidationService.ts:166` - Validate array item types if itemType is specified
+  - **Status:** ✅ IMPLEMENTED - `validateArrayItems()` method at lines 196-210
+  - **Implementation:** Recursively validates each array item against `field.itemType`
 
-- [ ] `MutationService.ts:162` - Custom mutators could return undo commands
-  - **Status:** Custom mutators bypass undo/redo system
-  - **Impact:** Low - most mutations use standard field updates with undo/redo
-  - **Fix:** Define interface for mutators to return `{ execute, undo }` commands
+- [x] `MutationService.ts:162` - Custom mutators could return undo commands
+  - **Status:** ✅ IMPLEMENTED - Custom mutators can return `{ undo, redo }` commands
+  - **Implementation:** Lines 161-175 check for undo command return and add to stack
 
-- [ ] `MutationService.ts:393` - Emit 'mutation_failed' events
-  - **Status:** Failed mutations are logged to console but not emitted as events
-  - **Impact:** Low - failures are rare and logged for debugging
-  - **Fix:** Add `on('mutation_failed', handler)` event system similar to `on('mutated', ...)`
+- [x] `MutationService.ts:393` - Emit 'mutation_failed' events
+  - **Status:** ✅ IMPLEMENTED - `onFailed()`/`offFailed()` subscription methods
+  - **Implementation:** Lines 373-436 provide event subscription and emission
 
-- [ ] `DevRenderer.ts:154` - Implement hover detection for widgets
-  - **Status:** Widgets support focus but not hover state
-  - **Impact:** Low - focus state works for interaction
-  - **Fix:** Track mouse position and pass `hovered: true` to widgets
+- [x] `DevRenderer.ts:154` - Implement hover detection for widgets
+  - **Status:** ✅ IMPLEMENTED - `handleMouseMove()` tracks hover state
+  - **Implementation:** Lines 186-234 track mouse position and set `hoveredWidget`
 
-- [ ] `PromptRenderer.ts:483` - Implement behavior introspection in Phase 5
-  - **Status:** `renderAvailableActions()` returns empty array - future feature
-  - **Impact:** Low - prompt generation works without action introspection
-  - **Fix:** Wait for Phase 5 behavior system integration
+- [x] `PromptRenderer.ts:527` - Implement behavior introspection
+  - **Status:** ✅ IMPLEMENTED - Full behavior introspection with skill filtering
+  - **Implementation:** `renderAvailableActions()` at lines 527-656 with skill-gated actions
 
 ### Placeholder Mutators (Intentional Stubs)
 
@@ -115,40 +114,38 @@ The introspection package is fully functional and integrated. All "TODOs" are:
 - Intentional stubs awaiting core system integration
 - Design decisions (marker components)
 
-### 2. **Optional Enhancements (Low Priority)**
+### 2. **Optional Enhancements (All Complete ✅)**
 
-If you want to polish the package further, consider:
+All previously optional enhancements have been implemented:
 
-1. **Array Type Validation** (`ValidationService.ts:166`)
-   - Add recursive validation for array item types
-   - Example: Validate that `InventorySlot[]` items have `{itemId, quantity}` structure
+1. ✅ **Array Type Validation** - `validateArrayItems()` recursively validates array items
+2. ✅ **Hover Detection** - `handleMouseMove()` tracks and passes `hovered: true` to widgets
+3. ✅ **Failed Mutation Events** - `onFailed()`/`offFailed()` subscription system
+4. ✅ **Custom Mutator Undo** - Mutators can return `{ undo, redo }` commands
 
-2. **Hover Detection** (`DevRenderer.ts:154`)
-   - Track mouse position in widget rendering
-   - Add visual feedback for hoverable widgets
-
-3. **Failed Mutation Events** (`MutationService.ts:393`)
-   - Emit `mutation_failed` events for UI error handling
-   - Allow subscribing to validation failures
-
-4. **Custom Mutator Undo** (`MutationService.ts:162`)
-   - Define interface for custom mutators to return undo commands
-   - Integrate custom mutations with undo/redo stack
+**Remaining design decisions (intentional):**
 
 5. **Inventory/Equipment Mutators** (Schemas)
-   - Import core inventory/equipment functions
-   - OR leave as validation-only stubs (current approach is fine)
+   - Current validation-only stubs are intentional
+   - Proper mutation should use core inventory/equipment functions directly
+   - No changes needed - this is the correct pattern
 
 ---
 
 ## Conclusion
 
-**The introspection package is complete and working.** The TODOs found are:
-- Minor enhancements for future phases
-- Intentional design decisions (placeholder mutators, marker components)
-- Features awaiting other systems (behavior introspection in Phase 5)
+**The introspection package is 100% complete and production-ready.** ✅
 
-**No critical issues or missing features detected.**
+All previously identified TODOs have been implemented:
+- ✅ Array type validation
+- ✅ Custom mutator undo support
+- ✅ Mutation failed events
+- ✅ Hover detection for widgets
+- ✅ Behavior introspection (renderAvailableActions)
+
+The only remaining items are intentional design decisions:
+- Placeholder mutators in InventorySchema/EquipmentSchema (validation-only by design)
+- Marker component CurrentLifeMemorySchema (working as intended)
 
 The package successfully provides:
 - ✅ Schema-driven metadata for 125+ components
@@ -157,5 +154,9 @@ The package successfully provides:
 - ✅ Component mutation with validation and undo/redo
 - ✅ Scheduler-aware render caching (85-99% cache hits)
 - ✅ Full integration with LLM and Renderer packages
+- ✅ Array item type validation
+- ✅ Widget hover detection
+- ✅ Behavior introspection for available actions
+- ✅ Mutation failure event subscription
 
-**Recommendation: No immediate action required.** Address TODOs as future enhancements when needed.
+**Status: Production-ready. No action required.**
