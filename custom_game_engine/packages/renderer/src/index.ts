@@ -65,6 +65,7 @@ export * from './PlanetCreationScreen.js';
 export * from './CosmicHubManager.js';
 export * from './UniverseGalleryScreen.js';
 export * from './PlanetListScreen.js';
+export * from './PlanetJoinScreen.js';
 export * from './LivePlanetCreationScreen.js';
 export * from './SettlementSelectionScreen.js';
 export * from './UniverseBrowserScreen.js';

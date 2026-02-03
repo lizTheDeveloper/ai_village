@@ -138,6 +138,7 @@ import {
   TimelinePanel,
   UniverseConfigScreen,
   UniverseBrowserScreen,
+  PlanetJoinScreen,
   type UniverseBrowserResult,
   type GameStartConfig,
   SettlementSelectionScreen,
@@ -4114,20 +4115,133 @@ async function main() {
   } else if (browserResult && browserResult.action === 'join_universe' && browserResult.universeId) {
     // Join an existing universe from the server (possibly on a specific planet)
     console.log(`[Demo] Joining universe ${browserResult.universeId}${browserResult.planetId ? ` on planet ${browserResult.planetId}` : ''}`);
-    try {
-      const API_BASE = 'http://localhost:3001/api';
-      const response = await fetch(`${API_BASE}/multiverse/universe/${browserResult.universeId}/snapshot/latest`);
-      if (!response.ok) throw new Error('Failed to fetch latest snapshot from server');
-      const data = await response.json();
 
-      if (data.snapshot) {
+    // Show the PlanetJoinScreen and wait for user to confirm entry
+    const joinResult = await new Promise<{ success: boolean; snapshot?: any }>((resolve) => {
+      const API_BASE = 'http://localhost:3001/api';
+
+      // Fetch universe and planet names for display
+      let universeName = 'Unknown Universe';
+      let planetName = 'Unknown Planet';
+
+      const planetJoinScreen = new PlanetJoinScreen('planet-join-screen', {
+        onEnterPlanet: () => {
+          planetJoinScreen.hide();
+          planetJoinScreen.destroy();
+          resolve({ success: true, snapshot: (planetJoinScreen as any)._loadedSnapshot });
+        },
+        onBack: () => {
+          planetJoinScreen.hide();
+          planetJoinScreen.destroy();
+          resolve({ success: false });
+        },
+      });
+
+      // Start loading
+      (async () => {
+        try {
+          // Fetch universe info
+          const universeRes = await fetch(`${API_BASE}/multiverse/universe/${browserResult.universeId}`);
+          if (universeRes.ok) {
+            const universeData = await universeRes.json();
+            universeName = universeData.universe?.name || 'Unknown Universe';
+          }
+
+          // Fetch planet info if specified
+          if (browserResult.planetId) {
+            const planetRes = await fetch(`${API_BASE}/multiverse/planet/${browserResult.planetId}`);
+            if (planetRes.ok) {
+              const planetData = await planetRes.json();
+              planetName = planetData.planet?.name || 'Unknown Planet';
+            }
+          } else {
+            planetName = 'All Planets';
+          }
+
+          // Show the screen
+          planetJoinScreen.show(planetName, universeName);
+          planetJoinScreen.setLoadingMessage('Fetching universe snapshot...');
+
+          // Fetch snapshot
+          const response = await fetch(`${API_BASE}/multiverse/universe/${browserResult.universeId}/snapshot/latest`);
+          if (!response.ok) throw new Error('Failed to fetch latest snapshot from server');
+          const data = await response.json();
+
+          if (!data.snapshot) throw new Error('No snapshot data in response');
+
+          // Store snapshot for later use
+          (planetJoinScreen as any)._loadedSnapshot = data.snapshot;
+
+          planetJoinScreen.setLoadingMessage('Extracting species data...');
+
+          // Extract species from entities in the snapshot
+          // Note: Component data is nested under .data (e.g., animalComp.data.speciesId)
+          const speciesList: Array<{ name: string; type: string; biome?: string }> = [];
+          const seenSpecies = new Set<string>();
+
+          for (const universeSnapshot of data.snapshot.universes || []) {
+            for (const entityData of universeSnapshot.entities || []) {
+              // Check for animal component - species is in .data.speciesId or .data.name
+              const animalComp = entityData.components?.find((c: any) => c.type === 'animal');
+              if (animalComp?.data) {
+                const speciesName = animalComp.data.name || animalComp.data.speciesId;
+                if (speciesName && !seenSpecies.has(speciesName)) {
+                  seenSpecies.add(speciesName);
+                  const posComp = entityData.components?.find((c: any) => c.type === 'position');
+                  speciesList.push({
+                    name: speciesName,
+                    type: 'animal',
+                    biome: animalComp.data.biome || posComp?.data?.biome,
+                  });
+                }
+              }
+
+              // Check for plant component - species is in .data.speciesId
+              const plantComp = entityData.components?.find((c: any) => c.type === 'plant');
+              if (plantComp?.data?.speciesId && !seenSpecies.has(plantComp.data.speciesId)) {
+                seenSpecies.add(plantComp.data.speciesId);
+                speciesList.push({
+                  name: plantComp.data.speciesId,
+                  type: 'plant',
+                  biome: plantComp.data.biome,
+                });
+              }
+
+              // Check for agent/identity component (NPCs) - species is in identity.data.species
+              const identityComp = entityData.components?.find((c: any) => c.type === 'identity');
+              if (identityComp?.data?.species && !seenSpecies.has(identityComp.data.species)) {
+                seenSpecies.add(identityComp.data.species);
+                speciesList.push({
+                  name: identityComp.data.species,
+                  type: 'agent',
+                  biome: 'settlement',
+                });
+              }
+            }
+          }
+
+          console.log(`[Demo] Found ${speciesList.length} species in snapshot`);
+
+          // Update screen with species
+          planetJoinScreen.setSpecies(speciesList);
+
+        } catch (error) {
+          console.error('[Demo] Failed to load snapshot for join screen:', error);
+          planetJoinScreen.setLoadingMessage(`Error: ${(error as Error).message}`);
+          planetJoinScreen.setLoadingComplete();
+        }
+      })();
+    });
+
+    if (joinResult.success && joinResult.snapshot) {
+      try {
         // Apply the snapshot to the world
         const worldImpl = gameLoop.world as any;
         worldImpl._entities.clear();
 
         // Import worldSerializer for deserialization
         const { worldSerializer } = await import('@ai-village/core');
-        for (const universeSnapshot of data.snapshot.universes || []) {
+        for (const universeSnapshot of joinResult.snapshot.universes || []) {
           await worldSerializer.deserializeWorld(universeSnapshot, gameLoop.world);
         }
 
@@ -4142,12 +4256,26 @@ async function main() {
         if (browserResult.planetId) {
           (gameLoop.world as any)._joinedPlanetId = browserResult.planetId;
         }
-      } else {
-        throw new Error('No snapshot data in response');
+      } catch (error) {
+        console.error('[Demo] Failed to deserialize snapshot:', error);
+        // Fall back to showing universe creation screen
+        universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
+          universeConfigScreen = new UniverseConfigScreen();
+          universeConfigScreen.show((config) => {
+            universeConfig = config;
+            resolve({ type: 'new', magicParadigm: config.magicParadigmId || 'none' });
+          });
+        });
       }
-    } catch (error) {
-      console.error('[Demo] Failed to join universe from server:', error);
-      // Fall back to showing universe creation screen
+    } else {
+      // User cancelled - go back to browser
+      const browserScreen = new UniverseBrowserScreen();
+      browserResult = await new Promise<UniverseBrowserResult>((res) => {
+        browserScreen.show(res);
+      });
+      browserScreen.hide();
+      browserScreen.destroy();
+      // Re-process the result (recursive handling would be complex, so just show creation screen as fallback)
       universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
         universeConfigScreen = new UniverseConfigScreen();
         universeConfigScreen.show((config) => {

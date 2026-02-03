@@ -547,17 +547,52 @@ export class UniverseBrowserScreen {
     createButton.onclick = async () => {
       if (this._onSelect) {
         this.hide();
-        // Launch the cosmic creation flow
-        const manager = new CosmicHubManager(createLocalStorageCallbacks());
+        // Unified flow: Create universe on server, then show LivePlanetCreationScreen with sprites
         try {
-          const cosmicConfig = await manager.showAndWaitForGameStart();
-          this._onSelect({ action: 'cosmic_start', cosmicConfig });
+          // First create a universe on the server
+          const universeId = `universe:${Date.now()}`;
+          const universeName = this.generateUniverseName();
+
+          const universeResponse = await fetch(`${this.API_BASE}/multiverse/universe`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: universeId,
+              name: universeName,
+              ownerId: getPlayerId(),
+              createdAt: Date.now(),
+              magicPreset: 'classic_fantasy',
+            }),
+          });
+
+          if (!universeResponse.ok) {
+            console.warn('[UniverseBrowser] Failed to create universe on server, falling back to cosmic hub');
+            // Fall back to the old CosmicHubManager flow
+            const manager = new CosmicHubManager(createLocalStorageCallbacks());
+            try {
+              const cosmicConfig = await manager.showAndWaitForGameStart();
+              this._onSelect({ action: 'cosmic_start', cosmicConfig });
+            } finally {
+              manager.destroy();
+            }
+            return;
+          }
+
+          // Show LivePlanetCreationScreen with sprites
+          this.showLivePlanetCreation(universeId, universeName);
         } catch (error) {
-          console.error('[UniverseBrowser] Cosmic creation cancelled or failed:', error);
-          // Return to browser screen
-          this.show(this._onSelect);
-        } finally {
-          manager.destroy();
+          console.error('[UniverseBrowser] Universe creation failed:', error);
+          // Fall back to old flow on error
+          const manager = new CosmicHubManager(createLocalStorageCallbacks());
+          try {
+            const cosmicConfig = await manager.showAndWaitForGameStart();
+            this._onSelect({ action: 'cosmic_start', cosmicConfig });
+          } catch (innerError) {
+            console.error('[UniverseBrowser] Cosmic creation also failed:', innerError);
+            this.show(this._onSelect);
+          } finally {
+            manager.destroy();
+          }
         }
       }
     };
@@ -770,6 +805,17 @@ export class UniverseBrowserScreen {
       this.timelineView.destroy();
       this.timelineView = null;
     }
+  }
+
+  /**
+   * Generate a random universe name
+   */
+  private generateUniverseName(): string {
+    const prefixes = ['Aether', 'Void', 'Cosmic', 'Celestial', 'Starborn', 'Nether', 'Primal', 'Astral', 'Ether', 'Divine'];
+    const suffixes = ['Realm', 'Domain', 'Expanse', 'Horizon', 'Sanctum', 'Haven', 'Nexus', 'Sphere', 'Verse', 'Plane'];
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+    return `${prefix} ${suffix}`;
   }
 
   private createTab(text: string, isActive: boolean, onClick: () => void, disabled: boolean = false): HTMLElement {
