@@ -373,14 +373,15 @@ export class ThreatResponseSystem extends BaseSystem {
     // Skip projectiles already past the agent
     if (projectileComp.expired || projectileComp.hit) return null;
 
-    // Calculate distance to projectile
+    // Calculate distance to projectile (use squared distance for range check)
     const dx = projectilePos.x - agentPos.x;
     const dy = projectilePos.y - agentPos.y;
     const distSq = dx * dx + dy * dy;
-    const distance = Math.sqrt(distSq);
 
-    // Only detect projectiles within 25 tiles
-    if (distance > 25) return null;
+    // Only detect projectiles within 25 tiles (squared comparison avoids sqrt)
+    if (distSq > 25 * 25) return null;
+
+    const distance = Math.sqrt(distSq);
 
     // Get projectile velocity
     const velocity = projectile.getComponent<any>(CT.Velocity) ?? projectileComp.velocity;

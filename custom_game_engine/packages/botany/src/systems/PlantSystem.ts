@@ -1164,7 +1164,7 @@ export class PlantSystem extends BaseSystem {
   private static readonly COMPANION_PENALTY = PLANT_CONSTANTS.COMPANION_PENALTY;
 
   /** Cache of nearby plants per position (cleared each update) */
-  private nearbyPlantsCache: Map<string, Array<{ speciesId: string; distance: number }>> = new Map();
+  private nearbyPlantsCache: Map<string, Array<{ speciesId: string; distanceSquared: number }>> = new Map();
 
   /** Chunk size for spatial queries (must match world package) */
   private static readonly CHUNK_SIZE = 32;
@@ -1178,14 +1178,14 @@ export class PlantSystem extends BaseSystem {
     position: { x: number; y: number },
     world: World,
     excludeEntityId: string
-  ): Array<{ speciesId: string; distance: number }> {
+  ): Array<{ speciesId: string; distanceSquared: number }> {
     const cacheKey = `${position.x},${position.y}`;
 
     if (this.nearbyPlantsCache.has(cacheKey)) {
       return this.nearbyPlantsCache.get(cacheKey)!;
     }
 
-    const nearbyPlants: Array<{ speciesId: string; distance: number }> = [];
+    const nearbyPlants: Array<{ speciesId: string; distanceSquared: number }> = [];
 
     // PERFORMANCE: Use chunk-based spatial query instead of global query
     // For COMPANION_RADIUS=3 and CHUNK_SIZE=32, we query a 3x3 chunk grid
@@ -1218,11 +1218,9 @@ export class PlantSystem extends BaseSystem {
           const distanceSquared = pdx * pdx + pdy * pdy;
 
           if (distanceSquared <= PlantSystem.COMPANION_RADIUS_SQUARED && distanceSquared > 0) {
-            // Only compute actual distance when needed (for distance falloff calculation)
-            const distance = Math.sqrt(distanceSquared);
             nearbyPlants.push({
               speciesId: plantComp.speciesId,
-              distance
+              distanceSquared
             });
           }
         }
@@ -1260,7 +1258,8 @@ export class PlantSystem extends BaseSystem {
     // Check which nearby plants affect this plant
     for (const nearby of nearbyPlants) {
       // Distance-based effect falloff (closer = stronger)
-      const distanceFactor = 1 - (nearby.distance / PlantSystem.COMPANION_RADIUS);
+      // Use squared distance ratio to avoid Math.sqrt: 1 - (d²/R²) gives similar falloff curve
+      const distanceFactor = 1 - (nearby.distanceSquared / PlantSystem.COMPANION_RADIUS_SQUARED);
 
       // Check if this nearby plant benefits from us
       // (We need to check the nearby plant's species for what it benefits)

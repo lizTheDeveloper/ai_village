@@ -99,6 +99,10 @@ export class TemperatureSystem extends BaseSystem {
   private tileInsulationCacheLastUpdate: number = 0;
   private readonly TILE_CACHE_DURATION = 50; // Refresh every 50 ticks (walls don't change often)
 
+  // Performance: Cache agent query results per tick
+  private agentQueryCache: ReadonlyArray<Entity> | null = null;
+  private agentQueryCacheTick = -1;
+
   protected onUpdate(ctx: SystemContext): void {
     // Calculate world ambient temperature (uses cached time entity)
     this.currentWorldTemp = this.calculateWorldTemperature(ctx.world);
@@ -131,12 +135,18 @@ export class TemperatureSystem extends BaseSystem {
     // Set to track entities that should be simulated this tick
     const activeEntityIds = new Set<string>();
 
-    // Fast path: Use chunk queries to find entities near agents (O(M × E_chunk))
-    if (ctx.world.spatialQuery) {
-      const agents = ctx.world.query()
+    // Cache agent query per tick (avoids redundant world query)
+    if (this.agentQueryCacheTick !== ctx.tick) {
+      this.agentQueryCache = ctx.world.query()
         .with(CT.Agent)
         .with(CT.Position)
         .executeEntities();
+      this.agentQueryCacheTick = ctx.tick;
+    }
+    const agents = this.agentQueryCache!;
+
+    // Fast path: Use chunk queries to find entities near agents (O(M × E_chunk))
+    if (ctx.world.spatialQuery) {
 
       for (const agent of agents) {
         const agentImpl = agent as EntityImpl;
@@ -161,10 +171,7 @@ export class TemperatureSystem extends BaseSystem {
       }
     } else {
       // Fallback: Global query with distance checking (O(N × M))
-      const agentPositions = ctx.world.query()
-        .with(CT.Agent)
-        .with(CT.Position)
-        .executeEntities()
+      const agentPositions = agents
         .map(e => (e as EntityImpl).getComponent<PositionComponent>(CT.Position)!);
 
       for (const entity of temperatureEntities) {

@@ -2412,18 +2412,29 @@ export class AdminAngelSystem extends BaseSystem {
   /**
    * Check if agent is near food storage
    */
+  // Cached storage query for food proximity checks
+  private storageQueryCache: ReadonlyArray<Entity> | null = null;
+  private storageQueryCacheTick = -1;
+
   private checkForNearbyFood(world: World, agent: Entity): boolean {
     const pos = agent.getComponent(CT.Position) as { x: number; y: number } | undefined;
     if (!pos) return false;
 
-    const storages = world.query().with(CT.Building).with(CT.Inventory).executeEntities();
+    // Cache storage query per tick (avoids O(all buildings) per hungry agent)
+    if (this.storageQueryCacheTick !== world.tick) {
+      this.storageQueryCache = world.query().with(CT.Building).with(CT.Inventory).executeEntities();
+      this.storageQueryCacheTick = world.tick;
+    }
 
-    for (const storage of storages) {
+    const radiusSquared = 5 * 5; // 5 tiles squared
+
+    for (const storage of this.storageQueryCache!) {
       const storagePos = storage.getComponent(CT.Position) as { x: number; y: number } | undefined;
       if (!storagePos) continue;
 
-      const dist = Math.sqrt((pos.x - storagePos.x) ** 2 + (pos.y - storagePos.y) ** 2);
-      if (dist < 5) { // Within 5 tiles
+      const dx = pos.x - storagePos.x;
+      const dy = pos.y - storagePos.y;
+      if (dx * dx + dy * dy < radiusSquared) {
         const inv = storage.getComponent(CT.Inventory) as { slots: Array<{ itemId: string; quantity: number } | null> } | undefined;
         if (inv) {
           const hasFood = inv.slots.some(slot => slot && slot.itemId === 'food' && slot.quantity > 0);

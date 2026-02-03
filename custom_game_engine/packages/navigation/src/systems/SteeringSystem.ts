@@ -57,6 +57,9 @@ export class SteeringSystem extends BaseSystem {
   // Track stuck agents for pathfinding fallback
   private stuckTracker: Map<string, { lastPos: Vector2; stuckTime: number; target: Vector2 }> = new Map();
 
+  // Reusable obstacles array to avoid per-entity allocation in obstacle avoidance
+  private _obstacleBuffer: Array<{ entity: Entity; radius: number }> = [];
+
   // Configuration constants from JSON
   private readonly CHUNK_SIZE = 32; // From collision config
   private readonly STUCK_DETECTION_TIME = steeringConfig.arrive.stuckDetectionTime;
@@ -171,14 +174,15 @@ export class SteeringSystem extends BaseSystem {
   /**
    * Seek behavior - move toward target
    */
-  private _seek(position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent): Vector2 {
-    if (!steering.target) {
+  private _seek(position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent, targetOverride?: Vector2): Vector2 {
+    const target = targetOverride ?? steering.target;
+    if (!target) {
       throw new Error('Seek behavior requires target position');
     }
 
     const desired = {
-      x: steering.target.x - position.x,
-      y: steering.target.y - position.y,
+      x: target.x - position.x,
+      y: target.y - position.y,
     };
 
     // PERFORMANCE: sqrt required for normalization to create unit vector
@@ -318,9 +322,10 @@ export class SteeringSystem extends BaseSystem {
     const chunkX = Math.floor(position.x / this.CHUNK_SIZE);
     const chunkY = Math.floor(position.y / this.CHUNK_SIZE);
 
-    // Collect obstacles from nearby chunks
+    // Collect obstacles from nearby chunks (reuse buffer to avoid allocation)
     // Check for: PhysicsComponent (solid=true), BuildingComponent (blocksMovement=true)
-    const obstacles: Array<{ entity: Entity; radius: number }> = [];
+    this._obstacleBuffer.length = 0;
+    const obstacles = this._obstacleBuffer;
     for (let dx = -1; dx <= 1; dx++) {
       for (let dy = -1; dy <= 1; dy++) {
         const nearbyEntityIds = world.getEntitiesInChunk(chunkX + dx, chunkY + dy);
@@ -460,7 +465,7 @@ export class SteeringSystem extends BaseSystem {
       y: circleCenter.y + Math.sin(steering.wanderAngle) * wanderRadius,
     };
 
-    return this._seek(position, velocity, { ...steering, target });
+    return this._seek(position, velocity, steering, target);
   }
 
   /**
@@ -511,7 +516,7 @@ export class SteeringSystem extends BaseSystem {
     if (position.x < bounds.minX || position.x > bounds.maxX ||
         position.y < bounds.minY || position.y > bounds.maxY) {
       const seekTarget = { x: centerX, y: centerY };
-      return this._seek(position, velocity, { ...steering, target: seekTarget });
+      return this._seek(position, velocity, steering, seekTarget);
     }
 
     return { x: forceX, y: forceY };
@@ -533,7 +538,7 @@ export class SteeringSystem extends BaseSystem {
 
       switch (behavior.type) {
         case 'seek':
-          force = this._seek(position, velocity, { ...steering, target: behavior.target });
+          force = this._seek(position, velocity, steering, behavior.target);
           break;
 
         case 'obstacle_avoidance':
@@ -556,9 +561,10 @@ export class SteeringSystem extends BaseSystem {
    * Limit vector magnitude
    */
   private _limit(vector: Vector2, max: number): Vector2 {
-    // PERFORMANCE: sqrt required for normalization when clamping vector to max length
-    const magnitude = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
-    if (magnitude > max) {
+    // Use squared comparison to avoid sqrt in the common case (within limit)
+    const magSq = vector.x * vector.x + vector.y * vector.y;
+    if (magSq > max * max) {
+      const magnitude = Math.sqrt(magSq);
       return {
         x: (vector.x / magnitude) * max,
         y: (vector.y / magnitude) * max,
