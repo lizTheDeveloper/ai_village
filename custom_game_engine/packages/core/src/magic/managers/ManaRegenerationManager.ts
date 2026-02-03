@@ -120,8 +120,9 @@ export class ManaRegenerationManager {
    * @param entity The entity to synchronize
    * @param manaPools The entity's mana pools component
    * @param paradigmState The entity's paradigm state component
+   * @param currentTick The current game tick (for event throttling)
    */
-  syncFaithAndFavor(entity: EntityImpl, manaPools: ManaPoolsComponent, paradigmState: ParadigmStateComponent): void {
+  syncFaithAndFavor(entity: EntityImpl, manaPools: ManaPoolsComponent, paradigmState: ParadigmStateComponent, currentTick: number = 0): void {
     // Only sync for divine paradigm users
     const spellKnowledge = entity.getComponent(CT.SpellKnowledgeComponent);
     const knownParadigmIds = (spellKnowledge && 'knownParadigmIds' in spellKnowledge && Array.isArray(spellKnowledge.knownParadigmIds)) ? spellKnowledge.knownParadigmIds : [];
@@ -143,8 +144,6 @@ export class ManaRegenerationManager {
     // Check if favor has reached critical levels (|favor| > 80)
     // Only emit once per 10 minutes (12000 ticks) per agent to avoid spam
     const lastCheck = this.lastFavorCheckTick.get(entity.id) || 0;
-    // EntityImpl doesn't have world property - we need to pass tick from outside or skip tick-based checks
-    const currentTick = 0; // TODO: Pass current tick as parameter to syncFaithAndFavor
     if (this.eventBus && Math.abs(normalizedFavor) > 80 && currentTick - lastCheck > 12000) {
       const deityId = spiritual.believedDeity;
 

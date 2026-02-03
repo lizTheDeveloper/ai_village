@@ -19,8 +19,8 @@ export interface IActionQueue {
   /** Get currently executing action for an entity */
   getExecuting(entityId: EntityId): Action | undefined;
 
-  /** Cancel an action */
-  cancel(actionId: string, reason: string): boolean;
+  /** Cancel an action. Pass world to trigger interrupt handlers for executing actions. */
+  cancel(actionId: string, reason: string, world?: WorldMutator): boolean;
 
   /** Process all actions (called each tick) */
   process(world: WorldMutator): void;
@@ -87,15 +87,22 @@ export class ActionQueue implements IActionQueue {
     return id ? this.actions.get(id) : undefined;
   }
 
-  cancel(actionId: string, reason: string): boolean {
+  cancel(actionId: string, reason: string, world?: WorldMutator): boolean {
     const action = this.actions.get(actionId);
     if (!action) return false;
 
     if (action.status === 'executing') {
-      // TODO: Call interrupt handler when world reference is available
-      // Currently cancel() doesn't receive a world parameter, but handler.onInterrupt() requires it.
-      // This is a known limitation - interrupt cleanup effects are not applied during cancellation.
-      // To fix: Either (1) add world param to cancel(), or (2) store world ref in ActionQueue.
+      // Call interrupt handler if world is available
+      if (world) {
+        const handler = this.registry.get(action.type);
+        if (handler && handler.onInterrupt) {
+          try {
+            handler.onInterrupt(action, world, reason);
+          } catch (e) {
+            console.error(`[ActionQueue] Interrupt handler failed for ${action.type}:`, e);
+          }
+        }
+      }
 
       this.executingByEntity.delete(action.actorId);
       this.executingActions.delete(actionId);

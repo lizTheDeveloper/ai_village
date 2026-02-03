@@ -592,14 +592,26 @@ export class StellarMiningSystem extends BaseSystem {
   ): { entity: Entity; component: WarehouseComponent } | null {
     const warehouses = world.query().with('warehouse').executeEntities();
 
+    // First pass: find warehouse matching both resource type and civilization ownership
     for (const warehouseEntity of warehouses) {
       const warehouse = warehouseEntity.getComponent<WarehouseComponent>('warehouse');
       if (!warehouse) continue;
 
-      // Check if warehouse matches resource type
       if (warehouse.resourceType === resourceType) {
-        // TODO: Verify warehouse belongs to civilization
-        // For now, return first matching warehouse
+        // Verify warehouse belongs to this civilization via building ownership
+        const building = warehouseEntity.getComponent('building') as { ownerId?: string } | undefined;
+        if (building?.ownerId === civilizationId) {
+          return { entity: warehouseEntity, component: warehouse };
+        }
+      }
+    }
+
+    // Fallback: return first matching warehouse if no faction-specific match found
+    for (const warehouseEntity of warehouses) {
+      const warehouse = warehouseEntity.getComponent<WarehouseComponent>('warehouse');
+      if (!warehouse) continue;
+
+      if (warehouse.resourceType === resourceType) {
         return { entity: warehouseEntity, component: warehouse };
       }
     }

@@ -212,7 +212,7 @@ export class MagicSystem extends BaseSystem {
 
     // Process each entity with magic
     for (const entity of ctx.activeEntities) {
-      this.processMagicEntity(entity, ctx.deltaTime);
+      this.processMagicEntity(entity, ctx.deltaTime, ctx.tick);
     }
 
     // Process active spell casts (multi-tick spells)
@@ -234,7 +234,7 @@ export class MagicSystem extends BaseSystem {
    * Process a single entity with magic.
    * Delegates to regeneration manager.
    */
-  private processMagicEntity(entity: EntityImpl, deltaTime: number): void {
+  private processMagicEntity(entity: EntityImpl, deltaTime: number, currentTick: number): void {
     const magic = entity.getComponent<MagicComponent>(CT.Magic);
     if (!magic || !magic.magicUser || !this.regenManager) return;
 
@@ -248,7 +248,7 @@ export class MagicSystem extends BaseSystem {
     if (!paradigmState) return;
 
     // Sync faith/favor for divine users
-    this.regenManager.syncFaithAndFavor(entity, manaPools as ManaPoolsComponent, paradigmState as ParadigmStateComponent);
+    this.regenManager.syncFaithAndFavor(entity, manaPools as ManaPoolsComponent, paradigmState as ParadigmStateComponent, currentTick);
   }
 
   // =========================================================================

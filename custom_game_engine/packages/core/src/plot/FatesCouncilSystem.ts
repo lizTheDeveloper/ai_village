@@ -306,13 +306,24 @@ export class FatesCouncilSystem extends BaseSystem {
     // Calculate world tension
     const worldTension = this.calculateWorldTension(world, allThreads);
 
-    // Count active exotic/epic plots
+    // Count active exotic/epic plots by checking actual scales
     let activeExotic = 0;
     let activeEpic = 0;
-    for (const thread of allThreads) {
-      // Count plot types from instance IDs
-      // TODO: Actually check plot scale
-      activeExotic += thread.activePlots.length;  // Simplified for now
+
+    // We need to query PlotLinesComponent again to get the actual scales
+    // (The thread.activePlots only contains IDs, not the full instances with scale)
+    const allEntitiesWithPlots = world.query().with(CT.PlotLines).executeEntities();
+    for (const entity of allEntitiesWithPlots) {
+      const plotLines = entity.getComponent<PlotLinesComponent>(CT.PlotLines);
+      if (!plotLines) continue;
+
+      for (const plot of plotLines.active) {
+        if (plot.scale === 'exotic') {
+          activeExotic++;
+        } else if (plot.scale === 'epic') {
+          activeEpic++;
+        }
+      }
     }
 
     return {

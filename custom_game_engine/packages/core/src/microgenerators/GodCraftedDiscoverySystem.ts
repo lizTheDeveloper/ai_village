@@ -199,10 +199,18 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
         const spellData = content.data as SpellData;
         return spellData.powerLevel ?? 5;
       }
-      case 'legendary_item':
-      case 'technology':
-        // TODO: Extract from item/tech data
+      case 'legendary_item': {
+        const itemData = content.data as LegendaryItemData;
+        // Power level based on number of legendary powers (1 power = ~3, 2 = ~5, 3+ = ~7+)
+        const powerCount = itemData.lore?.powers?.length ?? 0;
+        return Math.min(10, 1 + powerCount * 2);
+      }
+      case 'technology': {
+        // Estimate power from tags: 'advanced' = 7, 'basic' = 3, default = 5
+        if (content.tags.includes('advanced') || content.tags.includes('endgame')) return 7;
+        if (content.tags.includes('basic') || content.tags.includes('starter')) return 3;
         return 5;
+      }
       default:
         // Riddles, recipes have no power level
         return 0;

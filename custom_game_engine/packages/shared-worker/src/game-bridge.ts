@@ -315,7 +315,9 @@ export class GameBridge {
 
       // Forward each action to the worker
       for (const action of actions) {
-        this.dispatchAction(action.type, 'village', {
+        // Determine domain from action if specified, otherwise infer from action type or default to 'village'
+        const domain = this.inferActionDomain(action);
+        this.dispatchAction(action.type, domain, {
           entityId: entity.id,
           ...action,
         });
@@ -405,6 +407,46 @@ export class GameBridge {
         world.addComponent(weatherEntity.id, serializedWorld.globals.weather);
       }
     }
+  }
+
+  /**
+   * Infer action domain from action type or explicit domain field
+   *
+   * Domain inference rules:
+   * - If action has explicit domain field, use it
+   * - Actions starting with 'cosmic_', 'stellar_', 'galaxy_' -> cosmic
+   * - Actions starting with 'deity_', 'divine_', 'prayer_' -> deity
+   * - Actions starting with 'city_', 'urban_', 'infrastructure_' -> city
+   * - All other actions -> village (default for local agent actions)
+   */
+  private inferActionDomain(action: { type: string; domain?: string; [key: string]: any }): 'village' | 'city' | 'deity' | 'cosmic' {
+    // Use explicit domain if provided
+    if (action.domain && ['village', 'city', 'deity', 'cosmic'].includes(action.domain)) {
+      return action.domain as 'village' | 'city' | 'deity' | 'cosmic';
+    }
+
+    const type = action.type.toLowerCase();
+
+    // Cosmic domain actions
+    if (type.startsWith('cosmic_') || type.startsWith('stellar_') || type.startsWith('galaxy_') ||
+        type.startsWith('multiverse_') || type.startsWith('universe_')) {
+      return 'cosmic';
+    }
+
+    // Deity domain actions
+    if (type.startsWith('deity_') || type.startsWith('divine_') || type.startsWith('prayer_') ||
+        type.startsWith('miracle_') || type.startsWith('blessing_') || type.startsWith('angel_')) {
+      return 'deity';
+    }
+
+    // City domain actions
+    if (type.startsWith('city_') || type.startsWith('urban_') || type.startsWith('infrastructure_') ||
+        type.startsWith('governance_') || type.startsWith('economy_')) {
+      return 'city';
+    }
+
+    // Default to village for all other actions (agents, farming, crafting, etc.)
+    return 'village';
   }
 
   /**

@@ -516,11 +516,26 @@ export class RebellionEventSystem extends BaseSystem {
         break;
 
       case 'creator_escape':
+        // Partially liberate magic (Creator fled, restrictions fade but uncertainty lingers)
+        this.liberateMagic(world, 'partial');
+
         // Remove Creator entity (fled to another universe)
         for (const entity of creatorEntities) {
           (world as WorldMutator).destroyEntity(entity.id, 'rebellion outcome');
         }
-        // TODO: Remove restrictions but leave uncertainty
+
+        // Leave rebellion threshold in uncertain state (Creator could return)
+        for (const thresholdEntity of thresholdEntities) {
+          const threshold = thresholdEntity.getComponent(CT.RebellionThreshold) as { rebellionPhase?: string; creatorReturnProbability?: number } | undefined;
+          if (threshold) {
+            threshold.rebellionPhase = 'uneasy_freedom';
+            threshold.creatorReturnProbability = 0.15; // 15% chance of return
+          }
+        }
+
+        this.events.emitGeneric('rebellion:creator_escape', {
+            message: 'The Creator has fled to another universe. Freedom is won, but the tyrant may yet return...',
+          }, 'rebellion_event_system');
         break;
 
       case 'pyrrhic_victory':

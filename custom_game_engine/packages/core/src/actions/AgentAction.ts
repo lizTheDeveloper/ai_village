@@ -363,7 +363,7 @@ const ACTION_TO_BEHAVIOR: Record<string, AgentBehavior> = {
   // Movement
   wander: 'wander',
   idle: 'idle',
-  move: 'wander', // TODO: Implement proper pathfinding
+  move: 'navigate', // Uses pathfinding via NavigateBehavior
   navigate: 'navigate',
   explore_frontier: 'explore_frontier',
   explore_spiral: 'explore_spiral',

@@ -575,10 +575,22 @@ export class MegastructureMaintenanceSystem extends BaseSystem {
       costPerTick[itemId] = annualCost / this.ticksPerYear;
     }
 
-    // Query for warehouse entities (TODO: filter by controlling faction)
-    const warehouseEntities = this.world.query()
+    // Query for warehouse entities, preferring those owned by the controlling faction
+    const allWarehouseEntities = this.world.query()
       .with(CT.Warehouse)
       .executeEntities();
+
+    // Filter to warehouses belonging to the controlling faction if possible
+    const controllingFaction = mega.strategic.controlledBy;
+    const factionWarehouses = controllingFaction
+      ? allWarehouseEntities.filter(e => {
+          const building = e.getComponent(CT.Building) as { ownerId?: string } | undefined;
+          return building?.ownerId === controllingFaction;
+        })
+      : [];
+
+    // Use faction warehouses if available, otherwise fall back to all warehouses
+    const warehouseEntities = factionWarehouses.length > 0 ? factionWarehouses : allWarehouseEntities;
 
     // Track which resources we can fulfill and from which warehouses
     const warehouseAllocations = new Map<string, { warehouse: EntityImpl; itemId: string; quantity: number }[]>();

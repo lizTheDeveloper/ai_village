@@ -220,3 +220,11 @@ export { WorldContextBuilder } from './prompt-builders/WorldContextBuilder';
 export { VillageInfoBuilder } from './prompt-builders/VillageInfoBuilder';
 export { MemoryBuilder } from './prompt-builders/MemoryBuilder';
 export { ActionBuilder } from './prompt-builders/ActionBuilder';
+export { HarmonyContextBuilder } from './prompt-builders/HarmonyContextBuilder';
+
+// ============================================================================
+// Personality & Templates
+// ============================================================================
+
+export * from './PersonalityPromptTemplates';
+export * from './PersonalityVariationsLibrary';

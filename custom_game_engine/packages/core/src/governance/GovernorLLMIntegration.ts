@@ -381,24 +381,75 @@ export function executeDirectiveInterpretation(
       updateGovernanceComponentWithDirective(governor, directive, interpretation, world);
       break;
 
-    case 'delegate':
-      // Find lower-tier entities and delegate to them
-      // TODO: Find entities at target tier and create new delegation chain
-      break;
+    case 'delegate': {
+      // Find entities at the target tier and create a new delegation chain
+      const targetTier = interpretation.delegation_target as PoliticalTier ?? directive.targetTier;
+      const subordinate = findGovernorAtTier(targetTier, world);
 
-    case 'negotiate':
-      // Initiate negotiation with higher tier
-      // TODO: Create negotiation request event
+      if (subordinate) {
+        // Create new delegation chain for the subordinate
+        const subDirective: DelegationChain = {
+          id: `delegation_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+          origin: directive.targetTier, // This governor's tier becomes the origin
+          directive: directive.directive,
+          targetTier: targetTier,
+          parameters: { ...directive.parameters, delegatedBy: governor.id },
+          issuedTick: world.tick,
+          issuerAgentId: governor.id,
+          priority: directive.priority,
+        };
+
+        world.eventBus.emit({
+          type: 'governance:directive_delegated',
+          source: governor.id,
+          data: {
+            governorId: governor.id,
+            subordinateId: subordinate.id,
+            directive: subDirective.directive,
+            targetTier: targetTier,
+            tick: world.tick,
+          },
+        });
+      } else {
+        console.warn(`[GovernorLLM] No governor found at tier ${targetTier} for delegation`);
+      }
       break;
+    }
+
+    case 'negotiate': {
+      // Initiate negotiation with higher tier
+      world.eventBus.emit({
+        type: 'governance:negotiation_requested',
+        source: governor.id,
+        data: {
+          governorId: governor.id,
+          originTier: directive.origin,
+          directive: directive.directive,
+          negotiationPoints: interpretation.negotiation_points ?? [],
+          tick: world.tick,
+        },
+      });
+      break;
+    }
 
     case 'refuse':
-      // Refuse directive (risky!)
+      // Refuse directive (risky!) - could trigger sanctions or removal from office
       console.warn(
         `[GovernorLLM] ${governor.id} REFUSING directive from ${directive.origin}`
       );
       console.warn(`[GovernorLLM] Refusal reason: ${interpretation.refusal_reason}`);
-      // This could trigger sanctions or removal from office
-      // TODO: Emit event for higher tier to respond to refusal
+
+      world.eventBus.emit({
+        type: 'governance:directive_refused',
+        source: governor.id,
+        data: {
+          governorId: governor.id,
+          directive: directive.directive,
+          origin: directive.origin,
+          refusalReason: interpretation.refusal_reason ?? 'No reason given',
+          tick: world.tick,
+        },
+      });
       break;
   }
 }

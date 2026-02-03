@@ -1303,7 +1303,13 @@ export function buildFederationContext(president: Entity, world: World): Federat
       averageSatisfaction,
       secessionRisks,
     },
-    pendingProposals: [], // TODO: Link to FederationGovernanceSystem.activeProposals
+    pendingProposals: federation.pendingProposals.map(p => ({
+      id: p.id,
+      name: p.name,
+      type: p.type,
+      proposerId: p.proposerId,
+      status: (p.votingStartTick != null ? 'voting' : 'debating') as 'debating' | 'voting',
+    })),
   };
 }
 

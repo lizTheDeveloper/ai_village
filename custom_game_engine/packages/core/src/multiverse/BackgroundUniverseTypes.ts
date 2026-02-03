@@ -241,6 +241,12 @@ export interface PlanetState {
 
   /** Current tick */
   currentTick: bigint;
+
+  /** Distance to target world in light-years (default: 50) */
+  distanceToTarget?: number;
+
+  /** Tech level of the target world (for invasion scoring) */
+  targetTechLevel?: number;
 }
 
 /**
