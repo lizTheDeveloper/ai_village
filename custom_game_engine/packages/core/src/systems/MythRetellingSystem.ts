@@ -35,9 +35,6 @@ export class MythRetellingSystem extends BaseSystem {
 
   private retellingCooldown: Map<string, number> = new Map(); // agentId → lastTelling tick
 
-  // Performance optimizations
-  private lastUpdate = 0;
-  private readonly UPDATE_INTERVAL = 100; // Every 100 ticks (5 seconds)
   private readonly RETELLING_COOLDOWN = 3600; // 1 hour in ticks (assuming 60 ticks/min)
 
   // Cache for deity lookups (O(1) access)
@@ -56,12 +53,6 @@ export class MythRetellingSystem extends BaseSystem {
   }
 
   protected onUpdate(ctx: SystemContext): void {
-    // Throttling: Skip update if interval hasn't elapsed
-    if (ctx.world.tick - this.lastUpdate < this.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdate = ctx.world.tick;
-
     const currentTick = ctx.tick;
     // Use pre-filtered active entities (already filtered by SimulationScheduler)
     // Only process visible/nearby agents - myth retelling is a proximity-based interaction

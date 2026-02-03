@@ -5,12 +5,15 @@
  * - Shows all living animals
  * - Click animal portrait to focus camera on them and open animal info panel
  * - Highlights selected animal
+ *
+ * Extends BaseRosterPanel with animal-specific theming and world update logic.
  */
 
+import { BaseRosterPanel } from './BaseRosterPanel.js';
+import type { RosterItemInfo, RosterTheme } from './BaseRosterPanel.js';
 import { PixelLabSpriteLoader } from './sprites/PixelLabSpriteLoader.js';
 import { getAnimalSpriteVariant } from './sprites/AnimalSpriteVariants.js';
 import type { World } from '@ai-village/core';
-import type { IWindowPanel } from './types/WindowTypes.js';
 
 // Component interface for type safety
 interface AppearanceComponent {
@@ -18,11 +21,8 @@ interface AppearanceComponent {
   spriteFolderId?: string;
 }
 
-interface AnimalInfo {
-  id: string;
+export interface AnimalInfo extends RosterItemInfo {
   species: string;
-  spriteFolder: string;
-  lastInteractionTime: number;
 }
 
 // Known animal species that use variant system
@@ -30,14 +30,12 @@ const ANIMAL_SPECIES = new Set([
   'chicken', 'cow', 'sheep', 'horse', 'dog', 'cat', 'rabbit', 'deer', 'pig', 'goat'
 ]);
 
-export class AnimalRosterPanel implements IWindowPanel {
-  private visible: boolean = false;
-  private container: HTMLDivElement;
-  private rosterContainer: HTMLDivElement;
-  private animals: Map<string, AnimalInfo> = new Map();
-  private spriteLoader: PixelLabSpriteLoader;
-  private onAnimalClickCallback: ((animalId: string) => void) | null = null;
-  private selectedAnimalId: string | null = null;
+export class AnimalRosterPanel extends BaseRosterPanel<AnimalInfo> {
+  constructor(spriteLoader: PixelLabSpriteLoader) {
+    super(spriteLoader);
+  }
+
+  // --- Abstract method implementations ---
 
   getId(): string {
     return 'animal-roster';
@@ -47,108 +45,37 @@ export class AnimalRosterPanel implements IWindowPanel {
     return 'Animal Roster';
   }
 
-  getDefaultWidth(): number {
-    return 400;
+  getDisplayName(item: AnimalInfo): string {
+    return item.species.charAt(0).toUpperCase() + item.species.slice(1);
   }
 
-  getDefaultHeight(): number {
-    return 600;
+  getTheme(): RosterTheme {
+    return {
+      borderColor: '#8B4513',
+      selectedBorderColor: '#ffed4e',
+      hoverGlowColor: 'rgba(139, 69, 19, 0.6)',
+      modalBackground: 'linear-gradient(135deg, #2e1a1a 0%, #3e2116 50%, #604610 100%)',
+      modalBorderColor: '#8B4513',
+      modalTitleColor: '#8B4513',
+      modalBorderBottom: 'rgba(139, 69, 19, 0.3)',
+    };
   }
 
-  isVisible(): boolean {
-    return this.visible;
+  getAllButtonLabel(): string {
+    return 'Animals';
   }
 
-  setVisible(visible: boolean): void {
-    this.visible = visible;
+  getAllButtonEmoji(): string {
+    return '\u{1F43E}';
   }
 
-  constructor(spriteLoader: PixelLabSpriteLoader) {
-    this.spriteLoader = spriteLoader;
-    this.container = document.createElement('div');
-    this.setupStyles();
-    this.rosterContainer = this.createRosterContainer();
-    this.container.appendChild(this.rosterContainer);
-    document.body.appendChild(this.container);
-  }
-
-  private setupStyles(): void {
-    this.container.style.cssText = `
-      position: fixed;
-      top: 60px;
-      right: 20px;
-      width: 80px;
-      max-height: calc(100vh - 80px);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      z-index: 1000;
-      pointer-events: none;
-    `;
-  }
-
-  private createRosterContainer(): HTMLDivElement {
-    const roster = document.createElement('div');
-    roster.style.cssText = `
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      overflow-y: auto;
-      pointer-events: auto;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(255, 215, 0, 0.3) transparent;
-    `;
-    roster.style.setProperty('scrollbar-width', 'thin');
-    return roster;
-  }
-
-  /**
-   * Set callback for when an animal portrait is clicked
-   */
-  setOnAnimalClick(callback: (animalId: string) => void): void {
-    this.onAnimalClickCallback = callback;
-  }
-
-  /**
-   * Set the currently selected animal (for highlighting)
-   */
-  setSelectedAnimal(animalId: string | null): void {
-    this.selectedAnimalId = animalId;
-    this.updateDOM();
-  }
-
-  /**
-   * Add or update an animal in the roster
-   */
-  addAnimal(id: string, species: string, spriteFolder: string): void {
-    if (!this.animals.has(id)) {
-      this.animals.set(id, {
-        id,
-        species,
-        spriteFolder,
-        lastInteractionTime: Date.now(),
-      });
-      this.updateDOM();
-    }
-  }
-
-  /**
-   * Remove an animal from the roster (e.g., when they die)
-   */
-  removeAnimal(id: string): void {
-    this.animals.delete(id);
-    this.updateDOM();
-  }
-
-  /**
-   * Mark an animal as recently interacted with
-   */
-  touchAnimal(id: string): void {
-    const animal = this.animals.get(id);
-    if (animal) {
-      animal.lastInteractionTime = Date.now();
-      this.updateDOM();
-    }
+  sortItemsForModal(items: AnimalInfo[]): AnimalInfo[] {
+    // Sort animals by species then by ID
+    return items.sort((a, b) => {
+      const speciesCompare = a.species.localeCompare(b.species);
+      if (speciesCompare !== 0) return speciesCompare;
+      return a.id.localeCompare(b.id);
+    });
   }
 
   /**
@@ -170,7 +97,7 @@ export class AnimalRosterPanel implements IWindowPanel {
           spriteFolder = getAnimalSpriteVariant(entity.id, spriteFolder);
         }
 
-        if (!this.animals.has(entity.id)) {
+        if (!this.items.has(entity.id)) {
           this.addAnimal(entity.id, species, spriteFolder);
         }
       }
@@ -178,380 +105,52 @@ export class AnimalRosterPanel implements IWindowPanel {
 
     // Remove animals that no longer exist
     const existingIds = new Set(animalEntities.map(e => e.id));
-    for (const id of this.animals.keys()) {
+    for (const id of this.items.keys()) {
       if (!existingIds.has(id)) {
         this.removeAnimal(id);
       }
     }
   }
 
+  // --- Backwards-compatible public API wrappers ---
+
   /**
-   * IWindowPanel render method (no-op for DOM-based panel)
+   * Set callback for when an animal portrait is clicked
    */
-  render(
-    _ctx: CanvasRenderingContext2D,
-    _x: number,
-    _y: number,
-    _width: number,
-    _height: number,
-    _world?: World
-  ): void {
-    // This is a DOM-based panel, not canvas-based
-    // Rendering happens in updateDOM()
+  setOnAnimalClick(callback: (animalId: string) => void): void {
+    this.setOnItemClick(callback);
   }
 
   /**
-   * Update the DOM elements for this roster panel
+   * Set the currently selected animal (for highlighting)
    */
-  private updateDOM(): void {
-    const animalCount = this.animals.size;
-    const showAllButton = animalCount >= 20;
-    const maxVisible = showAllButton ? 9 : 20;
-
-    // Get animals sorted by last interaction time
-    const sortedAnimals = Array.from(this.animals.values())
-      .sort((a, b) => b.lastInteractionTime - a.lastInteractionTime)
-      .slice(0, maxVisible);
-
-    // Clear container
-    this.rosterContainer.innerHTML = '';
-
-    // Add animal portraits
-    for (const animal of sortedAnimals) {
-      const portrait = this.createAnimalPortrait(animal);
-      this.rosterContainer.appendChild(portrait);
-    }
-
-    // Add "All Animals" button if needed
-    if (showAllButton) {
-      const allButton = this.createAllAnimalsButton();
-      this.rosterContainer.appendChild(allButton);
-    }
-  }
-
-  private createAnimalPortrait(animal: AnimalInfo): HTMLDivElement {
-    const isSelected = this.selectedAnimalId === animal.id;
-    const portrait = document.createElement('div');
-    portrait.style.cssText = `
-      width: 70px;
-      height: 70px;
-      background: linear-gradient(135deg, rgba(30, 30, 50, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%);
-      border: ${isSelected ? '3px solid #ffed4e' : '2px solid #8B4513'};
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-      position: relative;
-      overflow: hidden;
-      ${isSelected ? 'box-shadow: 0 0 20px rgba(255, 237, 78, 0.8);' : ''}
-    `;
-
-    // Sprite canvas
-    const canvas = document.createElement('canvas');
-    canvas.width = 64;
-    canvas.height = 64;
-    canvas.style.cssText = `
-      width: 100%;
-      height: 100%;
-      image-rendering: pixelated;
-    `;
-
-    // Load sprite
-    this.loadAnimalSprite(canvas, animal.spriteFolder);
-
-    // Species tooltip
-    const speciesName = animal.species.charAt(0).toUpperCase() + animal.species.slice(1);
-    portrait.title = speciesName;
-
-    // Hover effects
-    portrait.addEventListener('mouseenter', () => {
-      portrait.style.transform = 'scale(1.1)';
-      portrait.style.boxShadow = '0 0 15px rgba(139, 69, 19, 0.6)';
-      portrait.style.borderColor = '#ffed4e';
-    });
-
-    portrait.addEventListener('mouseleave', () => {
-      portrait.style.transform = 'scale(1)';
-      portrait.style.boxShadow = 'none';
-      portrait.style.borderColor = isSelected ? '#ffed4e' : '#8B4513';
-    });
-
-    // Click to focus
-    portrait.addEventListener('click', () => {
-      this.touchAnimal(animal.id);
-      this.setSelectedAnimal(animal.id);
-      if (this.onAnimalClickCallback) {
-        this.onAnimalClickCallback(animal.id);
-      }
-    });
-
-    portrait.appendChild(canvas);
-    return portrait;
-  }
-
-  private async loadAnimalSprite(canvas: HTMLCanvasElement, spriteFolder: string): Promise<void> {
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    try {
-      const character = await this.spriteLoader.loadCharacter(spriteFolder);
-      const southImage = character.rotations.get('south');
-
-      if (southImage) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const scale = Math.min(
-          canvas.width / southImage.width,
-          canvas.height / southImage.height
-        );
-        const x = (canvas.width - southImage.width * scale) / 2;
-        const y = (canvas.height - southImage.height * scale) / 2;
-
-        ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(
-          southImage,
-          x, y,
-          southImage.width * scale,
-          southImage.height * scale
-        );
-      } else {
-        this.drawPlaceholder(ctx, canvas.width, canvas.height);
-      }
-    } catch (error) {
-      this.drawPlaceholder(ctx, canvas.width, canvas.height);
-    }
-  }
-
-  private drawPlaceholder(ctx: CanvasRenderingContext2D, width: number, height: number): void {
-    ctx.fillStyle = '#666';
-    ctx.beginPath();
-    ctx.arc(width / 2, height / 3, width / 6, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillRect(width / 2 - width / 8, height / 2, width / 4, height / 3);
-  }
-
-  private createAllAnimalsButton(): HTMLDivElement {
-    const button = document.createElement('div');
-    button.style.cssText = `
-      width: 70px;
-      height: 70px;
-      background: linear-gradient(135deg, rgba(50, 50, 70, 0.95) 0%, rgba(40, 40, 60, 0.95) 100%);
-      border: 2px solid #87CEEB;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: bold;
-      color: #87CEEB;
-      text-align: center;
-      padding: 5px;
-    `;
-
-    button.innerHTML = `
-      <div style="font-size: 20px; margin-bottom: 2px;">🐾</div>
-      <div>All<br/>Animals</div>
-    `;
-
-    button.title = `View all ${this.animals.size} animals`;
-
-    // Hover effects
-    button.addEventListener('mouseenter', () => {
-      button.style.transform = 'scale(1.1)';
-      button.style.boxShadow = '0 0 15px rgba(135, 206, 235, 0.6)';
-      button.style.borderColor = '#ADD8E6';
-    });
-
-    button.addEventListener('mouseleave', () => {
-      button.style.transform = 'scale(1)';
-      button.style.boxShadow = 'none';
-      button.style.borderColor = '#87CEEB';
-    });
-
-    // Click to open all animals modal
-    button.addEventListener('click', () => {
-      this.showAllAnimalsModal();
-    });
-
-    return button;
-  }
-
-  private showAllAnimalsModal(): void {
-    // Create modal backdrop
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 10001;
-    `;
-
-    // Create modal content
-    const content = document.createElement('div');
-    content.style.cssText = `
-      width: 90%;
-      max-width: 800px;
-      max-height: 80vh;
-      background: linear-gradient(135deg, #2e1a1a 0%, #3e2116 50%, #604610 100%);
-      border: 2px solid #8B4513;
-      border-radius: 12px;
-      padding: 20px;
-      overflow-y: auto;
-    `;
-
-    // Header
-    const header = document.createElement('div');
-    header.style.cssText = `
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid rgba(139, 69, 19, 0.3);
-    `;
-
-    const title = document.createElement('h2');
-    title.textContent = `All Animals (${this.animals.size})`;
-    title.style.cssText = `
-      color: #8B4513;
-      margin: 0;
-      font-size: 24px;
-    `;
-
-    const closeBtn = document.createElement('button');
-    closeBtn.textContent = '×';
-    closeBtn.style.cssText = `
-      background: transparent;
-      border: 2px solid #8B4513;
-      color: #8B4513;
-      width: 35px;
-      height: 35px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 24px;
-      line-height: 1;
-      transition: all 0.2s;
-    `;
-    closeBtn.addEventListener('click', () => modal.remove());
-
-    header.appendChild(title);
-    header.appendChild(closeBtn);
-
-    // Animal grid
-    const grid = document.createElement('div');
-    grid.style.cssText = `
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 15px;
-    `;
-
-    // Sort animals by species then by ID
-    const sortedAnimals = Array.from(this.animals.values())
-      .sort((a, b) => {
-        const speciesCompare = a.species.localeCompare(b.species);
-        if (speciesCompare !== 0) return speciesCompare;
-        return a.id.localeCompare(b.id);
-      });
-
-    for (const animal of sortedAnimals) {
-      const card = this.createModalAnimalCard(animal, modal);
-      grid.appendChild(card);
-    }
-
-    content.appendChild(header);
-    content.appendChild(grid);
-    modal.appendChild(content);
-    document.body.appendChild(modal);
-
-    // Click outside to close
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.remove();
-      }
-    });
-  }
-
-  private createModalAnimalCard(animal: AnimalInfo, modal: HTMLDivElement): HTMLDivElement {
-    const card = document.createElement('div');
-    card.style.cssText = `
-      background: linear-gradient(135deg, rgba(30, 30, 50, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%);
-      border: 2px solid #8B4513;
-      border-radius: 8px;
-      padding: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: center;
-    `;
-
-    // Sprite
-    const canvas = document.createElement('canvas');
-    canvas.width = 64;
-    canvas.height = 64;
-    canvas.style.cssText = `
-      width: 100%;
-      height: 100px;
-      image-rendering: pixelated;
-      margin-bottom: 8px;
-    `;
-    this.loadAnimalSprite(canvas, animal.spriteFolder);
-
-    // Species name
-    const speciesName = animal.species.charAt(0).toUpperCase() + animal.species.slice(1);
-    const name = document.createElement('div');
-    name.textContent = speciesName;
-    name.style.cssText = `
-      color: #8B4513;
-      font-size: 13px;
-      font-weight: bold;
-      word-wrap: break-word;
-    `;
-
-    // Hover effects
-    card.addEventListener('mouseenter', () => {
-      card.style.transform = 'scale(1.05)';
-      card.style.boxShadow = '0 0 20px rgba(139, 69, 19, 0.6)';
-      card.style.borderColor = '#ffed4e';
-    });
-
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'scale(1)';
-      card.style.boxShadow = 'none';
-      card.style.borderColor = '#8B4513';
-    });
-
-    // Click to focus and close modal
-    card.addEventListener('click', () => {
-      this.touchAnimal(animal.id);
-      this.setSelectedAnimal(animal.id);
-      if (this.onAnimalClickCallback) {
-        this.onAnimalClickCallback(animal.id);
-      }
-      modal.remove();
-    });
-
-    card.appendChild(canvas);
-    card.appendChild(name);
-    return card;
+  setSelectedAnimal(animalId: string | null): void {
+    this.setSelectedItem(animalId);
   }
 
   /**
-   * Show the roster panel
+   * Add or update an animal in the roster
    */
-  show(): void {
-    this.container.style.display = 'flex';
+  addAnimal(id: string, species: string, spriteFolder: string): void {
+    this.addItem(id, {
+      id,
+      species,
+      spriteFolder,
+      lastInteractionTime: Date.now(),
+    });
   }
 
   /**
-   * Hide the roster panel
+   * Remove an animal from the roster (e.g., when they die)
    */
-  hide(): void {
-    this.container.style.display = 'none';
+  removeAnimal(id: string): void {
+    this.removeItem(id);
+  }
+
+  /**
+   * Mark an animal as recently interacted with
+   */
+  touchAnimal(id: string): void {
+    this.touchItem(id);
   }
 }

@@ -81,44 +81,68 @@ import { DevView } from './DevView.js';
 import { ParasiticHiveMindView } from './ParasiticHiveMindView.js';
 
 /**
+ * Widen a typed DashboardView<TData> to DashboardView<ViewData> for heterogeneous
+ * collection storage. This encapsulates the necessary type widening in one place.
+ *
+ * This is safe at runtime because within a single view, getData() produces TData which
+ * is then consumed by textFormatter/canvasRenderer/handleClick. The data flow is always
+ * internal to one view instance, so the concrete type is always consistent. TypeScript
+ * prevents direct assignment because TData appears in both covariant (getData return)
+ * and contravariant (formatter/renderer parameter) positions, but runtime behavior is
+ * always correct.
+ *
+ * // TODO: [tech-debt] Add variance annotation to DashboardView<TData> in types.ts:
+ * //   interface DashboardView<out TData extends ViewData = ViewData>
+ * // TypeScript 4.7+ supports explicit `out` variance annotations. Making TData
+ * // covariant would allow DashboardView<SubType> to be assignable to
+ * // DashboardView<ViewData> without any cast. This requires updating the
+ * // textFormatter, canvasRenderer, and handleClick signatures to accept ViewData
+ * // (the base type) or restructuring the interface to separate producer/consumer
+ * // concerns (e.g., a separate ReadonlyDashboardView for collection storage).
+ */
+function asBaseView<T extends ViewData>(view: DashboardView<T>): DashboardView<ViewData> {
+  return view as unknown as DashboardView<ViewData>;
+}
+
+/**
  * All built-in views for registration.
- * Cast to base DashboardView type for array storage.
+ * Uses asBaseView() to widen specific view types for heterogeneous array storage.
  */
 export const builtInViews: readonly DashboardView<ViewData>[] = [
   // Core
-  ResourcesView as unknown as DashboardView<ViewData>,
-  PopulationView as unknown as DashboardView<ViewData>,
-  WeatherView as unknown as DashboardView<ViewData>,
+  asBaseView(ResourcesView),
+  asBaseView(PopulationView),
+  asBaseView(WeatherView),
   // Info
-  AgentInfoView as unknown as DashboardView<ViewData>,
-  AnimalInfoView as unknown as DashboardView<ViewData>,
-  PlantInfoView as unknown as DashboardView<ViewData>,
-  TileInspectorView as unknown as DashboardView<ViewData>,
+  asBaseView(AgentInfoView),
+  asBaseView(AnimalInfoView),
+  asBaseView(PlantInfoView),
+  asBaseView(TileInspectorView),
   // Economy
-  EconomyView as unknown as DashboardView<ViewData>,
-  ShopView as unknown as DashboardView<ViewData>,
-  CraftingView as unknown as DashboardView<ViewData>,
+  asBaseView(EconomyView),
+  asBaseView(ShopView),
+  asBaseView(CraftingView),
   // Social
-  RelationshipsView as unknown as DashboardView<ViewData>,
-  MemoryView as unknown as DashboardView<ViewData>,
-  GovernanceView as unknown as DashboardView<ViewData>,
+  asBaseView(RelationshipsView),
+  asBaseView(MemoryView),
+  asBaseView(GovernanceView),
   // Magic
-  MagicSystemsView as unknown as DashboardView<ViewData>,
-  SpellbookView as unknown as DashboardView<ViewData>,
+  asBaseView(MagicSystemsView),
+  asBaseView(SpellbookView),
   // Divinity
-  DivinePowersView as unknown as DashboardView<ViewData>,
-  PrayersView as unknown as DashboardView<ViewData>,
-  VisionComposerView as unknown as DashboardView<ViewData>,
-  AngelsView as unknown as DashboardView<ViewData>,
-  MythologyView as unknown as DashboardView<ViewData>,
-  PantheonView as unknown as DashboardView<ViewData>,
-  DeityIdentityView as unknown as DashboardView<ViewData>,
+  asBaseView(DivinePowersView),
+  asBaseView(PrayersView),
+  asBaseView(VisionComposerView),
+  asBaseView(AngelsView),
+  asBaseView(MythologyView),
+  asBaseView(PantheonView),
+  asBaseView(DeityIdentityView),
   // Parasitic/Hive
-  ParasiticHiveMindView as unknown as DashboardView<ViewData>,
+  asBaseView(ParasiticHiveMindView),
   // Settings/Dev
-  ControlsView as unknown as DashboardView<ViewData>,
-  SettingsView as unknown as DashboardView<ViewData>,
-  DevView as unknown as DashboardView<ViewData>,
+  asBaseView(ControlsView),
+  asBaseView(SettingsView),
+  asBaseView(DevView),
 ];
 
 /**

@@ -1,17 +1,17 @@
 /**
  * @ai-village/environment - Environment simulation systems
  *
- * This package provides core environment systems for simulating:
+ * @deprecated The canonical implementations of these systems now live in @ai-village/core.
+ * These re-exports exist for backwards compatibility. Prefer importing directly from @ai-village/core.
+ *
+ * This package previously provided core environment systems for simulating:
  * - Time (day/night cycles, time progression)
  * - Weather (rain, snow, storms, fog)
  * - Temperature (ambient temperature, building insulation, heat sources)
  * - Soil (farming fertility, moisture, nutrients)
- *
- * These systems form the foundation layer with minimal dependencies,
- * making them reusable across different game projects.
  */
 
-// Systems
+// Systems - re-exported from @ai-village/core for backwards compatibility
 export { TimeSystem, createTimeComponent } from './systems/TimeSystem.js';
 export type { TimeComponent, DayPhase } from './systems/TimeSystem.js';
 

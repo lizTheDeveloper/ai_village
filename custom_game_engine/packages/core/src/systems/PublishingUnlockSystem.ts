@@ -37,10 +37,6 @@ export class PublishingUnlockSystem extends BaseSystem {
     | null = null;
   private getAllPublishingSets: (() => any[]) | null = null;
 
-  // Performance optimizations
-  private lastUpdate = 0;
-  private readonly UPDATE_INTERVAL = 50; // Every 50 ticks (2.5 seconds)
-
   constructor(eventBus: CoreEventBus) {
     super();
     this.registerEventListeners(eventBus);
@@ -70,12 +66,6 @@ export class PublishingUnlockSystem extends BaseSystem {
   }
 
   protected onUpdate(ctx: SystemContext): void {
-    // Throttling: Skip update if interval hasn't elapsed
-    if (ctx.world.tick - this.lastUpdate < this.UPDATE_INTERVAL) {
-      return;
-    }
-    this.lastUpdate = ctx.world.tick;
-
     // Early exit: No need to check if no papers published
     if (this.publishedPapers.size === 0) {
       return;

@@ -37,6 +37,7 @@ export * from './BuildingPlacementUI.js';
 export * from './ZonePainterUI.js';
 export * from './GhostRenderer.js';
 export * from './AgentInfoPanel.js';
+export * from './BaseRosterPanel.js';
 export * from './AgentRosterPanel.js';
 export * from './AnimalInfoPanel.js';
 export * from './AnimalRosterPanel.js';

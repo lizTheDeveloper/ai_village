@@ -55,8 +55,6 @@ export class TimelineMergerSystem extends BaseSystem {
   public readonly activationComponents = [CT.Spaceship, CT.MergeCompatibility] as const;
   protected readonly throttleInterval = 100; // Every 5 seconds at 20 TPS
 
-  private lastUpdate = 0;
-
   // ============================================================================
   // Performance optimizations: Caching and object pooling
   // ============================================================================
@@ -118,12 +116,6 @@ export class TimelineMergerSystem extends BaseSystem {
    * Update - check for active merge operations and process them
    */
   protected onUpdate(ctx: SystemContext): void {
-    // Throttle updates
-    if (ctx.world.tick - this.lastUpdate < this.throttleInterval) {
-      return;
-    }
-    this.lastUpdate = ctx.world.tick;
-
     // Find all timeline_merger ships
     const mergerShips = ctx.world.query()
       .with(CT.Spaceship)
