@@ -384,6 +384,7 @@ export class MultiverseStorage {
 
   /**
    * Load a snapshot by tick
+   * Returns null if snapshot is corrupted, missing, or fails to parse
    */
   async loadSnapshot(universeId: string, tick: number): Promise<any | null> {
     await this.init();
@@ -400,13 +401,16 @@ export class MultiverseStorage {
       const content = await this.decompressAndRead(fullPath);
       return JSON.parse(content);
     } catch (error: any) {
-      if (error.code === 'ENOENT') return null;
-      throw error;
+      // Return null for any error (file not found, decompression error, JSON parse error)
+      // This allows fallback to older snapshots
+      console.warn(`[MultiverseStorage] Failed to load snapshot ${tick}: ${error.message}`);
+      return null;
     }
   }
 
   /**
-   * Load the latest snapshot
+   * Load the latest valid snapshot
+   * If the most recent snapshot is corrupted, falls back to older ones
    */
   async loadLatestSnapshot(universeId: string): Promise<{ snapshot: any; entry: SnapshotEntry } | null> {
     await this.init();
@@ -414,14 +418,36 @@ export class MultiverseStorage {
     const timeline = await this.getTimeline(universeId);
     if (!timeline || timeline.snapshots.length === 0) return null;
 
-    // Sort by tick descending
+    // Sort by tick descending and get unique ticks
     const sorted = [...timeline.snapshots].sort((a, b) => b.tick - a.tick);
-    const latest = sorted[0];
+    const seenTicks = new Set<number>();
+    const uniqueEntries: SnapshotEntry[] = [];
 
-    const snapshot = await this.loadSnapshot(universeId, latest.tick);
-    if (!snapshot) return null;
+    for (const entry of sorted) {
+      if (!seenTicks.has(entry.tick)) {
+        seenTicks.add(entry.tick);
+        uniqueEntries.push(entry);
+      }
+    }
 
-    return { snapshot, entry: latest };
+    // Try to load snapshots, starting from the most recent
+    // Fall back to older ones if the latest is corrupted
+    const MAX_FALLBACK_ATTEMPTS = 10;
+
+    for (let i = 0; i < Math.min(uniqueEntries.length, MAX_FALLBACK_ATTEMPTS); i++) {
+      const entry = uniqueEntries[i];
+      const snapshot = await this.loadSnapshot(universeId, entry.tick);
+
+      if (snapshot) {
+        if (i > 0) {
+          console.log(`[MultiverseStorage] Loaded fallback snapshot at tick ${entry.tick} (skipped ${i} corrupted snapshots)`);
+        }
+        return { snapshot, entry };
+      }
+    }
+
+    console.error(`[MultiverseStorage] No valid snapshots found for universe ${universeId} after ${MAX_FALLBACK_ATTEMPTS} attempts`);
+    return null;
   }
 
   /**
@@ -910,18 +936,34 @@ export class MultiverseStorage {
 
   /**
    * Read and decompress data from file
+   * Properly handles corrupted/truncated gzip files without crashing
    */
   private async decompressAndRead(filePath: string): Promise<string> {
-    const chunks: Buffer[] = [];
+    return new Promise((resolve, reject) => {
+      const chunks: Buffer[] = [];
 
-    const readable = createReadStream(filePath);
-    const gunzip = createGunzip();
+      const readable = createReadStream(filePath);
+      const gunzip = createGunzip();
 
-    gunzip.on('data', (chunk) => chunks.push(chunk));
+      // Handle errors on both streams to prevent unhandled error events
+      readable.on('error', (err) => {
+        gunzip.destroy();
+        reject(err);
+      });
 
-    await pipeline(readable, gunzip);
+      gunzip.on('error', (err) => {
+        readable.destroy();
+        reject(err);
+      });
 
-    return Buffer.concat(chunks).toString('utf-8');
+      gunzip.on('data', (chunk) => chunks.push(chunk));
+
+      gunzip.on('end', () => {
+        resolve(Buffer.concat(chunks).toString('utf-8'));
+      });
+
+      readable.pipe(gunzip);
+    });
   }
 
   /**

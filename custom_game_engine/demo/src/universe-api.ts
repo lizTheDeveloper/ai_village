@@ -217,28 +217,10 @@ export function createUniverseApiRouter(): Router {
   });
 
   /**
-   * GET /api/multiverse/universe/:id/snapshot/:tick
-   * Get a snapshot at a specific tick
-   */
-  router.get('/universe/:id/snapshot/:tick', async (req: Request, res: Response) => {
-    try {
-      const { id, tick } = req.params;
-
-      const snapshot = await multiverseStorage.loadSnapshot(id, parseInt(tick, 10));
-      if (!snapshot) {
-        return res.status(404).json({ error: 'Snapshot not found' });
-      }
-
-      res.json({ snapshot });
-    } catch (error: any) {
-      console.error('[UniverseAPI] Error loading snapshot:', error);
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  /**
    * GET /api/multiverse/universe/:id/snapshot/latest
    * Get the latest snapshot
+   * NOTE: This route MUST be registered BEFORE /snapshot/:tick to avoid
+   * Express matching "latest" as a tick parameter
    */
   router.get('/universe/:id/snapshot/latest', async (req: Request, res: Response) => {
     try {
@@ -255,6 +237,26 @@ export function createUniverseApiRouter(): Router {
       });
     } catch (error: any) {
       console.error('[UniverseAPI] Error loading latest snapshot:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  /**
+   * GET /api/multiverse/universe/:id/snapshot/:tick
+   * Get a snapshot at a specific tick
+   */
+  router.get('/universe/:id/snapshot/:tick', async (req: Request, res: Response) => {
+    try {
+      const { id, tick } = req.params;
+
+      const snapshot = await multiverseStorage.loadSnapshot(id, parseInt(tick, 10));
+      if (!snapshot) {
+        return res.status(404).json({ error: 'Snapshot not found' });
+      }
+
+      res.json({ snapshot });
+    } catch (error: any) {
+      console.error('[UniverseAPI] Error loading snapshot:', error);
       res.status(500).json({ error: error.message });
     }
   });
