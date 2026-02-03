@@ -110,6 +110,7 @@ export class BackgroundUniverseManager {
 
   // Portals/connections detected by player
   private playerPortals = new Set<string>(); // universe IDs player can access
+  private discoveryMethods = new Map<string, 'portal' | 'time_machine' | 'wormhole' | 'telescope' | 'magic'>();
 
   // Update throttling (check every 10 seconds)
   private lastUpdateTick = 0n;
@@ -251,9 +252,15 @@ export class BackgroundUniverseManager {
   /**
    * Register that player has portal/access to a universe.
    * Triggers instantiation on next update.
+   *
+   * @param universeId The universe being accessed
+   * @param method How the universe was discovered (defaults to 'portal')
    */
-  registerPlayerPortal(universeId: string): void {
+  registerPlayerPortal(universeId: string, method?: 'portal' | 'time_machine' | 'wormhole' | 'telescope' | 'magic'): void {
     this.playerPortals.add(universeId);
+    if (method) {
+      this.discoveryMethods.set(universeId, method);
+    }
   }
 
   /**
@@ -440,12 +447,32 @@ export class BackgroundUniverseManager {
     const discoveryEvent: BackgroundUniverseDiscoveredEvent = {
       universeId,
       type: bg.type,
-      discoveryMethod: 'portal', // TODO: Detect actual method
+      discoveryMethod: this.discoveryMethods.get(universeId) ?? this.inferDiscoveryMethod(bg.type),
       state: this.extractPlanetState(bg.planet, 0n),
     };
 
     this.eventBus.emit('multiverse:universe_discovered', discoveryEvent);
     this.stats.totalDiscovered++;
+  }
+
+  /**
+   * Infer discovery method from universe type when not explicitly provided.
+   */
+  private inferDiscoveryMethod(type: BackgroundUniverseType): 'portal' | 'time_machine' | 'wormhole' | 'telescope' | 'magic' {
+    switch (type) {
+      case 'future_timeline':
+      case 'past_timeline':
+        return 'time_machine';
+      case 'parallel_universe':
+        return 'wormhole';
+      case 'pocket_dimension':
+        return 'magic';
+      case 'other_planet':
+        return 'telescope';
+      case 'extradimensional':
+      default:
+        return 'portal';
+    }
   }
 
   /**

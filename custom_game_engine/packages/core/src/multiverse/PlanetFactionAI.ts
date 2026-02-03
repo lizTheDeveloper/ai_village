@@ -302,10 +302,9 @@ export class PlanetFactionAI {
     score += this.state.militaryPower * 0.2;
 
     // 4. Tech advantage (10% weight)
-    // Assume player at tech level 5 (TODO: query actual player tier)
-    const assumedPlayerTech = 5;
-    if (this.state.techLevel > assumedPlayerTech) {
-      const techAdvantage = (this.state.techLevel - assumedPlayerTech) / 5; // Normalize to 0-1
+    const targetTech = this.state.targetTechLevel ?? 5;
+    if (this.state.techLevel > targetTech) {
+      const techAdvantage = (this.state.techLevel - targetTech) / 5; // Normalize to 0-1
       score += techAdvantage * 0.1;
     }
 
@@ -395,7 +394,7 @@ export class PlanetFactionAI {
   /**
    * Calculate travel time to target (in ticks)
    *
-   * Assumes 50 light-years distance (TODO: use actual distance)
+   * Uses state.distanceToTarget if available, defaults to 50 light-years.
    * Speed based on tech level:
    * - Tech 7: 0.1c (500 years)
    * - Tech 8: 0.5c (100 years)
@@ -403,7 +402,7 @@ export class PlanetFactionAI {
    * - Tech 10: 10c (5 years) [FTL]
    */
   private calculateTravelTime(): bigint {
-    const distanceLightYears = 50; // TODO: Get actual distance
+    const distanceLightYears = this.state.distanceToTarget ?? 50;
     const ticksPerYear = 525600n; // 1 tick = 1 minute
 
     // Speed of light fraction based on tech level

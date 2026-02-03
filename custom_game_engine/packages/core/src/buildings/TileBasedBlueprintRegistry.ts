@@ -519,7 +519,86 @@ export class TileBasedBlueprintRegistry {
     //
     // For actual buildings with furniture and roofs, use VoxelBuildingDefinition.
 
-    // TODO: Add small crafting benches here if needed (workbench, anvil, etc.)
+    // Small crafting workstations - single-tile or 2-tile items
+    this.register(createTileBasedBlueprint({
+      id: 'workbench',
+      name: 'Workbench',
+      description: 'A sturdy wooden workbench for basic crafting and woodworking.',
+      category: 'crafting',
+      layoutString: ['..'],
+      materialDefaults: {
+        wall: 'wood',
+        floor: 'wood',
+        door: 'wood',
+      },
+      canRotate: true,
+      rotationAngles: [0, 90],
+      unlocked: true,
+    }));
+
+    this.register(createTileBasedBlueprint({
+      id: 'anvil',
+      name: 'Anvil',
+      description: 'A heavy iron anvil for metalworking and smithing.',
+      category: 'crafting',
+      layoutString: ['.'],
+      materialDefaults: {
+        wall: 'stone',
+        floor: 'stone',
+        door: 'wood',
+      },
+      canRotate: false,
+      rotationAngles: [0],
+      unlocked: true,
+    }));
+
+    this.register(createTileBasedBlueprint({
+      id: 'loom',
+      name: 'Loom',
+      description: 'A weaving loom for producing cloth and textiles.',
+      category: 'crafting',
+      layoutString: ['..', '..'],
+      materialDefaults: {
+        wall: 'wood',
+        floor: 'wood',
+        door: 'wood',
+      },
+      canRotate: true,
+      rotationAngles: [0, 90],
+      unlocked: true,
+    }));
+
+    this.register(createTileBasedBlueprint({
+      id: 'cooking_fire',
+      name: 'Cooking Fire',
+      description: 'A stone-ringed cooking fire for preparing food.',
+      category: 'crafting',
+      layoutString: ['.'],
+      materialDefaults: {
+        wall: 'stone',
+        floor: 'stone',
+        door: 'wood',
+      },
+      canRotate: false,
+      rotationAngles: [0],
+      unlocked: true,
+    }));
+
+    this.register(createTileBasedBlueprint({
+      id: 'alchemy_table',
+      name: 'Alchemy Table',
+      description: 'A table equipped for mixing potions and alchemical reagents.',
+      category: 'crafting',
+      layoutString: ['..'],
+      materialDefaults: {
+        wall: 'wood',
+        floor: 'wood',
+        door: 'wood',
+      },
+      canRotate: true,
+      rotationAngles: [0, 90],
+      unlocked: false, // Requires research to unlock
+    }));
   }
 }
 

@@ -46,6 +46,38 @@ import { getNarrativePressureSystem } from '../narrative/NarrativePressureSystem
 import { createOutcomeAttractor } from '../narrative/NarrativePressureTypes.js';
 
 /**
+ * Temporary emotional states that should be reverted after a duration.
+ * Key: entityId, Value: { originalState, expirationTick }
+ */
+const temporaryEmotionalStates = new Map<string, {
+  originalState: string;
+  expirationTick: number;
+}>();
+
+/**
+ * Process temporary emotional state expirations.
+ * Call this from a system's update loop (e.g., PlotProgressionSystem).
+ */
+export function processTemporaryEmotionalStates(world: World & WorldMutator, currentTick: number): void {
+  for (const [entityId, state] of temporaryEmotionalStates) {
+    if (currentTick >= state.expirationTick) {
+      const entity = world.getEntity(entityId);
+      if (entity) {
+        const mood = entity.getComponent<MoodComponent>('mood');
+        if (mood) {
+          const restoredMood: MoodComponent = {
+            ...mood,
+            emotionalState: state.originalState,
+          };
+          world.addComponent(entityId, restoredMood);
+        }
+      }
+      temporaryEmotionalStates.delete(entityId);
+    }
+  }
+}
+
+/**
  * Execute a single plot effect
  */
 export function executeEffect(
@@ -319,17 +351,20 @@ export function executeEffect(
       const mood = entity.getComponent<MoodComponent>('mood');
       if (!mood) break;
 
-      // Note: duration_ticks would need to be tracked separately
-      // For now, just set the state immediately
+      // Store original state for restoration if duration is specified
+      if (effect.duration_ticks && effect.duration_ticks > 0) {
+        temporaryEmotionalStates.set(context.entityId, {
+          originalState: mood.emotionalState,
+          expirationTick: context.personalTick + effect.duration_ticks,
+        });
+      }
+
       const updatedMood: MoodComponent = {
         ...mood,
         emotionalState: effect.state,
       };
 
       world.addComponent(context.entityId, updatedMood);
-
-      // TODO: Store duration and reset after duration_ticks
-      // This would require a separate system to track temporary states
       break;
     }
 
