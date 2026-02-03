@@ -65,6 +65,13 @@ export class SoilSystem extends BaseSystem {
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   /**
+   * Indoor tiles receive reduced evaporation (30% of outdoor rate).
+   * Indoor tiles are sheltered from direct sun but still lose moisture
+   * through ambient evaporation.
+   */
+  public static readonly INDOOR_EVAPORATION_MODIFIER = 0.3;
+
+  /**
    * Systems that must run before this one.
    * @see TimeSystem - provides time acceleration for daily soil updates
    * @see WeatherSystem - provides rain/snow events that increase soil moisture
@@ -139,12 +146,13 @@ export class SoilSystem extends BaseSystem {
   }
 
   /**
-   * Iterate over all outdoor tiles and call a callback for each.
+   * Iterate over all tiles and call a callback for each, providing indoor status.
    * Performance: Centralizes chunk iteration to avoid code duplication.
+   * Indoor detection runs once per tile and is passed to callback.
    */
-  private forEachOutdoorTile(
+  private forEachTile(
     world: World,
-    callback: (tile: Tile, worldX: number, worldY: number) => void
+    callback: (tile: Tile, worldX: number, worldY: number, indoors: boolean) => void
   ): void {
     const chunkManager = this.getCachedChunkManager(world);
     if (!chunkManager) return;
@@ -167,14 +175,12 @@ export class SoilSystem extends BaseSystem {
           const tile = row[x];
           if (!tile) continue;
 
-          // Validate tile and check if outdoor
+          // Validate tile structure before processing
           if (isTileWithMoisture(tile)) {
             const worldX = chunk.x * 32 + x; // CHUNK_SIZE = 32
             const worldY = chunk.y * 32 + y;
-
-            if (!this.isTileIndoors(tile, world, worldX, worldY)) {
-              callback(tile, worldX, worldY);
-            }
+            const indoors = this.isTileIndoors(tile, world, worldX, worldY);
+            callback(tile, worldX, worldY, indoors);
           }
         }
       }
@@ -182,10 +188,34 @@ export class SoilSystem extends BaseSystem {
   }
 
   /**
-   * Handle weather change events and emit specific rain/snow events
+   * Iterate over outdoor tiles only. Convenience wrapper around forEachTile.
    */
-  private handleWeatherChange(world: World, event: GameEvent<'weather:changed'>): void {
+  private forEachOutdoorTile(
+    world: World,
+    callback: (tile: Tile, worldX: number, worldY: number) => void
+  ): void {
+    this.forEachTile(world, (tile, worldX, worldY, indoors) => {
+      if (!indoors) {
+        callback(tile, worldX, worldY);
+      }
+    });
+  }
+
+  /**
+   * Handle weather change events and emit specific rain/snow events.
+   * Validates that rain/snow events include intensity data.
+   */
+  public handleWeatherChange(world: World, event: GameEvent<'weather:changed'>): void {
     const { weatherType, intensity } = event.data;
+
+    // Rain and snow events MUST have intensity - missing intensity is a bug
+    // in the WeatherSystem (it always provides intensity via selectIntensity())
+    if ((weatherType === 'rain' || weatherType === 'snow') && intensity === undefined) {
+      throw new Error(
+        `Weather event for '${weatherType}' requires intensity. ` +
+        `WeatherSystem must provide intensity for precipitation events.`
+      );
+    }
 
     // Normalize intensity to a number (0.0 - 1.0)
     const normalizedIntensity = this.normalizeIntensity(intensity);
@@ -262,22 +292,27 @@ export class SoilSystem extends BaseSystem {
   }
 
   /**
-   * Process daily moisture decay based on temperature
+   * Process daily moisture decay based on temperature.
+   * Outdoor tiles get full evaporation; indoor tiles get reduced evaporation.
    */
   private processDailyMoistureDecay(world: World): void {
     // Get current temperature for evaporation modifier (cached lookup)
     const temperature = this.getCurrentTemperature(world);
 
-    this.forEachOutdoorTile(world, (tile, worldX, worldY) => {
-      this.decayMoisture(world, tile, worldX, worldY, temperature);
+    this.forEachTile(world, (tile, worldX, worldY, indoors) => {
+      const evaporationModifier = indoors
+        ? SoilSystem.INDOOR_EVAPORATION_MODIFIER
+        : 1.0;
+      this.decayMoisture(world, tile, worldX, worldY, temperature, evaporationModifier);
     });
   }
 
   /**
-   * Check if a tile is indoors (covered by building)
-   * Buildings block rain and sun through walls, doors, windows, or roofs
+   * Check if a tile is indoors (covered by building).
+   * Buildings block rain and sun through walls, doors, windows, or roofs.
+   * Public for use by other systems (e.g., PlantSystem, TemperatureSystem).
    */
-  private isTileIndoors(tile: unknown, _world: World, _x: number, _y: number): boolean {
+  public isTileIndoors(tile: unknown, _world: World, _x: number, _y: number): boolean {
     // Per CLAUDE.md: No silent fallbacks - validate tile structure
     if (!tile || typeof tile !== 'object') {
       throw new Error(`isTileIndoors requires valid tile object, got ${typeof tile}`);
@@ -555,15 +590,25 @@ export class SoilSystem extends BaseSystem {
   } as const;
 
   /**
-   * Process moisture decay for a tile
+   * Process moisture decay for a tile.
+   * @param evaporationModifier - Optional multiplier for evaporation rate (default 1.0).
+   *   Indoor tiles use INDOOR_EVAPORATION_MODIFIER (0.3) for reduced evaporation.
    */
   public decayMoisture(
     world: World,
     tile: Tile,
     x: number,
     y: number,
-    temperature: number
+    temperature: number,
+    evaporationModifier: number = 1.0
   ): void {
+    // Runtime validation - temperature must be a finite number
+    if (typeof temperature !== 'number' || !Number.isFinite(temperature)) {
+      throw new Error(
+        `Temperature must be a finite number for evaporation calculation at (${x},${y}), got ${temperature}`
+      );
+    }
+
     if (tile.fertility === undefined) {
       throw new Error(`Tile fertility not set - required for farming at (${x},${y})`);
     }
@@ -591,6 +636,9 @@ export class SoilSystem extends BaseSystem {
       }
       decay *= seasonalModifier;
     }
+
+    // Apply evaporation modifier (e.g., indoor tiles get reduced evaporation)
+    decay *= evaporationModifier;
 
     tile.moisture = Math.max(0, tile.moisture - decay);
 
