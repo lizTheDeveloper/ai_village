@@ -8,20 +8,20 @@ export function existsSync(path: string): boolean {
   return false;
 }
 
-export function mkdirSync(path: string, options?: any): void {
+export function mkdirSync(path: string, options?: unknown): void {
   console.warn('[fs stub] mkdirSync called in browser - no-op');
 }
 
-export function writeFileSync(path: string, data: any, options?: any): void {
+export function writeFileSync(path: string, data: unknown, options?: unknown): void {
   console.warn('[fs stub] writeFileSync called in browser - no-op');
 }
 
-export function readFileSync(path: string, options?: any): string {
+export function readFileSync(path: string, options?: unknown): string {
   console.warn('[fs stub] readFileSync called in browser - returning empty string');
   return '';
 }
 
-export function appendFileSync(path: string, data: any, options?: any): void {
+export function appendFileSync(path: string, data: unknown, options?: unknown): void {
   console.warn('[fs stub] appendFileSync called in browser - no-op');
 }
 

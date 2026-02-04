@@ -713,8 +713,7 @@ export class MetricsCollectionSystem extends BaseSystem {
               type: 'canon_event' as const,
               timestamp: canonEvent.timestamp,
               agentId: canonEvent.agentIds[0],
-              data: canonEvent as unknown as Record<string, unknown>,
-              category: 'canon',
+              data: { ...canonEvent, category: 'canon' },
             });
           }
         }).catch((error) => {
@@ -745,8 +744,7 @@ export class MetricsCollectionSystem extends BaseSystem {
               type: 'canon_event',
               timestamp: canonEvent.timestamp,
               agentId: canonEvent.agentIds[0],
-              data: canonEvent as unknown as Record<string, unknown>,
-              category: 'canon',
+              data: { ...canonEvent, category: 'canon' },
             });
           }
         }).catch((error) => {
@@ -781,8 +779,7 @@ export class MetricsCollectionSystem extends BaseSystem {
               type: 'canon_event',
               timestamp: canonEvent.timestamp,
               agentId: canonEvent.agentIds[0],
-              data: canonEvent as unknown as Record<string, unknown>,
-              category: 'canon',
+              data: { ...canonEvent, category: 'canon' },
             });
           }
         }).catch((error) => {
@@ -931,7 +928,7 @@ export class MetricsCollectionSystem extends BaseSystem {
           day: currentDay,
           tick: world.tick,
           phase: timeComp.phase,
-          season: ('season' in timeComp) ? (timeComp as unknown as Record<string, unknown>).season : undefined,
+          season: timeComp.season,
         },
       }).catch((error) => {
         console.error('[MetricsCollection] Failed to record time milestone canon event:', error);
@@ -953,21 +950,19 @@ export class MetricsCollectionSystem extends BaseSystem {
         continue; // Skip if no needs component
       }
 
-      // Validate structure - cast to unknown first to avoid index signature error
-      const needs = needsComponent as unknown as Record<string, unknown>;
-
-      if (typeof needs.hunger !== 'number' ||
-          typeof needs.thirst !== 'number' ||
-          typeof needs.energy !== 'number' ||
-          typeof needs.health !== 'number') {
+      // Validate structure
+      if (typeof needsComponent.hunger !== 'number' ||
+          typeof needsComponent.thirst !== 'number' ||
+          typeof needsComponent.energy !== 'number' ||
+          typeof needsComponent.health !== 'number') {
         throw new Error(
           `Invalid needs component for agent ${agent.id}: ` +
           `Expected numbers for hunger/thirst/energy/health, got ` +
           `${JSON.stringify({
-            hunger: typeof needs.hunger,
-            thirst: typeof needs.thirst,
-            energy: typeof needs.energy,
-            health: typeof needs.health
+            hunger: typeof needsComponent.hunger,
+            thirst: typeof needsComponent.thirst,
+            energy: typeof needsComponent.energy,
+            health: typeof needsComponent.health
           })}`
         );
       }

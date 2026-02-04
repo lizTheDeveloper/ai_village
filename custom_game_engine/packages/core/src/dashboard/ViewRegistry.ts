@@ -73,7 +73,7 @@ export class ViewRegistry {
       console.warn(`[ViewRegistry] View '${view.id}' has no textFormatter or canvasRenderer`);
     }
 
-    this.views.set(view.id, view as unknown as DashboardView);
+    this.views.set(view.id, view);
     this.notifyListeners();
   }
 
@@ -114,7 +114,8 @@ export class ViewRegistry {
       const available = Array.from(this.views.keys()).join(', ') || '(none)';
       throw new Error(`View '${id}' not found. Available views: ${available}`);
     }
-    return view as unknown as DashboardView<TData>;
+    // Safe downcast: caller specifies the expected data type
+    return view as DashboardView<TData>;
   }
 
   /**

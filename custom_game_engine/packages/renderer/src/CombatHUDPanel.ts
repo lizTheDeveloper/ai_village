@@ -1,4 +1,4 @@
-import type { EventBus } from '@ai-village/core';
+import type { EventBus, GameEvent } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
 interface ActiveConflict {
@@ -27,9 +27,9 @@ export class CombatHUDPanel implements IWindowPanel {
   private element: HTMLElement | null = null;
 
   // Event handlers for cleanup
-  private conflictStartedHandler: ((data: any) => void) | null = null;
-  private conflictResolvedHandler: ((data: any) => void) | null = null;
-  private combatAttackHandler: ((data: any) => void) | null = null;
+  private conflictStartedHandler: ((event: GameEvent<'conflict:started'>) => void) | null = null;
+  private conflictResolvedHandler: ((event: GameEvent<'conflict:resolved'>) => void) | null = null;
+  private combatAttackHandler: ((event: GameEvent<'combat:attack'>) => void) | null = null;
 
 
   getDefaultWidth(): number {
@@ -102,21 +102,24 @@ export class CombatHUDPanel implements IWindowPanel {
   /**
    * Handle conflict started event
    */
-  private handleConflictStarted(event: any): void {
-    const data = event.data || event; // Support both GameEvent and legacy direct data
+  private handleConflictStarted(event: GameEvent<'conflict:started'>): void {
+    const data = event.data;
 
-    if (!data.conflictId || !data.type) {
-      throw new Error('conflict:started event missing required fields (conflictId, type)');
+    if (!data.conflictId) {
+      throw new Error('conflict:started event missing required field: conflictId');
     }
-    if (!data.participants || !Array.isArray(data.participants)) {
-      throw new Error('conflict:started event missing required field: participants array');
+
+    // Build participants array from initiator and target
+    const participants: string[] = [data.initiator];
+    if (data.target && !participants.includes(data.target)) {
+      participants.push(data.target);
     }
 
     this.activeConflicts.set(data.conflictId, {
       id: data.conflictId,
-      type: data.type,
-      participants: data.participants,
-      threatLevel: data.threatLevel || 'medium',
+      type: data.conflictType,
+      participants,
+      threatLevel: 'medium', // Default threat level
       startTime: Date.now(),
     });
 
@@ -135,8 +138,8 @@ export class CombatHUDPanel implements IWindowPanel {
   /**
    * Handle conflict resolved event
    */
-  private handleConflictResolved(event: any): void {
-    const data = event.data || event; // Support both GameEvent and legacy direct data
+  private handleConflictResolved(event: GameEvent<'conflict:resolved'>): void {
+    const data = event.data;
 
     if (!data.conflictId) {
       return;
@@ -160,9 +163,9 @@ export class CombatHUDPanel implements IWindowPanel {
   /**
    * Handle combat attack event
    */
-  private handleCombatAttack(event: any): void {
-    const data = event.data || event; // Support both GameEvent and legacy direct data
-    this.addRecentEvent(`${data.attackerId} attacks ${data.defenderId}`);
+  private handleCombatAttack(event: GameEvent<'combat:attack'>): void {
+    const data = event.data;
+    this.addRecentEvent(`${data.attackerId} attacks ${data.targetId}`);
     this.updateUI();
   }
 

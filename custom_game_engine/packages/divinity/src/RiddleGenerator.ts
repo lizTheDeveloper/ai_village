@@ -215,7 +215,7 @@ Generate the riddle now:`;
   /**
    * Validate and normalize difficulty
    */
-  private validateDifficulty(value: any): 'easy' | 'medium' | 'hard' {
+  private validateDifficulty(value: unknown): 'easy' | 'medium' | 'hard' {
     if (value === 'easy' || value === 'medium' || value === 'hard') {
       return value;
     }

@@ -38,6 +38,7 @@ import {
   type BuildingComponent,
   type ResourceComponent,
   type PlantComponent,
+  type BuildingBlueprint,
   formatGoalsForPrompt,
   formatGoalsSectionForPrompt,
   getAvailableBuildings,
@@ -72,8 +73,8 @@ export interface ExecutorPrompt {
  */
 type WorldWithBuildingRegistry = World & {
   buildingRegistry?: {
-    get(buildingType: string): any;
-    getUnlocked(): any[];
+    get(buildingType: string): BuildingBlueprint | undefined;
+    getUnlocked(): BuildingBlueprint[];
   };
 };
 
@@ -169,9 +170,9 @@ export class ExecutorPromptBuilder {
    */
   private buildSchemaPrompt(agent: Entity, world: World): string {
     // PromptRenderer expects Map interface; Entity.components provides compatible get/has/forEach methods
-    const renderableEntity: { id: string; components: Map<string, any> } = {
+    const renderableEntity: { id: string; components: Map<string, unknown> } = {
       id: agent.id,
-      components: agent.components as Map<string, any>
+      components: agent.components as Map<string, unknown>
     };
     const schemaPrompt = PromptRenderer.renderEntity(renderableEntity, world);
 
@@ -502,7 +503,7 @@ export class ExecutorPromptBuilder {
     const registry = worldWithRegistry.buildingRegistry;
 
     // Filter buildings based on skill levels if skills provided
-    let buildings: any[];
+    let buildings: BuildingBlueprint[];
     if (skills) {
       const skillLevels: Partial<Record<SkillId, SkillLevel>> = {};
       for (const skillId of Object.keys(skills.levels) as SkillId[]) {
@@ -523,7 +524,7 @@ export class ExecutorPromptBuilder {
     for (const blueprint of buildings) {
       text += `- ${blueprint.name}: ${blueprint.description}\n`;
       if (blueprint.resourceCost && blueprint.resourceCost.length > 0) {
-        const costs = blueprint.resourceCost.map((rc: any) => `${rc.amountRequired} ${rc.resourceId}`).join(', ');
+        const costs = blueprint.resourceCost.map(rc => `${rc.amountRequired} ${rc.resourceId}`).join(', ');
         text += `  Cost: ${costs}\n`;
       }
     }

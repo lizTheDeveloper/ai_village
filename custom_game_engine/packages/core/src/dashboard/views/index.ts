@@ -82,43 +82,43 @@ import { ParasiticHiveMindView } from './ParasiticHiveMindView.js';
 
 /**
  * All built-in views for registration.
- * Cast to base DashboardView type for array storage.
+ * Now type-safe with covariant DashboardView interface.
  */
 export const builtInViews: readonly DashboardView<ViewData>[] = [
   // Core
-  ResourcesView as unknown as DashboardView<ViewData>,
-  PopulationView as unknown as DashboardView<ViewData>,
-  WeatherView as unknown as DashboardView<ViewData>,
+  ResourcesView,
+  PopulationView,
+  WeatherView,
   // Info
-  AgentInfoView as unknown as DashboardView<ViewData>,
-  AnimalInfoView as unknown as DashboardView<ViewData>,
-  PlantInfoView as unknown as DashboardView<ViewData>,
-  TileInspectorView as unknown as DashboardView<ViewData>,
+  AgentInfoView,
+  AnimalInfoView,
+  PlantInfoView,
+  TileInspectorView,
   // Economy
-  EconomyView as unknown as DashboardView<ViewData>,
-  ShopView as unknown as DashboardView<ViewData>,
-  CraftingView as unknown as DashboardView<ViewData>,
+  EconomyView,
+  ShopView,
+  CraftingView,
   // Social
-  RelationshipsView as unknown as DashboardView<ViewData>,
-  MemoryView as unknown as DashboardView<ViewData>,
-  GovernanceView as unknown as DashboardView<ViewData>,
+  RelationshipsView,
+  MemoryView,
+  GovernanceView,
   // Magic
-  MagicSystemsView as unknown as DashboardView<ViewData>,
-  SpellbookView as unknown as DashboardView<ViewData>,
+  MagicSystemsView,
+  SpellbookView,
   // Divinity
-  DivinePowersView as unknown as DashboardView<ViewData>,
-  PrayersView as unknown as DashboardView<ViewData>,
-  VisionComposerView as unknown as DashboardView<ViewData>,
-  AngelsView as unknown as DashboardView<ViewData>,
-  MythologyView as unknown as DashboardView<ViewData>,
-  PantheonView as unknown as DashboardView<ViewData>,
-  DeityIdentityView as unknown as DashboardView<ViewData>,
+  DivinePowersView,
+  PrayersView,
+  VisionComposerView,
+  AngelsView,
+  MythologyView,
+  PantheonView,
+  DeityIdentityView,
   // Parasitic/Hive
-  ParasiticHiveMindView as unknown as DashboardView<ViewData>,
+  ParasiticHiveMindView,
   // Settings/Dev
-  ControlsView as unknown as DashboardView<ViewData>,
-  SettingsView as unknown as DashboardView<ViewData>,
-  DevView as unknown as DashboardView<ViewData>,
+  ControlsView,
+  SettingsView,
+  DevView,
 ];
 
 /**

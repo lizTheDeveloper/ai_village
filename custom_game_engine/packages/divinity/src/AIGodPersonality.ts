@@ -294,7 +294,7 @@ function describePantheon(
  * Parse LLM response into GeneratedPersonality
  */
 export function parsePersonalityResponse(response: string): GeneratedPersonality {
-  let parsed: any;
+  let parsed: unknown;
 
   try {
     // Try to parse as JSON
@@ -303,50 +303,67 @@ export function parsePersonalityResponse(response: string): GeneratedPersonality
     throw new Error(`Failed to parse personality response as JSON: ${response}`);
   }
 
+  // Type guard for parsed response
+  if (typeof parsed !== 'object' || parsed === null) {
+    throw new Error('Parsed response is not an object');
+  }
+
+  const parsedObj = parsed as Record<string, unknown>;
+
   // Validate structure
-  if (!parsed.personality) {
+  if (!parsedObj.personality || typeof parsedObj.personality !== 'object') {
     throw new Error('Response missing "personality" field');
   }
 
-  if (!parsed.goals) {
+  if (!parsedObj.goals || !Array.isArray(parsedObj.goals)) {
     throw new Error('Response missing "goals" field');
   }
 
-  if (!parsed.voice) {
+  if (!parsedObj.voice || typeof parsedObj.voice !== 'object') {
     throw new Error('Response missing "voice" field');
   }
 
-  if (!parsed.motivation) {
+  if (!parsedObj.motivation || typeof parsedObj.motivation !== 'string') {
     throw new Error('Response missing "motivation" field');
   }
 
+  const personalityObj = parsedObj.personality as Record<string, unknown>;
+  const voiceObj = parsedObj.voice as Record<string, unknown>;
+
   // Convert to typed structure
   const personality: PerceivedPersonality = {
-    benevolence: parsed.personality.benevolence ?? 0,
-    interventionism: parsed.personality.interventionism ?? 0,
-    wrathfulness: parsed.personality.wrathfulness ?? 0.5,
-    mysteriousness: parsed.personality.mysteriousness ?? 0.5,
-    generosity: parsed.personality.generosity ?? 0.5,
-    consistency: parsed.personality.consistency ?? 0.5,
-    seriousness: parsed.personality.seriousness ?? 0.5,
-    compassion: parsed.personality.compassion ?? 0.5,
+    benevolence: typeof personalityObj.benevolence === 'number' ? personalityObj.benevolence : 0,
+    interventionism: typeof personalityObj.interventionism === 'number' ? personalityObj.interventionism : 0,
+    wrathfulness: typeof personalityObj.wrathfulness === 'number' ? personalityObj.wrathfulness : 0.5,
+    mysteriousness: typeof personalityObj.mysteriousness === 'number' ? personalityObj.mysteriousness : 0.5,
+    generosity: typeof personalityObj.generosity === 'number' ? personalityObj.generosity : 0.5,
+    consistency: typeof personalityObj.consistency === 'number' ? personalityObj.consistency : 0.5,
+    seriousness: typeof personalityObj.seriousness === 'number' ? personalityObj.seriousness : 0.5,
+    compassion: typeof personalityObj.compassion === 'number' ? personalityObj.compassion : 0.5,
   };
 
-  const goals: DeityGoal[] = parsed.goals.map((g: any, i: number) => ({
-    id: `goal_${Date.now()}_${i}`,
-    type: g.type,
-    priority: g.priority ?? 0.5,
-    desiredOutcome: g.desiredOutcome ?? '',
-    preferredMethods: g.preferredMethods ?? [],
-    beliefBudget: g.beliefBudget ?? 100,
-    moralBoundary: g.moralBoundary ?? 0.5,
-    progress: 0,
-    created: Date.now(),
-  }));
+  const goals: DeityGoal[] = parsedObj.goals.map((g: unknown, i: number) => {
+    if (typeof g !== 'object' || g === null) {
+      throw new Error(`Goal ${i} is not an object`);
+    }
+    const goalObj = g as Record<string, unknown>;
+
+    return {
+      id: `goal_${Date.now()}_${i}`,
+      type: (typeof goalObj.type === 'string' ? goalObj.type : 'expand_worship') as DeityGoalType,
+      priority: typeof goalObj.priority === 'number' ? goalObj.priority : 0.5,
+      desiredOutcome: typeof goalObj.desiredOutcome === 'string' ? goalObj.desiredOutcome : '',
+      preferredMethods: Array.isArray(goalObj.preferredMethods) ? goalObj.preferredMethods.filter((m): m is string => typeof m === 'string') : [],
+      beliefBudget: typeof goalObj.beliefBudget === 'number' ? goalObj.beliefBudget : 100,
+      moralBoundary: typeof goalObj.moralBoundary === 'number' ? goalObj.moralBoundary : 0.5,
+      progress: 0,
+      created: Date.now(),
+    };
+  });
 
   const initialRelationships = new Map<string, number>();
-  if (parsed.relationships) {
-    for (const [deityId, sentiment] of Object.entries(parsed.relationships)) {
+  if (parsedObj.relationships && typeof parsedObj.relationships === 'object') {
+    for (const [deityId, sentiment] of Object.entries(parsedObj.relationships)) {
       if (typeof sentiment === 'number') {
         initialRelationships.set(deityId, sentiment);
       }
@@ -354,11 +371,11 @@ export function parsePersonalityResponse(response: string): GeneratedPersonality
   }
 
   const voiceCharacter: VoiceCharacter = {
-    style: parsed.voice.style ?? 'direct',
-    verbosity: parsed.voice.verbosity ?? 'moderate',
-    formality: parsed.voice.formality ?? 'formal',
-    emotionality: parsed.voice.emotionality ?? 'calm',
-    examplePhrases: parsed.voice.examplePhrases ?? [],
+    style: (typeof voiceObj.style === 'string' ? voiceObj.style : 'direct') as VoiceCharacter['style'],
+    verbosity: (typeof voiceObj.verbosity === 'string' ? voiceObj.verbosity : 'moderate') as VoiceCharacter['verbosity'],
+    formality: (typeof voiceObj.formality === 'string' ? voiceObj.formality : 'formal') as VoiceCharacter['formality'],
+    emotionality: (typeof voiceObj.emotionality === 'string' ? voiceObj.emotionality : 'calm') as VoiceCharacter['emotionality'],
+    examplePhrases: Array.isArray(voiceObj.examplePhrases) ? voiceObj.examplePhrases.filter((p): p is string => typeof p === 'string') : [],
   };
 
   return {
@@ -366,7 +383,7 @@ export function parsePersonalityResponse(response: string): GeneratedPersonality
     goals,
     initialRelationships,
     voiceCharacter,
-    motivation: parsed.motivation,
+    motivation: parsedObj.motivation,
   };
 }
 

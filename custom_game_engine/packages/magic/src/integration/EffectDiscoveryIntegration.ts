@@ -67,7 +67,13 @@ export interface RejectedEffectArtifact {
   id: string;
   effect: EffectExpression;
   rejectionReason: string;
-  scores: any;
+  scores: {
+    safety: number;
+    balance: number;
+    completeness: number;
+    creativity: number;
+    overall: number;
+  };
   creatorId: string;
   creatorName: string;
   rejectedAt: number;
@@ -409,13 +415,13 @@ export class EffectDiscoveryIntegration {
     return spell;
   }
 
-  private inferTechnique(effect: EffectExpression): any {
+  private inferTechnique(effect: EffectExpression): string {
     // Simplified technique inference
     const ops = effect.operations || [];
-    const hasSpawn = ops.some((op: any) => op.op === 'spawn_entity' || op.op === 'spawn_item');
-    const hasDamage = ops.some((op: any) => op.op === 'deal_damage');
-    const hasHeal = ops.some((op: any) => op.op === 'heal');
-    const hasBuff = ops.some((op: any) => op.op === 'modify_stat');
+    const hasSpawn = ops.some(op => op.op === 'spawn_entity' || op.op === 'spawn_item');
+    const hasDamage = ops.some(op => op.op === 'deal_damage');
+    const hasHeal = ops.some(op => op.op === 'heal');
+    const hasBuff = ops.some(op => op.op === 'modify_stat');
 
     if (hasSpawn) return 'create';
     if (hasDamage) return 'destroy';
@@ -424,12 +430,12 @@ export class EffectDiscoveryIntegration {
     return 'transform';
   }
 
-  private inferForm(effect: EffectExpression): any {
+  private inferForm(effect: EffectExpression): string {
     // Simplified form inference from operations
     const ops = effect.operations || [];
-    const hasFire = ops.some((op: any) => op.damageType === 'fire');
-    const hasIce = ops.some((op: any) => op.damageType === 'ice');
-    const hasLightning = ops.some((op: any) => op.damageType === 'lightning');
+    const hasFire = ops.some(op => 'damageType' in op && op.damageType === 'fire');
+    const hasIce = ops.some(op => 'damageType' in op && op.damageType === 'ice');
+    const hasLightning = ops.some(op => 'damageType' in op && op.damageType === 'lightning');
 
     if (hasFire) return 'fire';
     if (hasIce) return 'water';

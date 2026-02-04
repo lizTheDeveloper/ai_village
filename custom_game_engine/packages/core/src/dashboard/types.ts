@@ -151,7 +151,7 @@ export interface ViewSize {
  * };
  * ```
  */
-export interface DashboardView<TData extends ViewData = ViewData> {
+export interface DashboardView<out TData extends ViewData = ViewData> {
   /** Unique identifier for the view */
   id: string;
 

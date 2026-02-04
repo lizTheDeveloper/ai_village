@@ -22,7 +22,7 @@ import { CHUNK_SIZE } from './Chunk.js';
 /**
  * Placeholder for checksum function until we import from core
  */
-function computeChecksumSync(data: any): string {
+function computeChecksumSync(data: unknown): string {
   // Simple JSON-based checksum for now
   const str = JSON.stringify(data);
   let hash = 0;

@@ -2,7 +2,7 @@
  * Type definitions for chunk serialization
  */
 
-import type { Tile } from './Tile.js';
+import type { Tile, WallTile, DoorTile, WindowTile, FluidLayer } from './Tile.js';
 
 /**
  * Compression encoding strategies
@@ -130,9 +130,9 @@ export interface SerializedTile {
   moisture: number;
   fertility: number;
   biome?: string;
-  wall?: any;
-  door?: any;
-  window?: any;
+  wall?: WallTile;
+  door?: DoorTile;
+  window?: WindowTile;
   tilled: boolean;
   plantability: number;
   nutrients: {
@@ -146,7 +146,7 @@ export interface SerializedTile {
   lastTilled: number;
   composted: boolean;
   plantId: string | null;
-  fluid?: any;
+  fluid?: FluidLayer;
   mineable?: boolean;
   embeddedResource?: string;
   resourceAmount?: number;

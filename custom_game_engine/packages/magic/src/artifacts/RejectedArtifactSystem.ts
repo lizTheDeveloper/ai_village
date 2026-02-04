@@ -44,7 +44,7 @@ export interface RejectedArtifactComponent extends Component {
   type: 'rejected_artifact';
 
   /** The rejected effect expression */
-  effectExpression: any; // EffectExpression type (avoiding circular dependency)
+  effectExpression: unknown; // EffectExpression type (avoiding circular dependency)
 
   /** Original generation request for context */
   originalRequest: EffectGenerationRequest;
@@ -85,7 +85,7 @@ export interface CorruptedEffectComponent extends Component {
   type: 'corrupted_effect';
 
   /** Original effect data (may be invalid) */
-  effectExpression: any;
+  effectExpression: unknown;
 
   /** Original generation request */
   originalRequest: EffectGenerationRequest;
@@ -97,7 +97,7 @@ export interface CorruptedEffectComponent extends Component {
   validationErrors: ValidationIssue[];
 
   /** Original data for forensics */
-  originalData: any;
+  originalData: unknown;
 
   /** Can it be fixed */
   recoverable: boolean;
@@ -124,7 +124,7 @@ export interface EffectGenerationRequest {
   technique?: string;
   form?: string;
   targetComplexity?: 'simple' | 'moderate' | 'complex';
-  examples?: any[];
+  examples?: unknown[];
 }
 
 /**
@@ -170,7 +170,7 @@ export class RejectedArtifactSystem {
    * @returns Entity representing the rejected artifact
    */
   preserveRejectedEffect(
-    effect: any,
+    effect: unknown,
     request: EffectGenerationRequest,
     rejectionReason: string,
     rejectedBy: string,
@@ -223,7 +223,7 @@ export class RejectedArtifactSystem {
    * @returns Entity representing the corrupted effect
    */
   preserveCorruptedEffect(
-    effect: any,
+    effect: unknown,
     request: EffectGenerationRequest,
     validationErrors: ValidationIssue[],
     corruptionReason: string,
@@ -255,41 +255,56 @@ export class RejectedArtifactSystem {
    * @param effect - The effect expression
    * @returns Danger level 1-10
    */
-  private calculateDangerLevel(effect: any): number {
+  private calculateDangerLevel(effect: unknown): number {
     let danger = 5; // Base danger
 
+    // Type guard to check if effect has operations
+    if (typeof effect !== 'object' || effect === null) {
+      return danger;
+    }
+
+    const effectObj = effect as Record<string, unknown>;
+
     // Check for high-risk operations
-    const operations = effect.operations || [];
+    const operations = Array.isArray(effectObj.operations) ? effectObj.operations : [];
 
     for (const op of operations) {
+      if (typeof op !== 'object' || op === null) continue;
+
+      const operation = op as Record<string, unknown>;
+
       // Damage operations increase danger
-      if (op.op === 'deal_damage') {
-        const damageValue = op.value || 0;
+      if (operation.op === 'deal_damage') {
+        const damageValue = typeof operation.value === 'number' ? operation.value : 0;
         if (damageValue > 100) danger += 2;
         if (damageValue > 500) danger += 3;
       }
 
       // Spawning increases danger
-      if (op.op === 'spawn_entity') {
+      if (operation.op === 'spawn_entity') {
         danger += 1;
       }
 
       // Chain effects increase danger
-      if (op.op === 'chain_effect') {
+      if (operation.op === 'chain_effect') {
         danger += 2;
       }
 
       // Permanent transformations increase danger
-      if (op.op === 'transform' && op.permanent) {
+      if (operation.op === 'transform' && operation.permanent === true) {
         danger += 2;
       }
     }
 
     // Area effects are more dangerous
-    if (effect.target?.type === 'area') {
-      const radius = effect.target.radius || 0;
-      if (radius > 10) danger += 1;
-      if (radius > 20) danger += 2;
+    const target = effectObj.target;
+    if (typeof target === 'object' && target !== null) {
+      const targetObj = target as Record<string, unknown>;
+      if (targetObj.type === 'area') {
+        const radius = typeof targetObj.radius === 'number' ? targetObj.radius : 0;
+        if (radius > 10) danger += 1;
+        if (radius > 20) danger += 2;
+      }
     }
 
     return Math.max(1, Math.min(10, danger));
@@ -392,7 +407,7 @@ export class RejectedArtifactSystem {
    * @param dangerLevel - Danger level 1-10
    * @returns True if recoverable
    */
-  private isRetrievable(effect: any, dangerLevel: number): boolean {
+  private isRetrievable(effect: unknown, dangerLevel: number): boolean {
     // Extremely dangerous effects (10) are permanently banished
     if (dangerLevel >= 10) {
       return false;
@@ -505,7 +520,7 @@ export class RejectedArtifactSystem {
   attemptRecovery(
     artifactId: string,
     recoveryItems: string[]
-  ): { success: boolean; effect?: any; missingItems?: string[] } {
+  ): { success: boolean; effect?: unknown; missingItems?: string[] } {
     const entity = this.world.getEntity(artifactId);
     if (!entity) {
       return { success: false };

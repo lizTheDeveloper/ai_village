@@ -35,10 +35,15 @@ export interface GeneratedSoulName {
 /**
  * SoulNameGenerator - Manages unique soul name generation
  */
+interface SoulRepository {
+  getAllSouls(): Array<{ name: string }>;
+  soulNameExists(name: string): boolean;
+}
+
 export class SoulNameGenerator {
   private llmProvider?: LLMProvider;
   private useLLM: boolean = true;
-  private soulRepositorySystem?: any; // Reference to global soul repository
+  private soulRepositorySystem?: SoulRepository; // Reference to global soul repository
 
   // Track all used names globally (across all cultures)
   private usedNames = new Set<string>();
@@ -119,7 +124,7 @@ export class SoulNameGenerator {
   /**
    * Set the soul repository system for global uniqueness checking
    */
-  setSoulRepository(repository: any): void {
+  setSoulRepository(repository: SoulRepository): void {
     this.soulRepositorySystem = repository;
   }
 
@@ -213,7 +218,7 @@ export class SoulNameGenerator {
 
     // Get all existing names from repository (if available)
     const allExistingNames = this.soulRepositorySystem
-      ? this.soulRepositorySystem.getAllSouls().map((soul: any) => soul.name)
+      ? this.soulRepositorySystem.getAllSouls().map(soul => soul.name)
       : Array.from(this.usedNames);
 
     // Get recently used names for context
@@ -264,7 +269,7 @@ Name:`;
     if (isNameTaken && retryAttempt < 3) {
       // Name is taken - re-prompt with context about existing names
       const firstLetter = name.charAt(0).toUpperCase();
-      const namesWithSameLetter = allExistingNames.filter((n: string) =>
+      const namesWithSameLetter = allExistingNames.filter(n =>
         n.charAt(0).toUpperCase() === firstLetter
       );
 

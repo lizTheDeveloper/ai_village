@@ -72,7 +72,7 @@ export interface NeedsComponentWithHealth {
   type: 'needs';
   health: number;
   maxHealth?: number;
-  [key: string]: any; // Allow other properties
+  [key: string]: unknown; // Allow other properties
 }
 
 // ============================================================================
@@ -113,7 +113,7 @@ export interface EnvironmentComponent {
   weatherIntensity?: number;
   globalLightLevel?: number;
   temperatureModifier?: number;
-  globalZones?: any[];
+  globalZones?: unknown[];
 }
 
 export interface EnvironmentalZoneComponent {
@@ -122,8 +122,8 @@ export interface EnvironmentalZoneComponent {
   environmentType: string;
   radius: number;
   shape?: string;
-  properties: Record<string, any>;
-  areaEffects: any[];
+  properties: Record<string, unknown>;
+  areaEffects: unknown[];
   createdAt: number;
   duration?: number;
 }
@@ -148,17 +148,17 @@ export interface AppearanceComponent extends Component {
 export interface ParadigmState {
   suppressed?: boolean;
   suppressedUntil?: number;
-  [key: string]: any; // For extensibility
+  [key: string]: unknown; // For extensibility
 }
 
 export interface ChannelData {
   type: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface RiskData {
   type: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // ============================================================================
