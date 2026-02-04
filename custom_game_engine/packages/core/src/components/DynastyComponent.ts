@@ -1,4 +1,5 @@
 import type { Component } from '../ecs/Component.js';
+import { clamp01 } from '../utils/math.js';
 
 /**
  * DynastyComponent - Dynasty membership for soul agents
@@ -171,7 +172,7 @@ export function updateLegitimacyFactors(
   const negativeTraits = ['cruel', 'coward', 'incompetent', 'corrupt'];
   const positiveCount = traits.filter(t => leadershipTraits.includes(t)).length;
   const negativeCount = traits.filter(t => negativeTraits.includes(t)).length;
-  const traitsFactor = Math.max(0, Math.min(1, (positiveCount - negativeCount) / 5 + 0.5));
+  const traitsFactor = clamp01((positiveCount - negativeCount) / 5 + 0.5);
 
   return {
     ...dynasty,

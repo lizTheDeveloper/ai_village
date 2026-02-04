@@ -1,5 +1,6 @@
 import type { Component } from '../ecs/Component.js';
 import { BuildingType, type BuildingTypeString } from '../types/BuildingType.js';
+import { clamp } from '../utils/math.js';
 
 // Re-export enum and type for backwards compatibility
 export { BuildingType };
@@ -210,8 +211,8 @@ export function createBuildingComponent(
     type: 'building',
     version: 1,
     buildingType,
-    tier: Math.max(1, Math.min(3, tier)),
-    progress: Math.max(0, Math.min(100, progress)),
+    tier: clamp(tier, 1, 3),
+    progress: clamp(progress, 0, 100),
     isComplete: progress >= 100,
     blocksMovement,
     storageCapacity,

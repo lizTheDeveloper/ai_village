@@ -6,6 +6,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import type { MagicComponent } from '../../components/MagicComponent.js';
 import type { SpiritualComponent } from '../../components/SpiritualComponent.js';
+import { clamp, clamp01 } from '../../utils/math.js';
 
 // Type helpers for testing
 type EntityWithMethods = {
@@ -396,7 +397,7 @@ function validateResourcePool(pool: Record<string, unknown>): void {
 }
 
 function clampLocked(pool: any, value: number): number {
-  return Math.max(0, Math.min(pool.current, value));
+  return clamp(value, 0, pool.current);
 }
 
 function getAvailableResource(pool: Record<string, unknown>): number {
@@ -405,8 +406,8 @@ function getAvailableResource(pool: Record<string, unknown>): number {
 
 function validateAndFixResourcePool(pool: Record<string, unknown>): any {
   const fixed = { ...pool };
-  fixed.current = Math.max(0, Math.min(fixed.maximum, fixed.current));
-  fixed.locked = Math.max(0, Math.min(fixed.current, fixed.locked));
+  fixed.current = clamp(fixed.current, 0, fixed.maximum);
+  fixed.locked = clamp(fixed.locked, 0, fixed.current);
   return fixed;
 }
 
@@ -429,7 +430,7 @@ function validateParadigmCombination(paradigms: string[], config?: any): void {
 }
 
 function capProficiency(value: number): number {
-  return Math.max(0, Math.min(100, value));
+  return clamp(value, 0, 100);
 }
 
 function validateProficiency(value: number): void {
@@ -462,7 +463,7 @@ function calculatePrayerStatistics(spiritual: SpiritualComponent): any {
 }
 
 function clampFaith(value: number): number {
-  return Math.max(0, Math.min(1, value));
+  return clamp01(value);
 }
 
 function setFaith(spiritual: SpiritualComponent, deityId: string, value: number): void {

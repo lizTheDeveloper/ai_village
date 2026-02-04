@@ -11,6 +11,7 @@
  */
 
 import type { MagicParadigm } from './MagicParadigm.js';
+import { clamp } from '../utils/math.js';
 
 // ============================================================================
 // Types
@@ -325,7 +326,7 @@ export class MagicSystemStateManager {
   setPlayerProficiency(paradigmId: string, proficiency: number): void {
     const state = this.states.get(paradigmId);
     if (state) {
-      state.playerProficiency = Math.max(0, Math.min(100, proficiency));
+      state.playerProficiency = clamp(proficiency, 0, 100);
     }
   }
 

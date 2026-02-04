@@ -16,6 +16,7 @@ import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
+import { clamp01 } from '../utils/math.js';
 
 // ============================================================================
 // Mass Event Types
@@ -511,7 +512,7 @@ export class MassEventSystem extends BaseSystem {
 
       // Evaluate based on current faith
       const change = spiritual.faith > 0.7 ? 0.1 : -0.1;
-      spiritual.faith = Math.max(0, Math.min(1, spiritual.faith + change));
+      spiritual.faith = clamp01(spiritual.faith + change);
 
       changes.push({ entityId, change });
     }

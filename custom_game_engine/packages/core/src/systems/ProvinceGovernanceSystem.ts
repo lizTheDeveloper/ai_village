@@ -26,6 +26,7 @@ import type {
   ProvinceCityRecord,
 } from '../components/ProvinceGovernanceComponent.js';
 import type { TownHallComponent } from '../components/TownHallComponent.js';
+import { clamp01 } from '../utils/math.js';
 
 // ============================================================================
 // System
@@ -311,8 +312,8 @@ export class ProvinceGovernanceSystem extends BaseSystem {
     }
 
     // Update stability
-    const newStability = Math.max(0, Math.min(1,
-      governance.stability + stabilityModifier * 0.01)); // Gradual change
+    const newStability = clamp01(
+      governance.stability + stabilityModifier * 0.01); // Gradual change
 
     entity.updateComponent<ProvinceGovernanceComponent>(CT.ProvinceGovernance, (current) => ({
       ...current,

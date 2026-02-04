@@ -25,6 +25,7 @@ import {
   createUnlockCondition,
   createDefaultTreeRules,
 } from '../MagicSkillTree.js';
+import { clamp } from '../../utils/math.js';
 
 // ============================================================================
 // Constants
@@ -965,7 +966,7 @@ export function getBreachSeverity(
   if (hasProtection) severity -= 1;
 
   // Clamp
-  severity = Math.max(0, Math.min(4, severity));
+  severity = clamp(severity, 0, 4);
 
   if (severity === 0) return 'minor';
   if (severity === 1) return 'minor';

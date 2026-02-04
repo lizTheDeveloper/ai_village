@@ -36,6 +36,7 @@ import {
   getTaskFamiliarityBonus,
   getSpecializationBonus,
 } from '../components/SkillsComponent.js';
+import { clamp } from '../utils/math.js';
 
 /**
  * Map station types to cooking specializations.
@@ -255,13 +256,13 @@ export class CookingSystem extends BaseSystem {
     quality *= 1 + synergyBonus;
 
     // Mood bonus (-10 to +10)
-    quality += Math.max(-10, Math.min(10, moodBonus));
+    quality += clamp(moodBonus, -10, 10);
 
     // Random variance (-5 to +5)
     const variance = (Math.random() - 0.5) * 10;
     quality += variance;
 
-    return Math.max(0, Math.min(100, Math.round(quality)));
+    return clamp(Math.round(quality), 0, 100);
   }
 
   /**

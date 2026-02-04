@@ -14,6 +14,7 @@
  */
 
 import type { Component } from '../ecs/Component.js';
+import { clamp } from '../utils/math.js';
 
 // ============================================================================
 // Types
@@ -246,7 +247,7 @@ export function createAerialHarmonyComponent(
   return {
     type: 'aerial_harmony',
     version: 1,
-    harmonyScore: Math.max(0, Math.min(100, Math.round(harmonyScore))),
+    harmonyScore: clamp(Math.round(harmonyScore), 0, 100),
     harmonyLevel: getAerialHarmonyLevel(harmonyScore),
     thermals,
     windCorridors,

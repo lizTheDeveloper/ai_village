@@ -14,6 +14,7 @@
 
 import type { DetectionRisk, ForbiddenCategory, CreatorDetectionMetadata } from './SpellRegistry.js';
 import type { MagicForm, MagicTechnique, MagicSourceId } from '../components/MagicComponent.js';
+import { clamp, clamp01 } from '../utils/math.js';
 
 // ============================================================================
 // Detection Rule System
@@ -274,7 +275,7 @@ function riskValue(risk: DetectionRisk): number {
 /** Increase risk level by modifier */
 function increaseRisk(current: DetectionRisk, modifier: number): DetectionRisk {
   const currentValue = riskValue(current);
-  const newValue = Math.max(0, Math.min(5, currentValue + Math.round(modifier)));
+  const newValue = clamp(currentValue + Math.round(modifier), 0, 5);
 
   const risks: DetectionRisk[] = ['undetectable', 'low', 'moderate', 'high', 'critical', 'forbidden'];
   return risks[newValue]!; // newValue is clamped to 0-5, so this is safe
@@ -333,7 +334,7 @@ export function calculateDetectionChance(
   }
 
   // Clamp to [0, 1]
-  return Math.max(0, Math.min(1, chance));
+  return clamp01(chance);
 }
 
 // ============================================================================

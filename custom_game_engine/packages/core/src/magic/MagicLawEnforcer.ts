@@ -19,6 +19,7 @@ import type { ComposedSpell, MagicComponent, MagicTechnique, MagicForm } from '.
 import { costCalculatorRegistry } from './costs/CostCalculatorRegistry.js';
 import { createDefaultContext } from './costs/CostCalculator.js';
 import type { CastingContext } from './costs/CostCalculator.js';
+import { clamp01 } from '../utils/math.js';
 
 // ============================================================================
 // Validation Results
@@ -521,7 +522,7 @@ export class MagicLawEnforcer {
 
     return {
       risk,
-      probability: Math.min(1, Math.max(0, probability)),
+      probability: clamp01(probability),
       mitigated,
       mitigationReason,
     };

@@ -6,6 +6,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import type { Deity } from '../DeityTypes.js';
 import type { Prayer } from '../DivinePowerTypes.js';
+import { clamp } from '../../utils/math.js';
 
 describe('Belief Going Negative', () => {
   it('should prevent belief from going negative', () => {
@@ -689,7 +690,7 @@ function cleanupBelieverList(deity: Deity): Deity {
 function validateBelieverState(believer:Record<string, unknown>): any {
   return {
     ...believer,
-    faith: Math.max(0, Math.min(1, believer.faith)),
+    faith: clamp(believer.faith, 0, 1),
   };
 }
 
@@ -728,9 +729,9 @@ function detectPersonalityContradictions(deity: Deity): any[] {
 
 function validateAlignment(alignment:Record<string, unknown>): any {
   return {
-    law_chaos: Math.max(-1, Math.min(1, alignment.law_chaos)),
-    good_evil: Math.max(-1, Math.min(1, alignment.good_evil)),
-    selfless_selfish: Math.max(-1, Math.min(1, alignment.selfless_selfish)),
+    law_chaos: clamp(alignment.law_chaos, -1, 1),
+    good_evil: clamp(alignment.good_evil, -1, 1),
+    selfless_selfish: clamp(alignment.selfless_selfish, -1, 1),
   };
 }
 

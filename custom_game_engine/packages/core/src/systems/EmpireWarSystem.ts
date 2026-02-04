@@ -18,6 +18,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EmpireComponent, ImperialWar, ImperialTreaty, MilitaryContribution } from '../components/EmpireComponent.js';
+import { clamp } from '../utils/math.js';
 
 // ============================================================================
 // Types
@@ -141,7 +142,7 @@ export class EmpireWarSystem extends BaseSystem {
       factors.economicDamage +
       factors.duration;
 
-    return Math.max(0, Math.min(100, totalScore));
+    return clamp(totalScore, 0, 100);
   }
 
   /**

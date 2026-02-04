@@ -40,6 +40,8 @@ import {
   type DoorMaterial,
   type WindowMaterial,
   DeityComponent,
+  clamp,
+  clamp01,
 } from '@ai-village/core';
 import type { MegastructureComponent } from '../../core/src/components/MegastructureComponent.js';
 import type { MagicParadigm } from '@ai-village/magic';
@@ -1942,7 +1944,7 @@ export class DevPanel implements IWindowPanel {
 
   handleScroll(deltaY: number, _contentHeight?: number): boolean {
     const maxScroll = Math.max(0, this.contentHeight - this.visibleHeight);
-    this.scrollOffset = Math.max(0, Math.min(maxScroll, this.scrollOffset + deltaY));
+    this.scrollOffset = clamp(this.scrollOffset + deltaY, 0, maxScroll);
     return true;
   }
 
@@ -1992,7 +1994,7 @@ export class DevPanel implements IWindowPanel {
 
       case 'adjust_slider': {
         const sliderId = region.data!;
-        const progress = Math.max(0, Math.min(1, (clickX - region.x) / region.width));
+        const progress = clamp01((clickX - region.x) / region.width);
 
         if (sliderId.startsWith('mana_')) {
           const paradigmId = sliderId.replace('mana_', '');
@@ -2037,13 +2039,13 @@ export class DevPanel implements IWindowPanel {
       }
 
       case 'adjust_spawn_x': {
-        const progress = Math.max(0, Math.min(1, (clickX - region.x) / region.width));
+        const progress = clamp01((clickX - region.x) / region.width);
         this.spawnX = Math.floor(progress * 200);
         return true;
       }
 
       case 'adjust_spawn_y': {
-        const progress = Math.max(0, Math.min(1, (clickX - region.x) / region.width));
+        const progress = clamp01((clickX - region.x) / region.width);
         this.spawnY = Math.floor(progress * 200);
         return true;
       }

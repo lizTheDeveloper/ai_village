@@ -27,6 +27,7 @@ import type { FleetComponent } from '../components/FleetComponent.js';
 import type { SquadronComponent } from '../components/SquadronComponent.js';
 import type { SpaceshipComponent } from '../navigation/SpaceshipComponent.js';
 import type { ShipCrewComponent } from '../components/ShipCrewComponent.js';
+import { clamp01 } from '../utils/math.js';
 
 // ============================================================================
 // Types
@@ -555,7 +556,7 @@ export class HeartChamberNetworkSystem extends BaseSystem {
     const alignmentChance =
       coherenceBonus * (1 - stressPenalty) * moraleBonus * heartMultiplier;
 
-    return Math.max(0, Math.min(1, alignmentChance));
+    return clamp01(alignmentChance);
   }
 
   /**

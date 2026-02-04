@@ -33,6 +33,7 @@ import type { NationComponent } from '../components/NationComponent.js';
 import type { NavyComponent } from '../components/NavyComponent.js';
 import { selectHeir, handleSuccessionCrisis, executeSuccession } from './EmpireDynastyManager.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
+import { clamp01 } from '../utils/math.js';
 
 // ============================================================================
 // System
@@ -290,7 +291,7 @@ export class EmpireSystem extends BaseSystem {
     loyalty += religiousAlignment * 0.1;
 
     // Clamp to 0-1
-    return Math.max(0, Math.min(1, loyalty));
+    return clamp01(loyalty);
   }
 
   /**

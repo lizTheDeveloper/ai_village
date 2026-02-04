@@ -10,6 +10,7 @@
 
 import type { Component } from '../ecs/Component.js';
 import type { CauseOfDeath } from './AfterlifeComponent.js';
+import { clamp01 } from '../utils/math.js';
 
 export type JudgmentStage =
   | 'awaiting_psychopomp'  // Soul just died, waiting for guide to appear
@@ -191,7 +192,7 @@ export function calculateInitialPeace(
   // Unfinished business
   peace -= unfinishedGoalsCount * 0.05; // Each unfinished goal reduces peace
 
-  return Math.max(0, Math.min(1, peace));
+  return clamp01(peace);
 }
 
 /**
@@ -231,7 +232,7 @@ export function calculateInitialTether(
       break;
   }
 
-  return Math.max(0, Math.min(1, tether));
+  return clamp01(tether);
 }
 
 /**

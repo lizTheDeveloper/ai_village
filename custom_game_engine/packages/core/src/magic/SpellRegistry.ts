@@ -9,6 +9,7 @@
  */
 
 import type { ComposedSpell, MagicTechnique, MagicForm, MagicSourceId } from '../components/MagicComponent.js';
+import { clamp } from '../utils/math.js';
 
 // ============================================================================
 // Types
@@ -249,7 +250,7 @@ export class SpellRegistry {
   setProficiency(spellId: string, proficiency: number): void {
     const state = this.playerStates.get(spellId);
     if (state) {
-      state.proficiency = Math.max(0, Math.min(100, proficiency));
+      state.proficiency = clamp(proficiency, 0, 100);
       this.notify({ type: 'state_changed', spellId });
     }
   }

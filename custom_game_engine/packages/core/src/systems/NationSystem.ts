@@ -54,6 +54,7 @@ import {
   calculatePolicyEffect,
   type PolicyTarget,
 } from '../data/NationalPolicies.js';
+import { clamp, clamp01 } from '../utils/math.js';
 
 // ============================================================================
 // System
@@ -577,7 +578,7 @@ export class NationSystem extends BaseSystem {
       ...current,
       military: {
         ...current.military,
-        militaryReadiness: Math.max(0, Math.min(1, current.military.militaryReadiness + readinessDelta)),
+        militaryReadiness: clamp01(current.military.militaryReadiness + readinessDelta),
       },
     }));
 
@@ -940,11 +941,11 @@ export class NationSystem extends BaseSystem {
     const legitimacyMod = this.getPolicyModifier(nation, 'legitimacy');
 
     // Calculate rebellion risk
-    const rebellionRisk = Math.max(0, Math.min(1,
+    const rebellionRisk = clamp01(
       (1 - nation.stability) * 0.3 +
       (1 - nation.legitimacy) * 0.3 +
       (disloyalProvinces.length / Math.max(1, nation.provinceRecords.length)) * 0.4
-    ));
+    );
 
     // Calculate coup risk (higher if military is mobilized and stability low)
     const coupRisk = nation.military.mobilization === 'full' && nation.stability < 0.4 ? 0.1 : 0;
@@ -1448,7 +1449,7 @@ export class NationSystem extends BaseSystem {
 
       // Gradual opinion change (don't jump instantly)
       relation.opinion = previousOpinion + Math.sign(opinionChange) * Math.min(Math.abs(opinionChange), 5);
-      relation.opinion = Math.max(-100, Math.min(100, relation.opinion));
+      relation.opinion = clamp(relation.opinion, -100, 100);
 
       // Update relationship tier
       relation.relationship = this.opinionToRelationship(relation.opinion, relation);

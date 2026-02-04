@@ -24,6 +24,7 @@ import {
   type Renderer as PixiRenderer,
 } from 'pixi.js';
 import type { World, Entity, EventBus } from '@ai-village/core';
+import { clamp, clamp01 } from '@ai-village/core';
 import type { ChunkManager, TerrainGenerator, Chunk, Tile } from '@ai-village/world';
 import { CHUNK_SIZE, TERRAIN_COLORS } from '@ai-village/world';
 import { Camera, type VisibleBounds } from './Camera.js';
@@ -1552,7 +1553,7 @@ export class PixiJSRenderer implements IRenderer {
       graphics.stroke({ color: 0xffffff, width: 1 });
 
       // Health fill
-      const fillWidth = Math.max(0, Math.min(1, health)) * this.HEALTH_BAR_WIDTH;
+      const fillWidth = clamp01(health) * this.HEALTH_BAR_WIDTH;
       let fillColor: number;
       if (health >= this.HEALTH_GOOD) {
         fillColor = 0x00ff00; // Green
@@ -1654,8 +1655,8 @@ export class PixiJSRenderer implements IRenderer {
           arrowX = centerX + (arrowY - centerY) / tanAngle * Math.sign(dx);
         }
 
-        arrowX = Math.max(arrowMargin, Math.min(viewWidth - arrowMargin, arrowX));
-        arrowY = Math.max(arrowMargin, Math.min(viewHeight - arrowMargin, arrowY));
+        arrowX = clamp(arrowX, arrowMargin, viewWidth - arrowMargin);
+        arrowY = clamp(arrowY, arrowMargin, viewHeight - arrowMargin);
 
         // Position in screen space (convert to world space for container)
         // For off-screen arrows, we need screen coordinates relative to world container

@@ -7,6 +7,7 @@ import type { World } from '../ecs/World.js';
 import { getWorkingTools } from '../components/InventoryComponent.js';
 import type { InventoryComponent } from '../components/InventoryComponent.js';
 import type { GameEvent } from '../events/EventBus.js';
+import { clamp01 } from '../utils/math.js';
 
 export interface Tile {
   terrain: string;
@@ -223,7 +224,7 @@ export class SoilSystem extends BaseSystem {
       return 0.5; // Default moderate intensity
     }
     if (typeof intensity === 'number') {
-      return Math.max(0, Math.min(1, intensity));
+      return clamp01(intensity);
     }
     // Handle string intensity values
     switch (intensity) {

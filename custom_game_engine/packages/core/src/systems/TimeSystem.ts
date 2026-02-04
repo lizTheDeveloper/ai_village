@@ -13,6 +13,7 @@ import {
   GAME_DAY_SECONDS,
 } from '../constants/index.js';
 import { multiverseCoordinator } from '../multiverse/index.js';
+import { clamp } from '../utils/math.js';
 
 export type DayPhase = 'dawn' | 'day' | 'dusk' | 'night';
 export type Season = 'spring' | 'summer' | 'fall' | 'winter';
@@ -182,7 +183,7 @@ export class TimeSystem extends BaseSystem {
     // Set time speed
     world.eventBus.on('time:request_speed', (event) => {
       const data = event.data as { speed: number };
-      const speed = Math.max(0, Math.min(10, data.speed)); // Clamp 0-10
+      const speed = clamp(data.speed, 0, 10); // Clamp 0-10
 
       const timeEntities = world.query().with(CT.Time).executeEntities();
       const timeEntity = timeEntities[0] as EntityImpl | undefined;

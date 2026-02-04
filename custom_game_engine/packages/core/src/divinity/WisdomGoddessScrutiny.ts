@@ -14,6 +14,7 @@
 
 import type { PendingCreation } from '../crafting/PendingApprovalRegistry.js';
 import type { ResearchField } from '../research/types.js';
+import { clamp01 } from '../utils/math.js';
 
 /** Scrutiny style affects approval thresholds and prompts */
 export type ScrutinyStyle = 'strict' | 'encouraging' | 'curious' | 'pragmatic';
@@ -289,9 +290,9 @@ export function parseWisdomScrutinyResponse(response: string): WisdomScrutinyRes
       approved: parsed.approved,
       reasoning: parsed.reasoning || 'No reasoning provided',
       wisdomComment: parsed.wisdomComment || 'The goddess remains silent.',
-      balanceScore: Math.max(0, Math.min(1, parsed.balanceScore || 0.5)),
-      noveltyScore: Math.max(0, Math.min(1, parsed.noveltyScore || 0.5)),
-      fitScore: Math.max(0, Math.min(1, parsed.fitScore || 0.5)),
+      balanceScore: clamp01(parsed.balanceScore || 0.5),
+      noveltyScore: clamp01(parsed.noveltyScore || 0.5),
+      fitScore: clamp01(parsed.fitScore || 0.5),
     };
   } catch {
     return null;

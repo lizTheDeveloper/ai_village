@@ -4,6 +4,7 @@ import { AnimalComponent, type AnimalLifeStage } from '../components/AnimalCompo
 import { getAnimalSpecies } from '../data/animalSpecies.js';
 import { setMutationRate, clearMutationRate, MUTATION_PATHS } from '../components/MutationVectorComponent.js';
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import { clamp } from '../utils/math.js';
 
 /**
  * AnimalSystem handles animal lifecycle, needs, and state management
@@ -306,6 +307,6 @@ export class AnimalSystem extends BaseSystem {
     if (animal.health < 40) mood -= 20; // Sick
     mood -= animal.stress * 0.3; // Stress reduces mood
 
-    return Math.max(0, Math.min(100, mood));
+    return clamp(mood, 0, 100);
   }
 }

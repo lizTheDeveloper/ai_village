@@ -27,6 +27,7 @@ import type { VillageGovernanceComponent } from '../components/VillageGovernance
 import type { TownHallComponent } from '../components/TownHallComponent.js';
 import type { WarehouseComponent } from '../components/WarehouseComponent.js';
 import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
+import { clamp01 } from '../utils/math.js';
 
 export class CityGovernanceSystem extends BaseSystem {
   public readonly id: SystemId = 'city_governance';
@@ -171,7 +172,7 @@ export class CityGovernanceSystem extends BaseSystem {
       newEfficiency *= budgetModifier;
 
       // Clamp to 0-1 range
-      newEfficiency = Math.max(0, Math.min(1, newEfficiency));
+      newEfficiency = clamp01(newEfficiency);
 
       // Check if efficiency changed significantly (> 5%)
       if (Math.abs(newEfficiency - dept.efficiency) > 0.05) {

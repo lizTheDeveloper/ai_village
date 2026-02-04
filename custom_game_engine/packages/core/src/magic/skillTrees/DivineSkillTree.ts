@@ -27,6 +27,7 @@ import {
   createUnlockCondition,
   createDefaultTreeRules,
 } from '../MagicSkillTree.js';
+import { clamp } from '../../utils/math.js';
 
 // ============================================================================
 // Constants
@@ -864,5 +865,5 @@ export function getPrayerEffectiveness(
   // Sins reduce effectiveness
   effectiveness -= recentSins * 0.5;
 
-  return Math.max(0, Math.min(100, effectiveness));
+  return clamp(effectiveness, 0, 100);
 }

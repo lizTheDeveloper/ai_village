@@ -19,6 +19,7 @@ import { EntityImpl } from '../ecs/Entity.js';
 import type { ArmadaComponent } from '../components/ArmadaComponent.js';
 import type { FleetComponent } from '../components/FleetComponent.js';
 import type { SpaceshipType } from '../navigation/SpaceshipComponent.js';
+import { clamp } from '../utils/math.js';
 
 // ============================================================================
 // System
@@ -237,7 +238,7 @@ export class ArmadaSystem extends BaseSystem {
     // PERF: Only update if morale actually changes
     if (moraleChange === 0) return;
 
-    const newMorale = Math.max(0, Math.min(1, armada.morale.average + moraleChange));
+    const newMorale = clamp(armada.morale.average + moraleChange, 0, 1);
 
     armadaEntity.updateComponent<ArmadaComponent>(CT.Armada, (a) => ({
       ...a,

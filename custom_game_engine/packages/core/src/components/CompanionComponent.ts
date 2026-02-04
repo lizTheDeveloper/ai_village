@@ -14,6 +14,7 @@
  */
 
 import { ComponentBase } from '../ecs/Component.js';
+import { clamp01 } from '../utils/math.js';
 
 // ============================================================================
 // Type Definitions
@@ -245,7 +246,7 @@ export function updateNeed(
     throw new Error('updateNeed: companion parameter is required');
   }
 
-  companion.needs[need] = Math.max(0, Math.min(1, companion.needs[need] + delta));
+  companion.needs[need] = clamp01(companion.needs[need] + delta);
 }
 
 /**
