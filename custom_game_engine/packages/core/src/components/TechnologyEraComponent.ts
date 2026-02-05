@@ -12,6 +12,7 @@
  */
 
 import type { Component } from '../ecs/Component.js';
+import { clamp } from '../utils/math.js';
 
 /**
  * Technology eras spanning from Paleolithic to Transcendent.
@@ -546,7 +547,7 @@ export function updateCollapseRisk(component: TechnologyEraComponent): void {
   risk *= complexityMultiplier;
 
   // Clamp to 0-100
-  component.collapseRisk = Math.max(0, Math.min(100, risk));
+  component.collapseRisk = clamp(risk, 0, 100);
 }
 
 /**

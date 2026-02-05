@@ -37,6 +37,7 @@ import type { SkillsComponent } from '../../components/SkillsComponent.js';
 import { addSkillXP } from '../../components/SkillsComponent.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import { isEdibleSpecies } from '../../services/TargetingAPI.js';
+import { clamp } from '../../utils/math.js';
 import {
   GATHER_MAX_RANGE,
   HOME_RADIUS,
@@ -1235,9 +1236,11 @@ export class GatherBehavior extends BaseBehavior {
     // Calculate seed quality based on farming skill and plant health
     // Seeds get quality based on plant health and farming skill
     // Formula: base 50 + (skill * 8) + (health / 10) - gives range ~50-100
-    const seedQuality = Math.min(100, Math.max(0,
-      ENERGY_MODERATE + (farmingLevel * 8) + (plantComp.health / 10) + (Math.random() - 0.5) * 10
-    ));
+    const seedQuality = clamp(
+      ENERGY_MODERATE + (farmingLevel * 8) + (plantComp.health / 10) + (Math.random() - 0.5) * 10,
+      0,
+      100
+    );
 
     try {
       const result = addToInventoryWithQuality(inventory, seedItemId, seedsToGather, Math.round(seedQuality));
@@ -1335,9 +1338,11 @@ export class GatherBehavior extends BaseBehavior {
     const skillsComp = entity.getComponent(ComponentType.Skills);
     const gatheringLevel = skillsComp?.levels.gathering ?? 0;
     // Fruit quality: base 50 + (skill * 5) + (health / 5) - gives range ~50-100
-    const fruitQuality = Math.min(100, Math.max(0,
-      50 + (gatheringLevel * 5) + (plantComp.health / 5) + (Math.random() - 0.5) * 10
-    ));
+    const fruitQuality = clamp(
+      50 + (gatheringLevel * 5) + (plantComp.health / 5) + (Math.random() - 0.5) * 10,
+      0,
+      100
+    );
 
     try {
       const result = addToInventoryWithQuality(inventory, foodItemId, fruitToGather, Math.round(fruitQuality));

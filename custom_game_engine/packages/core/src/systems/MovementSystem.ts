@@ -13,6 +13,7 @@ import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { SteeringComponent } from '../components/SteeringComponent.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { Tile } from '@ai-village/world';
+import { clamp } from '../utils/math.js';
 import type { SpatialMemoryComponent } from '../components/SpatialMemoryComponent.js';
 import { addSpatialMemory } from '../components/SpatialMemoryComponent.js';
 import type { ResourceComponent } from '../components/ResourceComponent.js';
@@ -653,8 +654,8 @@ export class MovementSystem extends BaseSystem {
 
     if (steering?.containmentBounds) {
       const bounds = steering.containmentBounds;
-      clampedX = Math.max(bounds.minX, Math.min(bounds.maxX, x));
-      clampedY = Math.max(bounds.minY, Math.min(bounds.maxY, y));
+      clampedX = clamp(x, bounds.minX, bounds.maxX);
+      clampedY = clamp(y, bounds.minY, bounds.maxY);
     }
 
     const newChunkX = Math.floor(clampedX / 32);

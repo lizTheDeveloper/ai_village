@@ -14,6 +14,7 @@ import type { Component } from '../ecs/Component.js';
 import type { PersonalityComponent } from './PersonalityComponent.js';
 import type { MagicSkillProgress } from '../magic/MagicSkillTree.js';
 import skillsData from '../data/skills.json';
+import { clamp } from '../utils/math.js';
 
 /**
  * Skill identifiers for all trainable skills.
@@ -287,7 +288,7 @@ export function generateAffinitiesFromPersonality(
     const base = 0.5 + average * 1.5;
     // Add small random variance (-0.1 to +0.1)
     const variance = (Math.random() - 0.5) * 0.2;
-    return Math.max(0.5, Math.min(2.0, base + variance));
+    return clamp(base + variance, 0.5, 2.0);
   };
 
   // Stability is inverse of neuroticism (both in 0-1 range)

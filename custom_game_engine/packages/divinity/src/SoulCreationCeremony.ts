@@ -18,6 +18,8 @@
  * 6. Soul is finalized and released for incarnation
  */
 
+import { clamp } from '@ai-village/core';
+
 /** Fate deity identifiers */
 export const FATE_DEITIES = {
   WEAVER: 'fate_weaver',
@@ -407,8 +409,8 @@ export function calculateDefaultAlignment(cosmicAlignment: number): {
   tradition: number;
 } {
   return {
-    order: Math.max(-1, Math.min(1, cosmicAlignment * 0.3 + (Math.random() - 0.5) * 0.4)),
-    altruism: Math.max(-1, Math.min(1, cosmicAlignment * 0.2 + (Math.random() - 0.5) * 0.6)),
-    tradition: Math.max(-1, Math.min(1, (Math.random() - 0.5) * 0.8)),
+    order: clamp(cosmicAlignment * 0.3 + (Math.random() - 0.5) * 0.4, -1, 1),
+    altruism: clamp(cosmicAlignment * 0.2 + (Math.random() - 0.5) * 0.6, -1, 1),
+    tradition: clamp((Math.random() - 0.5) * 0.8, -1, 1),
   };
 }

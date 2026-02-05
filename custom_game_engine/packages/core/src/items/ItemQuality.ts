@@ -14,6 +14,7 @@ import {
   getTaskFamiliarityBonus,
 } from '../components/SkillsComponent.js';
 import type { ItemQuality } from '../types/ItemTypes.js';
+import { clamp } from '../utils/math.js';
 
 // Re-export for backwards compatibility
 export type { ItemQuality };
@@ -114,7 +115,7 @@ export function calculateCraftingQuality(
   const rawQuality = (baseMultiplier * 100) + familiarityBonus + (synergyBonus * 100) + (randomVariance * 100);
 
   // Clamp to 0-100
-  return Math.max(0, Math.min(100, Math.round(rawQuality)));
+  return clamp(Math.round(rawQuality), 0, 100);
 }
 
 /**
@@ -165,7 +166,7 @@ export function calculateHarvestQuality(
   const rawQuality = (baseMultiplier * healthContribution / 100 * 100) + maturityPenalty + (randomVariance * 100);
 
   // Clamp to 0-100
-  return Math.max(0, Math.min(100, Math.round(rawQuality)));
+  return clamp(Math.round(rawQuality), 0, 100);
 }
 
 /**
@@ -191,7 +192,7 @@ export function calculateGatheringQuality(
   }
 
   // Clamp to valid SkillLevel range
-  const validSkillLevel = Math.max(0, Math.min(5, Math.round(gatheringSkillLevel))) as import('../components/SkillsComponent.js').SkillLevel;
+  const validSkillLevel = clamp(Math.round(gatheringSkillLevel), 0, 5) as import('../components/SkillsComponent.js').SkillLevel;
 
   // Base quality from gathering skill (0.7 to 1.2)
   const baseMultiplier = getQualityMultiplier(validSkillLevel);
@@ -206,7 +207,7 @@ export function calculateGatheringQuality(
   const rawQuality = (baseMultiplier * resourceBaseQuality) + (randomVariance * 100);
 
   // Clamp to 0-100
-  return Math.max(0, Math.min(100, Math.round(rawQuality)));
+  return clamp(Math.round(rawQuality), 0, 100);
 }
 
 /**

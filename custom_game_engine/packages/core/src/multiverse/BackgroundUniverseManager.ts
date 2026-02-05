@@ -24,6 +24,7 @@ import type { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { MultiverseCoordinator } from './MultiverseCoordinator.js';
 import { PlanetFactionAI } from './PlanetFactionAI.js';
 import { AbstractPlanet, RenormalizationEngine } from '@ai-village/hierarchy-simulator';
+import { clamp } from '../utils/math.js';
 import type {
   BackgroundUniverseParams,
   BackgroundUniverse,
@@ -539,11 +540,11 @@ export class BackgroundUniverseManager {
     // Map technophilia to tech level and industrialization
     if (culturalTraits.technophilia !== undefined) {
       planet.civilizationStats.avgTechLevel += (culturalTraits.technophilia - 0.5) * 4; // ±2 levels
-      planet.civilizationStats.avgTechLevel = Math.max(0, Math.min(10, planet.civilizationStats.avgTechLevel));
+      planet.civilizationStats.avgTechLevel = clamp(planet.civilizationStats.avgTechLevel, 0, 10);
       planet.tech.level = planet.civilizationStats.avgTechLevel;
 
       planet.civilizationStats.industrialization += (culturalTraits.technophilia - 0.5) * 4;
-      planet.civilizationStats.industrialization = Math.max(0, Math.min(10, planet.civilizationStats.industrialization));
+      planet.civilizationStats.industrialization = clamp(planet.civilizationStats.industrialization, 0, 10);
     }
 
     // Map collectivism to government type and nation count
@@ -560,7 +561,7 @@ export class BackgroundUniverseManager {
     // Map expansionism to urbanization
     if (culturalTraits.expansionism !== undefined) {
       planet.civilizationStats.urbanization += (culturalTraits.expansionism - 0.5) * 0.4; // ±0.2
-      planet.civilizationStats.urbanization = Math.max(0.1, Math.min(1.0, planet.civilizationStats.urbanization));
+      planet.civilizationStats.urbanization = clamp(planet.civilizationStats.urbanization, 0.1, 1.0);
     }
 
     // Map aggressiveness to active wars in civilizations

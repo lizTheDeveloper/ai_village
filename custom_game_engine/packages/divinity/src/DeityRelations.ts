@@ -5,6 +5,7 @@
  * compete for believers, and engage in divine politics.
  */
 
+import { clamp } from '@ai-village/core';
 import type { DivineDomain } from './DeityTypes.js';
 
 // ============================================================================
@@ -178,7 +179,7 @@ export function calculateInitialRelationship(
   }
 
   // Clamp to [-1, 1]
-  sentiment = Math.max(-1, Math.min(1, sentiment));
+  sentiment = clamp(sentiment, -1, 1);
 
   // Determine status from sentiment
   let status: RelationshipStatus;
@@ -381,7 +382,7 @@ export function updateRelationshipFromEvent(
 
   // Update sentiment
   let sentiment = relation.sentiment + event.sentimentImpact;
-  sentiment = Math.max(-1, Math.min(1, sentiment));
+  sentiment = clamp(sentiment, -1, 1);
 
   // Update status based on new sentiment
   let status: RelationshipStatus;

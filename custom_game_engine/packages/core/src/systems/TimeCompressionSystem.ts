@@ -31,6 +31,7 @@ import type { World } from '../ecs/World.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import type { TimeCompressionComponent } from '../components/TimeCompressionComponent.js';
 import { TIME_SCALE_LIMITS } from '../components/TimeCompressionComponent.js';
+import { clamp, clamp01 } from '../utils/math.js';
 import type {
   TimeCompressionSnapshotComponent,
   EraSnapshot,
@@ -231,7 +232,7 @@ export class TimeCompressionSystem extends BaseSystem {
     }
 
     // Clamp to allowed range for current tier
-    const clampedScale = Math.max(1, Math.min(compression.maxTimeScale, newScale));
+    const clampedScale = clamp(newScale, 1, compression.maxTimeScale);
 
     entity.updateComponent<TimeCompressionComponent>(CT.TimeCompression, (current) => ({
       ...current,

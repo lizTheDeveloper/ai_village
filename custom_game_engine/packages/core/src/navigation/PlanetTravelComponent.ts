@@ -14,6 +14,7 @@
 
 import type { Component } from '../ecs/Component.js';
 
+import { clamp } from '../utils/math.js';
 // ============================================================================
 // Types
 // ============================================================================
@@ -230,7 +231,7 @@ export function updateTravelProgress(
   }
 
   const elapsed = currentTick - component.startTick;
-  component.progress = Math.min(1, Math.max(0, elapsed / totalDuration));
+  component.progress = clamp(elapsed / totalDuration, 0, 1);
 
   // Update state based on progress
   if (component.progress >= 1) {

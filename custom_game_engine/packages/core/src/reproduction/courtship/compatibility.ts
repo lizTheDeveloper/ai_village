@@ -12,6 +12,7 @@ import type { RelationshipComponent } from '../../components/RelationshipCompone
 import type { PersonalityComponent } from '../../components/PersonalityComponent';
 import type { StrategicPriorities } from '../../components/AgentComponent';
 
+import { clamp } from '../utils/math.js';
 // ============================================================================
 // Sexual Compatibility
 // ============================================================================
@@ -263,7 +264,7 @@ export function calculateCompatibility(agent1: Entity, agent2: Entity, _world: W
   score += socialScore * 0.1;
 
   // Normalize (max possible is 0.3 + 0.25 + 0.2 + 0.15 + 0.1 = 1.0)
-  return Math.max(0, Math.min(1, score));
+  return clamp(score, 0, 1);
 }
 
 // ============================================================================
@@ -294,7 +295,7 @@ export function calculateConceptionProbability(_agent1: Entity, _agent2: Entity)
     (0.8 + bondStrength * 0.4) * // 0.8-1.2 multiplier
     magicModifier;
 
-  return Math.max(0, Math.min(1, finalProbability));
+  return clamp(finalProbability, 0, 1);
 }
 
 export function calculateBondStrength(agent1: Entity, agent2: Entity): number {

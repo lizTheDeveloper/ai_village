@@ -31,6 +31,7 @@ import type { ReincarnationConfig, MemoryRetention, SpeciesConstraint } from '..
 import { NeedsComponent } from '../components/NeedsComponent.js';
 import { MemoryComponent } from '../components/MemoryComponent.js';
 import { PersonalityComponent as PersonalityComponentClass } from '../components/PersonalityComponent.js';
+import { clamp } from '../utils/math.js';
 import {
   createPositionComponent,
   createPhysicsComponent,
@@ -712,7 +713,7 @@ export class ReincarnationSystem extends BaseSystem {
     // Override with preserved skills (reduced by 1 level)
     if (original.levels) {
       for (const [skillId, level] of Object.entries(original.levels)) {
-        const reducedLevel = Math.max(0, Math.min(5, (level as number) - 1)) as 0 | 1 | 2 | 3 | 4 | 5;
+        const reducedLevel = clamp((level as number) - 1, 0, 5) as 0 | 1 | 2 | 3 | 4 | 5;
         baseSkills.levels[skillId as SkillId] = reducedLevel;
         // Preserve affinities from original
         if (original.affinities?.[skillId as SkillId]) {

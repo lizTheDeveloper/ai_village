@@ -13,6 +13,7 @@
  */
 
 import type { Component } from '../ecs/Component.js';
+import { clamp } from '../utils/math.js';
 
 // ============================================================================
 // EMPLOYEE TYPES
@@ -987,5 +988,5 @@ export function updateReputation(
   university: UniversityComponent,
   delta: number
 ): void {
-  university.reputation = Math.max(0, Math.min(100, university.reputation + delta));
+  university.reputation = clamp(university.reputation + delta, 0, 100);
 }

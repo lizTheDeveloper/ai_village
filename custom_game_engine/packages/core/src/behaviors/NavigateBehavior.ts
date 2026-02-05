@@ -24,6 +24,7 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 import type { MovementComponent } from '../components/MovementComponent.js';
 import { getMapKnowledge, worldToSector, type Direction } from '../navigation/MapKnowledge.js';
 import { recordMovement } from '../navigation/KnowledgeTransmission.js';
+import { clamp } from '../utils/math.js';
 
 /** Arrival threshold - agent is "there" when within this distance */
 const ARRIVAL_THRESHOLD = 2.0;
@@ -202,8 +203,8 @@ function getDirectionToSector(
   const dy = to.sectorY - from.sectorY;
 
   // Clamp to adjacent (-1, 0, 1)
-  const clampedDx = Math.max(-1, Math.min(1, dx));
-  const clampedDy = Math.max(-1, Math.min(1, dy));
+  const clampedDx = clamp(dx, -1, 1);
+  const clampedDy = clamp(dy, -1, 1);
 
   if (clampedDx === 0 && clampedDy === -1) return 'n';
   if (clampedDx === 1 && clampedDy === -1) return 'ne';

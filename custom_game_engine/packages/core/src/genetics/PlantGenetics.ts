@@ -1,6 +1,7 @@
 import { PlantComponent, type PlantGenetics, type GeneticMutation } from '../components/PlantComponent.js';
 import { SeedComponent } from '../components/SeedComponent.js';
 import type { PlantCategory } from '../types/PlantSpecies.js';
+import { clamp } from '../utils/math.js';
 
 /**
  * Cross-breeding compatibility rules
@@ -164,9 +165,9 @@ function blendGenetics(
 
     // Clamp based on trait type
     if (trait === 'growthRate' || trait === 'yieldAmount') {
-      return Math.max(0.3, Math.min(3.5, value)); // Slightly higher max for hybrids
+      return clamp(value, 0.3, 3.5); // Slightly higher max for hybrids
     }
-    return Math.max(0, Math.min(100, value));
+    return clamp(value, 0, 100);
   };
 
   const result: PlantGenetics = {

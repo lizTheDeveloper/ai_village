@@ -10,6 +10,7 @@
  * Generated spells go through divine scrutiny before being added to the registry.
  */
 
+import { clamp, clamp01 } from '@ai-village/core';
 import type { MagicTechnique, MagicForm, MagicSourceId } from '@ai-village/core';
 import type { SpellDefinition, DetectionRisk } from './SpellRegistry.js';
 
@@ -300,12 +301,12 @@ Respond with ONLY valid JSON:
         technique,
         form,
         school: parsed.school,
-        manaCost: Math.max(10, Math.min(100, parsed.manaCost || 20)),
-        castTime: Math.max(1, Math.min(10, parsed.castTime || 2)),
-        range: Math.max(0, Math.min(20, parsed.range || 5)),
-        duration: parsed.duration ? Math.max(1, Math.min(200, parsed.duration)) : undefined,
+        manaCost: clamp(parsed.manaCost || 20, 10, 100),
+        castTime: clamp(parsed.castTime || 2, 1, 10),
+        range: clamp(parsed.range || 5, 0, 20),
+        duration: parsed.duration ? clamp(parsed.duration, 1, 200) : undefined,
         effectType: parsed.effectType,
-        effectStrength: Math.max(10, Math.min(100, parsed.effectStrength || 30)),
+        effectStrength: clamp(parsed.effectStrength || 30, 10, 100),
         tags: Array.isArray(parsed.tags) ? parsed.tags : [],
         detectionRisk: parsed.detectionRisk || 'low',
         flavorText: parsed.flavorText,
@@ -365,7 +366,7 @@ Respond with ONLY valid JSON:
       score += 0.1;
     }
 
-    return Math.max(0, Math.min(1, score));
+    return clamp01(score);
   }
 }
 

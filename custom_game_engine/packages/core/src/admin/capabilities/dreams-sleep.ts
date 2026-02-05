@@ -29,6 +29,7 @@
  */
 
 import { capabilityRegistry, defineCapability, defineQuery, defineAction } from '../CapabilityRegistry.js';
+import { clamp } from '../../utils/math.js';
 
 // ============================================================================
 // Option Definitions
@@ -415,7 +416,7 @@ const dreamsSleepCapability = defineCapability({
         }
 
         // Validate intensity
-        const intensity = Math.min(50, Math.max(0, typeof params.intensity === 'number' ? params.intensity : 30));
+        const intensity = clamp(typeof params.intensity === 'number' ? params.intensity : 30, 0, 50);
 
         return {
           success: true,
@@ -502,7 +503,7 @@ const dreamsSleepCapability = defineCapability({
           return { success: false, error: 'No game connected' };
         }
 
-        const subtlety = Math.min(10, Math.max(1, typeof params.subtlety === 'number' ? params.subtlety : 7));
+        const subtlety = clamp(typeof params.subtlety === 'number' ? params.subtlety : 7, 1, 10);
 
         let message = `Memory seed planted in ${params.agentId}: "${params.concept}"`;
 
@@ -535,7 +536,7 @@ const dreamsSleepCapability = defineCapability({
           return { success: false, error: 'No game connected' };
         }
 
-        const bonus = Math.min(0.4, Math.max(0.1, typeof params.bonus === 'number' ? params.bonus : 0.2));
+        const bonus = clamp(typeof params.bonus === 'number' ? params.bonus : 0.2, 0.1, 0.4);
         const bonusPercent = (bonus * 100).toFixed(0);
 
         return {

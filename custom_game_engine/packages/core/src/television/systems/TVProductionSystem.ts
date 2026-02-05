@@ -17,6 +17,7 @@ import { ComponentType } from '../../types/ComponentType.js';
 import type { TVStationComponent, Production } from '../TVStation.js';
 import type { TVContentComponent, FilmedTake, FilmedScene } from '../TVContent.js';
 
+import { clamp } from '../utils/math.js';
 /** How often to process filming (every 2 game minutes) */
 const FILMING_INTERVAL = 20 * 60 * 2;
 
@@ -359,7 +360,7 @@ export class TVProductionSystem extends BaseSystem {
     }
 
     // Clamp to 0-1
-    return Math.min(1, Math.max(0, quality));
+    return clamp(quality, 0, 1);
   }
 
   /**

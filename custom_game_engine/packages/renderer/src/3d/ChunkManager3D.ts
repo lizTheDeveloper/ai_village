@@ -12,6 +12,7 @@ import * as THREE from 'three';
 import { ChunkMesh, type ChunkMeshConfig } from './ChunkMesh.js';
 import { OcclusionCuller } from './OcclusionCuller.js';
 import { MeshWorkerPool } from './MeshWorkerPool.js';
+import { clamp } from '@ai-village/core';
 
 /** Chunk manager configuration */
 export interface ChunkManager3DConfig {
@@ -394,7 +395,7 @@ export class ChunkManager3D {
    * Set render radius in chunks
    */
   setRenderRadius(radius: number): void {
-    this.config.renderRadius = Math.max(1, Math.min(16, radius));
+    this.config.renderRadius = clamp(radius, 1, 16);
   }
 
   /**

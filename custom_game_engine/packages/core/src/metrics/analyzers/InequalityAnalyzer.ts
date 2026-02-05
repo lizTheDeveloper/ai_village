@@ -165,7 +165,7 @@ export class InequalityAnalyzer {
 
     const gini = (2 * numerator) / (n * totalWealth) - (n + 1) / n;
 
-    return Math.max(0, Math.min(1, gini));
+    return clamp(gini, 0, 1);
   }
 
   /**

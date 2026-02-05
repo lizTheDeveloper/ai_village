@@ -20,6 +20,7 @@ import { createIdentityComponent } from '../components/IdentityComponent.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 
+import { clamp } from '../utils/math.js';
 /**
  * Interface for the prompt builder (from @ai-village/llm)
  */
@@ -594,7 +595,7 @@ export class LiveEntityAPI {
     }
 
     // Clamp value to 0-1 range (needs are 0-1 scale)
-    const clampedValue = Math.max(0, Math.min(1, value));
+    const clampedValue = clamp(value, 0, 1);
 
     // Set the need value
     needs[need] = clampedValue;

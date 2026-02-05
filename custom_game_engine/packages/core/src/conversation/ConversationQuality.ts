@@ -12,6 +12,7 @@
 
 import type { ConversationMessage } from '../components/ConversationComponent.js';
 import type { Interest, TopicId } from '../components/InterestsComponent.js';
+import { clamp } from '../utils/math.js';
 
 /**
  * Metrics for evaluating conversation quality.
@@ -239,7 +240,7 @@ export function analyzeDepth(messages: ConversationMessage[]): number {
     }
   }
 
-  return Math.max(0, Math.min(1, score));
+  return clamp(score, 0, 1);
 }
 
 /**

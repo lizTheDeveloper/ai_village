@@ -24,6 +24,7 @@ import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import { EntityImpl } from '../ecs/Entity.js';
+import { clamp } from '../utils/math.js';
 import type {
   FederationGovernanceComponent,
   FederalLaw,
@@ -940,7 +941,7 @@ export class FederationGovernanceSystem extends BaseSystem {
     proposal: FederalProposal
   ): string | null {
     // First 3-5 members are founders with veto power
-    const founderCount = Math.min(5, Math.max(3, federation.memberEmpireIds.length));
+    const founderCount = clamp(federation.memberEmpireIds.length, 3, 5);
     const founders = [
       ...federation.memberEmpireIds.slice(0, founderCount),
       ...federation.memberNationIds.slice(0, Math.max(0, founderCount - federation.memberEmpireIds.length)),

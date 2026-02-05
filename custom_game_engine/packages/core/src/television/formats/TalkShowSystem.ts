@@ -15,6 +15,7 @@ import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 
+import { clamp } from '../utils/math.js';
 // ============================================================================
 // TALK SHOW TYPES
 // ============================================================================
@@ -533,7 +534,7 @@ export class TalkShowManager {
     // Update audience energy
     const qualityScore = segment.qualityScore ?? 50;
     const energyChange = qualityScore > 70 ? 5 : qualityScore < 50 ? -5 : 0;
-    episode.audienceEnergyLevel = Math.max(0, Math.min(100, episode.audienceEnergyLevel + energyChange));
+    episode.audienceEnergyLevel = clamp(episode.audienceEnergyLevel + energyChange, 0, 100);
 
     this.events.emitGeneric('tv:talk_show:segment_taped', {
       episodeId,

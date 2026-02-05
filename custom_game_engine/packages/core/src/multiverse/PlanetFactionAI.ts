@@ -11,6 +11,7 @@
  */
 
 import type { AbstractPlanet } from '@ai-village/hierarchy-simulator';
+import { clamp } from '../utils/math.js';
 import type {
   CulturalTraits,
   FactionDecision,
@@ -327,7 +328,7 @@ export class PlanetFactionAI {
     // Mysticism reduces tech-based invasion likelihood
     score -= this.personality.mysticism * 0.1;
 
-    return Math.max(0, Math.min(1.0, score));
+    return clamp(score, 0, 1.0);
   }
 
   /**

@@ -37,6 +37,7 @@ export interface RecipeLLMProvider {
 }
 import type { ItemDefinition, ItemCategory } from '../items/ItemDefinition.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
+import { clamp } from '../utils/math.js';
 
 /**
  * Types of recipes that can be invented
@@ -391,15 +392,15 @@ If the ingredients don't make sense together for a ${recipeType}, respond with:
         description: String(parsed.description || '').substring(0, 200),
         category: this.getCategoryForType(recipeType),
         rarity: this.validateRarity(parsed.rarity),
-        craftingTime: Math.min(120, Math.max(5, Number(parsed.craftingTime) || 15)),
-        xpGain: Math.min(100, Math.max(5, Number(parsed.xpGain) || 10)),
-        hungerRestored: parsed.hungerRestored ? Math.min(50, Math.max(5, Number(parsed.hungerRestored))) : undefined,
-        quality: parsed.quality ? Math.min(5, Math.max(1, Number(parsed.quality))) : undefined,
+        craftingTime: clamp(Number(parsed.craftingTime) || 15, 5, 120),
+        xpGain: clamp(Number(parsed.xpGain) || 10, 5, 100),
+        hungerRestored: parsed.hungerRestored ? clamp(Number(parsed.hungerRestored), 5, 50) : undefined,
+        quality: parsed.quality ? clamp(Number(parsed.quality), 1, 5) : undefined,
         flavors: Array.isArray(parsed.flavors) ? parsed.flavors.slice(0, 3) : undefined,
-        durability: parsed.durability ? Math.min(500, Math.max(50, Number(parsed.durability))) : undefined,
-        armorValue: parsed.armorValue ? Math.min(20, Math.max(0, Number(parsed.armorValue))) : undefined,
+        durability: parsed.durability ? clamp(Number(parsed.durability), 50, 500) : undefined,
+        armorValue: parsed.armorValue ? clamp(Number(parsed.armorValue), 0, 20) : undefined,
         effectType: parsed.effectType ? String(parsed.effectType) : undefined,
-        effectStrength: parsed.effectStrength ? Math.min(10, Math.max(1, Number(parsed.effectStrength))) : undefined,
+        effectStrength: parsed.effectStrength ? clamp(Number(parsed.effectStrength), 1, 10) : undefined,
       };
     } catch (error) {
       console.error('[LLMRecipeGenerator] Failed to parse response:', error);

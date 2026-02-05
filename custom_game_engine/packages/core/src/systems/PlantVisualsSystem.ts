@@ -3,6 +3,7 @@ import { EntityImpl } from '../ecs/Entity.js';
 import type { PlantComponent, PlantStage } from '../components/PlantComponent.js';
 import type { RenderableComponent } from '../components/RenderableComponent.js';
 import { createRenderableComponent } from '../components/RenderableComponent.js';
+import { clamp } from '../utils/math.js';
 
 /**
  * PlantVisualsSystem - Computes visual metadata for plants based on growth stage and genetics
@@ -247,7 +248,7 @@ export class PlantVisualsSystem extends BaseSystem {
     }
 
     // Clamp to reasonable bounds (0.1 to 10.0 as per spec)
-    return Math.max(0.1, Math.min(10.0, sizeMultiplier));
+    return clamp(sizeMultiplier, 0.1, 10.0);
   }
 
   /**

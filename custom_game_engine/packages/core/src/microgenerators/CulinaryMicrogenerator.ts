@@ -17,6 +17,7 @@ import type {
 } from './types.js';
 import { godCraftedQueue } from './GodCraftedQueue.js';
 
+import { clamp } from '../utils/math.js';
 /**
  * Input for recipe creation
  */
@@ -207,9 +208,9 @@ Output a JSON object with this structure:
       return {
         name: parsed.name || input.name || 'Unnamed Recipe',
         itemId: parsed.itemId || this.sanitizeItemId(parsed.name || 'unknown_item'),
-        craftingTime: Math.max(10, Math.min(600, parsed.craftingTime || 60)),
+        craftingTime: clamp(parsed.craftingTime || 60, 10, 600),
         stationRequired: parsed.stationRequired || undefined,
-        outputAmount: Math.max(1, Math.min(10, parsed.outputAmount || 1)),
+        outputAmount: clamp(parsed.outputAmount || 1, 1, 10),
         item: {
           category: parsed.item?.category || input.type,
           weight: parsed.item?.weight || 1,
@@ -218,7 +219,7 @@ Output a JSON object with this structure:
           rarity: parsed.item?.rarity || 'common',
           properties: parsed.item?.properties || {},
         },
-        creativityScore: Math.max(0, Math.min(100, parsed.creativityScore || 50)),
+        creativityScore: clamp(parsed.creativityScore || 50, 0, 100),
       };
     } catch (error) {
       console.error('[Culinary] Failed to parse LLM response:', error);

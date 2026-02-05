@@ -19,6 +19,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { SpaceshipComponent } from '../navigation/SpaceshipComponent.js';
+import { clamp01 } from '../utils/math.js';
 import type {
   HeartChamberComponent,
   EmotionTheaterComponent,
@@ -424,7 +425,7 @@ export class SpaceshipManagementSystem extends BaseSystem {
 
     // Calculate final effectiveness (clamped to 0.0-1.0)
     const rawEffectiveness = baseEffectiveness * durationFactor * participantBonus * biofeedbackBonus;
-    return Math.max(0.0, Math.min(1.0, rawEffectiveness));
+    return clamp01(rawEffectiveness);
   }
 }
 

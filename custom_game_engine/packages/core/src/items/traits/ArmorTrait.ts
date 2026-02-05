@@ -10,6 +10,7 @@
 
 import type { DamageType } from './WeaponTrait.js';
 import type { BodyPartType, BodyPartFunction } from '../../components/BodyComponent.js';
+import { clamp } from '../../utils/math.js';
 
 /** Armor weight classes affecting movement and stamina */
 export type ArmorClass = 'clothing' | 'light' | 'medium' | 'heavy';
@@ -157,7 +158,7 @@ export function calculateDamageReduction(
 
   // Final reduction (capped at 0.9 = 90% max reduction)
   const finalReduction = (baseReduction + resistance) / weakness;
-  return Math.min(0.9, Math.max(0, finalReduction));
+  return clamp(finalReduction, 0, 0.9);
 }
 
 /**

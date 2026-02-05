@@ -5,6 +5,7 @@ import type { Entity } from '../ecs/Entity.js';
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { CanonEventComponent, CanonEventConvergence } from '../components/CanonEventComponent.js';
 import type { DivergenceTrackingComponent } from '../components/DivergenceTrackingComponent.js';
+import { clamp01 } from '../utils/math.js';
 
 /**
  * CanonEventSystem - Manages canon events (narrative anchors that resist change)
@@ -476,8 +477,8 @@ export class CanonEventSystem extends BaseSystem {
 
     const stability = (canonAdherence - divergencePenalty) * (this.AGE_BASE_WEIGHT + ageFactor * this.AGE_BASE_WEIGHT);
 
-    // PERF: Manual clamp (faster than Math.max/Math.min)
-    return stability > 1 ? 1 : (stability < 0 ? 0 : stability);
+    // Clamp to 0-1 range
+    return clamp01(stability);
   }
 
   // PERF: Reusable array for canon events (avoid allocation per update)

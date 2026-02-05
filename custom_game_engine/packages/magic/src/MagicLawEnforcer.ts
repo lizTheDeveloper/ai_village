@@ -5,6 +5,7 @@
  * calculates costs, evaluates risks, and determines consequences.
  */
 
+import { clamp01 } from '@ai-village/core';
 import type {
   MagicParadigm,
   MagicLaw,
@@ -510,7 +511,7 @@ export class MagicLawEnforcer {
 
     return {
       risk,
-      probability: Math.min(1, Math.max(0, probability)),
+      probability: clamp01(probability),
       mitigated,
       mitigationReason,
     };

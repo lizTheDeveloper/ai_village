@@ -16,6 +16,7 @@
 import { ComponentBase } from '../../ecs/Component.js';
 import type { EntityId, Tick } from '../../types.js';
 
+import { clamp } from '../utils/math.js';
 /** The collective's current strategic priority */
 export type CollectiveStrategy =
   | 'expansion' // Prioritize colonizing new hosts
@@ -485,7 +486,7 @@ export class CollectiveMindComponent extends ComponentBase {
     const desiredCount = allSkills.filter((s) => this.desiredTraits.includes(s)).length;
     const undesiredCount = allSkills.filter((s) => this.undesiredTraits.includes(s)).length;
 
-    return Math.min(1, Math.max(0, (desiredCount * 0.2 - undesiredCount * 0.3 + 0.5)));
+    return clamp((desiredCount * 0.2 - undesiredCount * 0.3 + 0.5, 0, 1));
   }
 
   /**

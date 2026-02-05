@@ -32,6 +32,8 @@
  * only where they currently sit on the spectrum.
  */
 
+import { clamp01 } from '@ai-village/core';
+
 // ============================================================================
 // The Presence Type - Everything Is This
 // ============================================================================
@@ -675,7 +677,7 @@ export function updatePresence(presence: Presence, deltaTime: number): Presence 
   // This creates the "stickiness" - you need sustained attention to move up
   const targetPosition = attentionToPosition(newAttention);
   const positionChange = (targetPosition - presence.spectrumPosition) * 0.01 * deltaTime;
-  const newPosition = Math.max(0, Math.min(1, presence.spectrumPosition + positionChange));
+  const newPosition = clamp01(presence.spectrumPosition + positionChange);
 
   const newPhase = getPhaseFromPosition(newPosition);
 

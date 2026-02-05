@@ -199,7 +199,7 @@ export function createOutcomeAttractor(params: {
     id: params.id,
     source: params.source,
     goal: params.goal,
-    strength: Math.max(0, Math.min(2, params.strength)), // Clamp to 0-2
+    strength: clamp(params.strength, 0, 2), // Clamp to 0-2
     urgency: params.urgency ?? 0.5,
     scope: params.scope ?? { type: 'global' },
     decay: params.decay ?? { type: 'on_achievement' },

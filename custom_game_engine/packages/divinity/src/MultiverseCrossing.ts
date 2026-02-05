@@ -12,6 +12,7 @@
  * See: specs/multiverse-divinity-crossing.md
  */
 
+import { clamp } from '@ai-village/core';
 import type { Presence } from './PresenceSpectrum.js';
 
 // ============================================================================
@@ -688,7 +689,7 @@ export function executeCrossing(
 
   // Adjust for spectrum position (higher = safer)
   successChance += (presence.spectrumPosition - 0.5) * 0.2;
-  successChance = Math.max(0.1, Math.min(0.99, successChance));
+  successChance = clamp(successChance, 0.1, 0.99);
 
   // Roll for success
   const roll = Math.random();

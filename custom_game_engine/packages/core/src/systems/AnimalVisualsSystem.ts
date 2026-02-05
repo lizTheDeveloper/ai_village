@@ -1,6 +1,7 @@
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { AnimalComponent } from '../components/AnimalComponent.js';
 import type { RenderableComponent } from '../components/RenderableComponent.js';
+import { clamp } from '../utils/math.js';
 
 /**
  * AnimalVisualsSystem - Computes visual metadata for animals based on size and life stage
@@ -44,7 +45,7 @@ export class AnimalVisualsSystem extends BaseSystem {
     }
 
     // Clamp to reasonable bounds (0.1 to 10.0 as per spec)
-    return Math.max(0.1, Math.min(10.0, sizeMultiplier));
+    return clamp(sizeMultiplier, 0.1, 10.0);
   }
 
   /**

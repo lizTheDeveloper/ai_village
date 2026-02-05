@@ -16,6 +16,7 @@
 import type { Component } from '../ecs/Component.js';
 import type { EmotionalSignature } from './SpaceshipComponent.js';
 
+import { clamp } from '../utils/math.js';
 // ============================================================================
 // Common Types
 // ============================================================================
@@ -539,7 +540,7 @@ export function calculateCoherence(crewStates: CrewEmotionalState[]): number {
   const avgVariance = varianceCount > 0 ? totalVariance / varianceCount : 0;
 
   // Coherence = 1 - variance (clamped to 0-1)
-  return Math.max(0, Math.min(1, 1 - Math.sqrt(avgVariance)));
+  return clamp(1 - Math.sqrt(avgVariance, 0, 1));
 }
 
 /**

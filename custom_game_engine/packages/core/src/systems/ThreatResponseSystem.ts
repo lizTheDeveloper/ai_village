@@ -33,6 +33,7 @@ import {
   isEvenMatch,
 } from '../components/ThreatDetectionComponent.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
+import { clamp } from '../utils/math.js';
 
 export class ThreatResponseSystem extends BaseSystem {
   public readonly id = 'threat-response';
@@ -167,7 +168,7 @@ export class ThreatResponseSystem extends BaseSystem {
       power *= healthPercent;
     }
 
-    return Math.min(100, Math.max(0, power));
+    return clamp(power, 0, 100);
   }
 
   private isHostile(agent: Entity, other: Entity): boolean {

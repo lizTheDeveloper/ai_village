@@ -22,6 +22,7 @@ import type { InterestsComponent } from '../components/InterestsComponent.js';
 import type { SocialMemoryComponent } from '../components/SocialMemoryComponent.js';
 import type { ConversationQuality } from '../conversation/ConversationQuality.js';
 import type { TopicId } from '../components/InterestsComponent.js';
+import { clamp } from '../utils/math.js';
 
 export class RelationshipConversationSystem extends BaseSystem {
   public readonly id: SystemId = 'relationship_conversation';
@@ -139,7 +140,7 @@ export class RelationshipConversationSystem extends BaseSystem {
     // Affinity increases with good conversations
     if (quality.overallQuality > 0.5) {
       const affinityGain = (quality.overallQuality - 0.3) * 5;
-      relationship.affinity = Math.min(100, Math.max(-100, relationship.affinity + affinityGain));
+      relationship.affinity = clamp(relationship.affinity + affinityGain, -100, 100);
     }
 
     // Trust grows with emotional connection

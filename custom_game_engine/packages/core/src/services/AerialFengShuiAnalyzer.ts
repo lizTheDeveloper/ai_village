@@ -32,6 +32,7 @@ import {
 } from '../components/AerialHarmonyComponent.js';
 import { DefaultZLevel } from '../components/PositionComponent.js';
 
+import { clamp } from '../utils/math.js';
 // ============================================================================
 // Types
 // ============================================================================
@@ -839,7 +840,7 @@ export class AerialFengShuiAnalyzer {
       score -= 10;
     }
 
-    return Math.max(0, Math.min(100, Math.round(score)));
+    return clamp(Math.round(score, 0, 100));
   }
 }
 

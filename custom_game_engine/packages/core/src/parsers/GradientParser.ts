@@ -1,5 +1,6 @@
 import type { ResourceType } from '../components/ResourceComponent.js';
 
+import { clamp } from '../utils/math.js';
 export interface ParsedGradient {
   resourceType: ResourceType;
   bearing: number; // 0-360 degrees
@@ -204,7 +205,7 @@ export class GradientParser {
       confidence -= 0.1;
     }
 
-    return Math.max(0.0, Math.min(1.0, confidence));
+    return clamp(confidence, 0.0, 1.0);
   }
 
   /**

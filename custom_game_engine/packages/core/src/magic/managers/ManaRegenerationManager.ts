@@ -18,6 +18,7 @@ import type { MagicSourceId } from '../../components/MagicComponent.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
 import { costRecoveryManager } from '../costs/CostRecoveryManager.js';
 
+import { clamp } from '../utils/math.js';
 /**
  * Manages regeneration of magic resources (mana, favor, etc.).
  *
@@ -195,7 +196,7 @@ export class ManaRegenerationManager {
       if (Math.abs(spiritual.faith - syncedValue) > 0.01) {
         entity.updateComponent<SpiritualComponent>(CT.Spiritual, (current) => ({
           ...current,
-          faith: Math.max(0, Math.min(1.0, syncedValue)),
+          faith: clamp(syncedValue, 0, 1.0),
         }));
       }
 

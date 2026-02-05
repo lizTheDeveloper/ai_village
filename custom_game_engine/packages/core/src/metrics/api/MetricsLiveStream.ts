@@ -10,6 +10,7 @@
 import type { MetricsCollector } from '../MetricsCollector.js';
 import { RingBuffer } from '../RingBuffer.js';
 
+import { clamp } from '../utils/math.js';
 /**
  * Metric types that can be subscribed to
  */
@@ -217,7 +218,7 @@ export class MetricsLiveStream {
       id,
       metrics: new Set(metrics),
       callback,
-      samplingRate: Math.max(0, Math.min(1, samplingRate)),
+      samplingRate: clamp(samplingRate, 0, 1),
     });
     return id;
   }
@@ -245,7 +246,7 @@ export class MetricsLiveStream {
   setSamplingRate(subscriberId: string, rate: number): boolean {
     const subscriber = this.subscribers.get(subscriberId);
     if (!subscriber) return false;
-    subscriber.samplingRate = Math.max(0, Math.min(1, rate));
+    subscriber.samplingRate = clamp(rate, 0, 1);
     return true;
   }
 

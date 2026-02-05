@@ -45,6 +45,7 @@ import {
 import { getNarrativePressureSystem } from '../narrative/NarrativePressureSystem.js';
 import { createOutcomeAttractor } from '../narrative/NarrativePressureTypes.js';
 
+import { clamp } from '../utils/math.js';
 /**
  * Execute a single plot effect
  */
@@ -211,7 +212,7 @@ export function executeEffect(
       if (!mood) break;
 
       const currentValue = mood.factors[effect.factor];
-      const newValue = Math.max(-100, Math.min(100, currentValue + effect.delta));
+      const newValue = clamp(currentValue + effect.delta, -100, 100);
       const updated = updateMoodFactor(mood, effect.factor, newValue);
       world.addComponent(context.entityId, updated);
       break;
@@ -264,7 +265,7 @@ export function executeEffect(
       const stress: StressState = mood.stress ?? createStressState();
       const updatedStress: StressState = {
         ...stress,
-        level: Math.max(0, Math.min(100, stress.level + effect.delta)),
+        level: clamp(stress.level + effect.delta, 0, 100),
       };
 
       const updatedMood: MoodComponent = {

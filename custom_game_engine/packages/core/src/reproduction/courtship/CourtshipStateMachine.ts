@@ -14,6 +14,7 @@ import { updateRelationship, ensureRelationshipComponent } from '../../component
 import type { CourtshipTactic, CourtshipParadigm, ActiveCourtship } from './types';
 import { calculateCompatibility } from './compatibility';
 
+import { clamp } from '../utils/math.js';
 export class CourtshipStateMachine {
   /**
    * Check if agent should become interested in potential mate
@@ -300,7 +301,7 @@ export class CourtshipStateMachine {
     // Apply personality modifiers (simplified)
     // In full implementation, would check target's personality traits
 
-    return Math.max(-1, Math.min(1, reception));
+    return clamp(reception, -1, 1);
   }
 
   /**
@@ -326,7 +327,7 @@ export class CourtshipStateMachine {
     // Success probability is weighted combination
     const successProbability = avgReception * 0.4 + compatibility * 0.6;
 
-    courtship.successProbability = Math.max(0, Math.min(1, successProbability));
+    courtship.successProbability = clamp(successProbability, 0, 1);
   }
 
   /**

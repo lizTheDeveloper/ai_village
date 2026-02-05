@@ -22,6 +22,7 @@ import { BuildingType } from '../../types/BuildingType.js';
 import { assignBed } from '../../components/AgentComponent.js';
 import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
 import type { NeedsComponent } from '../../components/NeedsComponent.js';
+import { clamp } from '../../utils/math.js';
 
 // ChunkSpatialQuery is now available via world.spatialQuery
 
@@ -299,7 +300,7 @@ export class SeekSleepBehavior extends BaseBehavior {
       }
     }
 
-    return Math.max(0.1, Math.min(1.0, quality));
+    return clamp(quality, 0.1, 1.0);
   }
 }
 
@@ -657,5 +658,5 @@ function calculateSleepQuality(location: Entity | null): number {
     }
   }
 
-  return Math.max(0.1, Math.min(1.0, quality));
+  return clamp(quality, 0.1, 1.0);
 }

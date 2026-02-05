@@ -7,6 +7,7 @@
 
 import type { MetricsCollector } from './MetricsCollector.js';
 
+import { clamp } from '../utils/math.js';
 /**
  * Insight severity level
  */
@@ -360,7 +361,7 @@ export class MetricsAnalysis {
         // 50% increase is a spike
         // Calculate severity based on magnitude of spike
         const multiplier = curr / prev;
-        const severity = Math.min(10, Math.max(5, Math.round(multiplier * 2)));
+        const severity = clamp(Math.round(multiplier * 2, 5, 10));
         anomalies.push({
           type: 'spike',
           severity,
@@ -674,7 +675,7 @@ export class MetricsAnalysis {
     const rSquared = 1 - ssRes / ssTot;
 
     // Return absolute value to handle negative R-squared (worse than mean model)
-    return Math.max(0, Math.min(1, rSquared));
+    return clamp(rSquared, 0, 1);
   }
 
   /**

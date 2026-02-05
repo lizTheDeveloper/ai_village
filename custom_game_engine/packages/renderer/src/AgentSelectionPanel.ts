@@ -8,6 +8,7 @@ import type {
   DeityComponent,
   PlayerControlComponent,
 } from '@ai-village/core';
+import { clamp } from '@ai-village/core';
 
 /**
  * AgentSelectionPanel - Select an agent to possess
@@ -330,7 +331,7 @@ export class AgentSelectionPanel implements IWindowPanel {
 
   handleScroll(deltaY: number, contentHeight: number): boolean {
     const maxScroll = Math.max(0, contentHeight - this.getDefaultHeight() + 100);
-    this.scrollOffset = Math.max(0, Math.min(maxScroll, this.scrollOffset + deltaY));
+    this.scrollOffset = clamp(this.scrollOffset + deltaY, 0, maxScroll);
     return true;
   }
 }

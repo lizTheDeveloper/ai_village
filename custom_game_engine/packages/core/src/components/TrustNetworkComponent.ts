@@ -1,4 +1,5 @@
 import { ComponentBase } from '../ecs/Component.js';
+import { clamp01 } from '../utils/math.js';
 
 export type VerificationResult = 'correct' | 'stale' | 'misidentified' | 'false_report' | 'unreliable';
 
@@ -86,7 +87,7 @@ export class TrustNetworkComponent extends ComponentBase {
     // Update trust score
     const currentTrust = this.getTrustScore(agentId);
     const trustChange = this._calculateTrustChange(result);
-    const newTrust = this._clamp(currentTrust + trustChange, 0, 1);
+    const newTrust = clamp01(currentTrust + trustChange);
     this.setTrustScore(agentId, newTrust);
   }
 
@@ -178,12 +179,5 @@ export class TrustNetworkComponent extends ComponentBase {
    */
   get verificationHistory(): ReadonlyMap<string, readonly VerificationRecord[]> {
     return new Map(this._verificationHistory);
-  }
-
-  /**
-   * Clamp value to range [min, max]
-   */
-  private _clamp(value: number, min: number, max: number): number {
-    return Math.max(min, Math.min(max, value));
   }
 }

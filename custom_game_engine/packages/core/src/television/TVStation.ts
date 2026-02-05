@@ -7,6 +7,7 @@
 
 import type { Component } from '../ecs/Component.js';
 
+import { clamp } from '../utils/math.js';
 // ============================================================================
 // EMPLOYEE TYPES
 // ============================================================================
@@ -350,7 +351,7 @@ export function updateReputation(
   station: TVStationComponent,
   delta: number
 ): void {
-  station.reputation = Math.max(0, Math.min(100, station.reputation + delta));
+  station.reputation = clamp(station.reputation + delta, 0, 100);
 }
 
 export function getAvailableCrewForRole(

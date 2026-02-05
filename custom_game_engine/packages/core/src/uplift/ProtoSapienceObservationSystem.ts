@@ -24,6 +24,7 @@ import {
 } from '../components/ProtoSapienceComponent.js';
 import type { UpliftProgramComponent } from '../components/UpliftProgramComponent.js';
 
+import { clamp } from '../utils/math.js';
 /**
  * Intelligence thresholds for behavior emergence
  */
@@ -229,7 +230,7 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
 
     // Probability of passing based on intelligence
     const baseChance = (proto.intelligence - EMERGENCE_THRESHOLDS.MIRROR_TEST) / 0.05;
-    const passChance = Math.max(0, Math.min(1, baseChance));
+    const passChance = clamp(baseChance, 0, 1);
 
     return Math.random() < passChance;
   }
@@ -245,7 +246,7 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
 
     // Can entity wait for better reward?
     const baseChance = (proto.intelligence - 0.5) / 0.2;
-    const passChance = Math.max(0, Math.min(1, baseChance));
+    const passChance = clamp(baseChance, 0, 1);
 
     return Math.random() < passChance;
   }
@@ -257,7 +258,7 @@ export class ProtoSapienceObservationSystem extends BaseSystem {
     // Score based on intelligence with random variation
     const baseScore = proto.intelligence;
     const variation = (Math.random() - 0.5) * 0.2; // +/- 0.1
-    return Math.max(0, Math.min(1, baseScore + variation));
+    return clamp(baseScore + variation, 0, 1);
   }
 
   /**

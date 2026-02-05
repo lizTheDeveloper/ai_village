@@ -15,6 +15,7 @@ import { BaseSystem, type SystemContext } from '../../ecs/SystemContext.js';
 import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 
+import { clamp } from '../utils/math.js';
 // ============================================================================
 // NEWS TYPES
 // ============================================================================
@@ -197,7 +198,7 @@ export class NewsDeskManager {
       agentId,
       name,
       status: 'available',
-      reportingSkill: Math.max(0, Math.min(100, skill)),
+      reportingSkill: clamp(skill, 0, 100),
     };
 
     desk.fieldReporters.push(reporter);

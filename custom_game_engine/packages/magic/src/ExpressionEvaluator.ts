@@ -1,3 +1,4 @@
+import { clamp as clampUtil } from '@ai-village/core';
 import type {
   Expression,
   ExpressionContext,
@@ -354,7 +355,7 @@ export class ExpressionEvaluator {
     if (typeof value !== 'number' || typeof min !== 'number' || typeof max !== 'number') {
       throw new Error('clamp requires numeric arguments');
     }
-    return Math.max(min, Math.min(value, max));
+    return clampUtil(value, min, max);
   }
 
   // ============================================================================

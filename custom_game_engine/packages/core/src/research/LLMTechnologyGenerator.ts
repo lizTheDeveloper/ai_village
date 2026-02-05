@@ -13,6 +13,7 @@
 
 import type { ResearchDefinition, ResearchField, ResearchUnlock } from './types.js';
 
+import { clamp } from '../utils/math.js';
 /**
  * LLM Provider interface for technology generation
  */
@@ -291,8 +292,8 @@ Respond with ONLY valid JSON in this format:
         name: parsed.name,
         description: parsed.description,
         field,
-        tier: Math.max(1, Math.min(5, parsed.tier || 1)),
-        progressRequired: Math.max(100, Math.min(500, parsed.progressRequired || 200)),
+        tier: clamp(parsed.tier || 1, 1, 5),
+        progressRequired: clamp(parsed.progressRequired || 200, 100, 500),
         prerequisites: Array.isArray(parsed.prerequisites) ? parsed.prerequisites : [],
         unlocks: Array.isArray(parsed.unlocks) ? parsed.unlocks : [],
         requiredBuilding: parsed.requiredBuilding || undefined,
@@ -324,7 +325,7 @@ Respond with ONLY valid JSON in this format:
     }
 
     // Clamp to 0-1
-    return Math.max(0, Math.min(1, score));
+    return clamp(score, 0, 1);
   }
 }
 

@@ -21,6 +21,7 @@ import type {
 } from '../components/BuildingHarmonyComponent.js';
 import { createBuildingHarmonyComponent } from '../components/BuildingHarmonyComponent.js';
 
+import { clamp } from '../utils/math.js';
 // ============================================================================
 // Types
 // ============================================================================
@@ -676,7 +677,7 @@ export class FengShuiAnalyzer {
     const balanceScore = Math.max(0, 25 - stdDev / 2);
     score = score - 25 + balanceScore;
 
-    return Math.max(0, Math.min(100, Math.round(score)));
+    return clamp(Math.round(score, 0, 100));
   }
 }
 

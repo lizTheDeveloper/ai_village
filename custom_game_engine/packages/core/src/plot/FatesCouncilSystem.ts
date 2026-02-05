@@ -37,6 +37,7 @@ import type { RelationshipComponent } from '../components/RelationshipComponent.
 import type { IdentityComponent } from '../components/IdentityComponent.js';
 import type { GoalsComponent } from '../components/GoalsComponent.js';
 
+import { clamp } from '../utils/math.js';
 /** Ticks per game day (20 TPS * 60 sec * 60 min * 24 hr = 1,728,000 ticks) */
 const TICKS_PER_DAY = 20 * 60 * 60 * 24;
 
@@ -914,7 +915,7 @@ export class FatesCouncilSystem extends BaseSystem {
     tension += overwhelmedCount * 0.02;
     tension -= challengedCount * 0.01;  // Stagnant world needs drama, so lower tension to encourage plots
 
-    return Math.min(1, Math.max(0, tension));
+    return clamp(tension, 0, 1);
   }
 
   /**

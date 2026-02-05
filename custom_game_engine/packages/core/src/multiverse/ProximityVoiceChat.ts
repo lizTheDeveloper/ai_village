@@ -9,6 +9,7 @@
 import type { PeerId } from './NetworkProtocol.js';
 import type { Position } from '../types.js';
 
+import { clamp } from '../utils/math.js';
 // ============================================================================
 // Types
 // ============================================================================
@@ -431,7 +432,7 @@ export class ProximityVoiceChat {
       (this.audioSettings.refDistance +
         this.audioSettings.rolloffFactor * (distance - this.audioSettings.refDistance));
 
-    return Math.max(0, Math.min(1, volume));
+    return clamp(volume, 0, 1);
   }
 
   // ============================================================================

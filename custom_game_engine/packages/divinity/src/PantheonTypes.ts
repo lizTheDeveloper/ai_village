@@ -5,6 +5,7 @@
  * and complex webs of divine politics. This shapes mortal religion and conflict.
  */
 
+import { clamp } from '@ai-village/core';
 import type { DivineDomain } from './DeityTypes.js';
 
 // ============================================================================
@@ -663,7 +664,7 @@ export function calculateRelationshipStrength(
   strength += posCount * 0.1;
   strength -= negCount * 0.1;
 
-  return Math.max(-1, Math.min(1, strength));
+  return clamp(strength, -1, 1);
 }
 
 /** Get relationship summary */

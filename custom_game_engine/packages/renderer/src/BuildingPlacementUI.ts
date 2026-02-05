@@ -16,6 +16,7 @@
 
 import type { World } from '@ai-village/core';
 import type { EventBus } from '@ai-village/core';
+import { clamp } from '@ai-village/core';
 import type {
   BuildingBlueprint,
   BuildingCategory,
@@ -922,10 +923,11 @@ export class BuildingPlacementUI {
 
     // Position tooltip to the right of the menu
     const tooltipX = this.menuWidth + 10;
-    const tooltipY = Math.max(10, Math.min(
+    const tooltipY = clamp(
       this.state.cursorScreenPosition.y - tooltipHeight / 2,
+      10,
       ctx.canvas.height - tooltipHeight - 10
-    ));
+    );
 
     const isUnlocked = this.isBuildingUnlocked(blueprint);
 

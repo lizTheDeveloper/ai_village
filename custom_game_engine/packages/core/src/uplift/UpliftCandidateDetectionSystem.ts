@@ -25,6 +25,7 @@ import { getAnimalSpecies } from '../data/animalSpecies.js';
 import { getClarketechSystem } from '../clarketech/ClarketechSystem.js';
 import { shouldEmergeBehaviors } from './UpliftHelpers.js';
 
+import { clamp } from '../utils/math.js';
 /**
  * Evaluation thresholds for uplift suitability
  */
@@ -280,7 +281,7 @@ export class UpliftCandidateDetectionSystem extends BaseSystem {
     // Add small random variation
     intelligence += (Math.random() - 0.5) * 0.1;
 
-    return Math.max(0, Math.min(1, intelligence));
+    return clamp(intelligence, 0, 1);
   }
 
   /**

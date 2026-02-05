@@ -33,6 +33,7 @@ import { EntityImpl } from '../ecs/Entity.js';
 import type { NavyComponent } from '../components/NavyComponent.js';
 import type { SpaceshipType } from '../navigation/SpaceshipComponent.js';
 import { createSpaceshipComponent } from '../navigation/SpaceshipComponent.js';
+import { clamp } from '../utils/math.js';
 
 // ============================================================================
 // Types
@@ -340,7 +341,7 @@ export class ShipyardProductionSystem extends BaseSystem {
     const efficiency =
       budgetFactor * 0.4 + resourceFactor * 0.3 + workforceFactor * 0.3;
 
-    return Math.max(0.1, Math.min(1.0, efficiency)); // Clamp to 10%-100%
+    return clamp(efficiency, 0.1, 1.0); // Clamp to 10%-100%
   }
 
   // ========================================================================

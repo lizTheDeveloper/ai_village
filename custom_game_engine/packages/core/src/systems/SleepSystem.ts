@@ -14,6 +14,7 @@ import { getAgent, getNeeds, getCircadian, getEpisodicMemory, getBuilding } from
 import type { BuildingHarmonyComponent } from '../components/BuildingHarmonyComponent.js';
 import { getHarmonyRestModifier } from '../components/BuildingHarmonyComponent.js';
 import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
+import { clamp } from '../utils/math.js';
 
 /**
  * Weird/surreal elements that can appear in dreams
@@ -274,7 +275,7 @@ export class SleepSystem extends BaseSystem {
     }
 
     // Clamp to valid range (0.1 to 1.0)
-    return Math.max(0.1, Math.min(1.0, quality));
+    return clamp(quality, 0.1, 1.0);
   }
 
   /**

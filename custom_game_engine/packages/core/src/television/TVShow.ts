@@ -8,6 +8,7 @@
 import type { Component } from '../ecs/Component.js';
 import type { Award } from './TVStation.js';
 
+import { clamp } from '../utils/math.js';
 // ============================================================================
 // SHOW FORMATS
 // ============================================================================
@@ -436,5 +437,5 @@ export function updateCulturalImpact(show: TVShowComponent): void {
 
   // Slowly approach total impact (prevents sudden jumps)
   show.culturalImpact += (totalImpact - show.culturalImpact) * 0.1;
-  show.culturalImpact = Math.min(100, Math.max(0, show.culturalImpact));
+  show.culturalImpact = clamp(show.culturalImpact, 0, 100);
 }

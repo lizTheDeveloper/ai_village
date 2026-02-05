@@ -17,6 +17,7 @@ import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import type { Storyline, PlotTwist, StorylineTheme, ShowCharacter } from '../TVShow.js';
 
+import { clamp } from '../utils/math.js';
 // ============================================================================
 // SOAP OPERA TYPES
 // ============================================================================
@@ -348,7 +349,7 @@ export class SoapOperaManager {
     }
 
     if (intensityChange) {
-      relationship.intensity = Math.max(0, Math.min(100, relationship.intensity + intensityChange));
+      relationship.intensity = clamp(relationship.intensity + intensityChange, 0, 100);
     }
 
     return relationship;

@@ -17,6 +17,7 @@ import type {
 } from './types.js';
 import { godCraftedQueue } from './GodCraftedQueue.js';
 
+import { clamp } from '../utils/math.js';
 /**
  * Input for spell creation
  */
@@ -84,7 +85,7 @@ export class SpellLabMicrogenerator {
       forms: data.forms,
       reagents: data.reagents,
       manaCost: parsed.manaCost,
-      powerLevel: Math.min(10, Math.max(1, data.powerLevel)),
+      powerLevel: clamp(data.powerLevel, 1, 10),
       effects: parsed.effects,
       creativityScore: parsed.creativityScore,
     };
@@ -205,7 +206,7 @@ Output a JSON object with this structure:
       return {
         name: parsed.name || input.name || 'Unnamed Spell',
         description: parsed.description || parsed.flavorText || 'A mysterious spell',
-        manaCost: Math.max(10, Math.min(200, parsed.manaCost || 50)),
+        manaCost: clamp(parsed.manaCost || 50, 10, 200),
         effects: {
           damage: parsed.effects?.damage || null,
           duration: parsed.effects?.duration || null,
@@ -213,7 +214,7 @@ Output a JSON object with this structure:
           areaOfEffect: parsed.effects?.areaOfEffect || null,
           custom: parsed.effects?.custom || {},
         },
-        creativityScore: Math.max(0, Math.min(1, parsed.creativityScore || 0.5)),
+        creativityScore: clamp(parsed.creativityScore || 0.5, 0, 1),
       };
     } catch (error) {
       console.error('[SpellLab] Failed to parse LLM response:', error);

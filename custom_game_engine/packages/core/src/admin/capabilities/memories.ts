@@ -39,6 +39,7 @@
  */
 
 import { capabilityRegistry, defineCapability, defineQuery, defineAction } from '../CapabilityRegistry.js';
+import { clamp } from '../../utils/math.js';
 
 // ============================================================================
 // Option Definitions
@@ -471,7 +472,7 @@ const memoriesCapability = defineCapability({
           return { success: false, error: 'No game connected' };
         }
 
-        const intensity = Math.min(1.0, Math.max(0.3, typeof params.intensity === 'number' ? params.intensity : 0.7));
+        const intensity = clamp(typeof params.intensity === 'number' ? params.intensity : 0.7, 0.3, 1.0);
 
         return {
           success: true,
@@ -496,7 +497,7 @@ const memoriesCapability = defineCapability({
           return { success: false, error: 'No game connected' };
         }
 
-        const soothing = Math.min(0.8, Math.max(0.2, typeof params.soothing === 'number' ? params.soothing : 0.5));
+        const soothing = clamp(typeof params.soothing === 'number' ? params.soothing : 0.5, 0.2, 0.8);
 
         return {
           success: true,
@@ -522,7 +523,7 @@ const memoriesCapability = defineCapability({
           return { success: false, error: 'No game connected' };
         }
 
-        const boost = Math.min(0.5, Math.max(0.1, typeof params.boost === 'number' ? params.boost : 0.3));
+        const boost = clamp(typeof params.boost === 'number' ? params.boost : 0.3, 0.1, 0.5);
 
         return {
           success: true,
@@ -550,7 +551,7 @@ const memoriesCapability = defineCapability({
           return { success: false, error: 'No game connected' };
         }
 
-        const strength = Math.min(0.8, Math.max(0.3, typeof params.strength === 'number' ? params.strength : 0.5));
+        const strength = clamp(typeof params.strength === 'number' ? params.strength : 0.5, 0.3, 0.8);
 
         return {
           success: true,
@@ -581,7 +582,7 @@ const memoriesCapability = defineCapability({
           return { success: false, error: 'No game connected' };
         }
 
-        const strength = Math.min(1.0, Math.max(0.1, typeof params.strength === 'number' ? params.strength : 0.5));
+        const strength = clamp(typeof params.strength === 'number' ? params.strength : 0.5, 0.1, 1.0);
 
         return {
           success: true,
@@ -610,7 +611,7 @@ const memoriesCapability = defineCapability({
           return { success: false, error: 'No game connected' };
         }
 
-        const clarity = Math.min(1.0, Math.max(0.3, typeof params.clarity === 'number' ? params.clarity : 0.6));
+        const clarity = clamp(typeof params.clarity === 'number' ? params.clarity : 0.6, 0.3, 1.0);
 
         let message = `Memory shared from ${params.sourceAgentId} to ${params.targetAgentId}.\n`;
         message += `Clarity: ${(clarity * 100).toFixed(0)}%\n\n`;

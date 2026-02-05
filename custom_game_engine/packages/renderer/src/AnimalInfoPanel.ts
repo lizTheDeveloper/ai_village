@@ -1,4 +1,5 @@
 import type { Entity, World, AnimalComponent, IdentityComponent } from '@ai-village/core';
+import { clamp } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
 import { DevSection } from './panels/agent-info/DevSection.js';
 import type { SectionRenderContext } from './panels/agent-info/types.js';
@@ -76,7 +77,7 @@ export class AnimalInfoPanel implements IWindowPanel {
   handleScroll(deltaY: number, _contentHeight: number): boolean {
     const scrollSpeed = 20;
     this.scrollOffset += deltaY > 0 ? scrollSpeed : -scrollSpeed;
-    this.scrollOffset = Math.max(0, Math.min(this.scrollOffset, this.maxScrollOffset));
+    this.scrollOffset = clamp(this.scrollOffset, 0, this.maxScrollOffset);
     return true;
   }
 
@@ -581,7 +582,7 @@ export class AnimalInfoPanel implements IWindowPanel {
     _invertColors: boolean = false
   ): void {
     const height = 12;
-    const barValue = Math.max(0, Math.min(100, value));
+    const barValue = clamp(value, 0, 100);
 
     // Background (dark gray)
     ctx.fillStyle = 'rgba(50, 50, 50, 0.8)';

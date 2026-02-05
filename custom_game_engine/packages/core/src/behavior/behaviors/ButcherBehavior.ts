@@ -25,6 +25,7 @@ import { ComponentType as CT } from '../../types/ComponentType.js';
 import { BuildingTargeting } from '../../targeting/BuildingTargeting.js';
 import { BuildingType } from '../../types/BuildingType.js';
 import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
+import { clamp } from '../../utils/math.js';
 
 export interface ButcherState {
   /** Target animal entity to butcher */
@@ -229,7 +230,7 @@ export class ButcherBehavior extends BaseBehavior {
     const variance = (Math.random() - 0.5) * 10;
     quality += variance;
 
-    return Math.max(0, Math.min(100, Math.round(quality)));
+    return clamp(Math.round(quality), 0, 100);
   }
 }
 
@@ -281,7 +282,7 @@ function calculateButcheringQuality(
   const variance = (Math.random() - 0.5) * 10;
   quality += variance;
 
-  return Math.max(0, Math.min(100, Math.round(quality)));
+  return clamp(Math.round(quality), 0, 100);
 }
 
 /**

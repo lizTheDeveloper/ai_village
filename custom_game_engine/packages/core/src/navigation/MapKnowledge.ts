@@ -468,7 +468,7 @@ export class MapKnowledge {
       const improvement = currentDistSq - neighborDistSq;
       // improvement > 0 means getting closer
       // Max improvement is ~2 (diagonal move toward goal)
-      goalAlignment = Math.min(1.0, Math.max(0.0, 0.5 + improvement / 4));
+      goalAlignment = clamp(0.5 + improvement / 4, 0.0, 1.0);
     }
 
     // Calculate elevation penalty (0 to 0.15)

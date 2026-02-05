@@ -1,4 +1,5 @@
 import type { Component } from '../ecs/Component.js';
+import { clamp01 } from '../utils/math.js';
 
 // ============================================================================
 // Types
@@ -169,7 +170,7 @@ export function calculateSoloJumpSuccessChance(
   // Combined success chance
   const successChance = coherenceBonus - attemptPenalty - contaminationPenalty;
 
-  return Math.max(0, Math.min(1, successChance));
+  return clamp01(successChance);
 }
 
 /**

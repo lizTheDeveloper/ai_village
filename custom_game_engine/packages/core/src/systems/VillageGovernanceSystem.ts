@@ -5,6 +5,7 @@ import type { World } from '../ecs/World.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EntityImpl } from '../ecs/Entity.js';
+import { clamp } from '../utils/math.js';
 import type {
   VillageGovernanceComponent,
   VillageProposal,
@@ -181,7 +182,7 @@ export class VillageGovernanceSystem extends BaseSystem {
     const sorted = [...candidates].sort((a, b) => b.age - a.age);
 
     // Select 3-7 elders depending on governance type
-    const elderCount = governance.governanceType === 'chieftain' ? 1 : Math.min(5, Math.max(3, Math.floor(voters.length / 10)));
+    const elderCount = governance.governanceType === 'chieftain' ? 1 : clamp(Math.floor(voters.length / 10), 3, 5);
 
     return sorted.slice(0, elderCount).map((c) => c.id);
   }

@@ -25,6 +25,7 @@ import { addHearsay, getTrustScore } from './HearsayMemory.js';
 import { getMapKnowledge, worldToSector, type AreaResourceType } from './MapKnowledge.js';
 import { parseResourceMentions, isResourceAnnouncement, vectorToCardinal } from './SpeechParser.js';
 
+import { clamp } from '../utils/math.js';
 /**
  * Process speech heard by an agent and update their hearsay memory.
  * Called by CommunicationSystem when speech is within hearing range.
@@ -142,7 +143,7 @@ export function verifyHearsayAtLocation(
   // Update trust based on result
   const trustChange = foundResource ? 0.1 : -0.15;
   const currentTrust = getTrustScore(listenerMemory, hearsay.sourceAgentId);
-  const newTrust = Math.max(0.1, Math.min(1.0, currentTrust + trustChange));
+  const newTrust = clamp(currentTrust + trustChange, 0.1, 1.0);
 
   // Update trust rating
   let rating = listenerMemory.trustRatings.get(hearsay.sourceAgentId);

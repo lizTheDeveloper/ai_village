@@ -17,6 +17,7 @@
  */
 
 import type { Component } from '../ecs/Component.js';
+import { clamp01 } from '../utils/math.js';
 
 /**
  * A single frame in the replay sequence.
@@ -318,7 +319,7 @@ function calculateReplayQuality(replay: VideoReplayComponent): number {
   const uniqueAngles = new Set(replay.frames.map(f => Math.floor(f.cameraAngle * 10)));
   qualityScore += Math.min(0.1, uniqueAngles.size / 50);
 
-  return Math.min(1.0, Math.max(0.0, qualityScore));
+  return clamp01(qualityScore);
 }
 
 // ============================================================================

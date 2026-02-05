@@ -1,4 +1,5 @@
 import { ComponentBase } from '../ecs/Component.js';
+import { clamp01 } from '../utils/math.js';
 
 export interface Impression {
   readonly text: string;
@@ -92,7 +93,7 @@ export class SocialMemoryComponent extends ComponentBase {
       const newMemory: SocialMemory = Object.freeze({
         agentId: input.agentId,
         overallSentiment: input.sentiment,
-        trust: Math.max(0, Math.min(1, 0.5 + (input.trustDelta ?? 0))),
+        trust: clamp01(0.5 + (input.trustDelta ?? 0)),
         impressions: input.impression
           ? Object.freeze([
               Object.freeze({ text: input.impression, timestamp: input.timestamp }),
@@ -114,10 +115,7 @@ export class SocialMemoryComponent extends ComponentBase {
       // Update existing memory
       const newSentiment =
         existing.overallSentiment * 0.8 + input.sentiment * 0.2;
-      const newTrust = Math.max(
-        0,
-        Math.min(1, existing.trust + (input.trustDelta ?? 0))
-      );
+      const newTrust = clamp01(existing.trust + (input.trustDelta ?? 0));
 
       const newImpressions = input.impression
         ? [

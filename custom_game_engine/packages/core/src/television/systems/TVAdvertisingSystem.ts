@@ -16,6 +16,7 @@ import type { EventBus } from '../../events/EventBus.js';
 import { SystemEventManager } from '../../events/TypedEventEmitter.js';
 import { ComponentType } from '../../types/ComponentType.js';
 
+import { clamp } from '../utils/math.js';
 // ============================================================================
 // ADVERTISING TYPES
 // ============================================================================
@@ -242,7 +243,7 @@ export class AdvertisingManager {
       durationTicks: durationSeconds * 20, // 20 ticks per second
       costPerAiring,
       targetAudience: [],
-      creativeQuality: Math.max(0, Math.min(100, creativeQuality)),
+      creativeQuality: clamp(creativeQuality, 0, 100),
       totalAirings: 0,
       totalImpressions: 0,
       effectivenessScore: 50,

@@ -10,6 +10,7 @@ import type { CombatStatsComponent } from '../components/CombatStatsComponent.js
 import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
+import { clamp } from '../utils/math.js';
 
 // Simplified animal component interface for predator attacks
 interface AnimalComponent extends Component {
@@ -405,7 +406,7 @@ export class PredatorAttackSystem extends BaseSystem {
     // For simplicity, no terrain/weather modifiers in this implementation
     const detectionChance = (awareness - stealth + 10) / 20; // Normalized to 0-1
 
-    return Math.random() < Math.max(0.1, Math.min(0.9, detectionChance));
+    return Math.random() < clamp(detectionChance, 0.1, 0.9);
   }
 
   /**
