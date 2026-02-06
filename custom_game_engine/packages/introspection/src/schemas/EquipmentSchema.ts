@@ -7,6 +7,7 @@
  */
 
 import { defineComponent, autoRegister, type Component } from '../index.js';
+import { CT } from '@ai-village/core';
 
 /**
  * Simple equipment slot - stores item ID reference
@@ -207,7 +208,7 @@ export const EquipmentSchema = autoRegister(
        * Equip an item to a body part
        */
       equipItem: (entity, bodyPartId: string, itemId: string, instanceId?: string) => {
-        const equipment = entity.getComponent('equipment') as EquipmentComponent;
+        const equipment = entity.getComponent(CT.Equipment) as EquipmentComponent;
         if (!equipment) {
           throw new Error('Entity does not have equipment component');
         }
@@ -234,7 +235,7 @@ export const EquipmentSchema = autoRegister(
         itemId: string,
         instanceId?: string
       ) => {
-        const equipment = entity.getComponent('equipment') as EquipmentComponent;
+        const equipment = entity.getComponent(CT.Equipment) as EquipmentComponent;
         if (!equipment) {
           throw new Error('Entity does not have equipment component');
         }

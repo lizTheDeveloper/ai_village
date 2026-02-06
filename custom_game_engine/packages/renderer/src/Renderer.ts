@@ -17,6 +17,7 @@ import type {
   EventBus,
   BuildingBlueprint,
 } from '@ai-village/core';
+import { CT } from '@ai-village/core';
 import type { PlantComponent } from '@ai-village/core';
 import { buildingBlueprintRegistry } from '@ai-village/core';
 import {
@@ -397,7 +398,7 @@ export class Renderer {
     // PERF: Use cached building entities instead of querying every frame
     const buildingEntities = this._cachedBuildingEntities;
     for (const entity of buildingEntities) {
-      const building = entity.components.get('building') as BuildingComponent | undefined;
+      const building = entity.getComponent(CT.Building) as BuildingComponent | undefined;
       if (!building) continue;
 
       const blueprint = buildingBlueprintRegistry.tryGet(building.buildingType) as BuildingBlueprint | null;
@@ -461,7 +462,7 @@ export class Renderer {
     this._agentPositions.length = 0;
     const agentEntities = this._cachedAgentEntities;
     for (const agentEntity of agentEntities) {
-      const pos = agentEntity.components.get('position') as PositionComponent | undefined;
+      const pos = agentEntity.getComponent(CT.Position) as PositionComponent | undefined;
       if (pos) {
         this._agentPositions.push({ x: pos.x, y: pos.y });
       }
@@ -481,7 +482,7 @@ export class Renderer {
     // Keep if: building, planted crop, near any agent, or in viewport
     this._visibleEntities.length = 0;
     for (const entity of renderableEntities) {
-      const pos = entity.components.get('position') as PositionComponent | undefined;
+      const pos = entity.getComponent(CT.Position) as PositionComponent | undefined;
       if (!pos) continue;
 
       // Always keep buildings (agent-created)
@@ -491,7 +492,7 @@ export class Renderer {
       }
 
       // Always keep planted crops (agent-created)
-      const plant = entity.components.get('plant') as PlantComponent | undefined;
+      const plant = entity.getComponent(CT.Plant) as PlantComponent | undefined;
       if (plant?.planted) {
         this._visibleEntities.push(entity);
         continue;
@@ -538,7 +539,7 @@ export class Renderer {
       // Filter in-place into _sortedEntities to avoid allocation
       this._sortedEntities.length = 0;
       for (const entity of entities) {
-        const pos = entity.components.get('position') as PositionComponent | undefined;
+        const pos = entity.getComponent(CT.Position) as PositionComponent | undefined;
         if (!pos) continue;
 
         // Get entity position on depth axis
@@ -557,8 +558,8 @@ export class Renderer {
 
       // Sort in-place by depth (furthest first) then by Z (height)
       entities.sort((a, b) => {
-        const posA = a.components.get('position') as PositionComponent | undefined;
-        const posB = b.components.get('position') as PositionComponent | undefined;
+        const posA = a.getComponent(CT.Position) as PositionComponent | undefined;
+        const posB = b.getComponent(CT.Position) as PositionComponent | undefined;
         if (!posA || !posB) return 0;
 
         // Sort by depth - furthest entities render first (back to front)
@@ -587,7 +588,7 @@ export class Renderer {
       // Cache positions once (O(n) component lookups instead of O(n log n))
       const posCache = this._sortPositionCache;
       for (let i = 0; i < count; i++) {
-        const pos = entitiesArray[i]!.components.get('position') as PositionComponent | undefined;
+        const pos = entitiesArray[i]!.getComponent(CT.Position) as PositionComponent | undefined;
         const idx = i * 2;
         posCache[idx] = pos?.y ?? 0;
         posCache[idx + 1] = pos?.z ?? 0;
@@ -621,8 +622,8 @@ export class Renderer {
     }
 
     for (const entity of entities) {
-      const pos = entity.components.get('position') as PositionComponent | undefined;
-      const renderable = entity.components.get('renderable') as RenderableComponent | undefined;
+      const pos = entity.getComponent(CT.Position) as PositionComponent | undefined;
+      const renderable = entity.getComponent(CT.Renderable) as RenderableComponent | undefined;
 
       if (!pos || !renderable || !renderable.visible) continue;
 
@@ -636,7 +637,7 @@ export class Renderer {
       const screen = this.camera.worldToScreenInto(worldX, worldY, entityZ, this._screenPos);
 
       // Check if this is a building under construction
-      const building = entity.components.get('building') as BuildingComponent | undefined;
+      const building = entity.getComponent(CT.Building) as BuildingComponent | undefined;
 
       const isUnderConstruction = building && !building.isComplete && building.progress < 100;
 
@@ -699,7 +700,7 @@ export class Renderer {
       }
 
       // Draw resource amount bar for harvestable resources (trees, rocks)
-      const resource = entity.components.get('resource') as ResourceComponent | undefined;
+      const resource = entity.getComponent(CT.Resource) as ResourceComponent | undefined;
       if (resource && resource.harvestable && resource.maxAmount > 0 && this.showResourceAmounts) {
         this.buildingRenderer.drawResourceAmount(screen.x, screen.y, resource.amount, resource.maxAmount, resource.resourceType, this.tileSize, this.camera.zoom);
       }
@@ -772,8 +773,8 @@ export class Renderer {
       }
 
       // Draw agent behavior label
-      const agent = entity.components.get('agent') as AgentComponent | undefined;
-      const circadian = entity.components.get('circadian') as CircadianComponent | undefined;
+      const agent = entity.getComponent(CT.Agent) as AgentComponent | undefined;
+      const circadian = entity.getComponent(CT.Circadian) as CircadianComponent | undefined;
       if (agent && agent.behavior && this.showAgentTasks) {
         this.agentRenderer.drawAgentBehavior(screen.x, screen.y, agent.behavior, agent.behaviorState, circadian);
       }
@@ -789,13 +790,13 @@ export class Renderer {
       }
 
       // Draw reflection indicator for agents currently reflecting
-      const reflection = entity.components.get('reflection') as ReflectionComponent | undefined;
+      const reflection = entity.getComponent(CT.Reflection) as ReflectionComponent | undefined;
       if (reflection?.isReflecting) {
         this.agentRenderer.drawReflectionIndicator(screen.x, screen.y, reflection.reflectionType);
       }
 
       // Draw animal state label
-      const animal = entity.components.get('animal') as AnimalComponent | undefined;
+      const animal = entity.getComponent(CT.Animal) as AnimalComponent | undefined;
       if (animal) {
         this.getAnimalRenderer().drawAnimalState(screen.x, screen.y, animal.state, animal.wild, this.tileSize, this.camera.zoom);
       }

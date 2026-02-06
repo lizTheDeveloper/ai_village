@@ -24,6 +24,7 @@
 import type { Entity } from '@ai-village/core';
 import type { World } from '@ai-village/core';
 import {
+  CT,
   type IdentityComponent,
   type PersonalityComponent,
   type SkillsComponent,
@@ -91,13 +92,13 @@ export class ExecutorPromptBuilder {
     // Initialize frame-level cache
     promptCache.startFrame(world.tick);
 
-    const identity = agent.components.get('identity') as IdentityComponent | undefined;
-    const personality = agent.components.get('personality') as PersonalityComponent | undefined;
-    const skills = agent.components.get('skills') as SkillsComponent | undefined;
-    const needs = agent.components.get('needs') as NeedsComponent | undefined;
-    const vision = agent.components.get('vision') as VisionComponent | undefined;
-    const inventory = agent.components.get('inventory') as InventoryComponent | undefined;
-    const agentComp = agent.components.get('agent') as AgentComponent | undefined;
+    const identity = agent.getComponent(CT.Identity) as IdentityComponent | undefined;
+    const personality = agent.getComponent(CT.Personality) as PersonalityComponent | undefined;
+    const skills = agent.getComponent(CT.Skills) as SkillsComponent | undefined;
+    const needs = agent.getComponent(CT.Needs) as NeedsComponent | undefined;
+    const vision = agent.getComponent(CT.Vision) as VisionComponent | undefined;
+    const inventory = agent.getComponent(CT.Inventory) as InventoryComponent | undefined;
+    const agentComp = agent.getComponent(CT.Agent) as AgentComponent | undefined;
 
     // Schema-driven component rendering
     const schemaPrompt = this.buildSchemaPrompt(agent, world);
@@ -115,7 +116,7 @@ export class ExecutorPromptBuilder {
     const taskQueueText = this.buildTaskQueueSection(agentComp);
 
     // Goals: What you want to achieve
-    const goals = agent.components.get('goals') as GoalsComponent | undefined;
+    const goals = agent.getComponent(CT.Goals) as GoalsComponent | undefined;
     const goalsText = goals ? formatGoalsForPrompt(goals) : undefined;
     const goalsSectionText = goals ? formatGoalsSectionForPrompt(goals) : null;
 
@@ -193,7 +194,7 @@ export class ExecutorPromptBuilder {
    * to prevent simultaneous duplicate construction.
    */
   private hasCampfireInChunk(agent: Entity, world: World): boolean {
-    const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
+    const agentPos = agent.getComponent(CT.Position) as { x: number; y: number } | undefined;
     if (!agentPos) return false;
 
     // FAST PATH: O(1) lookup using world.spatialQuery
@@ -222,13 +223,13 @@ export class ExecutorPromptBuilder {
       if (!entity) continue;
 
       // Check for completed campfire buildings
-      const building = entity.components.get('building') as BuildingComponent | undefined;
+      const building = entity.getComponent(CT.Building) as BuildingComponent | undefined;
       if (building?.buildingType === 'campfire') {
         return true;
       }
 
       // Check for agents currently building campfires (prevents duplicate simultaneous builds)
-      const agentComp = entity.components.get('agent') as AgentComponent | undefined;
+      const agentComp = entity.getComponent(CT.Agent) as AgentComponent | undefined;
       if (agentComp?.behavior === 'build' && agentComp.behaviorState?.buildingType === 'campfire') {
         return true;
       }
@@ -347,14 +348,14 @@ export class ExecutorPromptBuilder {
       return '';
     }
 
-    const skills = agent.components.get('skills') as SkillsComponent | undefined;
+    const skills = agent.getComponent(CT.Skills) as SkillsComponent | undefined;
     const buildingSkill: SkillLevel = skills?.levels.building ?? 0;
 
     // Query all buildings in the world
     const buildings = world.query().with('building').executeEntities();
     const buildingData = buildings.map(b => {
-      const buildingComp = b.components.get('building') as BuildingComponent | undefined;
-      const identity = b.components.get('identity') as IdentityComponent | undefined;
+      const buildingComp = b.getComponent(CT.Building) as BuildingComponent | undefined;
+      const identity = b.getComponent(CT.Identity) as IdentityComponent | undefined;
       return {
         id: b.id,
         name: buildingComp?.buildingType || 'Unknown Building',
@@ -434,7 +435,7 @@ export class ExecutorPromptBuilder {
           const resource = world.getEntity(resourceId);
           if (!resource) continue;
 
-          const resourceComp = resource.components.get('resource') as ResourceComponent | undefined;
+          const resourceComp = resource.getComponent(CT.Resource) as ResourceComponent | undefined;
           if (resourceComp?.resourceType) {
             const currentCount = resourceCounts.get(resourceComp.resourceType) || 0;
             resourceCounts.set(resourceComp.resourceType, currentCount + 1);
@@ -448,7 +449,7 @@ export class ExecutorPromptBuilder {
           const plant = world.getEntity(plantId);
           if (!plant) continue;
 
-          const plantComp = plant.components.get('plant') as PlantComponent | undefined;
+          const plantComp = plant.getComponent(CT.Plant) as PlantComponent | undefined;
           if (plantComp?.speciesId) {
             const speciesName = plantComp.speciesId.replace(/-/g, ' ');
             const currentCount = plantCounts.get(speciesName) || 0;

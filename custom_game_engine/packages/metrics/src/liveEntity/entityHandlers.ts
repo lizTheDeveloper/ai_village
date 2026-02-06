@@ -10,6 +10,7 @@
  */
 
 import type { World, Entity } from '@ai-village/core';
+import { CT } from '@ai-village/core';
 import type {
   QueryRequest,
   QueryResponse,
@@ -79,13 +80,13 @@ export function handlePlantsQuery(
   for (const entity of ctx.world.entities.values()) {
     if (!entity.components.has('plant')) continue;
 
-    const plantComp = entity.components.get('plant');
+    const plantComp = entity.getComponent(CT.Plant);
     const plant = plantComp && isPlantComponent(plantComp) ? plantComp : undefined;
 
-    const positionComp = entity.components.get('position');
+    const positionComp = entity.getComponent(CT.Position);
     const position = positionComp && isPositionComponent(positionComp) ? positionComp : undefined;
 
-    const renderableComp = entity.components.get('renderable');
+    const renderableComp = entity.getComponent(CT.Renderable);
     const renderable = renderableComp && isRenderableComponent(renderableComp) ? renderableComp : undefined;
 
     // Skip plants without position or renderable
@@ -406,7 +407,7 @@ export function getEntitySummary(entity: Entity): EntitySummary {
   const id = entity.id;
 
   // Get name from identity component
-  const identityComp = entity.components.get('identity');
+  const identityComp = entity.getComponent(CT.Identity);
   const identity = identityComp && isIdentityComponent(identityComp) ? identityComp : undefined;
   const name = identity?.name || id;
 
@@ -425,12 +426,12 @@ export function getEntitySummary(entity: Entity): EntitySummary {
   }
 
   // Get position
-  const positionComp = entity.components.get('position');
+  const positionComp = entity.getComponent(CT.Position);
   const position = positionComp && isPositionComponent(positionComp) ? positionComp : undefined;
   const pos = position ? { x: position.x ?? 0, y: position.y ?? 0 } : undefined;
 
   // Get current behavior
-  const agentComp = entity.components.get('agent');
+  const agentComp = entity.getComponent(CT.Agent);
   const agent = agentComp && isAgentComponent(agentComp) ? agentComp : undefined;
   const behavior = agent?.currentBehavior;
 
@@ -442,7 +443,7 @@ export function getEntitySummary(entity: Entity): EntitySummary {
  */
 export function getEntityDetails(entity: Entity): EntityDetails {
   const id = entity.id;
-  const identityComp = entity.components.get('identity');
+  const identityComp = entity.getComponent(CT.Identity);
   const identity = identityComp && isIdentityComponent(identityComp) ? identityComp : undefined;
   const name = identity?.name;
 

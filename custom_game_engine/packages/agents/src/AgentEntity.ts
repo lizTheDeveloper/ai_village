@@ -53,6 +53,7 @@ import {
   createRealmLocationComponent,
   SpeciesComponent,
   createParentingComponent,
+  ComponentType as CT,
 } from '@ai-village/core';
 // Reproduction system components
 import {
@@ -314,7 +315,7 @@ export function createWanderingAgent(
   entity.addComponent(new SpeciesComponent('human', 'Human', 'humanoid_biped'));
 
   // Language knowledge - add native language from species
-  const speciesComponent = entity.getComponent('species') as SpeciesComponent;
+  const speciesComponent = entity.getComponent(CT.Species) as SpeciesComponent;
   if (speciesComponent?.nativeLanguageId) {
     entity.addComponent(
       createLanguageKnowledgeComponent([speciesComponent.nativeLanguageId])
@@ -325,8 +326,8 @@ export function createWanderingAgent(
   world.addEntity(entity);
 
   // Emit agent:birth event for metrics tracking
-  const identity = entity.getComponent('identity') as { name: string } | undefined;
-  const needs = entity.getComponent('needs') as { health: number; hunger: number; energy: number } | undefined;
+  const identity = entity.getComponent(CT.Identity) as { name: string } | undefined;
+  const needs = entity.getComponent(CT.Needs) as { health: number; hunger: number; energy: number } | undefined;
   world.eventBus.emit({
     type: 'agent:birth',
     source: entity.id,
@@ -567,8 +568,8 @@ export function createLLMAgent(
   world.addEntity(entity);
 
   // Emit agent:birth event for metrics tracking
-  const identity = entity.getComponent('identity') as { name: string } | undefined;
-  const needs = entity.getComponent('needs') as { health: number; hunger: number; energy: number } | undefined;
+  const identity = entity.getComponent(CT.Identity) as { name: string } | undefined;
+  const needs = entity.getComponent(CT.Needs) as { health: number; hunger: number; energy: number } | undefined;
   world.eventBus.emit({
     type: 'agent:birth',
     source: entity.id,

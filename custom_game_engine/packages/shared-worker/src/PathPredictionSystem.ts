@@ -9,7 +9,7 @@
  */
 
 import type { World, Entity } from '@ai-village/core';
-import { EntityImpl, BaseSystem, type SystemContext } from '@ai-village/core';
+import { EntityImpl, BaseSystem, type SystemContext, CT } from '@ai-village/core';
 import type {
   PathPrediction,
   PathPredictionComponent,
