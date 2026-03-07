@@ -722,6 +722,8 @@ export class AdminAngelSystem extends BaseSystem {
   private pendingRequests = new Set<string>(); // Track in-flight requests
   private llmQueue: LLMDecisionQueue | null = null; // Shared LLM queue (if provided)
   private timeEntityId: string | null = null; // Cache for time entity (performance)
+  private agentQueryCache: ReadonlyArray<Entity> | null = null;
+  private agentQueryCacheTick = -1;
 
   constructor(config?: AdminAngelSystemConfig) {
     super();
@@ -936,7 +938,7 @@ export class AdminAngelSystem extends BaseSystem {
       speedMultiplier?: number;
     } | undefined;
 
-    const agents = world.query().with(CT.Agent).executeEntities();
+    const agents = this.getCachedAgents(world);
 
     // TODO: Get selected agent from somewhere
     // TODO: Get recent events
@@ -1950,7 +1952,7 @@ export class AdminAngelSystem extends BaseSystem {
    */
   private findAgentByName(world: World, name: string): Entity | null {
     const nameLower = name.toLowerCase().trim();
-    const agents = world.query().with(CT.Agent).executeEntities();
+    const agents = this.getCachedAgents(world);
 
     for (const agent of agents) {
       const identity = agent.getComponent(CT.Identity) as IdentityComponent | undefined;
@@ -2065,7 +2067,7 @@ export class AdminAngelSystem extends BaseSystem {
    * Phase 5: Handle status command - Village overview
    */
   private handleStatusCommand(world: World, angel: AdminAngelComponent): string {
-    const agents = world.query().with(CT.Agent).executeEntities();
+    const agents = this.getCachedAgents(world);
 
     if (agents.length === 0) {
       return 'no agents in the village rn';
@@ -2170,7 +2172,7 @@ export class AdminAngelSystem extends BaseSystem {
    * Returns 1-3 agents weighted by interest, player interaction, and notable states
    */
   private selectAgentsToObserve(world: World, angel: AdminAngelComponent): Entity[] {
-    const allAgents = world.query().with(CT.Agent).executeEntities();
+    const allAgents = this.getCachedAgents(world);
     if (allAgents.length === 0) return [];
 
     // Build weighted selection
@@ -2210,9 +2212,12 @@ export class AdminAngelSystem extends BaseSystem {
       return { agent, weight };
     });
 
-    // Sort and pick top 1-3
+    // Sort and pick agents - scale count with total agents for better coverage
+    // With 5 agents: observe 2-3, with 10 agents: observe 3-5, with 20+: observe 4-7
     weights.sort((a, b) => b.weight - a.weight);
-    const count = 1 + Math.floor(Math.random() * 3);
+    const minCount = Math.max(2, Math.floor(allAgents.length * 0.3));
+    const maxCount = Math.max(3, Math.ceil(allAgents.length * 0.5));
+    const count = Math.min(maxCount, minCount + Math.floor(Math.random() * (maxCount - minCount + 1)));
 
     const selected = weights.slice(0, count).map(w => w.agent);
 
@@ -2573,7 +2578,7 @@ export class AdminAngelSystem extends BaseSystem {
    * Checks for critical needs, deaths, achievements
    */
   private updateMood(world: World, angel: AdminAngelComponent): void {
-    const agents = world.query().with(CT.Agent).executeEntities();
+    const agents = this.getCachedAgents(world);
 
     // Count agents with critical needs
     let criticalCount = 0;
@@ -2620,9 +2625,10 @@ export class AdminAngelSystem extends BaseSystem {
     const angel = angelEntity.getComponent(CT.AdminAngel) as AdminAngelComponent | undefined;
     if (!angel || !angel.active) return;
 
-    // Phase 2: Ambient scanning (every 100-200 ticks, ~5-10 seconds)
+    // Phase 2: Ambient scanning (every 60-100 ticks, ~3-5 seconds)
+    // Faster scanning gives the angel better awareness of agent state changes
     const ticksSinceLastThought = Number(ctx.tick) - angel.memory.consciousness.lastThoughtTick;
-    const scanInterval = 100 + Math.floor(Math.random() * 100); // Random 100-200 ticks
+    const scanInterval = 60 + Math.floor(Math.random() * 40); // Random 60-100 ticks
     if (ticksSinceLastThought >= scanInterval) {
       this.performAmbientScan(ctx, angel);
     }
@@ -2661,7 +2667,7 @@ export class AdminAngelSystem extends BaseSystem {
 
     // Check for proactive turn
     const ticksSinceLastProactive = Number(ctx.tick) - angel.memory.conversation.lastProactiveTick;
-    const minProactiveInterval = 200; // At least 10 seconds between proactive messages
+    const minProactiveInterval = 100; // At least 5 seconds between proactive messages
     const maxProactiveInterval = angel.proactiveInterval; // Default 1200 ticks (60 seconds)
 
     if (ticksSinceLastProactive >= minProactiveInterval && !angel.awaitingResponse) {
@@ -2801,33 +2807,38 @@ export class AdminAngelSystem extends BaseSystem {
    * NEW: Personality-driven detection for relationships
    */
   private detectAgentInteraction(world: World, angel: AdminAngelComponent): string | null {
-    const agents = world.query().with(CT.Agent).with(CT.Position).with(CT.Identity).executeEntities();
+    const agents = this.getCachedAgents(world);
 
-    // Check all agent pairs for proximity
-    for (let i = 0; i < agents.length; i++) {
-      for (let j = i + 1; j < agents.length; j++) {
-        const agent1 = agents[i];
-        const agent2 = agents[j];
-        if (!agent1 || !agent2) continue;
+    // Pre-filter to agents with position and identity (avoids getComponent calls in O(n²) loop)
+    const agentsWithPosId: Array<{ entity: Entity; pos: { x: number; y: number }; identity: IdentityComponent }> = [];
+    for (const agent of agents) {
+      const pos = agent.getComponent(CT.Position) as { x: number; y: number } | undefined;
+      const identity = agent.getComponent(CT.Identity) as IdentityComponent | undefined;
+      if (pos && identity) {
+        agentsWithPosId.push({ entity: agent, pos, identity });
+      }
+    }
 
-        const pos1 = agent1.getComponent(CT.Position) as { x: number; y: number } | undefined;
-        const pos2 = agent2.getComponent(CT.Position) as { x: number; y: number } | undefined;
-        const id1 = agent1.getComponent(CT.Identity) as IdentityComponent | undefined;
-        const id2 = agent2.getComponent(CT.Identity) as IdentityComponent | undefined;
+    // Check all agent pairs for proximity using squared distance
+    const proximityThresholdSq = 3 * 3; // 9 = (3 tiles)²
+    for (let i = 0; i < agentsWithPosId.length; i++) {
+      for (let j = i + 1; j < agentsWithPosId.length; j++) {
+        const a1 = agentsWithPosId[i]!;
+        const a2 = agentsWithPosId[j]!;
 
-        if (!pos1 || !pos2 || !id1 || !id2) continue;
-
-        // Check if agents are near each other (within 3 tiles)
-        const dist = Math.sqrt((pos1.x - pos2.x) ** 2 + (pos1.y - pos2.y) ** 2);
-        if (dist < 3) {
+        const dx = a1.pos.x - a2.pos.x;
+        const dy = a1.pos.y - a2.pos.y;
+        if (dx * dx + dy * dy < proximityThresholdSq) {
           // Check if this is a repeated pattern
-          const pairKey = [agent1.id, agent2.id].sort().join('-');
+          const pairKey = a1.entity.id < a2.entity.id
+            ? `${a1.entity.id}-${a2.entity.id}`
+            : `${a2.entity.id}-${a1.entity.id}`;
           const interactionCount = this.getInteractionCount(angel, pairKey);
 
           if (interactionCount >= 3) {
             // Mark as mentioned to avoid spam
             this.markInteractionMentioned(angel, pairKey);
-            return `${id1.name} and ${id2.name} keep hanging out. are they... friends? more? i'm invested now`;
+            return `${a1.identity.name} and ${a2.identity.name} keep hanging out. are they... friends? more? i'm invested now`;
           }
         }
       }
@@ -2975,6 +2986,18 @@ export class AdminAngelSystem extends BaseSystem {
     const entity = this.getOrCreateAngel(world);
     if (!entity) return null;
     return entity.getComponent(CT.AdminAngel) as AdminAngelComponent | null;
+  }
+
+  /**
+   * Get cached agent entities for current tick.
+   * Avoids repeated world.query().with(CT.Agent) calls within the same tick.
+   */
+  private getCachedAgents(world: World): ReadonlyArray<Entity> {
+    if (this.agentQueryCacheTick !== world.tick) {
+      this.agentQueryCache = world.query().with(CT.Agent).executeEntities();
+      this.agentQueryCacheTick = Number(world.tick);
+    }
+    return this.agentQueryCache!;
   }
 
   /**
@@ -3310,7 +3333,7 @@ if u dont know something just say idk and figure it out together.`;
    */
   private scanForPatterns(ctx: SystemContext, angel: AdminAngelComponent): void {
     const narrative = angel.memory.narrative;
-    const agents = ctx.world.query().with(CT.Agent).executeEntities();
+    const agents = this.getCachedAgents(ctx.world);
 
     for (const agentEntity of agents) {
       const agent = agentEntity.getComponent(CT.Agent);
@@ -3817,7 +3840,7 @@ if u dont know something just say idk and figure it out together.`;
    * Generate a new goal for the angel
    */
   private generateGoal(ctx: SystemContext, angel: AdminAngelComponent): AngelGoal | null {
-    const agents = ctx.world.query().with(CT.Agent).with(CT.Needs).executeEntities();
+    const agents = this.getCachedAgents(ctx.world);
     if (agents.length === 0) return null;
 
     // Pick a goal type based on current situation
@@ -3970,19 +3993,21 @@ if u dont know something just say idk and figure it out together.`;
 
     if (parts[0] === 'village') {
       // Village-wide goal
-      const agents = ctx.world.query().with(CT.Agent).with(CT.Needs).executeEntities();
+      const agents = this.getCachedAgents(ctx.world);
       if (agents.length === 0) {
         return { completed: false, failed: false, progress: 0 };
       }
 
       let totalHappiness = 0;
+      let agentsWithNeeds = 0;
       for (const agent of agents) {
         const needs = agent.getComponent(CT.Needs) as NeedsComponent | undefined;
         if (needs) {
           totalHappiness += (needs.hunger + needs.energy + needs.social) / 3;
+          agentsWithNeeds++;
         }
       }
-      const avgHappiness = totalHappiness / agents.length;
+      const avgHappiness = agentsWithNeeds > 0 ? totalHappiness / agentsWithNeeds : 0;
       const threshold = parseFloat(parts[2] || '60') / 100;
 
       // Check deadline
