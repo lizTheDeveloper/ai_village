@@ -328,17 +328,25 @@ export class ScheduledDecisionProcessor {
       return { changed: false, source: 'none' };
     }
 
-    // Build prompt for selected layer
-    const prompt = this.scheduler.buildPrompt(layerSelection.layer, entity, world);
+    // Use lazy prompt building: prompt is built at send-time when request
+    // reaches front of queue, ensuring it reflects current agent state,
+    // not stale queue-time state. This matches the async LLMScheduler path.
+    const layer = layerSelection.layer;
+    const promptBuilder = () => {
+      const built = this.scheduler.buildPrompt(layer, entity, world);
+      // Update stored prompt for logging when response arrives
+      this.pendingPrompts.set(entity.id, built);
+      return built;
+    };
 
     // Store which layer we're requesting (so we can label it when the response comes back)
     this.pendingLayerSelection.set(entity.id, layerSelection.layer);
 
-    // Store the prompt so we can record it with the response later
-    this.pendingPrompts.set(entity.id, prompt);
+    // Store placeholder prompt (will be replaced by promptBuilder at send-time)
+    this.pendingPrompts.set(entity.id, '(lazy - built at send time)');
 
-    // Request decision from queue (fire-and-forget, will be ready next tick)
-    this.llmDecisionQueue.requestDecision(entity.id, prompt, agent.customLLM).catch((error: Error) => {
+    // Request decision from queue with lazy builder (fire-and-forget, will be ready next tick)
+    this.llmDecisionQueue.requestDecision(entity.id, promptBuilder, agent.customLLM).catch((error: Error) => {
       this.errorCount++;
       const now = Date.now();
       if (now - this.lastErrorLogTime > 30000) {

@@ -292,6 +292,7 @@ export class TalkerPromptBuilder {
         if (!seenAgent) continue;
 
         const seenIdentity = seenAgent.components.get('identity') as IdentityComponent | undefined;
+        const seenAgentComp = seenAgent.components.get('agent') as { behavior?: string } | undefined;
         const seenName = seenIdentity?.name || 'someone';
 
         // Check relationship
@@ -301,16 +302,18 @@ export class TalkerPromptBuilder {
           if (rel) {
             // affinity is -100 to 100, normalize to check relationships
             if (rel.affinity > 70) {
-              relationshipNote = ' (close friend)';
+              relationshipNote = ', close friend';
             } else if (rel.affinity > 40) {
-              relationshipNote = ' (friend)';
+              relationshipNote = ', friend';
             } else if (rel.affinity < -40) {
-              relationshipNote = ' (dislike)';
+              relationshipNote = ', dislike';
             }
           }
         }
 
-        nearbyAgents.push(`${seenName}${relationshipNote}`);
+        // Show what they're doing
+        const activity = seenAgentComp?.behavior || 'idle';
+        nearbyAgents.push(`${seenName} (${activity}${relationshipNote})`);
       }
     }
 

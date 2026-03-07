@@ -1716,16 +1716,19 @@ export class StructuredPromptBuilder {
     if (otherAgents.length > 0) {
       status += `- ${otherAgents.length} other villager${otherAgents.length > 1 ? 's are' : ' is'} in the village\n`;
 
-      // Show a few names for context
-      const names = otherAgents.slice(0, 3).map(a => {
+      // Show names and current activities for coordination
+      const agentDescriptions = otherAgents.slice(0, 5).map(a => {
         const identity = a.components.get('identity') as IdentityComponent | undefined;
-        return identity?.name || 'Unknown';
+        const agentComp = a.components.get('agent') as AgentComponent | undefined;
+        const name = identity?.name || 'Unknown';
+        const behavior = agentComp?.behavior || 'idle';
+        return `${name} (${behavior})`;
       });
 
-      if (names.length > 0) {
-        status += `- Villagers present: ${names.join(', ')}`;
-        if (otherAgents.length > 3) {
-          status += ` and ${otherAgents.length - 3} more`;
+      if (agentDescriptions.length > 0) {
+        status += `- Villagers: ${agentDescriptions.join(', ')}`;
+        if (otherAgents.length > 5) {
+          status += ` and ${otherAgents.length - 5} more`;
         }
         status += '\n';
       }

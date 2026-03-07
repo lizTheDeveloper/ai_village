@@ -96,7 +96,7 @@ export interface ILLMDecisionQueue {
    * Request a new decision (async)
    * Returns a promise that resolves with the LLM response text
    */
-  requestDecision(entityId: string, prompt: string, customLLM?: CustomLLMConfig): Promise<string>;
+  requestDecision(entityId: string, prompt: string | (() => string), customLLM?: CustomLLMConfig): Promise<string>;
 }
 
 /**

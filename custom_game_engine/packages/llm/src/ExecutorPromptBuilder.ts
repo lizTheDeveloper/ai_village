@@ -369,12 +369,34 @@ export class ExecutorPromptBuilder {
     let status = '--- Village Status ---\n';
     status += villageInfo;
 
-    // Food storage info (important for planning) - skill-gated by cooking level
-    const cookingSkill: SkillLevel = skills?.levels.cooking ?? 0;
-
-    // Query all agents to get village size
+    // Query all agents for village coordination
     const agents = world.query().with('agent').executeEntities();
     const agentCount = agents.length;
+
+    // Show what other agents are doing - critical for strategic coordination
+    const otherAgents = agents.filter(a => a.id !== agentId);
+    if (otherAgents.length > 0) {
+      status += '\nOther villagers:\n';
+      for (const other of otherAgents) {
+        const otherIdentity = other.components.get('identity') as IdentityComponent | undefined;
+        const otherAgent = other.components.get('agent') as AgentComponent | undefined;
+        const otherNeeds = other.components.get('needs') as NeedsComponent | undefined;
+        const name = otherIdentity?.name || 'Unknown';
+        const behavior = otherAgent?.behavior || 'idle';
+
+        // Build a concise status line for each agent
+        const warnings: string[] = [];
+        if (otherNeeds) {
+          if (otherNeeds.hunger < 0.2) warnings.push('hungry');
+          if (otherNeeds.energy < 0.2) warnings.push('exhausted');
+        }
+        const warningStr = warnings.length > 0 ? ` [${warnings.join(', ')}]` : '';
+        status += `- ${name}: ${behavior}${warningStr}\n`;
+      }
+    }
+
+    // Food storage info (important for planning) - skill-gated by cooking level
+    const cookingSkill: SkillLevel = skills?.levels.cooking ?? 0;
 
     // Estimate consumption rate (agents need food)
     const consumptionRate = agentCount * 2.5; // 2.5 food per agent per day
