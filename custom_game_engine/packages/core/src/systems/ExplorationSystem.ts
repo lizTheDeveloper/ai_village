@@ -103,11 +103,11 @@ export class ExplorationSystem extends BaseSystem {
       throw new Error('position component missing');
     }
 
-    // Check if current target reached
+    // Check if current target reached (squared distance avoids sqrt)
     const currentTarget = explorationState.currentTarget;
     if (currentTarget) {
-      const distance = this._distance(position, currentTarget);
-      if (distance < 5) {
+      const distSq = this._distanceSquared(position, currentTarget);
+      if (distSq < 5 * 5) {
         // Target reached, clear it
         explorationState.currentTarget = undefined;
       }
@@ -118,12 +118,12 @@ export class ExplorationSystem extends BaseSystem {
       const frontier = this._identifyFrontier(explorationState);
 
       if (frontier.length > 0) {
-        // Find closest frontier sector
+        // Find closest frontier sector (squared distance for comparison)
         const closest = frontier.reduce((prev, curr) => {
           const prevWorld = this.sectorToWorld(prev);
           const currWorld = this.sectorToWorld(curr);
-          const prevDist = this._distance(position, prevWorld);
-          const currDist = this._distance(position, currWorld);
+          const prevDist = this._distanceSquared(position, prevWorld);
+          const currDist = this._distanceSquared(position, currWorld);
           return currDist < prevDist ? curr : prev;
         });
 
@@ -162,11 +162,11 @@ export class ExplorationSystem extends BaseSystem {
       throw new Error('Spiral exploration mode requires homeBase in ExplorationState');
     }
 
-    // Check if current target reached
+    // Check if current target reached (squared distance avoids sqrt)
     const currentTarget = explorationState.currentTarget;
     if (currentTarget) {
-      const distance = this._distance(position, currentTarget);
-      if (distance < 5) {
+      const distSq = this._distanceSquared(position, currentTarget);
+      if (distSq < 5 * 5) {
         // Target reached, get next spiral position
         explorationState.spiralStep = (explorationState.spiralStep ?? 0) + 1;
         const nextPos = this._getNextSpiralPosition(explorationState);
@@ -349,11 +349,11 @@ export class ExplorationSystem extends BaseSystem {
   }
 
   /**
-   * Calculate distance between two points
+   * Calculate squared distance between two points (avoids sqrt)
    */
-  private _distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
+  private _distanceSquared(a: { x: number; y: number }, b: { x: number; y: number }): number {
     const dx = a.x - b.x;
     const dy = a.y - b.y;
-    return Math.sqrt(dx * dx + dy * dy);
+    return dx * dx + dy * dy;
   }
 }

@@ -46,6 +46,15 @@ export class ThreatResponseSystem extends BaseSystem {
 
   protected onUpdate(ctx: SystemContext): void {
     this.ctx = ctx; // Store context for helper methods
+
+    // Invalidate per-tick caches
+    if (this.cacheValidTick !== ctx.tick) {
+      this.cachedAnimals = null;
+      this.cachedProjectiles = null;
+      this.cachedVillages = null;
+      this.cacheValidTick = ctx.tick;
+    }
+
     for (const entity of ctx.activeEntities) {
       this.processEntity(entity, ctx.world);
     }
@@ -110,9 +119,11 @@ export class ThreatResponseSystem extends BaseSystem {
       }
     }
 
-    // Scan for wild animals
-    const allAnimals = world.query()?.with?.(CT.Animal)?.executeEntities?.() ?? [];
-    for (const animal of allAnimals) {
+    // Scan for wild animals (cached per tick)
+    if (!this.cachedAnimals) {
+      this.cachedAnimals = world.query()?.with?.(CT.Animal)?.executeEntities?.() ?? [];
+    }
+    for (const animal of this.cachedAnimals) {
       const animalComp = animal.getComponent<any>(CT.Animal);
       if (!animalComp || animalComp.tamed) continue;
 
@@ -120,9 +131,11 @@ export class ThreatResponseSystem extends BaseSystem {
       if (threat) threats.push(threat);
     }
 
-    // Scan for incoming projectiles
-    const allProjectiles = world.query()?.with?.(CT.Projectile)?.executeEntities?.() ?? [];
-    for (const projectile of allProjectiles) {
+    // Scan for incoming projectiles (cached per tick)
+    if (!this.cachedProjectiles) {
+      this.cachedProjectiles = world.query()?.with?.(CT.Projectile)?.executeEntities?.() ?? [];
+    }
+    for (const projectile of this.cachedProjectiles) {
       const threat = this.createThreatFromProjectile(projectile, position, entity.id, world);
       if (threat) threats.push(threat);
     }
@@ -211,8 +224,11 @@ export class ThreatResponseSystem extends BaseSystem {
     const position = agent.getComponent<PositionComponent>(CT.Position);
     if (!position) return null;
 
-    // Check if agent is within a village with nation membership
-    const villages = this.ctx?.world.query()?.with?.(CT.VillageGovernance)?.executeEntities?.() ?? [];
+    // Check if agent is within a village with nation membership (cached per tick)
+    if (!this.cachedVillages) {
+      this.cachedVillages = this.ctx?.world.query()?.with?.(CT.VillageGovernance)?.executeEntities?.() ?? [];
+    }
+    const villages = this.cachedVillages;
     for (const village of villages) {
       const governance = village.getComponent<any>(CT.VillageGovernance);
       const villagePos = village.getComponent<PositionComponent>(CT.Position);
@@ -284,6 +300,12 @@ export class ThreatResponseSystem extends BaseSystem {
 
   // Store context for use in helper methods
   private ctx: SystemContext | null = null;
+
+  // Per-tick query caches to avoid repeated world.query() calls
+  private cachedAnimals: ReadonlyArray<Entity> | null = null;
+  private cachedProjectiles: ReadonlyArray<Entity> | null = null;
+  private cachedVillages: ReadonlyArray<Entity> | null = null;
+  private cacheValidTick = -1;
 
   private createThreatFromAgent(
     hostile: Entity,
