@@ -109,6 +109,9 @@ export interface FeatureFlags {
   // --- Always-on infrastructure (not gatable) ---
   // MetricsCollectionSystem, QueryCacheMonitorSystem, EventCoalescingMonitorSystem,
   // AutoSaveSystem, ChunkSyncSystem — controlled by their own config options, not flags.
+
+  /** Index signature for dynamic flag access and serialization compatibility */
+  [key: string]: boolean;
 }
 
 /** All flags ON — full game, same as current behavior */
@@ -226,6 +229,27 @@ export const SPRINT_2_FLAGS: Readonly<FeatureFlags> = {
 };
 
 /**
+ * Sprint 3: Depth Systems
+ *
+ * Building, reproduction, hierarchy, persistence, metrics.
+ * Players build structures, NPCs reproduce, social hierarchies form, game saves/loads.
+ * Extends Sprint 2 with: building, bodyReproduction, animals, combat, governance, economy, research, technology.
+ */
+export const SPRINT_3_FLAGS: Readonly<FeatureFlags> = {
+  ...SPRINT_2_FLAGS,
+
+  // ON: Depth system additions
+  building: true,
+  bodyReproduction: true,
+  animals: true,
+  combat: true,
+  governance: true,
+  economy: true,
+  research: true,
+  technology: true,
+};
+
+/**
  * Look up the flags preset for a given sprint number.
  * Defaults to ALL_SYSTEMS_ON for unknown sprint values.
  */
@@ -233,6 +257,7 @@ export function getSprintFlags(sprint: number): Readonly<FeatureFlags> {
   switch (sprint) {
     case 1: return SPRINT_1_FLAGS;
     case 2: return SPRINT_2_FLAGS;
+    case 3: return SPRINT_3_FLAGS;
     default: return ALL_SYSTEMS_ON;
   }
 }
@@ -259,4 +284,45 @@ export function getFeatureFlagSummary(): { enabled: string[]; disabled: string[]
     (value ? enabled : disabled).push(key);
   }
   return { enabled, disabled };
+}
+
+// --- Entity budget caps ---
+
+/** Per-sprint NPC entity caps. Prevents unbounded agent spawning. */
+export const ENTITY_BUDGETS: Record<number, { maxNPCs: number }> = {
+  1: { maxNPCs: 10 },
+  2: { maxNPCs: 50 },
+  3: { maxNPCs: 100 },
+};
+
+/** Default cap when no sprint is specified (full game). */
+const DEFAULT_MAX_NPCS = 200;
+
+let _activeMaxNPCs = DEFAULT_MAX_NPCS;
+
+/** Set the active NPC cap (call alongside setActiveFeatureFlags). */
+export function setEntityBudget(sprint: number): void {
+  _activeMaxNPCs = ENTITY_BUDGETS[sprint]?.maxNPCs ?? DEFAULT_MAX_NPCS;
+}
+
+/** Get the current NPC cap. */
+export function getMaxNPCs(): number {
+  return _activeMaxNPCs;
+}
+
+/**
+ * Check whether a new NPC agent can be spawned.
+ * Counts entities with 'personality' component as NPCs.
+ * Returns true if under the cap, false if at/over.
+ */
+export function canSpawnNPC(world: { query(): { with(type: string): { execute(): { length: number } } } }): boolean {
+  const count = world.query().with('personality').execute().length;
+  return count < _activeMaxNPCs;
+}
+
+/**
+ * Get the current NPC count from a world.
+ */
+export function getNPCCount(world: { query(): { with(type: string): { execute(): { length: number } } } }): number {
+  return world.query().with('personality').execute().length;
 }

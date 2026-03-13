@@ -337,9 +337,15 @@ export {
   ALL_SYSTEMS_ON,
   SPRINT_1_FLAGS,
   SPRINT_2_FLAGS,
+  SPRINT_3_FLAGS,
   getSprintFlags,
   getActiveFeatureFlags,
   getFeatureFlagSummary,
+  canSpawnNPC,
+  getMaxNPCs,
+  getNPCCount,
+  setEntityBudget,
+  ENTITY_BUDGETS,
 } from './FeatureFlags.js';
 
 // Multi-Village System
