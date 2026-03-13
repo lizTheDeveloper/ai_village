@@ -77,6 +77,9 @@ import {
   PlayerInputSystem,
   // Feature flags (sprint gating)
   getSprintFlags,
+  getActiveFeatureFlags,
+  canSpawnNPC,
+  getMaxNPCs,
 } from '@ai-village/core';
 import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus, planetClient, multiverseClient, creationStateManager, EntityPersistenceStream, type PlanetMetadata, type CreationState, type SettlementData } from '@ai-village/persistence';
 import { LiveEntityAPI } from '@ai-village/metrics';
@@ -304,7 +307,7 @@ interface UIContext {
   cityStatsWidget: CityStatsWidget;
   inventoryUI: InventoryUI;
   craftingUI: CraftingPanelUI;
-  placementUI: BuildingPlacementUI;
+  placementUI: BuildingPlacementUI | null;
   windowManager: WindowManager;
   menuBar: MenuBar;
   keyboardRegistry: KeyboardRegistry;
@@ -484,6 +487,10 @@ function createInitialAgents(
   const currentTick = (world as any).tick ?? 0;
 
   for (let i = 0; i < agentCount; i++) {
+    if (!canSpawnNPC(world)) {
+      console.warn(`[Agents] NPC cap reached (${getMaxNPCs()}), stopping spawn at ${i}/${agentCount}`);
+      break;
+    }
     const offsetX = (i % 3) - 1;
     const offsetY = Math.floor(i / 3) - 0.5;
     const x = centerX + offsetX * spread + Math.random() * 0.5;
@@ -871,6 +878,7 @@ async function registerAllSystems(
     chunkManager,
     terrainGenerator,
     featureFlags,
+    sprintNumber: sprintNumber > 0 ? sprintNumber : undefined,
   });
 
   // Set up plant species lookup (injected from @ai-village/world)
@@ -1642,11 +1650,27 @@ function setupWindowManager(
 
   // Wire up agent spawning in dev panel
   devPanel.setAgentSpawnHandler({
-    spawnWanderingAgent: (x, y) => createWanderingAgent(gameLoop.world, x, y),
-    spawnLLMAgent: (x, y) => createLLMAgent(gameLoop.world, x, y),
+    spawnWanderingAgent: (x, y) => {
+      if (!canSpawnNPC(gameLoop.world)) {
+        console.warn(`[DevPanel] NPC cap reached (${getMaxNPCs()}), cannot spawn`);
+        return '';
+      }
+      return createWanderingAgent(gameLoop.world, x, y);
+    },
+    spawnLLMAgent: (x, y) => {
+      if (!canSpawnNPC(gameLoop.world)) {
+        console.warn(`[DevPanel] NPC cap reached (${getMaxNPCs()}), cannot spawn`);
+        return '';
+      }
+      return createLLMAgent(gameLoop.world, x, y);
+    },
     spawnVillage: (count, x, y) => {
       const agentIds: string[] = [];
       for (let i = 0; i < count; i++) {
+        if (!canSpawnNPC(gameLoop.world)) {
+          console.warn(`[DevPanel] NPC cap reached (${getMaxNPCs()}), spawned ${i}/${count}`);
+          break;
+        }
         const offsetX = x + (i % 5) * 3;
         const offsetY = y + Math.floor(i / 5) * 3;
         agentIds.push(createWanderingAgent(gameLoop.world, offsetX, offsetY));
@@ -2470,7 +2494,7 @@ function setupInputHandlers(
       if (inventoryHandled) {
         return;
       }
-      placementUI.updateCursorPosition(screenX, screenY, gameLoop.world);
+      placementUI?.updateCursorPosition(screenX, screenY, gameLoop.world);
 
       // Update hover info with entity under cursor
       const hoveredEntity = 'findEntityAtScreenPosition' in renderer
@@ -2572,7 +2596,7 @@ function handleKeyDown(
   }
 
   // Check placement UI
-  if (placementUI.handleKeyDown(key, shiftKey)) {
+  if (placementUI?.handleKeyDown(key, shiftKey)) {
     return true;
   }
 
@@ -2881,7 +2905,7 @@ function handleMouseClick(
   }
 
   // Placement UI
-  if (placementUI.handleClick(screenX, screenY, button)) {
+  if (placementUI?.handleClick(screenX, screenY, button)) {
     return true;
   }
 
@@ -3010,7 +3034,7 @@ function handleMouseClick(
 function setupDebugAPI(
   gameLoop: GameLoop,
   renderer: Renderer,
-  placementUI: BuildingPlacementUI,
+  placementUI: BuildingPlacementUI | null,
   blueprintRegistry: BuildingBlueprintRegistry,
   agentInfoPanel: AgentInfoPanel,
   animalInfoPanel: AnimalInfoPanel,
@@ -4548,10 +4572,13 @@ async function main() {
     },
   });
 
-  // Create building placement system
+  // Create building placement system (only when building flag is enabled)
+  const buildingEnabled = getActiveFeatureFlags().building;
   const blueprintRegistry = new BuildingBlueprintRegistry();
-  blueprintRegistry.registerDefaults();
-  blueprintRegistry.registerExampleBuildings();
+  if (buildingEnabled) {
+    blueprintRegistry.registerDefaults();
+    blueprintRegistry.registerExampleBuildings();
+  }
   // NOTE: Shops, farms, temples, and midwifery buildings are now registered
   // automatically in BuildingBlueprintRegistry constructor
   (gameLoop.world as any).buildingRegistry = blueprintRegistry;
@@ -4562,12 +4589,12 @@ async function main() {
   }
 
   const placementValidator = new PlacementValidator();
-  const placementUI = new BuildingPlacementUI({
+  const placementUI = buildingEnabled ? new BuildingPlacementUI({
     registry: blueprintRegistry,
     validator: placementValidator,
     camera: renderer.getCamera(),
     eventBus: gameLoop.world.eventBus,
-  });
+  }) : null;
 
   // Generate terrain only if NOT loading from a checkpoint
   // (terrain is restored from checkpoint by WorldSerializer)
@@ -4912,7 +4939,7 @@ async function main() {
         ? (renderer as any).getContext()
         : canvas.getContext('2d');
       if (ctx) {
-        placementUI.render(ctx);
+        placementUI?.render(ctx);
       }
 
       const selectedAgentId = panels.agentInfoPanel.getSelectedEntityId();
