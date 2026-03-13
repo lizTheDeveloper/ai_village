@@ -247,6 +247,9 @@ export const SPRINT_3_FLAGS: Readonly<FeatureFlags> = {
   economy: true,
   research: true,
   technology: true,
+  divinity: true,
+  deathRealms: true,
+  publishing: true,
 };
 
 /**
