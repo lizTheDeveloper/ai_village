@@ -412,6 +412,21 @@ export class SectorTierAdapter {
         }
       }
     }
+
+    // Guarantee at least one gate: FTL civilizations must have connectivity
+    if (abstractSector.infrastructure.wormholeGates.length === 0) {
+      const source = ftlSystems[0]!;
+      const dest = ftlSystems[1]!;
+      abstractSector.infrastructure.wormholeGates.push({
+        id: `${abstractSector.id}_wormhole_0_1`,
+        sourceSystem: source.id,
+        destinationSystem: dest.id,
+        distance: 5 + Math.random() * 10,
+        travelTime: 7,
+        stability: 0.7 + Math.random() * 0.3,
+        operational: true,
+      });
+    }
   }
 
   /**
