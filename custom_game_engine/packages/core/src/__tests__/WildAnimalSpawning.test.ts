@@ -10,11 +10,12 @@ describe('Wild Animal Spawning System', () => {
   let spawningSystem: WildAnimalSpawningSystem;
   let eventBus: EventBusImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
 
     spawningSystem = new WildAnimalSpawningSystem();
+    await spawningSystem.initialize(world, eventBus);
 
     // Mock Math.random to ensure spawning succeeds (0.01 < any spawnDensity)
     vi.spyOn(Math, 'random').mockReturnValue(0.01);
@@ -326,7 +327,8 @@ describe('Wild Animal Spawning System', () => {
       eventBus.subscribe('animal_spawned', eventHandler);
 
       // Simulate chunk generation event
-      eventBus.emit('chunk_generated', {
+      eventBus.emit({
+        type: 'chunk_generated',
         x: 5,
         y: 5,
         biome: 'grassland',
