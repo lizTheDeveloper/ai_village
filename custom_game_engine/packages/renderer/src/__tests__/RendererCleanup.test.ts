@@ -33,8 +33,9 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
   });
 
   describe('Criterion 4: Renderer destroy() method', () => {
-    it('should have a destroy() method', async () => {
-      // Import Renderer dynamically to avoid initialization issues
+    it('should have a destroy() method', { timeout: 15000 }, async () => {
+      // Import Renderer dynamically to avoid initialization issues.
+      // Renderer has heavy transitive imports (PixiJS, Three.js) — allow 15s.
       const { Renderer } = await import('../Renderer');
 
       const renderer = new Renderer(canvas, chunkManager, terrainGenerator);

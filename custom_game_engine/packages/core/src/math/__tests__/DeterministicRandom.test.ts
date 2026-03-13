@@ -563,12 +563,17 @@ describe('DeterministicRandom', () => {
     it('handles very large number of calls', () => {
       const rng = new DeterministicRandom(12345);
 
-      // Should not crash or produce invalid values
+      // Should not crash or produce invalid values.
+      // Check bounds outside the loop to avoid 200k expect() calls timing out.
+      let minVal = Infinity;
+      let maxVal = -Infinity;
       for (let i = 0; i < 100000; i++) {
         const value = rng.nextRaw();
-        expect(value).toBeGreaterThanOrEqual(0);
-        expect(value).toBeLessThanOrEqual(0xFFFFFFFF);
+        if (value < minVal) minVal = value;
+        if (value > maxVal) maxVal = value;
       }
+      expect(minVal).toBeGreaterThanOrEqual(0);
+      expect(maxVal).toBeLessThanOrEqual(0xFFFFFFFF);
     });
 
     it('state transitions are deterministic', () => {
