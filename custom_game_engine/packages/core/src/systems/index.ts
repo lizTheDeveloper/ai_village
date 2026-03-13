@@ -35,6 +35,9 @@ export * from './SleepSystem.js';
 export * from './AnimalSystem.js';
 export * from './AnimalProductionSystem.js';
 export * from './TamingSystem.js';
+export * from './WorkingAnimalSystem.js';
+export { AnimalGroupSystem } from './AnimalGroupSystem.js';
+export { PredatorPreyEcologySystem } from './PredatorPreyEcologySystem.js';
 export * from './WildAnimalSpawningSystem.js';
 export * from './AnimalHousingSystem.js';
 // Visual Metadata Systems (compute sizeMultiplier/alpha from game state)
@@ -147,6 +150,7 @@ export * from './AvatarSystem.js';
 // Phase 16: Player Avatar System (Player Control)
 export * from './PossessionSystem.js';
 export * from './PlayerInputSystem.js';
+export * from './PlayerActionSystem.js';
 // Phase 7: Angels
 export * from './AngelTypes.js';  // Shared types (extracted to break circular deps)
 export * from './AngelSystem.js';
@@ -205,6 +209,8 @@ export * from './PredatorAttackSystem.js';
 export * from './VillageDefenseSystem.js';
 // Building Maintenance
 export * from './BuildingMaintenanceSystem.js';
+// Building Upgrades
+export * from './BuildingUpgradeSystem.js';
 // Building Spatial Analysis (Feng Shui)
 export * from './BuildingSpatialAnalysisSystem.js';
 // Sacred Sites
@@ -309,6 +315,14 @@ export { InvasionPlotHandler } from './InvasionPlotHandler.js';
 export * from './MovementIntentionSystem.js';
 export { MovementIntentionSystem } from './MovementIntentionSystem.js';
 
+// Player Avatar Management System (jack-in/jack-out)
+export * from './AvatarManagementSystem.js';
+export { AvatarManagementSystem } from './AvatarManagementSystem.js';
+
+// Player Avatar Respawn System (death and respawn)
+export * from './AvatarRespawnSystem.js';
+export { AvatarRespawnSystem } from './AvatarRespawnSystem.js';
+
 // Centralized system registration
 export {
   registerAllSystems,
@@ -316,3 +330,11 @@ export {
   type SystemRegistrationResult,
   type PlantSystemsConfig,
 } from './registerAllSystems.js';
+
+// Multi-Village System
+export * from './VillageSummarySystem.js';
+export { VillageSummarySystem } from './VillageSummarySystem.js';
+export * from './InterVillageCaravanSystem.js';
+export { InterVillageCaravanSystem } from './InterVillageCaravanSystem.js';
+export * from './NewsPropagationSystem.js';
+export { NewsPropagationSystem } from './NewsPropagationSystem.js';

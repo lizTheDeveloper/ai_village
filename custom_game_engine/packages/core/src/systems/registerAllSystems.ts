@@ -52,6 +52,9 @@ import { AnimalHousingSystem } from './AnimalHousingSystem.js';
 import { WildAnimalSpawningSystem } from './WildAnimalSpawningSystem.js';
 import { AquaticAnimalSpawningSystem } from './AquaticAnimalSpawningSystem.js';
 import { TamingSystem } from './TamingSystem.js';
+import { WorkingAnimalSystem } from './WorkingAnimalSystem.js';
+import { AnimalGroupSystem } from './AnimalGroupSystem.js';
+import { PredatorPreyEcologySystem } from './PredatorPreyEcologySystem.js';
 import { AnimalVisualsSystem } from './AnimalVisualsSystem.js';
 
 // Uplift (Animal Consciousness)
@@ -134,6 +137,7 @@ import { ArchaeologySystem } from './ArchaeologySystem.js';
 // Building & Construction
 import { BuildingSystem } from './BuildingSystem.js';
 import { BuildingMaintenanceSystem } from './BuildingMaintenanceSystem.js';
+import { BuildingUpgradeSystem } from './BuildingUpgradeSystem.js';
 import { BuildingSpatialAnalysisSystem } from './BuildingSpatialAnalysisSystem.js';
 import { ResourceGatheringSystem } from './ResourceGatheringSystem.js';
 import { RoofRepairSystem } from './RoofRepairSystem.js';
@@ -216,6 +220,7 @@ import { PackMindSystem } from '../consciousness/PackMindSystem.js';
 
 // Magic
 import { MagicSystem } from './MagicSystem.js';
+import { SpellDiscoverySystem } from './SpellDiscoverySystem.js';
 // import { MagicDetectionSystem } from '../magic/MagicDetectionSystem.js'; // TODO: Not a System class, utility functions only
 
 // Idle & Goals
@@ -251,6 +256,11 @@ import { AdminAngelSystem } from './AdminAngelSystem.js';
 import { MilestoneSystem } from './MilestoneSystem.js';
 import { PossessionSystem } from './PossessionSystem.js';
 import { PlayerInputSystem } from './PlayerInputSystem.js';
+import { PlayerActionSystem } from './PlayerActionSystem.js';
+
+// Player Avatar System (jack-in/jack-out)
+import { AvatarManagementSystem } from './AvatarManagementSystem.js';
+import { AvatarRespawnSystem } from './AvatarRespawnSystem.js';
 
 // Divinity - Advanced Theology
 import { SchismSystem } from './SchismSystem.js';
@@ -337,6 +347,11 @@ import { ArtifactSystem } from '../items/ArtifactSystem.js';
 
 // Decision Systems
 import { AutonomicSystem } from '../decision/AutonomicSystem.js';
+
+// Multi-Village System
+import { VillageSummarySystem } from './VillageSummarySystem.js';
+import { InterVillageCaravanSystem } from './InterVillageCaravanSystem.js';
+import { NewsPropagationSystem } from './NewsPropagationSystem.js';
 
 // Governance & Metrics
 import { GovernanceDataSystem } from './GovernanceDataSystem.js';
@@ -622,6 +637,9 @@ export function registerAllSystems(
   const aquaticAnimalSpawning = new AquaticAnimalSpawningSystem();
   gameLoop.systemRegistry.register(aquaticAnimalSpawning);
   gameLoop.systemRegistry.register(new TamingSystem());
+  gameLoop.systemRegistry.register(new WorkingAnimalSystem());
+  gameLoop.systemRegistry.register(new AnimalGroupSystem());
+  gameLoop.systemRegistry.register(new PredatorPreyEcologySystem());
 
   // ============================================================================
   // UPLIFT (Animal Consciousness Emergence)
@@ -790,6 +808,9 @@ export function registerAllSystems(
   // BuildingMaintenanceSystem - Uses MutationVectorComponent for per-tick condition decay
   gameLoop.systemRegistry.register(new BuildingMaintenanceSystem());
 
+  // BuildingUpgradeSystem - Processes in-progress building upgrades
+  gameLoop.systemRegistry.register(new BuildingUpgradeSystem());
+
   gameLoop.systemRegistry.register(new BuildingSpatialAnalysisSystem());
   // ResourceGatheringSystem - Uses MutationVectorComponent for per-tick resource regeneration
   gameLoop.systemRegistry.register(new ResourceGatheringSystem());
@@ -918,6 +939,7 @@ export function registerAllSystems(
   // ============================================================================
   const magicSystem = new MagicSystem();
   gameLoop.systemRegistry.register(magicSystem);
+  gameLoop.systemRegistry.register(new SpellDiscoverySystem());
   // gameLoop.systemRegistry.register(new MagicDetectionSystem()); // TODO: Not a System class
 
   // ============================================================================
@@ -995,6 +1017,15 @@ export function registerAllSystems(
   // Keep enabled - player can possess agents from the start
   gameLoop.systemRegistry.register(new PlayerInputSystem());
   gameLoop.systemRegistry.register(new PossessionSystem());
+  gameLoop.systemRegistry.register(new PlayerActionSystem());
+
+  // ============================================================================
+  // PLAYER AVATAR JACK-IN/JACK-OUT SYSTEM
+  // ============================================================================
+  // AvatarManagementSystem (priority 10): jack-in/jack-out mechanics
+  gameLoop.systemRegistry.register(new AvatarManagementSystem());
+  // AvatarRespawnSystem (priority 55): death detection and respawn
+  gameLoop.systemRegistry.register(new AvatarRespawnSystem());
 
   // ============================================================================
   // ADMIN ANGEL (NUX Helper)
@@ -1199,6 +1230,17 @@ export function registerAllSystems(
   // DECISION SYSTEMS
   // ============================================================================
   // gameLoop.systemRegistry.register(new AutonomicSystem()); // TODO: Not a System class, utility class only
+
+  // ============================================================================
+  // MULTI-VILLAGE SYSTEM
+  // ============================================================================
+  // LAZY ACTIVATION: Multi-village systems - disabled until multiple villages exist
+  // VillageSummarySystem (priority 195): aggregates agent data into village summaries
+  registerDisabled(new VillageSummarySystem());
+  // InterVillageCaravanSystem (priority 190): manages trade caravans between villages
+  registerDisabled(new InterVillageCaravanSystem());
+  // NewsPropagationSystem (priority 196): propagates news between villages
+  registerDisabled(new NewsPropagationSystem());
 
   // ============================================================================
   // GOVERNANCE
