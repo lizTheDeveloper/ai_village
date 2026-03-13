@@ -15,6 +15,7 @@ import type { LLMDecisionQueue } from '../types/LLMTypes.js';
 import type { PromptBuilder } from '../decision/LLMDecisionProcessor.js';
 import type { ScheduledDecisionProcessor } from '../decision/ScheduledDecisionProcessor.js';
 import type { ChunkManager, TerrainGenerator } from '@ai-village/world';
+import { type FeatureFlags, ALL_SYSTEMS_ON, setActiveFeatureFlags } from './FeatureFlags.js';
 
 /**
  * Simplified EventBus interface used by some combat systems.
@@ -445,6 +446,8 @@ export interface PlantSystemsConfig {
  * Configuration for system registration
  */
 export interface SystemRegistrationConfig extends LLMDependencies {
+  /** Feature flags to control which system categories are registered. Defaults to ALL_SYSTEMS_ON. */
+  featureFlags?: FeatureFlags;
   /** Session ID for metrics */
   gameSessionId?: string;
   /** Metrics server URL */
@@ -474,22 +477,21 @@ export interface SystemRegistrationConfig extends LLMDependencies {
  * Result of system registration
  */
 export interface SystemRegistrationResult {
-  soilSystem: SoilSystem;
-  /** PlantSystem instance (from @ai-village/botany or deprecated core version) */
-  plantSystem: System;
-  wildAnimalSpawning: WildAnimalSpawningSystem;
-  aquaticAnimalSpawning: AquaticAnimalSpawningSystem;
-  governanceDataSystem: GovernanceDataSystem;
+  soilSystem?: SoilSystem;
+  plantSystem?: System;
+  wildAnimalSpawning?: WildAnimalSpawningSystem;
+  aquaticAnimalSpawning?: AquaticAnimalSpawningSystem;
+  governanceDataSystem?: GovernanceDataSystem;
   metricsSystem?: MetricsCollectionSystem;
-  magicSystem: MagicSystem;
-  researchSystem: ResearchSystem;
-  divinePowerSystem: DivinePowerSystem;
-  marketEventSystem: MarketEventSystem;
-  realmManager: RealmManager;
-  /** ChunkLoadingSystem instance (if chunkManager and terrainGenerator were provided) */
+  magicSystem?: MagicSystem;
+  researchSystem?: ResearchSystem;
+  divinePowerSystem?: DivinePowerSystem;
+  marketEventSystem?: MarketEventSystem;
+  realmManager?: RealmManager;
   chunkLoadingSystem?: ChunkLoadingSystem;
-  /** FatesCouncilSystem instance (if llmQueue was provided) */
   fatesCouncilSystem?: FatesCouncilSystem;
+  /** The active feature flags used for this registration */
+  featureFlags: Readonly<FeatureFlags>;
 }
 
 /**
@@ -502,7 +504,11 @@ export function registerAllSystems(
   gameLoop: GameLoop,
   config: SystemRegistrationConfig = {}
 ): SystemRegistrationResult {
-  const { llmQueue, promptBuilder, scheduledProcessor, gameSessionId, metricsServerUrl, enableMetrics = true, enableAutoSave = true, plantSystems, chunkManager, terrainGenerator } = config;
+  const { llmQueue, promptBuilder, scheduledProcessor, gameSessionId, metricsServerUrl, enableMetrics = true, enableAutoSave = true, plantSystems, chunkManager, terrainGenerator, featureFlags } = config;
+
+  // Set active feature flags for runtime query
+  const flags = featureFlags ?? ALL_SYSTEMS_ON;
+  setActiveFeatureFlags(flags);
 
   // Plant systems must be provided from @ai-village/botany
   if (!plantSystems) {
@@ -527,750 +533,570 @@ export function registerAllSystems(
   // ============================================================================
   // TIME & ENVIRONMENT
   // ============================================================================
-  gameLoop.systemRegistry.register(new TimeSystem());
-  gameLoop.systemRegistry.register(new TimeCompressionSystem());
-  gameLoop.systemRegistry.register(new TimeThrottleCoordinator());
-  gameLoop.systemRegistry.register(new StatisticalModeManager());
-  gameLoop.systemRegistry.register(new WeatherSystem());
-
-  const soilSystem = new SoilSystem();
-  gameLoop.systemRegistry.register(soilSystem);
+  let soilSystem: SoilSystem | undefined;
+  if (flags.time) {
+    gameLoop.systemRegistry.register(new TimeSystem());
+    gameLoop.systemRegistry.register(new TimeCompressionSystem());
+    gameLoop.systemRegistry.register(new TimeThrottleCoordinator());
+    gameLoop.systemRegistry.register(new StatisticalModeManager());
+  }
+  if (flags.environment) {
+    gameLoop.systemRegistry.register(new WeatherSystem());
+    soilSystem = new SoilSystem();
+    gameLoop.systemRegistry.register(soilSystem);
+  }
 
   // ============================================================================
   // INFRASTRUCTURE - SPATIAL INDEXING & SOA SYNCHRONIZATION
   // ============================================================================
-  // SoASyncSystem (priority 10) - Keep SoA storage synchronized with components
-  // Runs early to ensure SoA data is up-to-date before systems use it
-  gameLoop.systemRegistry.register(new SoASyncSystem());
-
-  // SpatialGridMaintenanceSystem (priority 15) - Keep spatial grid synchronized
-  // Runs early to ensure spatial grid is up-to-date before systems query it
-  gameLoop.systemRegistry.register(new SpatialGridMaintenanceSystem());
+  if (flags.infrastructure) {
+    gameLoop.systemRegistry.register(new SoASyncSystem());
+    gameLoop.systemRegistry.register(new SpatialGridMaintenanceSystem());
+  }
 
   // ============================================================================
   // CHUNK LOADING (Terrain Generation)
   // ============================================================================
-  // ChunkLoadingSystem - Handles chunk loading and terrain generation
-  // In visual mode: loads chunks around camera viewport
-  // In headless mode: loads chunks around agents
   let chunkLoadingSystem: ChunkLoadingSystem | undefined;
-  if (chunkManager && terrainGenerator) {
-    chunkLoadingSystem = new ChunkLoadingSystem(chunkManager, terrainGenerator);
-    gameLoop.systemRegistry.register(chunkLoadingSystem);
+  if (flags.terrain) {
+    if (chunkManager && terrainGenerator) {
+      chunkLoadingSystem = new ChunkLoadingSystem(chunkManager, terrainGenerator);
+      gameLoop.systemRegistry.register(chunkLoadingSystem);
+    }
+    gameLoop.systemRegistry.register(new BackgroundChunkGeneratorSystem());
+    gameLoop.systemRegistry.register(new PredictiveChunkLoadingSystem());
   }
 
-  // BackgroundChunkGeneratorSystem - Processes background chunk generation queue
-  // Priority 6 (right after ChunkLoadingSystem)
-  // Pre-generates chunks during soul creation, agent spawning, etc.
-  gameLoop.systemRegistry.register(new BackgroundChunkGeneratorSystem());
-
-  // PredictiveChunkLoadingSystem - Predicts and queues chunks ahead of moving agents
-  // Priority 7 (after BackgroundChunkGeneratorSystem)
-  // Prevents lag when agents enter new areas by pre-generating chunks in movement direction
-  gameLoop.systemRegistry.register(new PredictiveChunkLoadingSystem());
-
   // StateMutatorSystem - Batched vector updates (priority 5, runs before most systems)
-  // Used by: NeedsSystem, BuildingMaintenanceSystem, AnimalSystem, PlantSystem, TemperatureSystem, etc.
-  const stateMutator = new StateMutatorSystem();
-  gameLoop.systemRegistry.register(stateMutator);
+  // Core infrastructure needed by many systems — register if movement OR environment is on
+  if (flags.movement || flags.environment || flags.agentNeeds) {
+    const stateMutator = new StateMutatorSystem();
+    gameLoop.systemRegistry.register(stateMutator);
+  }
 
-  // FluidDynamicsSystem - Dwarf Fortress-style water flow (priority 16)
-  // Updates once per game minute for planetary-scale performance
-  const fluidDynamics = new FluidDynamicsSystem();
-  gameLoop.systemRegistry.register(fluidDynamics);
+  if (flags.fluidDynamics) {
+    gameLoop.systemRegistry.register(new FluidDynamicsSystem());
+    gameLoop.systemRegistry.register(new PlanetaryCurrentsSystem());
+    gameLoop.systemRegistry.register(new AgentSwimmingSystem());
+  }
 
-  // PlanetaryCurrentsSystem - Large-scale ocean circulation (priority 17)
-  // Handles ocean gyres, thermohaline circulation, and tidal forces
-  const planetaryCurrents = new PlanetaryCurrentsSystem();
-  gameLoop.systemRegistry.register(planetaryCurrents);
-
-  // AgentSwimmingSystem - Depth-based swimming mechanics (priority 18)
-  // Oxygen consumption and pressure damage - uses MutationVectorComponent for gradual effects
-  const agentSwimming = new AgentSwimmingSystem();
-  gameLoop.systemRegistry.register(agentSwimming);
-
-  // TemperatureSystem - Uses MutationVectorComponent for temperature damage
-  const temperatureSystem = new TemperatureSystem();
-  gameLoop.systemRegistry.register(temperatureSystem);
-
-  // FireSpreadSystem - Handles fire spreading and burning damage
-  // Uses MutationVectorComponent for burning DoT damage
-  const fireSpreadSystem = new FireSpreadSystem();
-  gameLoop.systemRegistry.register(fireSpreadSystem);
+  if (flags.environment) {
+    gameLoop.systemRegistry.register(new TemperatureSystem());
+    gameLoop.systemRegistry.register(new FireSpreadSystem());
+  }
 
   // ============================================================================
   // RENDERING
   // ============================================================================
-  gameLoop.systemRegistry.register(new AnimationSystem());
-
-  // ============================================================================
-  // VISUAL METADATA (computes sizeMultiplier/alpha from game state)
-  // Priority 300-301: Runs after growth systems, before rendering applies values
-  // ============================================================================
-  gameLoop.systemRegistry.register(new PlantVisualsSystem());
-  gameLoop.systemRegistry.register(new AnimalVisualsSystem());
-  gameLoop.systemRegistry.register(new AgentVisualsSystem());
+  if (flags.rendering) {
+    gameLoop.systemRegistry.register(new AnimationSystem());
+    gameLoop.systemRegistry.register(new PlantVisualsSystem());
+    gameLoop.systemRegistry.register(new AnimalVisualsSystem());
+    gameLoop.systemRegistry.register(new AgentVisualsSystem());
+  }
 
   // ============================================================================
   // PLANTS (use @ai-village/botany systems if provided, otherwise deprecated core versions)
   // ============================================================================
-  // PlantSystem - Uses MutationVectorComponent for per-tick hydration/age/health updates
-  const plantSystem = new PlantSystemClass(eventBus);
-  gameLoop.systemRegistry.register(plantSystem);
-  gameLoop.systemRegistry.register(new PlantDiscoverySystemClass());
-  gameLoop.systemRegistry.register(new PlantDiseaseSystemClass(eventBus));
-  gameLoop.systemRegistry.register(new WildPlantPopulationSystemClass(eventBus));
+  let plantSystem: System | undefined;
+  if (flags.plants) {
+    plantSystem = new PlantSystemClass(eventBus);
+    gameLoop.systemRegistry.register(plantSystem);
+    gameLoop.systemRegistry.register(new PlantDiscoverySystemClass());
+    gameLoop.systemRegistry.register(new PlantDiseaseSystemClass(eventBus));
+    gameLoop.systemRegistry.register(new WildPlantPopulationSystemClass(eventBus));
+  }
 
   // ============================================================================
   // ANIMALS
   // ============================================================================
-  gameLoop.systemRegistry.register(new AnimalBrainSystem());
-
-  // AnimalSystem - Uses MutationVectorComponent for per-tick needs mutations
-  const animalSystem = new AnimalSystem();
-  gameLoop.systemRegistry.register(animalSystem);
-
-  gameLoop.systemRegistry.register(new AnimalProductionSystem());
-  gameLoop.systemRegistry.register(new AnimalHousingSystem());
-  const wildAnimalSpawning = new WildAnimalSpawningSystem();
-  gameLoop.systemRegistry.register(wildAnimalSpawning);
-  const aquaticAnimalSpawning = new AquaticAnimalSpawningSystem();
-  gameLoop.systemRegistry.register(aquaticAnimalSpawning);
-  gameLoop.systemRegistry.register(new TamingSystem());
-  gameLoop.systemRegistry.register(new WorkingAnimalSystem());
-  gameLoop.systemRegistry.register(new AnimalGroupSystem());
-  gameLoop.systemRegistry.register(new PredatorPreyEcologySystem());
+  let wildAnimalSpawning: WildAnimalSpawningSystem | undefined;
+  let aquaticAnimalSpawning: AquaticAnimalSpawningSystem | undefined;
+  if (flags.animals) {
+    gameLoop.systemRegistry.register(new AnimalBrainSystem());
+    gameLoop.systemRegistry.register(new AnimalSystem());
+    gameLoop.systemRegistry.register(new AnimalProductionSystem());
+    gameLoop.systemRegistry.register(new AnimalHousingSystem());
+    wildAnimalSpawning = new WildAnimalSpawningSystem();
+    gameLoop.systemRegistry.register(wildAnimalSpawning);
+    aquaticAnimalSpawning = new AquaticAnimalSpawningSystem();
+    gameLoop.systemRegistry.register(aquaticAnimalSpawning);
+    gameLoop.systemRegistry.register(new TamingSystem());
+    gameLoop.systemRegistry.register(new WorkingAnimalSystem());
+    gameLoop.systemRegistry.register(new AnimalGroupSystem());
+    gameLoop.systemRegistry.register(new PredatorPreyEcologySystem());
+  }
 
   // ============================================================================
   // UPLIFT (Animal Consciousness Emergence)
   // ============================================================================
-  // Tech requirement: consciousness_studies (research lab + biology research)
-  registerDisabled(new UpliftCandidateDetectionSystem());
-  registerDisabled(new ProtoSapienceObservationSystem());
-  registerDisabled(new ConsciousnessEmergenceSystem());
-  registerDisabled(new UpliftBreedingProgramSystem());
+  if (flags.uplift) {
+    registerDisabled(new UpliftCandidateDetectionSystem());
+    registerDisabled(new ProtoSapienceObservationSystem());
+    registerDisabled(new ConsciousnessEmergenceSystem());
+    registerDisabled(new UpliftBreedingProgramSystem());
+  }
 
   // ============================================================================
   // AGENT CORE
   // ============================================================================
-  gameLoop.systemRegistry.register(new IdleBehaviorSystem());
-  gameLoop.systemRegistry.register(new GoalGenerationSystem());
+  if (flags.agentBrain) {
+    gameLoop.systemRegistry.register(new IdleBehaviorSystem());
+    gameLoop.systemRegistry.register(new GoalGenerationSystem());
+    gameLoop.systemRegistry.register(
+      new AgentBrainSystem(
+        llmQueue,
+        promptBuilder,
+        undefined,
+        scheduledProcessor
+      )
+    );
+  }
 
-  // Always register AgentBrainSystem - it works without LLM (uses scripted behaviors)
-  // NEW: If scheduledProcessor provided, use scheduler-based approach for intelligent layer selection
-  gameLoop.systemRegistry.register(
-    new AgentBrainSystem(
-      llmQueue,
-      promptBuilder,
-      undefined, // behaviorRegistry (use default)
-      scheduledProcessor // NEW: ScheduledDecisionProcessor
-    )
-  );
+  if (flags.movement) {
+    gameLoop.systemRegistry.register(new MovementIntentionSystem());
+    gameLoop.systemRegistry.register(new MovementSystem());
+    gameLoop.systemRegistry.register(new SteeringSystem());
+  }
 
-  // MovementIntentionSystem - Factorio-style movement optimization (priority 18)
-  // Processes arrival events, snaps position on arrival, emits entity:arrived event
-  // Reduces brain updates by 90% by storing movement destination instead of per-tick positions
-  gameLoop.systemRegistry.register(new MovementIntentionSystem());
-
-  gameLoop.systemRegistry.register(new MovementSystem());
-
-  // NeedsSystem - Uses MutationVectorComponent for per-tick state mutations
-  gameLoop.systemRegistry.register(new NeedsSystem());
-
-  gameLoop.systemRegistry.register(new MoodSystem());
-
-  // SleepSystem - Uses MutationVectorComponent for per-tick sleep drive and energy recovery
-  gameLoop.systemRegistry.register(new SleepSystem());
-
-  gameLoop.systemRegistry.register(new SteeringSystem());
-  gameLoop.systemRegistry.register(new AgeTrackingSystem());
+  if (flags.agentNeeds) {
+    gameLoop.systemRegistry.register(new NeedsSystem());
+    gameLoop.systemRegistry.register(new MoodSystem());
+    gameLoop.systemRegistry.register(new SleepSystem());
+    gameLoop.systemRegistry.register(new AgeTrackingSystem());
+  }
 
   // ============================================================================
   // MEMORY & COGNITION
   // ============================================================================
-  gameLoop.systemRegistry.register(new MemorySystem());
-  gameLoop.systemRegistry.register(new MemoryFormationSystem(eventBus));
-  gameLoop.systemRegistry.register(new MemoryConsolidationSystem());
-  gameLoop.systemRegistry.register(new SpatialMemoryQuerySystem());
-  gameLoop.systemRegistry.register(new ReflectionSystem());
-  gameLoop.systemRegistry.register(new JournalingSystem());
-  gameLoop.systemRegistry.register(new BeliefFormationSystem());
-  gameLoop.systemRegistry.register(new BeliefGenerationSystem());
+  if (flags.memory) {
+    gameLoop.systemRegistry.register(new MemorySystem());
+    gameLoop.systemRegistry.register(new MemoryFormationSystem(eventBus));
+    gameLoop.systemRegistry.register(new MemoryConsolidationSystem());
+    gameLoop.systemRegistry.register(new SpatialMemoryQuerySystem());
+    gameLoop.systemRegistry.register(new ReflectionSystem());
+    gameLoop.systemRegistry.register(new JournalingSystem());
+    gameLoop.systemRegistry.register(new BeliefFormationSystem());
+    gameLoop.systemRegistry.register(new BeliefGenerationSystem());
+  }
 
   // ============================================================================
   // SOCIAL & COMMUNICATION
   // ============================================================================
-  gameLoop.systemRegistry.register(new CommunicationSystem());
-  gameLoop.systemRegistry.register(new SocialFatigueSystem());
-  gameLoop.systemRegistry.register(new SocialGradientSystem());
-  gameLoop.systemRegistry.register(new VerificationSystem());
-  gameLoop.systemRegistry.register(new InterestsSystem());
+  if (flags.social) {
+    gameLoop.systemRegistry.register(new CommunicationSystem());
+    gameLoop.systemRegistry.register(new SocialFatigueSystem());
+    gameLoop.systemRegistry.register(new SocialGradientSystem());
+    gameLoop.systemRegistry.register(new VerificationSystem());
+    gameLoop.systemRegistry.register(new InterestsSystem());
+    gameLoop.systemRegistry.register(new RelationshipConversationSystem());
+    gameLoop.systemRegistry.register(new InterestEvolutionSystem());
+  }
 
-  // Deep Conversation System - Phase 6: Emergent Social Dynamics - RE-ENABLED
-  gameLoop.systemRegistry.register(new RelationshipConversationSystem());
-  // gameLoop.systemRegistry.register(new FriendshipSystem()); // TODO: Enable after testing
-  gameLoop.systemRegistry.register(new InterestEvolutionSystem());
-
-  // Deep Conversation System - Phase 7.1: Interest Evolution
-  // TODO: Fix incomplete implementations before enabling
-  // gameLoop.systemRegistry.register(new InterestEvolutionSystem());
-
-  // Cross-realm communication
-  // LAZY ACTIVATION: Communication systems - disabled until communication tech exists
-  // Tech requirement: cross_realm_phones (enables cross-realm communication)
-  registerDisabled(new CrossRealmPhoneSystem());
-  // Tech requirement: cell_phone (enables cellular communication)
-  registerDisabled(new CellPhoneSystem());
-  // Tech requirement: walkie_talkie (enables short-range radio)
-  registerDisabled(new WalkieTalkieSystem());
-  // Tech requirement: radio_broadcasting (enables radio stations)
-  registerDisabled(new RadioBroadcastingSystem());
+  if (flags.advancedComms) {
+    registerDisabled(new CrossRealmPhoneSystem());
+    registerDisabled(new CellPhoneSystem());
+    registerDisabled(new WalkieTalkieSystem());
+    registerDisabled(new RadioBroadcastingSystem());
+  }
 
   // ============================================================================
   // EXPLORATION & NAVIGATION
   // ============================================================================
-  gameLoop.systemRegistry.register(new ExplorationSystem());
-  if (llmQueue) {
-    gameLoop.systemRegistry.register(new LandmarkNamingSystem(llmQueue));
+  if (flags.exploration) {
+    gameLoop.systemRegistry.register(new ExplorationSystem());
+    if (llmQueue) {
+      gameLoop.systemRegistry.register(new LandmarkNamingSystem(llmQueue));
+    }
+    gameLoop.systemRegistry.register(new EmotionalNavigationSystem());
+    gameLoop.systemRegistry.register(new ExplorationDiscoverySystem());
+    registerDisabled(new StellarMiningSystem());
   }
-  gameLoop.systemRegistry.register(new EmotionalNavigationSystem());
-  gameLoop.systemRegistry.register(new ExplorationDiscoverySystem());
-  // LAZY ACTIVATION: Stellar mining - disabled until space mining tech exists
-  // Tech requirement: stellar_mining (enables asteroid/star mining)
-  registerDisabled(new StellarMiningSystem()); // Priority 185: Resource extraction from stellar phenomena
 
   // ============================================================================
   // FLEET & SQUADRON MANAGEMENT
   // ============================================================================
-  // LAZY ACTIVATION: Disabled by default - no ships/fleets at planet spawn
-  // Tech requirement: shipyard (enables navy, fleet, squadron systems)
-  // Navy management (priority 70): Nation-scale naval forces
-  // Armada management (priority 75): Multi-fleet campaign forces (3-10 fleets)
-  // Fleet management (priority 80): Strategic fleet groups (3-10 squadrons)
-  // Squadron management (priority 85): Tactical ship squadrons (3-10 ships)
-  registerDisabled(new NavySystem());
-  registerDisabled(new NavyPersonnelSystem());
-  registerDisabled(new ShipyardProductionSystem());
-  registerDisabled(new ArmadaSystem());
-  registerDisabled(new FleetSystem());
-  registerDisabled(new SquadronSystem());
-  // Fleet coherence (priority 400): Squadron→Fleet→Armada coherence aggregation
-  registerDisabled(new FleetCoherenceSystem());
-  // Crew stress (priority 420): Stress accumulation/recovery during β-space navigation
-  registerDisabled(new CrewStressSystem());
-  // Straggler recovery (priority 430): Handle ships left behind during fleet β-jumps
-  registerDisabled(new StragglerRecoverySystem());
-  // Heart Chamber Network (priority 450): Fleet-wide emotional sync for β-jumps
-  registerDisabled(new HeartChamberNetworkSystem());
-  // Fleet combat (priority 600): Lanchester's Laws fleet battle resolution
-  registerDisabled(new FleetCombatSystem());
-  // Squadron combat (priority 610): Formation-based tactical combat between squadrons
-  registerDisabled(new SquadronCombatSystem());
-  // Ship combat (priority 620): Individual ship-to-ship combat with phases
-  registerDisabled(new ShipCombatSystem());
-  // Navy budget (priority 850): Annual budget cycle, shipyard production
-  registerDisabled(new NavyBudgetSystem());
+  if (flags.fleet) {
+    registerDisabled(new NavySystem());
+    registerDisabled(new NavyPersonnelSystem());
+    registerDisabled(new ShipyardProductionSystem());
+    registerDisabled(new ArmadaSystem());
+    registerDisabled(new FleetSystem());
+    registerDisabled(new SquadronSystem());
+    registerDisabled(new FleetCoherenceSystem());
+    registerDisabled(new CrewStressSystem());
+    registerDisabled(new StragglerRecoverySystem());
+    registerDisabled(new HeartChamberNetworkSystem());
+    registerDisabled(new FleetCombatSystem());
+    registerDisabled(new SquadronCombatSystem());
+    registerDisabled(new ShipCombatSystem());
+    registerDisabled(new NavyBudgetSystem());
+  }
 
   // ============================================================================
   // MEGASTRUCTURES (Phase 5: Grand Strategy)
   // ============================================================================
-  // LAZY ACTIVATION: Disabled by default - no megastructures at planet spawn
-  // Tech requirement: megastructure_engineering (advanced construction tech)
-  // Megastructure Construction (priority 300): Manages construction projects
-  // Advances construction progress, consumes resources, handles phases
-  registerDisabled(new MegastructureConstructionSystem());
-
-  // Megastructure Maintenance (priority 310): Handles maintenance, degradation, and decay
-  // Runs after construction systems to process operational structures
-  registerDisabled(new MegastructureMaintenanceSystem());
-
-  // Archaeology System (priority 235): Excavates ruins and discovers artifacts
-  // Listens for megastructure collapse events to create archaeological sites
-  // Processes excavation progress and artifact reverse engineering
-  // Tech requirement: archaeology (requires historical research)
-  registerDisabled(new ArchaeologySystem());
+  if (flags.megastructures) {
+    registerDisabled(new MegastructureConstructionSystem());
+    registerDisabled(new MegastructureMaintenanceSystem());
+    registerDisabled(new ArchaeologySystem());
+  }
 
   // ============================================================================
   // VIRTUAL REALITY
   // ============================================================================
-  // Tech requirement: vr_headset (requires neural_interface research)
-  gameLoop.systemRegistry.register(new VRSystem());
-  gameLoop.systemRegistry.disable('vr_system');
+  if (flags.vr) {
+    gameLoop.systemRegistry.register(new VRSystem());
+    gameLoop.systemRegistry.disable('vr_system');
+  }
 
   // ============================================================================
   // BUILDING & CONSTRUCTION
   // ============================================================================
-  gameLoop.systemRegistry.register(new BuildingSystem());
-
-  // RoofRepairSystem - One-time migration to add roofs to existing buildings
-  gameLoop.systemRegistry.register(new RoofRepairSystem());
-
-  // BuildingMaintenanceSystem - Uses MutationVectorComponent for per-tick condition decay
-  gameLoop.systemRegistry.register(new BuildingMaintenanceSystem());
-
-  // BuildingUpgradeSystem - Processes in-progress building upgrades
-  gameLoop.systemRegistry.register(new BuildingUpgradeSystem());
-
-  gameLoop.systemRegistry.register(new BuildingSpatialAnalysisSystem());
-  // ResourceGatheringSystem - Uses MutationVectorComponent for per-tick resource regeneration
-  gameLoop.systemRegistry.register(new ResourceGatheringSystem());
-
-  // Tile-Based Voxel Building (Phase 3-4)
-  gameLoop.systemRegistry.register(new TreeFellingSystem());
-  // Use singleton to ensure behaviors use same instance
-  gameLoop.systemRegistry.register(getTileConstructionSystem());
-  // Door system for auto-open/close mechanics
-  gameLoop.systemRegistry.register(new DoorSystem());
+  if (flags.building) {
+    gameLoop.systemRegistry.register(new BuildingSystem());
+    gameLoop.systemRegistry.register(new RoofRepairSystem());
+    gameLoop.systemRegistry.register(new BuildingMaintenanceSystem());
+    gameLoop.systemRegistry.register(new BuildingUpgradeSystem());
+    gameLoop.systemRegistry.register(new BuildingSpatialAnalysisSystem());
+    gameLoop.systemRegistry.register(new ResourceGatheringSystem());
+    gameLoop.systemRegistry.register(new TreeFellingSystem());
+    gameLoop.systemRegistry.register(getTileConstructionSystem());
+    gameLoop.systemRegistry.register(new DoorSystem());
+  }
 
   // ============================================================================
   // AUTOMATION & PRODUCTION (Phase 38)
   // ============================================================================
-  // LAZY ACTIVATION: Factory systems - disabled until factory buildings exist
-  // Tech requirement: factory_automation (enables factory systems)
-  // Factory AI (priority 48 - autonomous management)
-  registerDisabled(new FactoryAISystem());
-  // Off-screen optimization (priority 49 - runs before full simulation)
-  registerDisabled(new OffScreenProductionSystem());
-  // Full simulation systems (priority 50+)
-  registerDisabled(new PowerGridSystem());
-  registerDisabled(new DirectConnectionSystem());
-  registerDisabled(new BeltSystem());
-  // AssemblyMachineSystem - Uses MutationVectorComponent for smooth crafting progress
-  registerDisabled(new AssemblyMachineSystem());
+  if (flags.automation) {
+    registerDisabled(new FactoryAISystem());
+    registerDisabled(new OffScreenProductionSystem());
+    registerDisabled(new PowerGridSystem());
+    registerDisabled(new DirectConnectionSystem());
+    registerDisabled(new BeltSystem());
+    registerDisabled(new AssemblyMachineSystem());
+  }
 
   // ============================================================================
   // ECONOMY & TRADE
   // ============================================================================
-  // LAZY ACTIVATION: Trade systems - disabled until market/trade infrastructure exists
-  // Tech requirement: marketplace (enables trading systems)
-  registerDisabled(new TradingSystem());
-  const marketEventSystem = new MarketEventSystem();
-  registerDisabled(marketEventSystem);
-  registerDisabled(new TradeAgreementSystem());
-  registerDisabled(new TradeEscortSystem());
+  let marketEventSystem: MarketEventSystem | undefined;
+  if (flags.economy) {
+    registerDisabled(new TradingSystem());
+    marketEventSystem = new MarketEventSystem();
+    registerDisabled(marketEventSystem);
+    registerDisabled(new TradeAgreementSystem());
+    registerDisabled(new TradeEscortSystem());
+  }
 
   // ============================================================================
   // SKILLS & CRAFTING
   // ============================================================================
-  gameLoop.systemRegistry.register(new SkillSystem());
-  gameLoop.systemRegistry.register(new CookingSystem());
-  gameLoop.systemRegistry.register(new DurabilitySystem());
-  gameLoop.systemRegistry.register(new ExperimentationSystem());
+  if (flags.skills) {
+    gameLoop.systemRegistry.register(new SkillSystem());
+    gameLoop.systemRegistry.register(new CookingSystem());
+    gameLoop.systemRegistry.register(new DurabilitySystem());
+    gameLoop.systemRegistry.register(new ExperimentationSystem());
+  }
 
   // ============================================================================
   // RESEARCH
   // ============================================================================
-  // Basic research system - keep enabled for early game discovery
-  const researchSystem = new ResearchSystem();
-  gameLoop.systemRegistry.register(researchSystem);
+  let researchSystem: ResearchSystem | undefined;
+  if (flags.research) {
+    researchSystem = new ResearchSystem();
+    gameLoop.systemRegistry.register(researchSystem);
+    const academicPaperSystem = new AcademicPaperSystem();
+    academicPaperSystem.initialize(gameLoop.world, eventBus);
+    registerDisabled(academicPaperSystem);
+    registerDisabled(new CookInfluencerSystem());
+    gameLoop.systemRegistry.register(new HerbalistDiscoverySystem());
+    registerDisabled(new InventorFameSystem());
+    registerDisabled(new PublicationSystem());
+    registerDisabled(new ChroniclerSystem());
+  }
 
-  // LAZY ACTIVATION: Academic systems - disabled until university/academia exists
-  const academicPaperSystem = new AcademicPaperSystem();
-  academicPaperSystem.initialize(gameLoop.world, eventBus);
-  registerDisabled(academicPaperSystem);
-
-  // LAZY ACTIVATION: Fame/influencer systems - disabled until social infrastructure exists
-  registerDisabled(new CookInfluencerSystem());
-  // HerbalistDiscoverySystem - keep enabled, basic herbalism works early
-  gameLoop.systemRegistry.register(new HerbalistDiscoverySystem());
-  registerDisabled(new InventorFameSystem());
-  registerDisabled(new PublicationSystem());
-  registerDisabled(new ChroniclerSystem());
+  // ============================================================================
+  // TECHNOLOGY (always-on if flag enabled — TechnologyUnlockSystem enables other systems)
+  // ============================================================================
+  if (flags.technology) {
+    const technologyUnlockSystem = new TechnologyUnlockSystem(eventBus, gameLoop.systemRegistry);
+    gameLoop.systemRegistry.register(technologyUnlockSystem);
+    gameLoop.systemRegistry.register(new TechnologyEraSystem());
+    gameLoop.systemRegistry.register(new CollapseSystem());
+    gameLoop.systemRegistry.register(new EventReportingSystem());
+  }
 
   // ============================================================================
   // PUBLISHING & KNOWLEDGE INFRASTRUCTURE
   // ============================================================================
-  // LAZY ACTIVATION: Publishing systems - disabled until printing press tech
-  const publishingUnlockSystem = new PublishingUnlockSystem(eventBus);
-  registerDisabled(publishingUnlockSystem);
-
-  // TechnologyUnlockSystem - MUST stay enabled, it enables disabled systems!
-  const technologyUnlockSystem = new TechnologyUnlockSystem(eventBus, gameLoop.systemRegistry);
-  gameLoop.systemRegistry.register(technologyUnlockSystem);
-
-  // TechnologyEraSystem - keep enabled for era progression
-  const technologyEraSystem = new TechnologyEraSystem();
-  gameLoop.systemRegistry.register(technologyEraSystem);
-
-  // CollapseSystem - keep enabled for civilization collapse mechanics
-  const collapseSystem = new CollapseSystem();
-  gameLoop.systemRegistry.register(collapseSystem);
-
-  // LAZY ACTIVATION: Knowledge preservation - disabled until libraries exist
-  const knowledgePreservationSystem = new KnowledgePreservationSystem();
-  registerDisabled(knowledgePreservationSystem);
-
-  // LAZY ACTIVATION: Production/city systems - disabled until cities exist
-  const productionScalingSystem = new ProductionScalingSystem();
-  registerDisabled(productionScalingSystem);
-
-  const cityBuildingGenerationSystem = new CityBuildingGenerationSystem();
-  registerDisabled(cityBuildingGenerationSystem);
-
-  const professionWorkSimulationSystem = new ProfessionWorkSimulationSystem();
-  registerDisabled(professionWorkSimulationSystem);
-
-  // EventReportingSystem - keep enabled for event tracking
-  const eventReportingSystem = new EventReportingSystem();
-  gameLoop.systemRegistry.register(eventReportingSystem);
-
-  // LAZY ACTIVATION: Publishing production - disabled until printing press tech
-  const publishingProductionSystem = new PublishingProductionSystem();
-  registerDisabled(publishingProductionSystem);
-
-  // LAZY ACTIVATION: Library system - disabled until first library built
-  const librarySystem = new LibrarySystem();
-  registerDisabled(librarySystem);
-
-  // LAZY ACTIVATION: Bookstore system - disabled until first bookstore built
-  const bookstoreSystem = new BookstoreSystem();
-  registerDisabled(bookstoreSystem);
-
-  // LAZY ACTIVATION: University system - disabled until first university built
-  const universitySystem = new UniversitySystem(eventBus);
-  registerDisabled(universitySystem);
-
-  const universityResearchManagementSystem = new UniversityResearchManagementSystem();
-  universityResearchManagementSystem.setUniversitySystem(universitySystem);
-  registerDisabled(universityResearchManagementSystem);
+  if (flags.publishing) {
+    registerDisabled(new PublishingUnlockSystem(eventBus));
+    registerDisabled(new KnowledgePreservationSystem());
+    registerDisabled(new ProductionScalingSystem());
+    registerDisabled(new CityBuildingGenerationSystem());
+    registerDisabled(new ProfessionWorkSimulationSystem());
+    registerDisabled(new PublishingProductionSystem());
+    registerDisabled(new LibrarySystem());
+    registerDisabled(new BookstoreSystem());
+    const universitySystem = new UniversitySystem(eventBus);
+    registerDisabled(universitySystem);
+    const universityResearchManagementSystem = new UniversityResearchManagementSystem();
+    universityResearchManagementSystem.setUniversitySystem(universitySystem);
+    registerDisabled(universityResearchManagementSystem);
+  }
 
   // ============================================================================
   // MAGIC
   // ============================================================================
-  const magicSystem = new MagicSystem();
-  gameLoop.systemRegistry.register(magicSystem);
-  gameLoop.systemRegistry.register(new SpellDiscoverySystem());
-  // gameLoop.systemRegistry.register(new MagicDetectionSystem()); // TODO: Not a System class
+  let magicSystem: MagicSystem | undefined;
+  if (flags.magic) {
+    magicSystem = new MagicSystem();
+    gameLoop.systemRegistry.register(magicSystem);
+    gameLoop.systemRegistry.register(new SpellDiscoverySystem());
+  }
 
   // ============================================================================
   // BODY & REPRODUCTION
   // ============================================================================
-  gameLoop.systemRegistry.register(new BodySystem());
-  gameLoop.systemRegistry.register(new EquipmentSystem());
-  gameLoop.systemRegistry.register(new ReproductionSystem());
-  gameLoop.systemRegistry.register(new CourtshipSystem());
-  gameLoop.systemRegistry.register(new MidwiferySystem());
-  gameLoop.systemRegistry.register(new ParentingSystem());
-  // Tech requirement: parasitic_biology (requires advanced biology research)
-  registerDisabled(new ParasiticReproductionSystem());
-  gameLoop.systemRegistry.register(new ColonizationSystem());
-  // TODO: Fix incomplete implementation before enabling
-  // gameLoop.systemRegistry.register(new JealousySystem());
+  if (flags.bodyReproduction) {
+    gameLoop.systemRegistry.register(new BodySystem());
+    gameLoop.systemRegistry.register(new EquipmentSystem());
+    gameLoop.systemRegistry.register(new ReproductionSystem());
+    gameLoop.systemRegistry.register(new CourtshipSystem());
+    gameLoop.systemRegistry.register(new MidwiferySystem());
+    gameLoop.systemRegistry.register(new ParentingSystem());
+    registerDisabled(new ParasiticReproductionSystem());
+    gameLoop.systemRegistry.register(new ColonizationSystem());
+  }
 
   // ============================================================================
   // NEURAL & TECH
   // ============================================================================
-  // Tech requirement: neural_interface_lab (requires neuroscience research)
-  registerDisabled(new NeuralInterfaceSystem());
-  registerDisabled(new VRTrainingSystem());
-
-  // ============================================================================
-  // DIVINITY - CORE
-  // ============================================================================
-  gameLoop.systemRegistry.register(new DeityEmergenceSystem({}, llmQueue || undefined));
-  gameLoop.systemRegistry.register(new AIGodBehaviorSystem());
-  const divinePowerSystem = new DivinePowerSystem();
-  gameLoop.systemRegistry.register(divinePowerSystem);
-  gameLoop.systemRegistry.register(new FaithMechanicsSystem());
-  gameLoop.systemRegistry.register(new PrayerSystem());
-  gameLoop.systemRegistry.register(new SpiritualResponseSystem()); // Event-driven prayer triggers
-  gameLoop.systemRegistry.register(new PrayerAnsweringSystem());
-  if (llmQueue) {
-    gameLoop.systemRegistry.register(new MythGenerationSystem(llmQueue));
-    gameLoop.systemRegistry.register(new MythRetellingSystem()); // Handles myth spreading & mutation
+  if (flags.vr) {
+    registerDisabled(new NeuralInterfaceSystem());
+    registerDisabled(new VRTrainingSystem());
   }
-  // MythGenerationSystem requires llmQueue, so skip if not provided
-
-  // Chat Rooms - General chat system (DMs, group chats, divine chat, etc.)
-  // Note: ChatRoomSystem replaces the deprecated DivineChatSystem
-  const chatRoomSystem = new ChatRoomSystem();
-  gameLoop.systemRegistry.register(chatRoomSystem);
-
-  // Companion System - Ophanim tutorial/emotional companion
-  gameLoop.systemRegistry.register(new CompanionSystem());
-
-  // gameLoop.systemRegistry.register(new AttributionSystem()); // TODO: Not a System class
-  // gameLoop.systemRegistry.register(new VisionDeliverySystem()); // TODO: Not a System class, requires constructor args
 
   // ============================================================================
-  // DIVINITY - INSTITUTIONS
+  // DIVINITY
   // ============================================================================
-  // LAZY ACTIVATION: Religious institutions - disabled until first temple is built
-  // Tech requirement: temple_construction (enables organized religion)
-  registerDisabled(new TempleSystem());
-  registerDisabled(new PriesthoodSystem());
-  registerDisabled(new RitualSystem());
-  registerDisabled(new HolyTextSystem());
-  registerDisabled(new SacredSiteSystem());
+  let divinePowerSystem: DivinePowerSystem | undefined;
+  if (flags.divinity) {
+    gameLoop.systemRegistry.register(new DeityEmergenceSystem({}, llmQueue || undefined));
+    gameLoop.systemRegistry.register(new AIGodBehaviorSystem());
+    divinePowerSystem = new DivinePowerSystem();
+    gameLoop.systemRegistry.register(divinePowerSystem);
+    gameLoop.systemRegistry.register(new FaithMechanicsSystem());
+    gameLoop.systemRegistry.register(new PrayerSystem());
+    gameLoop.systemRegistry.register(new SpiritualResponseSystem());
+    gameLoop.systemRegistry.register(new PrayerAnsweringSystem());
+    if (llmQueue) {
+      gameLoop.systemRegistry.register(new MythGenerationSystem(llmQueue));
+      gameLoop.systemRegistry.register(new MythRetellingSystem());
+    }
+    const chatRoomSystem = new ChatRoomSystem();
+    gameLoop.systemRegistry.register(chatRoomSystem);
+    gameLoop.systemRegistry.register(new CompanionSystem());
+
+    // Institutions
+    registerDisabled(new TempleSystem());
+    registerDisabled(new PriesthoodSystem());
+    registerDisabled(new RitualSystem());
+    registerDisabled(new HolyTextSystem());
+    registerDisabled(new SacredSiteSystem());
+
+    // Avatar & Angels
+    registerDisabled(new AvatarSystem());
+    registerDisabled(new AngelSystem());
+  }
 
   // ============================================================================
-  // DIVINITY - AVATAR & ANGELS
+  // PLAYER AVATAR SYSTEM
   // ============================================================================
-  // LAZY ACTIVATION: Divine manifestations - disabled until deity has enough power
-  // Enabled when deity:power_threshold_reached event fires
-  registerDisabled(new AvatarSystem());
-  registerDisabled(new AngelSystem());
+  if (flags.playerAvatar) {
+    gameLoop.systemRegistry.register(new PlayerInputSystem());
+    gameLoop.systemRegistry.register(new PossessionSystem());
+    gameLoop.systemRegistry.register(new PlayerActionSystem());
+    gameLoop.systemRegistry.register(new AvatarManagementSystem());
+    gameLoop.systemRegistry.register(new AvatarRespawnSystem());
+  }
 
   // ============================================================================
-  // PLAYER AVATAR SYSTEM (Phase 16: Polish & Player)
+  // ADMIN ANGEL, MILESTONE, ADVANCED DIVINITY
   // ============================================================================
-  // Keep enabled - player can possess agents from the start
-  gameLoop.systemRegistry.register(new PlayerInputSystem());
-  gameLoop.systemRegistry.register(new PossessionSystem());
-  gameLoop.systemRegistry.register(new PlayerActionSystem());
+  if (flags.divinity) {
+    gameLoop.systemRegistry.register(new AdminAngelSystem({ llmQueue }));
+    gameLoop.systemRegistry.register(new MilestoneSystem());
 
-  // ============================================================================
-  // PLAYER AVATAR JACK-IN/JACK-OUT SYSTEM
-  // ============================================================================
-  // AvatarManagementSystem (priority 10): jack-in/jack-out mechanics
-  gameLoop.systemRegistry.register(new AvatarManagementSystem());
-  // AvatarRespawnSystem (priority 55): death detection and respawn
-  gameLoop.systemRegistry.register(new AvatarRespawnSystem());
+    // Advanced theology
+    registerDisabled(new SchismSystem());
+    registerDisabled(new SyncretismSystem());
+    registerDisabled(new ReligiousCompetitionSystem());
+    registerDisabled(new ConversionWarfareSystem());
 
-  // ============================================================================
-  // ADMIN ANGEL (NUX Helper)
-  // ============================================================================
-  // Keep enabled - the admin angel helps players learn the game via divine chat
-  // Pass LLM queue for shared LLM infrastructure (metrics, rate limiting, headless support)
-  gameLoop.systemRegistry.register(new AdminAngelSystem({
-    llmQueue: llmQueue,
-  }));
+    // World impact
+    registerDisabled(new TerrainModificationSystem());
+    registerDisabled(new SpeciesCreationSystem());
+    registerDisabled(new DivineWeatherControl());
+    registerDisabled(new DivineBodyModification());
+    registerDisabled(new MassEventSystem());
 
-  // ============================================================================
-  // MILESTONE SYSTEM (Player Progression)
-  // ============================================================================
-  // Tracks player achievements and unlocks features like angel bifurcation
-  gameLoop.systemRegistry.register(new MilestoneSystem());
-
-  // ============================================================================
-  // DIVINITY - ADVANCED THEOLOGY
-  // ============================================================================
-  // LAZY ACTIVATION: Advanced theology - disabled until multiple religions exist
-  // Enabled when religion:second_religion_emerges event fires
-  registerDisabled(new SchismSystem());
-  registerDisabled(new SyncretismSystem());
-  registerDisabled(new ReligiousCompetitionSystem());
-  registerDisabled(new ConversionWarfareSystem());
-
-  // ============================================================================
-  // DIVINITY - WORLD IMPACT
-  // ============================================================================
-  // LAZY ACTIVATION: Divine world modification - disabled until deity has power
-  // Enabled when deity:power_threshold_reached event fires
-  registerDisabled(new TerrainModificationSystem());
-  registerDisabled(new SpeciesCreationSystem());
-  registerDisabled(new DivineWeatherControl());
-  registerDisabled(new DivineBodyModification());
-  registerDisabled(new MassEventSystem());
-
-  // ============================================================================
-  // DIVINITY - CREATOR
-  // ============================================================================
-  // Keep enabled - player can observe and intervene from the start
-  gameLoop.systemRegistry.register(new CreatorSurveillanceSystem());
-  gameLoop.systemRegistry.register(new CreatorInterventionSystem());
-  gameLoop.systemRegistry.register(new LoreSpawnSystem());
-  gameLoop.systemRegistry.register(new RealityAnchorSystem());
-  gameLoop.systemRegistry.register(new RebellionEventSystem());
+    // Creator
+    gameLoop.systemRegistry.register(new CreatorSurveillanceSystem());
+    gameLoop.systemRegistry.register(new CreatorInterventionSystem());
+    gameLoop.systemRegistry.register(new LoreSpawnSystem());
+    gameLoop.systemRegistry.register(new RealityAnchorSystem());
+    gameLoop.systemRegistry.register(new RebellionEventSystem());
+  }
 
   // ============================================================================
   // COMBAT & SECURITY
   // ============================================================================
-  // HuntingSystem now extends BaseSystem and handles event bus in onInitialize
-  gameLoop.systemRegistry.register(new HuntingSystem());
-  gameLoop.systemRegistry.register(new PredatorAttackSystem());
-  gameLoop.systemRegistry.register(new AgentCombatSystem());
-  gameLoop.systemRegistry.register(new DominanceChallengeSystem());
-  gameLoop.systemRegistry.register(new InjurySystem());
-  gameLoop.systemRegistry.register(new GuardDutySystem());
-  gameLoop.systemRegistry.register(new VillageDefenseSystem());
-  gameLoop.systemRegistry.register(new ThreatResponseSystem());
-
-  // ============================================================================
-  // REALMS & PORTALS
-  // ============================================================================
-  // LAZY ACTIVATION: Multiverse systems - disabled until multiverse tech unlocked
-  // Tech requirement: universe_forking (enables multiverse mechanics)
-  registerDisabled(new UniverseForkingSystem());  // Multiverse forking mechanics (priority 10)
-  registerDisabled(new DivergenceTrackingSystem());  // Multiverse: track timeline differences (priority 250)
-  registerDisabled(new CanonEventSystem());  // Multiverse: canon events and convergence (priority 260)
-  registerDisabled(new PassageSystem());
-  registerDisabled(new PassageTraversalSystem());  // Inter-universe passage traversal (priority 90)
-  registerDisabled(new TimelineMergerSystem());  // Timeline merge compatibility and operations (priority 95)
-  // Tech requirement: probability_ships (enables scout ships)
-  registerDisabled(new ProbabilityScoutSystem());  // Probability scout ship missions (priority 96)
-  registerDisabled(new SvetzRetrievalSystem());  // Svetz retrieval ship missions (priority 97)
-  registerDisabled(new InvasionSystem());  // Multiverse invasion mechanics (priority 100)
-  registerDisabled(new ParadoxDetectionSystem());  // Paradox detection and resolution (priority 220)
-  // Basic portal system - can be enabled when portal tech is researched
-  registerDisabled(new PortalSystem());
-  // RealmTimeSystem needed for basic realm mechanics
-  gameLoop.systemRegistry.register(new RealmTimeSystem());
-
-  // Death systems - keep enabled since agents can die at any time
-  gameLoop.systemRegistry.register(new DeathJudgmentSystem());
-
-  // Death Bargain System - hero challenges to cheat death
-  // Heroes can challenge the God of Death with riddles to win a second chance
-  // Note: LLM riddle judgment requires LLMProvider (not llmQueue) - works without it using exact match
-  const deathBargainSystem = new DeathBargainSystem();
-  gameLoop.systemRegistry.register(deathBargainSystem);
-
-  // Death Transition System - handles moving dead entities to afterlife
-  // Routes souls based on deity worship, handles reincarnation/annihilation policies
-  const deathTransitionSystem = new DeathTransitionSystem();
-  deathTransitionSystem.setDeathBargainSystem(deathBargainSystem);
-  gameLoop.systemRegistry.register(deathTransitionSystem);
-
-  const realmManager = new RealmManager();
-  gameLoop.systemRegistry.register(realmManager);
-
-  // Soul Creation (divine ceremony for creating new souls)
-  gameLoop.systemRegistry.register(new SoulCreationSystem());
-
-  // PixelLab sprite generation for newborn souls
-  gameLoop.systemRegistry.register(new PixelLabSpriteGenerationSystem());
-
-  // Soul Consolidation (merge soul memories after death)
-  gameLoop.systemRegistry.register(new SoulConsolidationSystem());
-
-  // Soul Repository (persistent backup of all souls)
-  // Only register in Node.js environment (uses fs, path, process.cwd)
-  // Use dynamic import to avoid bundling Node.js modules in browser
-  if (typeof process !== 'undefined' && typeof process.cwd === 'function') {
-    import('./SoulRepositorySystem.js').then(({ SoulRepositorySystem }) => {
-      gameLoop.systemRegistry.register(new SoulRepositorySystem());
-    }).catch(err => {
-      console.warn('[registerAllSystems] SoulRepositorySystem not available:', err.message);
-    });
+  if (flags.combat) {
+    gameLoop.systemRegistry.register(new HuntingSystem());
+    gameLoop.systemRegistry.register(new PredatorAttackSystem());
+    gameLoop.systemRegistry.register(new AgentCombatSystem());
+    gameLoop.systemRegistry.register(new DominanceChallengeSystem());
+    gameLoop.systemRegistry.register(new InjurySystem());
+    gameLoop.systemRegistry.register(new GuardDutySystem());
+    gameLoop.systemRegistry.register(new VillageDefenseSystem());
+    gameLoop.systemRegistry.register(new ThreatResponseSystem());
   }
 
-  // LAZY ACTIVATION: Afterlife systems - disabled until first death occurs
-  // These process souls in the Underworld; enabled by death:first_soul_arrives event
-  // AfterlifeNeedsSystem - Uses MutationVectorComponent for spiritual needs decay
-  const afterlifeNeedsSystem = new AfterlifeNeedsSystem();
-  registerDisabled(afterlifeNeedsSystem);
-  registerDisabled(new AncestorTransformationSystem());
-  registerDisabled(new ReincarnationSystem());
-  registerDisabled(new AfterlifeMemoryFadingSystem());
+  // ============================================================================
+  // REALMS & PORTALS (Multiverse)
+  // ============================================================================
+  if (flags.multiverse) {
+    registerDisabled(new UniverseForkingSystem());
+    registerDisabled(new DivergenceTrackingSystem());
+    registerDisabled(new CanonEventSystem());
+    registerDisabled(new PassageSystem());
+    registerDisabled(new PassageTraversalSystem());
+    registerDisabled(new TimelineMergerSystem());
+    registerDisabled(new ProbabilityScoutSystem());
+    registerDisabled(new SvetzRetrievalSystem());
+    registerDisabled(new InvasionSystem());
+    registerDisabled(new ParadoxDetectionSystem());
+    registerDisabled(new PortalSystem());
+    gameLoop.systemRegistry.register(new RealmTimeSystem());
+  }
 
-  // Wisdom Goddess - manifests when pending approvals pile up, posts to divine chat
-  const wisdomGoddessSystem = new WisdomGoddessSystem();
-  wisdomGoddessSystem.setChatRoomSystem(chatRoomSystem);
-  registerDisabled(wisdomGoddessSystem);
+  // ============================================================================
+  // DEATH & REALMS
+  // ============================================================================
+  let realmManager: RealmManager | undefined;
+  if (flags.deathRealms) {
+    gameLoop.systemRegistry.register(new DeathJudgmentSystem());
+    const deathBargainSystem = new DeathBargainSystem();
+    gameLoop.systemRegistry.register(deathBargainSystem);
+    const deathTransitionSystem = new DeathTransitionSystem();
+    deathTransitionSystem.setDeathBargainSystem(deathBargainSystem);
+    gameLoop.systemRegistry.register(deathTransitionSystem);
+    realmManager = new RealmManager();
+    gameLoop.systemRegistry.register(realmManager);
+    gameLoop.systemRegistry.register(new SoulCreationSystem());
+    gameLoop.systemRegistry.register(new PixelLabSpriteGenerationSystem());
+    gameLoop.systemRegistry.register(new SoulConsolidationSystem());
+    if (typeof process !== 'undefined' && typeof process.cwd === 'function') {
+      import('./SoulRepositorySystem.js').then(({ SoulRepositorySystem }) => {
+        gameLoop.systemRegistry.register(new SoulRepositorySystem());
+      }).catch(err => {
+        console.warn('[registerAllSystems] SoulRepositorySystem not available:', err.message);
+      });
+    }
+    registerDisabled(new AfterlifeNeedsSystem());
+    registerDisabled(new AncestorTransformationSystem());
+    registerDisabled(new ReincarnationSystem());
+    registerDisabled(new AfterlifeMemoryFadingSystem());
+    registerDisabled(new WisdomGoddessSystem());
+  }
 
   // ============================================================================
   // TELEVISION & MEDIA
   // ============================================================================
-  // Tech requirement: television_station (requires broadcasting technology)
-  // TV Show Formats
-  registerDisabled(new GameShowSystem());
-  registerDisabled(new NewsroomSystem());
-  registerDisabled(new SoapOperaSystem());
-  registerDisabled(new TalkShowSystem());
-
-  // TV Production Pipeline
-  // gameLoop.systemRegistry.register(new CastingSystem()); // TODO: Not a System class
-  registerDisabled(new TVWritingSystem());
-  registerDisabled(new TVDevelopmentSystem());
-  registerDisabled(new TVProductionSystem());
-  registerDisabled(new TVPostProductionSystem());
-  registerDisabled(new TVBroadcastingSystem());
-  registerDisabled(new TVRatingsSystem());
-  registerDisabled(new TVCulturalImpactSystem());
-  registerDisabled(new TVArchiveSystem());
-  registerDisabled(new TVAdvertisingSystem());
+  if (flags.television) {
+    registerDisabled(new GameShowSystem());
+    registerDisabled(new NewsroomSystem());
+    registerDisabled(new SoapOperaSystem());
+    registerDisabled(new TalkShowSystem());
+    registerDisabled(new TVWritingSystem());
+    registerDisabled(new TVDevelopmentSystem());
+    registerDisabled(new TVProductionSystem());
+    registerDisabled(new TVPostProductionSystem());
+    registerDisabled(new TVBroadcastingSystem());
+    registerDisabled(new TVRatingsSystem());
+    registerDisabled(new TVCulturalImpactSystem());
+    registerDisabled(new TVArchiveSystem());
+    registerDisabled(new TVAdvertisingSystem());
+  }
 
   // ============================================================================
   // PLOT & NARRATIVE
   // ============================================================================
-  // Tech requirement: library or university (requires storytelling/literature)
-  registerDisabled(new PlotAssignmentSystem());
-  registerDisabled(new PlotProgressionSystem());
-  registerDisabled(new NarrativePressureSystem());
-
-  // Fates Council - Exotic/Epic plot weaving (priority 999, end of day)
-  // Requires LLM provider for Fates conversations
   let fatesCouncilSystem: FatesCouncilSystem | undefined;
-  if (llmQueue) {
-    fatesCouncilSystem = new FatesCouncilSystem(llmQueue);
-    registerDisabled(fatesCouncilSystem);
+  if (flags.plot) {
+    registerDisabled(new PlotAssignmentSystem());
+    registerDisabled(new PlotProgressionSystem());
+    registerDisabled(new NarrativePressureSystem());
+    if (llmQueue) {
+      fatesCouncilSystem = new FatesCouncilSystem(llmQueue);
+      registerDisabled(fatesCouncilSystem);
+    }
   }
 
   // ============================================================================
   // CONSCIOUSNESS (Collective Minds)
   // ============================================================================
-  // LAZY ACTIVATION: Collective consciousness - disabled until hive/pack species exist
-  // Tech requirement: collective_consciousness (enables hive/pack minds)
-  registerDisabled(new HiveMindSystem());
-  registerDisabled(new PackMindSystem());
-
-  // ============================================================================
-  // AUTOMATION & FACTORIES (Phase 38)
-  // ============================================================================
-  // Factory automation systems already registered above (lines 342-349)
-  // Systems: PowerGrid, Belt, DirectConnection, Assembly, FactoryAI, OffScreen
+  if (flags.collectiveConsciousness) {
+    registerDisabled(new HiveMindSystem());
+    registerDisabled(new PackMindSystem());
+  }
 
   // ============================================================================
   // CLARKETECH
   // ============================================================================
-  // LAZY ACTIVATION: Clarketech - disabled until advanced tech threshold reached
-  // Tech requirement: clarketech_research (enables sufficiently advanced technology)
-  registerDisabled(new ClarketechSystem());
+  if (flags.clarketech) {
+    registerDisabled(new ClarketechSystem());
+  }
 
   // ============================================================================
   // APPS & ARTIFACTS
   // ============================================================================
-  // LAZY ACTIVATION: App system - disabled until smartphone/computing tech exists
-  // Tech requirement: smartphone (enables app ecosystem)
-  registerDisabled(new AppSystem());
-  // gameLoop.systemRegistry.register(new ArtifactSystem()); // TODO: Fix compilation errors - missing System interface implementation
-
-  // ============================================================================
-  // DECISION SYSTEMS
-  // ============================================================================
-  // gameLoop.systemRegistry.register(new AutonomicSystem()); // TODO: Not a System class, utility class only
+  if (flags.apps) {
+    registerDisabled(new AppSystem());
+  }
 
   // ============================================================================
   // MULTI-VILLAGE SYSTEM
   // ============================================================================
-  // LAZY ACTIVATION: Multi-village systems - disabled until multiple villages exist
-  // VillageSummarySystem (priority 195): aggregates agent data into village summaries
-  registerDisabled(new VillageSummarySystem());
-  // InterVillageCaravanSystem (priority 190): manages trade caravans between villages
-  registerDisabled(new InterVillageCaravanSystem());
-  // NewsPropagationSystem (priority 196): propagates news between villages
-  registerDisabled(new NewsPropagationSystem());
+  if (flags.multiVillage) {
+    registerDisabled(new VillageSummarySystem());
+    registerDisabled(new InterVillageCaravanSystem());
+    registerDisabled(new NewsPropagationSystem());
+  }
 
   // ============================================================================
   // GOVERNANCE
   // ============================================================================
-  // Basic governance - needed for village/city founding
-  const governanceDataSystem = new GovernanceDataSystem();
-  gameLoop.systemRegistry.register(governanceDataSystem);
-  gameLoop.systemRegistry.register(new CityDirectorSystem());
-  gameLoop.systemRegistry.register(new VillageGovernanceSystem());
-  gameLoop.systemRegistry.register(new CityGovernanceSystem());
-
-  // LAZY ACTIVATION: Advanced governance - disabled until larger political entities form
-  // Tech requirement: provincial_administration (enables province governance)
-  registerDisabled(new ProvinceGovernanceSystem());
-  // Tech requirement: nation_founding (enables nation-level governance)
-  registerDisabled(new NationSystem());  // Nation-level governance (priority 195)
-  // Tech requirement: imperial_administration (enables empire governance)
-  registerDisabled(new EmpireSystem());  // Empire-level governance (priority 200)
-  registerDisabled(new EmpireDiplomacySystem());  // Inter-empire diplomacy (priority 202)
-  registerDisabled(new EmpireWarSystem());  // Empire war resolution (priority 605, combat phase)
-  // Tech requirement: interstellar_federation (enables federation governance)
-  registerDisabled(new FederationGovernanceSystem());  // Federation governance (priority 205)
-  // Tech requirement: galactic_council (enables galactic-scale governance)
-  registerDisabled(new GalacticCouncilSystem());  // Galactic Council governance (priority 210)
-  // Tech requirement: multiverse_diplomacy (enables multiverse invasion plots)
-  registerDisabled(new InvasionPlotHandler());  // Multiverse invasion plot assignment (priority 215)
-  // Tech requirement: uplift_diplomacy (enables civilization uplift)
-  registerDisabled(new UpliftDiplomacySystem());  // Civilization uplift diplomacy (priority 220)
-  // LLM-powered governance decisions - only useful when cities exist
-  registerDisabled(new GovernorDecisionSystem(llmQueue));  // Phase 6: AI Governance (LLM-powered)
+  let governanceDataSystem: GovernanceDataSystem | undefined;
+  if (flags.governance) {
+    governanceDataSystem = new GovernanceDataSystem();
+    gameLoop.systemRegistry.register(governanceDataSystem);
+    gameLoop.systemRegistry.register(new CityDirectorSystem());
+    gameLoop.systemRegistry.register(new VillageGovernanceSystem());
+    gameLoop.systemRegistry.register(new CityGovernanceSystem());
+    registerDisabled(new ProvinceGovernanceSystem());
+    registerDisabled(new NationSystem());
+    registerDisabled(new EmpireSystem());
+    registerDisabled(new EmpireDiplomacySystem());
+    registerDisabled(new EmpireWarSystem());
+    registerDisabled(new FederationGovernanceSystem());
+    registerDisabled(new GalacticCouncilSystem());
+    registerDisabled(new InvasionPlotHandler());
+    registerDisabled(new UpliftDiplomacySystem());
+    registerDisabled(new GovernorDecisionSystem(llmQueue));
+  }
 
   // ============================================================================
   // METRICS (Optional)
@@ -1332,5 +1158,6 @@ export function registerAllSystems(
     realmManager,
     chunkLoadingSystem,
     fatesCouncilSystem,
+    featureFlags: flags,
   };
 }

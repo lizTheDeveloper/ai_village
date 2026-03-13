@@ -331,6 +331,15 @@ export {
   type PlantSystemsConfig,
 } from './registerAllSystems.js';
 
+// Feature flags
+export {
+  type FeatureFlags,
+  ALL_SYSTEMS_ON,
+  SPRINT_1_FLAGS,
+  getActiveFeatureFlags,
+  getFeatureFlagSummary,
+} from './FeatureFlags.js';
+
 // Multi-Village System
 export * from './VillageSummarySystem.js';
 export { VillageSummarySystem } from './VillageSummarySystem.js';
