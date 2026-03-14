@@ -20,3 +20,4 @@ export {
   createPlantGeometry,
 } from './InstancedRenderer.js';
 export { MeshWorkerPool, type BlockData as WorkerBlockData } from './MeshWorkerPool.js';
+export { SmoothTerrainSurface, type SmoothTerrainConfig } from './SmoothTerrainSurface.js';

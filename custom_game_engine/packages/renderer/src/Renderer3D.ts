@@ -16,6 +16,7 @@ import { getPixelLabSpriteLoader, type PixelLabSpriteLoader, PixelLabDirection }
 import { findSprite, type SpriteTraits } from './sprites/SpriteRegistry.js';
 import { lookupSprite } from './sprites/SpriteService.js';
 import { ChunkManager3D } from './3d/ChunkManager3D.js';
+import { SmoothTerrainSurface } from './3d/SmoothTerrainSurface.js';
 import { SpriteAtlasBuilder } from './3d/SpriteAtlasBuilder.js';
 import { InstancedSpriteRenderer } from './3d/InstancedSpriteRenderer.js';
 
@@ -163,6 +164,7 @@ export class Renderer3D {
 
   // Terrain: Optimized ChunkManager3D with greedy meshing
   private chunkManager: ChunkManager3D | null = null;
+  private smoothTerrain: SmoothTerrainSurface | null = null;
 
   // Entities (agents)
   private entitySprites: Map<string, {
@@ -350,6 +352,13 @@ export class Renderer3D {
       blockSize: this.config.blockSize,
     });
 
+    // Initialize smooth terrain surface overlay
+    this.smoothTerrain = new SmoothTerrainSurface(this.scene, {
+      radius: 48,
+      resolution: 2,
+      blockSize: this.config.blockSize,
+    });
+
     // Setup lights
     this.setupLights();
 
@@ -531,6 +540,12 @@ export class Renderer3D {
     // Configure chunk manager with world tile accessor
     if (this.chunkManager && world.getTileAt) {
       this.chunkManager.setTileAccessor((x, y) => world.getTileAt?.(x, y) ?? null);
+    }
+
+    // Configure smooth terrain surface with same tile accessor
+    if (this.smoothTerrain && world.getTileAt) {
+      this.smoothTerrain.setTileAccessor((x, y) => world.getTileAt?.(x, y) ?? null);
+      this.smoothTerrain.markDirty();
     }
   }
 
@@ -1064,14 +1079,23 @@ export class Renderer3D {
       const animal = entity.components.get('animal') as { speciesId?: string } | undefined;
 
       // Build traits for sprite lookup
-      const traits: SpriteTraits = animal ? {
-        species: animal.speciesId,
-      } : {
-        species: appearance?.species || 'human',
-        gender: appearance?.gender,
-        hairColor: appearance?.hairColor,
-        skinTone: appearance?.skinTone,
-      };
+      let traits: SpriteTraits;
+      if (animal) {
+        traits = { species: animal.speciesId ?? 'unknown' };
+      } else {
+        // Validate gender is a known value before assigning
+        const rawGender = appearance?.gender;
+        const gender: 'male' | 'female' | 'nonbinary' | undefined =
+          rawGender === 'male' || rawGender === 'female' || rawGender === 'nonbinary'
+            ? rawGender
+            : undefined;
+        traits = {
+          species: appearance?.species || 'human',
+          gender,
+          hairColor: appearance?.hairColor,
+          skinTone: appearance?.skinTone,
+        };
+      }
 
       // Find the best matching sprite folder
       const spriteResult = lookupSprite(traits);
@@ -2251,6 +2275,11 @@ export class Renderer3D {
       // Update terrain around camera
       this.updateTerrain();
 
+      // Update smooth terrain surface overlay
+      if (this.smoothTerrain) {
+        this.smoothTerrain.update(this.camera);
+      }
+
       // Update entities (agents)
       this.updateEntities();
 
@@ -2324,6 +2353,12 @@ export class Renderer3D {
     if (this.chunkManager) {
       this.chunkManager.dispose();
       this.chunkManager = null;
+    }
+
+    // Dispose smooth terrain surface
+    if (this.smoothTerrain) {
+      this.smoothTerrain.dispose();
+      this.smoothTerrain = null;
     }
 
     // Dispose instanced sprite renderer
