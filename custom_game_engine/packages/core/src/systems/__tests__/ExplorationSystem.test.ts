@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../../World';
+import { World } from '../../ecs/World.js';
 import { ExplorationSystem } from '../ExplorationSystem';
 import { createExplorationStateComponent } from '../../components/ExplorationStateComponent';
 import { createPositionComponent } from '../../components/PositionComponent';
@@ -8,15 +8,16 @@ import { createAgentComponent } from '../../components/AgentComponent';
 import type { EntityImpl } from '../../ecs/Entity';
 
 import { ComponentType } from '../../types/ComponentType.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 describe('ExplorationSystem', () => {
   let world: World;
   let eventBus: EventBusImpl;
   let system: ExplorationSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new ExplorationSystem();
+    system.initialize(world, eventBus);
   });
 
   describe('AC3: Exploration Covers Territory', () => {
@@ -196,6 +197,45 @@ describe('ExplorationSystem', () => {
     });
   });
 
+  describe('regression: negative world coordinates (MUL-1086/MUL-1157)', () => {
+    it('should not crash when entity is at negative world coordinates', () => {
+      // Regression: entities spawning at negative world positions caused crash
+      // "markSectorExplored requires non-negative sector coordinates"
+      const entity = world.createEntity();
+      const entityImpl = entity as EntityImpl;
+
+      entityImpl.addComponent(createPositionComponent(-10, -10)); // Negative world coords
+      entityImpl.addComponent(createExplorationStateComponent({ mode: 'frontier', explorationRadius: 64 }));
+      entityImpl.addComponent(createSteeringComponent('none', 2.0, 0.5));
+
+      expect(() => {
+        system.update(world, world.getAllEntities(), 1.0);
+      }).not.toThrow();
+    });
+
+    it('should mark negative sectors as explored for entities at negative world positions', () => {
+      // worldToSector(-10, -10) → sector (-1, -1) — must be tracked, not silently skipped
+      const entity = world.createEntity();
+      const entityImpl = entity as EntityImpl;
+
+      entityImpl.addComponent(createPositionComponent(-10, -10));
+      const explorationState = createExplorationStateComponent({ mode: 'frontier', explorationRadius: 64 });
+      entityImpl.addComponent(explorationState);
+      entityImpl.addComponent(createSteeringComponent('none', 2.0, 0.5));
+
+      system.update(world, world.getAllEntities(), 1.0);
+
+      const state = entityImpl.getComponent(ComponentType.ExplorationState);
+      // sector(-10, -10) = floor(-10/16) = -1
+      expect(state?.exploredSectors.has('-1,-1')).toBe(true);
+    });
+
+    it('should convert negative world position to correct negative sector coordinates', () => {
+      expect(system.worldToSector({ x: -10, y: -5 })).toEqual({ x: -1, y: -1 });
+      expect(system.worldToSector({ x: -16, y: -32 })).toEqual({ x: -1, y: -2 });
+    });
+  });
+
   describe('sector grid conversion', () => {
     it('should convert world position to sector coordinates', () => {
       const worldPos = { x: 80, y: 80 };
@@ -342,9 +382,7 @@ describe('ExplorationSystem', () => {
       });
       entityImpl.addComponent(explorationState);
 
-      // Initialize system with eventBus
-      const eventBus = eventBus;
-      system.initialize(world, eventBus);
+      // system.initialize already called in beforeEach
 
       const events: any[] = [];
       eventBus.subscribe('exploration:milestone', (e: any) => events.push(e));
@@ -360,6 +398,8 @@ describe('ExplorationSystem', () => {
       }
 
       system.update(world, world.getAllEntities(), 1000);
+      // Flush event queue so queued events are dispatched to subscribers
+      eventBus.flush();
 
       expect(events.length).toBeGreaterThan(0);
     });
