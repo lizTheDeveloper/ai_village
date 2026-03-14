@@ -722,6 +722,9 @@ export class AdminAngelSystem extends BaseSystem {
   private pendingRequests = new Set<string>(); // Track in-flight requests
   private llmQueue: LLMDecisionQueue | null = null; // Shared LLM queue (if provided)
   private timeEntityId: string | null = null; // Cache for time entity (performance)
+  private directCallFailCount: number = 0; // Circuit breaker for callLLMDirect
+  private directCallDisabledUntil: number = 0; // Circuit breaker: don't retry until this time
+  private lastGoalEvalTick: number = 0; // Throttle evaluateGoals
 
   constructor(config?: AdminAngelSystemConfig) {
     super();
@@ -748,7 +751,6 @@ export class AdminAngelSystem extends BaseSystem {
     // Angels use 'high' intelligence tier for better responses
     if (this.llmQueue) {
       try {
-        console.error(`[AdminAngelSystem] Calling LLM queue with tier=high for ${agentId}`);
         const response = await this.llmQueue.requestDecision(agentId, prompt, { tier: 'high' });
         // Strip thinking tags if present (qwen models use them)
         return response.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
@@ -772,6 +774,12 @@ export class AdminAngelSystem extends BaseSystem {
     startTime: number,
     agentId: string
   ): Promise<string> {
+    // Circuit breaker: skip if direct calls have been failing repeatedly
+    const now = Date.now();
+    if (now < this.directCallDisabledUntil) {
+      throw new Error('AdminAngelSystem: direct LLM calls temporarily disabled (circuit breaker)');
+    }
+
     const { model, baseUrl, apiKey } = LLM_CONFIG;
 
     // Emit llm:request event for metrics tracking
@@ -791,7 +799,7 @@ export class AdminAngelSystem extends BaseSystem {
     // Check if we're in browser environment - use proxy
     const isBrowser = typeof window !== 'undefined';
     const url = isBrowser
-      ? `/api/llm/chat`  // Vite proxy route
+      ? `/api/llm/chat`  // Vite dev server proxy route (not available in production builds)
       : `${baseUrl}/chat/completions`;
 
     const headers: Record<string, string> = {
@@ -811,16 +819,29 @@ export class AdminAngelSystem extends BaseSystem {
       max_tokens: 512,  // Short responses
     };
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
     try {
       const response = await fetch(url, {
         method: 'POST',
         headers,
+        signal: controller.signal,
         body: JSON.stringify(isBrowser ? { ...body, baseUrl, apiKey } : body),
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const errorText = await response.text();
         const error = new Error(`LLM API error: ${response.status} - ${errorText.substring(0, 200)}`);
+
+        // Circuit breaker: disable direct calls after 3 consecutive failures for 60 seconds
+        this.directCallFailCount++;
+        if (this.directCallFailCount >= 3) {
+          this.directCallDisabledUntil = Date.now() + 60000;
+          this.directCallFailCount = 0;
+        }
 
         // Emit llm:error event
         if (world?.eventBus) {
@@ -837,6 +858,9 @@ export class AdminAngelSystem extends BaseSystem {
 
         throw error;
       }
+
+      // Reset circuit breaker on success
+      this.directCallFailCount = 0;
 
       const data = await response.json();
       const content = data.choices?.[0]?.message?.content || '';
@@ -861,6 +885,17 @@ export class AdminAngelSystem extends BaseSystem {
       // Strip any thinking tags if present (qwen sometimes uses them)
       return content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
     } catch (error) {
+      clearTimeout(timeoutId);
+
+      // Circuit breaker: disable direct calls after 3 consecutive failures for 60 seconds
+      if (error instanceof Error && error.name === 'AbortError') {
+        this.directCallFailCount++;
+        if (this.directCallFailCount >= 3) {
+          this.directCallDisabledUntil = Date.now() + 60000;
+          this.directCallFailCount = 0;
+        }
+      }
+
       console.error('[AdminAngelSystem] LLM call failed:', error);
 
       // Emit llm:error if not already emitted
@@ -2634,8 +2669,12 @@ export class AdminAngelSystem extends BaseSystem {
       angel.memory.narrative.lastPatternScanTick = Number(ctx.tick);
     }
 
-    // Phase 4: Goal evaluation and power regeneration
-    this.evaluateGoals(ctx, angel);
+    // Phase 4: Goal evaluation (every 100 ticks, ~5 seconds) and power regeneration (every tick)
+    const ticksSinceGoalEval = Number(ctx.tick) - this.lastGoalEvalTick;
+    if (ticksSinceGoalEval >= 100) {
+      this.evaluateGoals(ctx, angel);
+      this.lastGoalEvalTick = Number(ctx.tick);
+    }
     angel.memory.agency.power.current = Math.min(
       angel.memory.agency.power.max,
       angel.memory.agency.power.current + angel.memory.agency.power.regenRate
@@ -2751,6 +2790,10 @@ export class AdminAngelSystem extends BaseSystem {
         text: `noticed ${newQuirk.name} ${newQuirk.quirks[0]}`,
         type: 'quirk'
       });
+      // Cap memories to prevent unbounded growth
+      if (newQuirk.memories.length > 20) {
+        newQuirk.memories = newQuirk.memories.slice(-20);
+      }
       return {
         speak: true,
         reason: `${newQuirk.name} ${newQuirk.quirks[0]}. that's interesting`
@@ -2818,8 +2861,10 @@ export class AdminAngelSystem extends BaseSystem {
         if (!pos1 || !pos2 || !id1 || !id2) continue;
 
         // Check if agents are near each other (within 3 tiles)
-        const dist = Math.sqrt((pos1.x - pos2.x) ** 2 + (pos1.y - pos2.y) ** 2);
-        if (dist < 3) {
+        const dx = pos1.x - pos2.x;
+        const dy = pos1.y - pos2.y;
+        const distSq = dx * dx + dy * dy;
+        if (distSq < 9) { // 3² = 9
           // Check if this is a repeated pattern
           const pairKey = [agent1.id, agent2.id].sort().join('-');
           const interactionCount = this.getInteractionCount(angel, pairKey);
@@ -2884,7 +2929,7 @@ export class AdminAngelSystem extends BaseSystem {
         // Also remove from divine_chat room if present
         const divineChatRooms = world.query().with(CT.ChatRoom).executeEntities();
         for (const roomEntity of divineChatRooms) {
-          const room = roomEntity.getComponent(CT.ChatRoom) as { config: { id: string; membership: { members: string[] } } } | undefined;
+          const room = roomEntity.getComponent<ChatRoomComponent>(CT.ChatRoom);
           if (room?.config.id === 'divine_chat') {
             const memberIndex = room.config.membership.members.indexOf(entity.id);
             if (memberIndex !== -1) {
@@ -3629,6 +3674,10 @@ if u dont know something just say idk and figure it out together.`;
       if (oldest) {
         oldest.status = 'abandoned';
         investigations.completedInvestigations.push(oldest);
+        // Cap completed investigations to prevent unbounded memory growth
+        if (investigations.completedInvestigations.length > 20) {
+          investigations.completedInvestigations = investigations.completedInvestigations.slice(-20);
+        }
       }
     }
   }
