@@ -235,11 +235,13 @@ import { getLanguageRegistry } from '@ai-village/language';
 
 // ============================================================================
 // URL CONFIGURATION
-// Use Vite env vars in production, fall back to localhost for local dev.
-// Set VITE_API_URL, VITE_LLM_PROXY_URL, VITE_METRICS_WS_URL in .env or at build time.
+// Use Vite env vars in production. Set in .env for local dev (see .env.example).
+// NOTE: LLM_PROXY_URL has no hardcoded fallback — must be explicitly set via VITE_LLM_PROXY_URL
+// in .env or the build environment. Without it, the game falls back to direct LLM providers
+// or runs without LLM. This prevents localhost:8766 from appearing in production bundles.
 // ============================================================================
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-const LLM_PROXY_URL = import.meta.env.VITE_LLM_PROXY_URL || 'http://localhost:8766';
+const LLM_PROXY_URL = (import.meta.env.VITE_LLM_PROXY_URL as string | undefined) ?? '';
 const METRICS_WS_URL = import.meta.env.VITE_METRICS_WS_URL || 'ws://localhost:8765';
 
 // ============================================================================
@@ -3609,11 +3611,12 @@ async function main() {
   // Create LLM provider - use ProxyLLMProvider by default for server-side API calls and rate limiting
   let llmProvider: LLMProvider;
 
-  // Check if we should use the proxy provider (default: yes, unless settings explicitly configure direct provider)
-  const useProxy = settings.llm.provider !== 'openai-compat-direct' && settings.llm.provider !== 'ollama';
+  // Use proxy only when VITE_LLM_PROXY_URL is explicitly configured at build time.
+  // Without an explicit URL, skip ProxyLLMProvider to avoid localhost:8766 calls in production.
+  const useProxy = !!LLM_PROXY_URL && settings.llm.provider !== 'openai-compat-direct' && settings.llm.provider !== 'ollama';
 
   if (useProxy) {
-    // Default: Use ProxyLLMProvider for server-side API calls with automatic fallback
+    // ProxyLLMProvider for server-side API calls with automatic fallback
     llmProvider = new ProxyLLMProvider(LLM_PROXY_URL);
   } else {
     // Legacy mode: Direct client-side API calls (for local Ollama or explicit settings)
@@ -3623,25 +3626,16 @@ async function main() {
     const groqApiKey = import.meta.env.VITE_GROQ_API_KEY || import.meta.env.GROQ_API_KEY;
     const cerebrasApiKey = import.meta.env.VITE_CEREBRAS_API_KEY || import.meta.env.CEREBRAS_API_KEY;
 
-    // 1. Primary: Cerebras with Qwen 3-32B
-    if (cerebrasApiKey) {
-      providers.push(new OpenAICompatProvider(
-        'qwen-3-32b',
-        'https://api.cerebras.ai/v1',
-        cerebrasApiKey
-      ));
-    }
-
-    // 2. Secondary: Groq with Qwen 3-32B (backup for provider 1)
+    // 1. Primary: Groq with GPT-OSS-120B
     if (groqApiKey) {
       providers.push(new OpenAICompatProvider(
-        'qwen/qwen3-32b',
+        'openai/gpt-oss-120b',
         'https://api.groq.com/openai/v1',
         groqApiKey
       ));
     }
 
-    // 3. Tertiary: Cerebras with GPT-OSS-120B
+    // 2. Secondary: Cerebras with GPT-OSS-120B
     if (cerebrasApiKey) {
       providers.push(new OpenAICompatProvider(
         'gpt-oss-120b',
@@ -3650,10 +3644,19 @@ async function main() {
       ));
     }
 
-    // 4. Quaternary: Groq with GPT-OSS-120B (last resort)
+    // 3. Tertiary: Cerebras with Qwen 3-32B
+    if (cerebrasApiKey) {
+      providers.push(new OpenAICompatProvider(
+        'qwen-3-32b',
+        'https://api.cerebras.ai/v1',
+        cerebrasApiKey
+      ));
+    }
+
+    // 4. Quaternary: Groq with Qwen 3-32B (last resort)
     if (groqApiKey) {
       providers.push(new OpenAICompatProvider(
-        'openai/gpt-oss-120b',
+        'qwen/qwen3-32b',
         'https://api.groq.com/openai/v1',
         groqApiKey
       ));
@@ -3713,18 +3716,18 @@ async function main() {
 
     const directProviders: LLMProvider[] = [];
 
-    if (cerebrasApiKey) {
-      directProviders.push(new OpenAICompatProvider(
-        'qwen-3-32b',
-        'https://api.cerebras.ai/v1',
-        cerebrasApiKey
-      ));
-    }
     if (groqApiKey) {
       directProviders.push(new OpenAICompatProvider(
-        'qwen/qwen3-32b',
+        'openai/gpt-oss-120b',
         'https://api.groq.com/openai/v1',
         groqApiKey
+      ));
+    }
+    if (cerebrasApiKey) {
+      directProviders.push(new OpenAICompatProvider(
+        'gpt-oss-120b',
+        'https://api.cerebras.ai/v1',
+        cerebrasApiKey
       ));
     }
 
