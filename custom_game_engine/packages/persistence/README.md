@@ -786,24 +786,21 @@ World Instance (restored)
 User triggers save
   ↓
 SaveLoadService.save()
-  → 'save:started' (not implemented, but pattern exists)
   → Serialize world
   → Compress
   → Write to storage
-  ↓ 'save:completed' (not implemented)
 
 User triggers load
   ↓
 SaveLoadService.load()
-  → 'load:started' (not implemented)
   → Read from storage
   → Decompress
   → Validate
   → Deserialize world
-  ↓ 'load:completed' (not implemented)
+  → Emit 'world:loaded' { tick, entityCount }
 ```
 
-**Note:** Save/load events are not currently emitted by the service, but the pattern is established for future use.
+**Events emitted:** After a successful load, `world:loaded` is emitted on the world's event bus. Systems with tick-based caches should subscribe to reset stale state. See `packages/core/src/events/domains/world.events.ts`.
 
 ### Component Relationships
 
@@ -1130,12 +1127,15 @@ await saveLoadService.save(world, { name: 'Checkpoint' });
 // → Saves multiverse.time.absoluteTick
 // → Saves all universes + passages
 // → Saves god-crafted queue
+// → Saves world.tick for time continuity
 
 // Load restores multiverse state
 await saveLoadService.load('checkpoint_key', world);
 // → Restores multiverse time
 // → Restores all universes
-// → Restores passages (not yet implemented)
+// → Restores passages (via multiverseCoordinator)
+// → Restores world.tick and entity.createdAt for correct time-delta calculations
+// → Emits 'world:loaded' event for system cache invalidation
 ```
 
 ### Time Travel System
@@ -1255,7 +1255,7 @@ npm test -- compression.test.ts
 
 **Event-driven architecture:**
 - Persistence is primarily API-driven (call `saveLoadService.save()`)
-- No events currently emitted (pattern exists for future implementation)
+- `world:loaded` is emitted after successful load — subscribe to invalidate tick-based caches
 - Never bypass `SaveLoadService` for save/load operations
 - Always use `saveLoadService` singleton (pre-configured, globally available)
 
@@ -1291,5 +1291,5 @@ npm test -- compression.test.ts
 **Time travel mechanics:**
 - Every save is a checkpoint (can rewind to any save)
 - Universe forking creates alternate timelines (branch points)
-- Multiverse state preserved (absolute tick, real-time elapsed)
-- Passages between universes stored (not yet restored on load)
+- Multiverse state preserved (absolute tick, real-time elapsed, world.tick, entity.createdAt)
+- Passages between universes stored and restored on load
