@@ -658,30 +658,38 @@ export class PixiJSRenderer implements IRenderer {
 
     // Try parent element first, fall back to window dimensions
     const parent = this._canvas.parentElement;
-    let width: number;
-    let height: number;
+    let cssWidth: number;
+    let cssHeight: number;
 
     if (parent && parent.clientWidth > 0 && parent.clientHeight > 0) {
-      width = parent.clientWidth;
-      height = parent.clientHeight;
+      cssWidth = parent.clientWidth;
+      cssHeight = parent.clientHeight;
     } else {
       // Fallback to window dimensions
-      width = window.innerWidth;
-      height = window.innerHeight;
+      cssWidth = window.innerWidth;
+      cssHeight = window.innerHeight;
     }
 
-    // Only resize if dimensions have actually changed
-    if (
-      Math.abs(this._canvas.width - width) > 1 ||
-      Math.abs(this._canvas.height - height) > 1
-    ) {
-      this.app.renderer.resize(width, height);
-      this._camera.setViewportSize(width, height);
+    // Scale to physical pixels so PixiJS fills the full canvas buffer (fix black bands on retina)
+    const dpr = window.devicePixelRatio || 1;
+    const physWidth = Math.round(cssWidth * dpr);
+    const physHeight = Math.round(cssHeight * dpr);
 
-      // Also resize the overlay canvas
+    // Only resize if dimensions have actually changed (compare physical pixels)
+    if (
+      Math.abs(this._canvas.width - physWidth) > 1 ||
+      Math.abs(this._canvas.height - physHeight) > 1
+    ) {
+      this._canvas.width = physWidth;
+      this._canvas.height = physHeight;
+      this.app.renderer.resize(physWidth, physHeight);
+      // Camera viewport in CSS pixels so world coordinates remain stable across DPR changes
+      this._camera.setViewportSize(cssWidth, cssHeight);
+
+      // Also resize the overlay canvas to physical pixels
       if (this._overlayCanvas) {
-        this._overlayCanvas.width = width;
-        this._overlayCanvas.height = height;
+        this._overlayCanvas.width = physWidth;
+        this._overlayCanvas.height = physHeight;
       }
     }
   };
@@ -770,8 +778,9 @@ export class PixiJSRenderer implements IRenderer {
     const centerX = this._canvas.width / 2;
     const centerY = this._canvas.height / 2;
 
-    this.worldContainer.x = centerX - this._camera.x * zoom;
-    this.worldContainer.y = centerY - this._camera.y * zoom;
+    // Pixel-snap to whole numbers to prevent sub-pixel gaps between chunk containers
+    this.worldContainer.x = Math.round(centerX - this._camera.x * zoom);
+    this.worldContainer.y = Math.round(centerY - this._camera.y * zoom);
     this.worldContainer.scale.set(zoom);
   }
 
@@ -895,10 +904,8 @@ export class PixiJSRenderer implements IRenderer {
       }
     }
 
-    // PASS 2: Smooth terrain edges at biome boundaries
-    // Draw semi-transparent blended strips where terrain types differ
-    const blendSize = Math.max(3, Math.floor(ts * 0.4));
-
+    // PASS 2: Single-pixel edge blend at biome boundaries
+    // One fill per edge (was 12+) — eliminates cyan line artifacts from multi-strip blending
     for (let y = 0; y < CHUNK_SIZE; y++) {
       for (let x = 0; x < CHUNK_SIZE; x++) {
         const tile = chunk.tiles[y * CHUNK_SIZE + x];
@@ -907,63 +914,31 @@ export class PixiJSRenderer implements IRenderer {
         const px = x * ts;
         const py = y * ts;
 
-        // Check right neighbor — vertical edge blend
+        // Right neighbor — 1-pixel vertical edge blend
         if (x < CHUNK_SIZE - 1) {
           const rightTile = chunk.tiles[y * CHUNK_SIZE + x + 1];
           if (rightTile && rightTile.terrain !== tile.terrain) {
-            const rightColor = this.getTileColor(rightTile.terrain, rightTile);
-            const myColor = this.getTileColor(tile.terrain, tile);
-            const midColor = this.blendColors(myColor, rightColor, 0.5);
-
-            // Draw blended gradient strips at boundary
-            const edgeX = px + ts;
-            for (let i = 0; i < blendSize; i++) {
-              const t = i / blendSize;
-              const alpha = 0.35 * (1 - t);
-              // Right side: blend right color into left tile area
-              graphics.rect(edgeX - blendSize + i, py, 1, ts);
-              graphics.fill({ color: midColor, alpha });
-              // Left side: blend left color into right tile area
-              graphics.rect(edgeX + i, py, 1, ts);
-              graphics.fill({ color: midColor, alpha: 0.35 * (1 - (blendSize - 1 - i) / blendSize) });
-            }
+            const midColor = this.blendColors(
+              this.getTileColor(tile.terrain, tile),
+              this.getTileColor(rightTile.terrain, rightTile),
+              0.5
+            );
+            graphics.rect(px + ts - 1, py, 2, ts);
+            graphics.fill({ color: midColor, alpha: 0.35 });
           }
         }
 
-        // Check bottom neighbor — horizontal edge blend
+        // Bottom neighbor — 1-pixel horizontal edge blend
         if (y < CHUNK_SIZE - 1) {
           const bottomTile = chunk.tiles[(y + 1) * CHUNK_SIZE + x];
           if (bottomTile && bottomTile.terrain !== tile.terrain) {
-            const bottomColor = this.getTileColor(bottomTile.terrain, bottomTile);
-            const myColor = this.getTileColor(tile.terrain, tile);
-            const midColor = this.blendColors(myColor, bottomColor, 0.5);
-
-            const edgeY = py + ts;
-            for (let i = 0; i < blendSize; i++) {
-              const t = i / blendSize;
-              const alpha = 0.35 * (1 - t);
-              graphics.rect(px, edgeY - blendSize + i, ts, 1);
-              graphics.fill({ color: midColor, alpha });
-              graphics.rect(px, edgeY + i, ts, 1);
-              graphics.fill({ color: midColor, alpha: 0.35 * (1 - (blendSize - 1 - i) / blendSize) });
-            }
-          }
-        }
-
-        // Corner blend for diagonal transitions
-        if (x < CHUNK_SIZE - 1 && y < CHUNK_SIZE - 1) {
-          const diagTile = chunk.tiles[(y + 1) * CHUNK_SIZE + x + 1];
-          if (diagTile && diagTile.terrain !== tile.terrain) {
-            const diagColor = this.getTileColor(diagTile.terrain, diagTile);
-            const myColor = this.getTileColor(tile.terrain, tile);
-            const midColor = this.blendColors(myColor, diagColor, 0.5);
-            const cornerX = px + ts;
-            const cornerY = py + ts;
-            const r = blendSize;
-
-            // Draw small blended circle at corner
-            graphics.circle(cornerX, cornerY, r);
-            graphics.fill({ color: midColor, alpha: 0.25 });
+            const midColor = this.blendColors(
+              this.getTileColor(tile.terrain, tile),
+              this.getTileColor(bottomTile.terrain, bottomTile),
+              0.5
+            );
+            graphics.rect(px, py + ts - 1, ts, 2);
+            graphics.fill({ color: midColor, alpha: 0.35 });
           }
         }
       }
