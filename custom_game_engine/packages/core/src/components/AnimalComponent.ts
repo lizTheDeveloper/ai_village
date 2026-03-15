@@ -2,6 +2,134 @@ import type { Component } from '../ecs/Component.js';
 import type { Position } from '../types.js';
 import type { AnimalLifeStage, AnimalState } from '../types/AnimalTypes.js';
 
+// ============================================================================
+// Animal Genetics
+// ============================================================================
+
+export interface AnimalGeneTrait {
+  allele1: number;    // 0–100
+  allele2: number;    // 0–100
+  expression: number; // mean of allele1 and allele2, 0–100
+}
+
+export interface AnimalGenetics {
+  size: AnimalGeneTrait;
+  strength: AnimalGeneTrait;
+  speed: AnimalGeneTrait;
+  health: AnimalGeneTrait;
+  lifespan: AnimalGeneTrait;
+  temperament: AnimalGeneTrait;
+  intelligence: AnimalGeneTrait;
+  trainability: AnimalGeneTrait;
+  colorVariant: AnimalGeneTrait;
+}
+
+export interface AnimalMutation {
+  traitAffected: keyof AnimalGenetics;
+  effect: number;         // Numeric delta applied to expression
+  beneficial: boolean;
+  inheritChance: number;  // 0–1
+}
+
+const ANIMAL_TRAIT_KEYS: (keyof AnimalGenetics)[] = [
+  'size', 'strength', 'speed', 'health', 'lifespan',
+  'temperament', 'intelligence', 'trainability', 'colorVariant',
+];
+
+const BASE_VALUE = 50;
+const ALLELE_VARIANCE = 20;
+
+/**
+ * Generate random animal genetics.
+ * Each allele is BASE_VALUE ± ALLELE_VARIANCE, clamped to [0, 100].
+ * Expression = mean(allele1, allele2).
+ *
+ * @param rng - Optional random number generator (defaults to Math.random).
+ */
+export function generateAnimalGenetics(rng: () => number = Math.random): AnimalGenetics {
+  function makeTrait(): AnimalGeneTrait {
+    const allele1 = Math.min(100, Math.max(0, BASE_VALUE + (rng() * 2 - 1) * ALLELE_VARIANCE));
+    const allele2 = Math.min(100, Math.max(0, BASE_VALUE + (rng() * 2 - 1) * ALLELE_VARIANCE));
+    return { allele1, allele2, expression: (allele1 + allele2) / 2 };
+  }
+
+  return {
+    size:         makeTrait(),
+    strength:     makeTrait(),
+    speed:        makeTrait(),
+    health:       makeTrait(),
+    lifespan:     makeTrait(),
+    temperament:  makeTrait(),
+    intelligence: makeTrait(),
+    trainability: makeTrait(),
+    colorVariant: makeTrait(),
+  };
+}
+
+/**
+ * Inherit genetics from two parents using Mendelian allele selection.
+ * Each offspring allele is drawn randomly from one of the two parental alleles.
+ * Inherited mutations are applied to expression and clamped to [0, 100].
+ *
+ * @param parent1Genetics - First parent's genetics.
+ * @param parent2Genetics - Second parent's genetics.
+ * @param parent1Mutations - First parent's mutations eligible for inheritance.
+ * @param parent2Mutations - Second parent's mutations eligible for inheritance.
+ * @param rng - Random number generator.
+ * @param mutationChance - Per-trait probability of a new spontaneous mutation (0–1).
+ */
+export function inheritAnimalGenetics(
+  parent1Genetics: AnimalGenetics,
+  parent2Genetics: AnimalGenetics,
+  parent1Mutations: AnimalMutation[],
+  parent2Mutations: AnimalMutation[],
+  rng: () => number,
+  mutationChance: number,
+): { genetics: AnimalGenetics; mutations: AnimalMutation[] } {
+  const offspringGenetics = {} as AnimalGenetics;
+
+  for (const key of ANIMAL_TRAIT_KEYS) {
+    const p1 = parent1Genetics[key];
+    const p2 = parent2Genetics[key];
+
+    // Mendelian: pick one allele from each parent randomly
+    const allele1 = rng() < 0.5 ? p1.allele1 : p1.allele2;
+    const allele2 = rng() < 0.5 ? p2.allele1 : p2.allele2;
+    const baseExpression = (allele1 + allele2) / 2;
+
+    offspringGenetics[key] = { allele1, allele2, expression: baseExpression };
+  }
+
+  // Collect inherited mutations from both parents
+  const inheritedMutations: AnimalMutation[] = [];
+  for (const mutation of [...parent1Mutations, ...parent2Mutations]) {
+    if (rng() < mutation.inheritChance) {
+      inheritedMutations.push({ ...mutation });
+    }
+  }
+
+  // Apply inherited mutations to expression values
+  for (const mutation of inheritedMutations) {
+    const trait = offspringGenetics[mutation.traitAffected];
+    trait.expression = Math.min(100, Math.max(0, trait.expression + mutation.effect));
+  }
+
+  // Spontaneous new mutations (if mutationChance > 0)
+  if (mutationChance > 0) {
+    for (const key of ANIMAL_TRAIT_KEYS) {
+      if (rng() < mutationChance) {
+        const effect = (rng() < 0.5 ? 1 : -1) * (5 + Math.floor(rng() * 16));
+        const beneficial = effect > 0;
+        inheritedMutations.push({ traitAffected: key, effect, beneficial, inheritChance: 0.5 });
+        const trait = offspringGenetics[key];
+        trait.expression = Math.min(100, Math.max(0, trait.expression + effect));
+      }
+    }
+  }
+
+  return { genetics: offspringGenetics, mutations: inheritedMutations };
+}
+
 // Re-export for backwards compatibility
 export type { AnimalLifeStage, AnimalState };
 
