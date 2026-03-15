@@ -15,7 +15,6 @@ describe('ReflectionSystem', () => {
 
   beforeEach(() => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
-    eventBus = new EventBus();
     system = new ReflectionSystem(eventBus);
     agent = world.createEntity();
     agent.addComponent(EpisodicMemoryComponent, {});

@@ -7,18 +7,17 @@ import { SocialMemoryComponent } from '../../components/SocialMemoryComponent';
 import { JournalComponent } from '../../components/JournalComponent';
 import { createAgentComponent } from '../../components/AgentComponent';
 import { PersonalityComponent } from '../../components/PersonalityComponent';
-import { EventBus } from '../../EventBus';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 describe('JournalingSystem', () => {
   let world: World;
   let system: JournalingSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
   let agent: any;
 
   beforeEach(() => {
-    eventBus = new EventBusImpl(); world = new World(eventBus);
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
+    world = new World(eventBus);
     system = new JournalingSystem(eventBus);
     agent = world.createEntity();
 

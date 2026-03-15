@@ -6,6 +6,11 @@ export default defineConfig({
     // Use jsdom by default for most tests (React components need DOM)
     environment: 'jsdom',
     globals: true,
+    environmentOptions: {
+      jsdom: {
+        url: 'http://localhost',
+      },
+    },
     setupFiles: ['./vitest.setup.ts'],
     exclude: [
       '**/node_modules/**',

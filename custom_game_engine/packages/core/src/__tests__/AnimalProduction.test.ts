@@ -11,10 +11,11 @@ describe('Animal Production System', () => {
   let productionSystem: AnimalProductionSystem;
   let eventBus: EventBusImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
-    
+
     productionSystem = new AnimalProductionSystem();
+    await productionSystem.initialize(world, eventBus);
   });
 
   describe('Animal Product Definitions', () => {
@@ -529,7 +530,7 @@ describe('Animal Production System', () => {
       expect(() => {
         const entities = world.query().with(ComponentType.Animal).executeEntities();
         productionSystem.update(world, entities, 86400);
-      }).toThrow('missing required \'health\' field');
+      }).toThrow('missing required CT.Health field');
     });
   });
 });

@@ -105,17 +105,15 @@ export class CombatHUDPanel implements IWindowPanel {
   private handleConflictStarted(event: any): void {
     const data = event.data || event; // Support both GameEvent and legacy direct data
 
-    if (!data.conflictId || !data.type) {
+    if (!data.conflictId || !(data.conflictType || data.type)) {
       throw new Error('conflict:started event missing required fields (conflictId, type)');
     }
-    if (!data.participants || !Array.isArray(data.participants)) {
-      throw new Error('conflict:started event missing required field: participants array');
-    }
+    const participants = data.participants || [data.initiator, data.target].filter(Boolean);
 
     this.activeConflicts.set(data.conflictId, {
       id: data.conflictId,
-      type: data.type,
-      participants: data.participants,
+      type: data.conflictType || data.type,
+      participants: participants,
       threatLevel: data.threatLevel || 'medium',
       startTime: Date.now(),
     });
@@ -126,7 +124,7 @@ export class CombatHUDPanel implements IWindowPanel {
     }
 
     // Add to recent events
-    this.addRecentEvent(`${data.type} started`);
+    this.addRecentEvent(`${data.conflictType || data.type} started`);
 
     // Re-render
     this.updateUI();

@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { World } from '../../World.js';
+import { World } from '../../ecs/World.js';
 import { CreatorSurveillanceSystem } from '../CreatorSurveillanceSystem.js';
 import { SupremeCreatorComponent } from '../../components/SupremeCreatorComponent.js';
 import { DeityComponent } from '../../components/DeityComponent.js';
 import { SpellRegistry } from '../../magic/SpellRegistry.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 describe('CreatorSurveillanceSystem', () => {
   let world: World;
@@ -380,7 +380,7 @@ describe('CreatorSurveillanceSystem', () => {
       eventBus.flush(); // Dispatch secondary events
 
       // Update to trigger alert level check
-      system.update(world);
+      system.update(world, [], 1);
       eventBus.flush(); // Dispatch surveillance_alert event
 
       // Should emit alert level change
@@ -435,7 +435,7 @@ describe('CreatorSurveillanceSystem', () => {
       eventBus.flush(); // Dispatch secondary events
 
       // Update to trigger alert level check
-      system.update(world);
+      system.update(world, [], 1);
       eventBus.flush(); // Dispatch surveillance_alert event
 
       // Should immediately escalate to critical
@@ -483,7 +483,7 @@ describe('CreatorSurveillanceSystem', () => {
       for (let i = 0; i < 600; i++) {
         world.advanceTick();
       }
-      system.update(world);
+      system.update(world, [], 1);
       eventBus.flush(); // Dispatch any events from update
 
       // Non-existent god should be removed
@@ -959,7 +959,7 @@ describe('CreatorSurveillanceSystem', () => {
         for (let i = 0; i < 600; i++) {
           world.advanceTick();
         }
-        system.update(world);
+        system.update(world, [], 1);
         eventBus.flush();
       }).not.toThrow();
 
@@ -1072,7 +1072,7 @@ describe('CreatorSurveillanceSystem', () => {
       const uninitSystem = new CreatorSurveillanceSystem();
 
       expect(() => {
-        uninitSystem.update(world);
+        uninitSystem.update(world, [], 1);
       }).not.toThrow();
 
       expect(() => {
@@ -1129,7 +1129,7 @@ describe('CreatorSurveillanceSystem', () => {
       }
       eventBus.flush();
       eventBus.flush();
-      system.update(world);
+      system.update(world, [], 1);
       eventBus.flush();
 
       const stats1 = system.getStats();
@@ -1140,7 +1140,7 @@ describe('CreatorSurveillanceSystem', () => {
       systemAny.stats.recentDetections = [];
 
       // Alert should drop
-      system.update(world);
+      system.update(world, [], 1);
       eventBus.flush();
 
       const stats2 = system.getStats();

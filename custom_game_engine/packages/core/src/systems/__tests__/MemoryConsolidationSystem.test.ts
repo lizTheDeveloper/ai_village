@@ -27,7 +27,6 @@ describe('MemoryConsolidationSystem', () => {
 
   beforeEach(() => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
-    eventBus = new EventBus();
     system = new MemoryConsolidationSystem(eventBus);
     agent = world.createEntity();
     agent.addComponent(EpisodicMemoryComponent, {});

@@ -13,7 +13,6 @@ describe('MemoryFormationSystem', () => {
 
   beforeEach(() => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
-    eventBus = new EventBus();
     system = new MemoryFormationSystem(eventBus);
     agent = world.createEntity();
     agent.addComponent(EpisodicMemoryComponent, {});

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { EntityAwakenerSystem } from '../EntityAwakenerSystem.js';
 import { World } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
-import { EventBus } from '../../EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 import type { SleepComponent } from '../../components/SleepComponent.js';
 
 /** Helper to create an entity with auto-generated ID */
@@ -13,11 +13,11 @@ function createEntity(tick = 0): EntityImpl {
 describe('EntityAwakenerSystem', () => {
   let system: EntityAwakenerSystem;
   let world: World;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
     system = new EntityAwakenerSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     world = new World(eventBus);
     system.initialize(world, eventBus);
   });
