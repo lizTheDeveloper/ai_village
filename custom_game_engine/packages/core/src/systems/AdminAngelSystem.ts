@@ -836,11 +836,12 @@ export class AdminAngelSystem extends BaseSystem {
         const errorText = await response.text();
         const error = new Error(`LLM API error: ${response.status} - ${errorText.substring(0, 200)}`);
 
-        // Circuit breaker: disable direct calls after 3 consecutive failures for 60 seconds
+        // Circuit breaker: permanently disable direct calls after 3 consecutive failures.
+        // No retry window — this endpoint (/api/llm/chat) requires the Vite dev proxy and
+        // is not available in production builds. Retrying would only cause periodic spikes.
         this.directCallFailCount++;
         if (this.directCallFailCount >= 3) {
-          this.directCallDisabledUntil = Date.now() + 60000;
-          this.directCallFailCount = 0;
+          this.directCallDisabledUntil = Infinity;
         }
 
         // Emit llm:error event
@@ -887,12 +888,12 @@ export class AdminAngelSystem extends BaseSystem {
     } catch (error) {
       clearTimeout(timeoutId);
 
-      // Circuit breaker: disable direct calls after 3 consecutive failures for 60 seconds
+      // Circuit breaker: permanently disable direct calls after 3 consecutive failures.
+      // No retry window — retrying periodically causes game loop spikes.
       if (error instanceof Error && error.name === 'AbortError') {
         this.directCallFailCount++;
         if (this.directCallFailCount >= 3) {
-          this.directCallDisabledUntil = Date.now() + 60000;
-          this.directCallFailCount = 0;
+          this.directCallDisabledUntil = Infinity;
         }
       }
 
@@ -1113,16 +1114,16 @@ export class AdminAngelSystem extends BaseSystem {
       });
     }
 
-    // Call LLM asynchronously (pass world for metrics tracking)
+    // Dispatch LLM call fire-and-forget — no await, no retry. Results applied when available.
     this.callLLM(prompt, ctx.world)
       .then((response) => {
         this.handleAngelResponseDirect(ctx.world, angel, angelEntity, response);
       })
-      .catch((error) => {
-        console.error('[AdminAngelSystem] Failed to get LLM response:', error);
+      .catch(() => {
+        // LLM unavailable — silently drop. Angel simply won't respond this turn.
         angel.awaitingResponse = false;
 
-        // Clear typing indicator on error
+        // Clear typing indicator
         ctx.world.eventBus.emit({
           type: 'chat:typing_indicator',
           data: {
@@ -1133,25 +1134,6 @@ export class AdminAngelSystem extends BaseSystem {
           },
           source: angelEntity.id,
         });
-
-        // Re-queue the message for retry instead of failing immediately
-        if (playerMessage) {
-          // Extract retry count from message prefix (format: __retry:N__message)
-          const retryMatch = playerMessage.match(/^__retry:(\d+)__(.+)$/s);
-          const retryCount = retryMatch ? parseInt(retryMatch[1]!, 10) : 0;
-          const originalMessage = retryMatch ? retryMatch[2]! : playerMessage;
-          const maxRetries = 3;
-
-          if (retryCount < maxRetries) {
-            // Re-queue with incremented retry count
-            const retryMessage = `__retry:${retryCount + 1}__${originalMessage}`;
-            angel.pendingPlayerMessages.push(retryMessage);
-          } else {
-            // Max retries reached - silently fail, don't show error to player
-            // (A real person would just not respond rather than say "I'm having trouble thinking")
-            console.warn(`[AdminAngelSystem] Max retries reached, silently dropping message`);
-          }
-        }
       })
       .finally(() => {
         this.pendingRequests.delete(requestKey);
@@ -2704,19 +2686,20 @@ export class AdminAngelSystem extends BaseSystem {
     const maxProactiveInterval = angel.proactiveInterval; // Default 1200 ticks (60 seconds)
 
     if (ticksSinceLastProactive >= minProactiveInterval && !angel.awaitingResponse) {
-      // Check if there's something worth saying
-      const { speak, reason } = this.shouldSpeakProactively(angel, ctx.world);
-
-      // Speak if we have a reason, OR if it's been too long and we have pending observations
+      // Compute before calling shouldSpeakProactively (which resets the timer)
       const hasPending = angel.memory.conversation.pendingObservations.length > 0;
       const tooLongSilent = ticksSinceLastProactive >= maxProactiveInterval;
 
+      // Always reset the timer to prevent shouldSpeakProactively (O(n²)) from running every tick
+      angel.memory.conversation.lastProactiveTick = Number(ctx.tick);
+
+      // Check if there's something worth saying
+      const { speak, reason } = this.shouldSpeakProactively(angel, ctx.world);
+
       if (speak || (tooLongSilent && hasPending)) {
-        // Set the trigger for prompt context
         if (reason) {
           angel.memory.consciousness.proactiveTrigger = reason;
         }
-        angel.memory.conversation.lastProactiveTick = Number(ctx.tick);
         this.processTurn(ctx, angel, angelEntity);
       }
     }
