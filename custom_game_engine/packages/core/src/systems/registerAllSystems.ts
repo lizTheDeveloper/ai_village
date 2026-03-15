@@ -337,7 +337,7 @@ import { ReincarnationSystem } from './ReincarnationSystem.js';
 import { SoulCreationSystem } from './SoulCreationSystem.js';
 import { PixelLabSpriteGenerationSystem } from './PixelLabSpriteGenerationSystem.js';
 import { SoulConsolidationSystem } from '../soul/SoulConsolidationSystem.js';
-// SoulRepositorySystem uses Node.js APIs (fs, path) - imported dynamically below
+import { SoulRepositorySystem } from './SoulRepositorySystem.js';
 
 // Clarketech
 import { ClarketechSystem } from '../clarketech/ClarketechSystem.js';
@@ -1005,11 +1005,7 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(new PixelLabSpriteGenerationSystem());
     gameLoop.systemRegistry.register(new SoulConsolidationSystem());
     if (typeof process !== 'undefined' && typeof process.cwd === 'function') {
-      import('./SoulRepositorySystem.js').then(({ SoulRepositorySystem }) => {
-        gameLoop.systemRegistry.register(new SoulRepositorySystem());
-      }).catch(err => {
-        console.warn('[registerAllSystems] SoulRepositorySystem not available:', err.message);
-      });
+      gameLoop.systemRegistry.register(new SoulRepositorySystem());
     }
     registerDisabled(new AfterlifeNeedsSystem());
     registerDisabled(new AncestorTransformationSystem());

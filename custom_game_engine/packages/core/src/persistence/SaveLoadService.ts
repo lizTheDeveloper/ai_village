@@ -17,6 +17,9 @@ import { worldSerializer } from './WorldSerializer.js';
 import { computeChecksumSync, getGameVersion } from './utils.js';
 import { validateWorldState, validateSaveFile } from './InvariantChecker.js';
 import { multiverseCoordinator } from '../multiverse/MultiverseCoordinator.js';
+import { createPassageComponent } from '../components/PassageComponent.js';
+import { createPassageExtended } from '../components/PassageExtendedComponent.js';
+import { EntityImpl } from '../ecs/Entity.js';
 
 // Canon event types for multiverse server sync
 export type CanonEventType =
@@ -466,11 +469,9 @@ export class SaveLoadService {
         const passageEntity = sourceUniverse.world.createEntity();
 
         // Cast to EntityImpl to access addComponent (internal mutable interface)
-        const { EntityImpl } = await import('../ecs/Entity.js');
         const passageEntityImpl = passageEntity as typeof EntityImpl.prototype;
 
         // Add PassageComponent with restored data
-        const { createPassageComponent } = await import('../components/PassageComponent.js');
         const passageComponent = createPassageComponent(
           passageSnapshot.id,
           passageSnapshot.sourceUniverseId,
@@ -486,7 +487,6 @@ export class SaveLoadService {
 
         // Add PassageExtendedComponent with default values
         // (Extended data not currently saved, will use defaults based on type)
-        const { createPassageExtended } = await import('../components/PassageExtendedComponent.js');
         const passageExtended = createPassageExtended(
           passageSnapshot.id,
           passageSnapshot.type,

@@ -40,7 +40,7 @@
 import type { Entity, EntityImpl } from './Entity.js';
 import type { World, WorldMutator } from './World.js';
 import type { EventBus } from '../events/EventBus.js';
-import type { SystemEventManager } from '../events/TypedEventEmitter.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 import type { GameEventMap, EventType } from '../events/EventMap.js';
 import type { System, SystemMetadata } from './System.js';
 import type { Component } from './Component.js';
@@ -598,8 +598,6 @@ export abstract class BaseSystem implements System {
   async initialize(world: WorldMutator, eventBus: EventBus): Promise<void> {
     this.world = world;
 
-    // Import SystemEventManager dynamically to avoid circular deps
-    const { SystemEventManager } = await import('../events/TypedEventEmitter.js');
     this.events = new SystemEventManager(eventBus, this.id);
 
     await this.onInitialize?.(world, eventBus);
@@ -692,7 +690,6 @@ export async function createSystemContext(
   chunkSpatialQuery?: ChunkSpatialQuery,
   skipSimulationFiltering: boolean = false
 ): Promise<SystemContext> {
-  const { SystemEventManager } = await import('../events/TypedEventEmitter.js');
   const events = new SystemEventManager(eventBus, systemId);
 
   return new SystemContextImpl(

@@ -18,6 +18,7 @@
 
 import type { ResearchDefinition } from './types.js';
 import researchData from '../../data/research/spaceship.json';
+import { ResearchRegistry } from './ResearchRegistry.js';
 
 /**
  * Load spaceflight research from JSON data
@@ -60,13 +61,10 @@ export const VR_SYSTEMS = SPACEFLIGHT_RESEARCH.find((r) => r.id === 'spaceflight
  * Register all spaceflight research with the ResearchRegistry.
  */
 export function registerSpaceflightResearch(): void {
-  // Dynamically import to avoid circular dependency
-  import('./ResearchRegistry.js').then(({ ResearchRegistry }) => {
-    const registry = ResearchRegistry.getInstance();
-    for (const research of SPACEFLIGHT_RESEARCH) {
-      if (!registry.has(research.id)) {
-        registry.register(research);
-      }
+  const registry = ResearchRegistry.getInstance();
+  for (const research of SPACEFLIGHT_RESEARCH) {
+    if (!registry.has(research.id)) {
+      registry.register(research);
     }
-  });
+  }
 }

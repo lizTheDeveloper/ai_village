@@ -47,6 +47,7 @@ import {
   getAllTiersOrdered,
   isTierHigherThan,
 } from './types.js';
+import { getAcknowledgmentTrackingSystem } from '../systems/AcknowledgmentTrackingSystem.js';
 
 // Re-export PoliticalTier and utilities for consumers
 export type { PoliticalTier };
@@ -546,28 +547,17 @@ export function delegateDirective(
   if (directive.requiresAcknowledgment) {
     // Use AcknowledgmentTrackingSystem to track acknowledgments
     // The system will monitor timeouts and escalate as needed
-    // Use .then() instead of await since this is a non-async function and tracking is non-blocking
-    import('../systems/AcknowledgmentTrackingSystem.js')
-      .then(({ getAcknowledgmentTrackingSystem }) => {
-        const ackSystem = getAcknowledgmentTrackingSystem();
-        ackSystem.trackDirective(
-          world,
-          fromGovernor.id,
-          directive.id || `directive-${uuidv4()}`,
-          directive.directive,
-          directive.origin,
-          directive.targetTier,
-          toEntities.map(e => e.id),
-          directive.priority
-        );
-      })
-      .catch((error) => {
-        // Fallback: log warning if system not available
-        console.warn(
-          `[DecisionProtocols] Directive ${directive.id} requires acknowledgment from ${toEntities.length} entities. ` +
-          `AcknowledgmentTrackingSystem not available: ${error}`
-        );
-      });
+    const ackSystem = getAcknowledgmentTrackingSystem();
+    ackSystem.trackDirective(
+      world,
+      fromGovernor.id,
+      directive.id || `directive-${uuidv4()}`,
+      directive.directive,
+      directive.origin,
+      directive.targetTier,
+      toEntities.map(e => e.id),
+      directive.priority
+    );
   }
 
   // Emit event for directive issued

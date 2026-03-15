@@ -1,4 +1,5 @@
 import type { Recipe } from './Recipe.js';
+import { autoGenerateAllRecipes } from './RecipeAutoGenerator.js';
 
 /**
  * Registry for storing and retrieving crafting recipes.
@@ -154,9 +155,6 @@ export async function initializeDefaultRecipes(registry: RecipeRegistry = global
     return;
   }
   initializedRegistries.add(registry);
-
-  // Import auto-generator
-  const { autoGenerateAllRecipes } = await import('./RecipeAutoGenerator.js');
 
   // Auto-generate all recipes from items with craftedFrom data
   autoGenerateAllRecipes(registry);
