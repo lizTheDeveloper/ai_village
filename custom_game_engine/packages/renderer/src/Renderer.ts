@@ -1025,13 +1025,13 @@ export class Renderer {
    * @param worldY World Y coordinate (in tile units)
    * @param elevation Optional elevation/z-coordinate (defaults to 0)
    */
-  centerCameraOnWorldPosition(worldX: number, worldY: number, elevation: number = 0): void {
+  centerCameraOnWorldPosition(worldX: number, worldY: number, elevation: number = 0, isIndoor: boolean = false): void {
     // Update 2D camera
     this.camera.setPosition(worldX * this.tileSize, worldY * this.tileSize);
 
     // Also update 3D camera if in 3D mode
     if (this.was3DActive && this.renderer3D) {
-      this.renderer3D.setCameraFromWorld(worldX, worldY, elevation);
+      this.renderer3D.setCameraFromWorld(worldX, worldY, elevation, isIndoor);
     }
   }
 

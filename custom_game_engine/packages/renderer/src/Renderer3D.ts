@@ -632,9 +632,17 @@ export class Renderer3D {
 
   /**
    * Set camera position from 2D coordinates
+   * @param isIndoor When true, uses top-down camera (no Z-offset) to avoid frustum cutoff inside buildings
    */
-  setCameraFromWorld(worldX: number, worldY: number, elevation: number): void {
-    this.camera.position.set(worldX, elevation + 15, worldY + 15);
+  setCameraFromWorld(worldX: number, worldY: number, elevation: number, isIndoor: boolean = false): void {
+    if (isIndoor) {
+      // Interior spaces: position camera directly overhead with no behind-offset.
+      // The outdoor +15 Z-offset pushes the camera behind the entity and causes the
+      // viewing frustum to clip large building interiors, rendering ~60% black.
+      this.camera.position.set(worldX, elevation + 15, worldY);
+    } else {
+      this.camera.position.set(worldX, elevation + 15, worldY + 15);
+    }
     this.camera.lookAt(worldX, elevation, worldY);
   }
 

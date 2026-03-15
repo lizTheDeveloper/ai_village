@@ -4293,7 +4293,9 @@ async function main() {
       const pos = entity.components.get('position') as any;
       if (pos) {
         if ('centerCameraOnWorldPosition' in renderer) {
-          (renderer as any).centerCameraOnWorldPosition(pos.x, pos.y, pos.z || 0);
+          const tile = gameLoop.world.getTileAt?.(Math.floor(pos.x), Math.floor(pos.y));
+          const isIndoor = !!(tile?.floor);
+          (renderer as any).centerCameraOnWorldPosition(pos.x, pos.y, pos.z || 0, isIndoor);
         } else {
           // Fallback: directly set camera position
           const camera = renderer.getCamera();
@@ -4320,7 +4322,9 @@ async function main() {
       const pos = entity.components.get('position') as any;
       if (pos) {
         if ('centerCameraOnWorldPosition' in renderer) {
-          (renderer as any).centerCameraOnWorldPosition(pos.x, pos.y, pos.z || 0);
+          const tile = gameLoop.world.getTileAt?.(Math.floor(pos.x), Math.floor(pos.y));
+          const isIndoor = !!(tile?.floor);
+          (renderer as any).centerCameraOnWorldPosition(pos.x, pos.y, pos.z || 0, isIndoor);
         } else {
           // Fallback: directly set camera position
           const camera = renderer.getCamera();
