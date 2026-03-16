@@ -108,12 +108,19 @@ describe('SoilSystem', () => {
 
     it('should modify decay based on season (summer = +25%)', () => {
       const world = new World(eventBus);
-      // Set the world to summer season (index 1)
-      // Season cycle: spring (0), summer (1), autumn (2), winter (3)
-      // Days: 0-27 = spring, 28-55 = summer, 56-83 = autumn, 84-111 = winter
-      // 1200 ticks/hour * 24 hours/day = 28,800 ticks/day
-      // Day 28 = 28 * 28,800 = 806,400 ticks
-      world.setTick(28 * 24 * 1200); // Day 28 = first day of summer
+      // Create time entity with summer season for getCurrentSeason() lookup
+      const timeEntity = world.createEntity();
+      timeEntity.addComponent({
+        type: 'time',
+        version: 1,
+        timeOfDay: 12,
+        dayLength: 48,
+        speedMultiplier: 1,
+        phase: 'day' as const,
+        lightLevel: 1.0,
+        day: 120,
+        season: 'summer' as const,
+      });
 
       const tile = {
         terrain: 'dirt',
@@ -140,10 +147,19 @@ describe('SoilSystem', () => {
 
     it('should modify decay based on season (winter = -50%)', () => {
       const world = new World(eventBus);
-      // Set the world to winter season (index 3)
-      // Days: 84-111 = winter
-      // Day 84 = 84 * 28,800 = 2,419,200 ticks
-      world.setTick(84 * 24 * 1200); // Day 84 = first day of winter
+      // Create time entity with winter season for getCurrentSeason() lookup
+      const timeEntity = world.createEntity();
+      timeEntity.addComponent({
+        type: 'time',
+        version: 1,
+        timeOfDay: 12,
+        dayLength: 48,
+        speedMultiplier: 1,
+        phase: 'day' as const,
+        lightLevel: 1.0,
+        day: 300,
+        season: 'winter' as const,
+      });
 
       const tile = {
         terrain: 'dirt',

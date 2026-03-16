@@ -48,17 +48,8 @@ describe('SoilSystem Weather Integration (Simple)', () => {
   });
 
   it('should call onInitialize when system context initializes', () => {
-    // Create a mock system context
-    const ctx = {
-      world,
-      deltaTime: 0.05,
-      activeEntities: [],
-      components: () => ({}) as unknown,
-      getSingleton: () => undefined,
-    } as SystemContext;
-
-    // Call onInitialize
-    (soilSystem as Record<string, unknown>).onInitialize(ctx);
+    // onInitialize takes a World (not SystemContext) - it subscribes to events
+    (soilSystem as Record<string, unknown>).onInitialize(world);
 
     // Verify event listeners were registered
     expect((soilSystem as Record<string, unknown>).initialized).toBe(true);
