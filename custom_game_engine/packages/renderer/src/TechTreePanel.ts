@@ -58,6 +58,37 @@ interface TreeCamera {
 }
 
 // ============================================================================
+// Field configuration
+// ============================================================================
+
+const FIELD_CONFIG: Record<string, { color: string; glow: string; emoji: string; label: string }> = {
+  agriculture: { color: '#4CAF50', glow: 'rgba(76, 175, 80, 0.4)', emoji: '🌾', label: 'Agriculture' },
+  metallurgy:  { color: '#a07050', glow: 'rgba(160, 112, 80, 0.4)', emoji: '⚒️', label: 'Metallurgy' },
+  alchemy:     { color: '#c060e8', glow: 'rgba(192, 96, 232, 0.4)', emoji: '⚗️', label: 'Alchemy' },
+  society:     { color: '#4090e8', glow: 'rgba(64, 144, 232, 0.4)', emoji: '🏛️', label: 'Society' },
+  nature:      { color: '#7ac040', glow: 'rgba(122, 192, 64, 0.4)', emoji: '🍃', label: 'Nature' },
+  construction:{ color: '#e89020', glow: 'rgba(232, 144, 32, 0.4)', emoji: '🪨', label: 'Construction' },
+  arcane:      { color: '#9060d8', glow: 'rgba(144, 96, 216, 0.4)', emoji: '✨', label: 'Arcane' },
+};
+
+const DEFAULT_FIELD = { color: '#888', glow: 'rgba(128,128,128,0.3)', emoji: '📜', label: 'Unknown' };
+
+function getFieldCfg(field: string) {
+  return FIELD_CONFIG[field] ?? DEFAULT_FIELD;
+}
+
+// Pre-generated star positions (deterministic)
+const STARS: Array<{ x: number; y: number; r: number; a: number }> = (() => {
+  const out: Array<{ x: number; y: number; r: number; a: number }> = [];
+  let seed = 42;
+  const rng = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 0xffffffff; };
+  for (let i = 0; i < 200; i++) {
+    out.push({ x: rng() * 4000 - 2000, y: rng() * 4000 - 2000, r: rng() * 1.2 + 0.3, a: rng() * 0.5 + 0.2 });
+  }
+  return out;
+})();
+
+// ============================================================================
 // Tech Tree Panel
 // ============================================================================
 
@@ -319,11 +350,17 @@ export class TechTreePanel implements IWindowPanel {
   ): void {
     if (!this.visible || !world) return;
 
+    const now = performance.now();
+
     // Rebuild tree from published papers in world
     this.rebuildTreeFromWorld(world);
 
-    // Clear background
-    ctx.fillStyle = '#1a1a2e';
+    // Deep space gradient background
+    const bg = ctx.createLinearGradient(0, 0, width, height);
+    bg.addColorStop(0, '#0d0b1e');
+    bg.addColorStop(0.5, '#110d22');
+    bg.addColorStop(1, '#0a0818');
+    ctx.fillStyle = bg;
     ctx.fillRect(0, 0, width, height);
 
     // Save context for camera transform
@@ -334,159 +371,493 @@ export class TechTreePanel implements IWindowPanel {
     ctx.scale(this.camera.zoom, this.camera.zoom);
     ctx.translate(-this.camera.x, -this.camera.y);
 
+    // Star field (world-space, so they pan with camera)
+    this.renderStars(ctx, now);
+
+    // Tier column background strips
+    this.renderTierColumns(ctx);
+
     // Render connections first (behind nodes)
-    this.renderConnections(ctx);
+    this.renderConnections(ctx, now);
 
     // Render nodes
-    this.renderNodes(ctx);
+    this.renderNodes(ctx, now);
 
     // Restore context
     ctx.restore();
 
     // Render UI overlay (not affected by camera)
-    this.renderOverlay(ctx, width, height);
+    this.renderOverlay(ctx, width, height, now);
+
+    // Selected node detail panel
+    if (this.selectedPaperId) {
+      const node = this.nodes.get(this.selectedPaperId);
+      if (node) this.renderDetailPanel(ctx, node, width, height);
+    }
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+
+  private renderStars(ctx: CanvasRenderingContext2D, _now: number): void {
+    for (const star of STARS) {
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 255, 255, ${star.a})`;
+      ctx.fill();
+    }
+  }
+
+  private renderTierColumns(ctx: CanvasRenderingContext2D): void {
+    // Collect distinct tiers
+    const tiers = new Set<number>();
+    for (const node of this.nodes.values()) {
+      const tier = node.paper.tier ?? node.paper.complexity ?? 1;
+      tiers.add(tier);
+    }
+
+    for (const tier of tiers) {
+      const colX = tier * this.TIER_SPACING_X - 10;
+      const colW = this.NODE_WIDTH + 20;
+
+      // Subtle column tint
+      ctx.fillStyle = 'rgba(255,255,255,0.015)';
+      ctx.fillRect(colX, -1200, colW, 2400);
+
+      // Tier label at top
+      ctx.font = 'bold 11px Arial';
+      ctx.fillStyle = 'rgba(255,255,255,0.2)';
+      ctx.textAlign = 'center';
+      ctx.fillText(`Tier ${tier}`, colX + colW / 2, -1100);
+      ctx.textAlign = 'left';
+    }
   }
 
   /**
-   * Render connections between nodes
+   * Render connections between nodes with glowing gradient lines + arrowheads
    */
-  private renderConnections(ctx: CanvasRenderingContext2D): void {
-    ctx.strokeStyle = '#444';
-    ctx.lineWidth = 2;
-
+  private renderConnections(ctx: CanvasRenderingContext2D, now: number): void {
     for (const conn of this.connections) {
       const fromNode = this.nodes.get(conn.fromPaperId);
       const toNode = this.nodes.get(conn.toPaperId);
 
       if (!fromNode || !toNode) continue;
-
-      // Apply filters
       if (!this.shouldShowNode(fromNode) || !this.shouldShowNode(toNode)) continue;
 
-      // Calculate connection points
       const fromX = fromNode.x + this.NODE_WIDTH;
       const fromY = fromNode.y + this.NODE_HEIGHT / 2;
-      const toX = toNode.x;
-      const toY = toNode.y + this.NODE_HEIGHT / 2;
+      const toX   = toNode.x;
+      const toY   = toNode.y + this.NODE_HEIGHT / 2;
+      const cpOff = (toX - fromX) / 2;
 
-      // Draw bezier curve
-      ctx.beginPath();
-      ctx.moveTo(fromX, fromY);
-      const controlPointOffset = (toX - fromX) / 2;
-      ctx.bezierCurveTo(
-        fromX + controlPointOffset, fromY,
-        toX - controlPointOffset, toY,
-        toX, toY
-      );
+      const isHighlighted =
+        conn.fromPaperId === this.selectedPaperId ||
+        conn.toPaperId   === this.selectedPaperId ||
+        conn.fromPaperId === this.hoveredPaperId  ||
+        conn.toPaperId   === this.hoveredPaperId;
 
-      // Color based on status
-      if (fromNode.status === 'published' && toNode.status === 'published') {
-        ctx.strokeStyle = '#4CAF50'; // Green for published chain
-      } else {
-        ctx.strokeStyle = '#444'; // Gray for unpublished
+      const fromCfg = getFieldCfg(fromNode.paper.field);
+      const toCfg   = getFieldCfg(toNode.paper.field);
+
+      // Glow pass for highlighted connections
+      if (isHighlighted) {
+        const pulse = 0.5 + 0.5 * Math.sin(now / 400);
+        ctx.save();
+        ctx.shadowColor = fromCfg.glow;
+        ctx.shadowBlur = 12 + pulse * 6;
+        ctx.strokeStyle = `rgba(255,255,255,${0.15 + pulse * 0.1})`;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(fromX, fromY);
+        ctx.bezierCurveTo(fromX + cpOff, fromY, toX - cpOff, toY, toX, toY);
+        ctx.stroke();
+        ctx.restore();
       }
 
+      // Gradient line from-field → to-field color
+      const grad = ctx.createLinearGradient(fromX, fromY, toX, toY);
+      grad.addColorStop(0, fromCfg.color + (isHighlighted ? 'cc' : '66'));
+      grad.addColorStop(1, toCfg.color  + (isHighlighted ? 'cc' : '66'));
+
+      ctx.beginPath();
+      ctx.moveTo(fromX, fromY);
+      ctx.bezierCurveTo(fromX + cpOff, fromY, toX - cpOff, toY, toX, toY);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = isHighlighted ? 2.5 : 1.5;
       ctx.stroke();
+
+      // Small arrowhead at toX, toY
+      const arrowSize = 7;
+      // Approximate tangent direction at end of bezier
+      const tx = toX - (toX - cpOff) * 0.01;
+      const ty = toY - (toNode.y + this.NODE_HEIGHT / 2 - toY) * 0.01;
+      const angle = Math.atan2(toY - (fromY + toY) / 2, toX - (fromX + toX) / 2);
+      ctx.save();
+      ctx.translate(toX, toY);
+      ctx.rotate(angle);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(-arrowSize, -arrowSize / 2);
+      ctx.lineTo(-arrowSize, arrowSize / 2);
+      ctx.closePath();
+      ctx.fillStyle = toCfg.color + (isHighlighted ? 'dd' : '88');
+      ctx.fill();
+      ctx.restore();
     }
   }
 
   /**
-   * Render nodes
+   * Render nodes as polished cards
    */
-  private renderNodes(ctx: CanvasRenderingContext2D): void {
+  private renderNodes(ctx: CanvasRenderingContext2D, now: number): void {
+    const NW = this.NODE_WIDTH;
+    const NH = this.NODE_HEIGHT;
+    const R  = 8; // corner radius
+
     for (const [paperId, node] of this.nodes) {
       if (!this.shouldShowNode(node)) continue;
 
       const isSelected = paperId === this.selectedPaperId;
-      const isHovered = paperId === this.hoveredPaperId;
+      const isHovered  = paperId === this.hoveredPaperId;
+      const cfg = getFieldCfg(node.paper.field);
+      const { x, y } = node;
 
-      // Node background
-      ctx.fillStyle = this.getNodeColor(node.status);
-      ctx.fillRect(node.x, node.y, this.NODE_WIDTH, this.NODE_HEIGHT);
+      // ── Drop shadow
+      ctx.save();
+      ctx.shadowColor = isSelected ? 'rgba(255, 215, 0, 0.5)'
+                      : isHovered  ? `${cfg.glow}`
+                      : 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = isSelected ? 18 : isHovered ? 14 : 8;
+      ctx.shadowOffsetY = 3;
 
-      // Node border
-      ctx.strokeStyle = isSelected ? '#FFD700' : isHovered ? '#FFF' : '#666';
-      ctx.lineWidth = isSelected || isHovered ? 3 : 1;
-      ctx.strokeRect(node.x, node.y, this.NODE_WIDTH, this.NODE_HEIGHT);
+      // ── Card background gradient
+      const bgGrad = ctx.createLinearGradient(x, y, x, y + NH);
+      if (node.status === 'published') {
+        bgGrad.addColorStop(0, 'rgba(18, 24, 36, 0.97)');
+        bgGrad.addColorStop(1, 'rgba(10, 14, 22, 0.97)');
+      } else if (node.status === 'read') {
+        bgGrad.addColorStop(0, 'rgba(16, 22, 40, 0.97)');
+        bgGrad.addColorStop(1, 'rgba(8, 12, 28, 0.97)');
+      } else {
+        bgGrad.addColorStop(0, 'rgba(20, 18, 28, 0.88)');
+        bgGrad.addColorStop(1, 'rgba(12, 10, 18, 0.88)');
+      }
 
-      // Paper title (truncated)
-      ctx.fillStyle = '#FFF';
+      ctx.beginPath();
+      ctx.roundRect(x, y, NW, NH, R);
+      ctx.fillStyle = bgGrad;
+      ctx.fill();
+      ctx.restore();
+
+      // ── Border
+      ctx.save();
+      if (isSelected) {
+        const pulse = 0.5 + 0.5 * Math.sin(now / 300);
+        ctx.shadowColor = 'rgba(255, 215, 0, 0.8)';
+        ctx.shadowBlur  = 12 + pulse * 8;
+        ctx.strokeStyle = `rgba(255, 215, 0, ${0.8 + pulse * 0.2})`;
+        ctx.lineWidth = 2.5;
+      } else if (isHovered) {
+        const pulse = 0.5 + 0.5 * Math.sin(now / 450);
+        ctx.shadowColor = cfg.glow;
+        ctx.shadowBlur  = 8 + pulse * 6;
+        ctx.strokeStyle = cfg.color + 'cc';
+        ctx.lineWidth = 2;
+      } else {
+        ctx.strokeStyle = cfg.color + '44';
+        ctx.lineWidth = 1;
+      }
+      ctx.beginPath();
+      ctx.roundRect(x, y, NW, NH, R);
+      ctx.stroke();
+      ctx.restore();
+
+      // ── Field-colored left accent bar
+      ctx.save();
+      ctx.beginPath();
+      ctx.roundRect(x, y + R, 3, NH - R * 2, 1);
+      ctx.fillStyle = cfg.color + 'cc';
+      ctx.fill();
+      ctx.restore();
+
+      // ── Field emoji + title row
+      const emoji = cfg.emoji;
       ctx.font = 'bold 11px Arial';
-      const maxWidth = this.NODE_WIDTH - 16;
+      ctx.fillStyle = '#e8e0f0';
+      const maxTitleW = NW - 28;
       let title = node.paper.title;
-      while (ctx.measureText(title).width > maxWidth && title.length > 0) {
+      while (ctx.measureText(title).width > maxTitleW && title.length > 0) {
         title = title.slice(0, -1);
       }
-      if (title.length < node.paper.title.length) {
-        title += '...';
-      }
-      ctx.fillText(title, node.x + 8, node.y + 18);
+      if (title.length < node.paper.title.length) title += '…';
 
-      // Field
-      ctx.font = '9px Arial';
-      ctx.fillStyle = this.getFieldColor(node.paper.field);
-      ctx.fillText(node.paper.field, node.x + 8, node.y + 34);
+      ctx.fillText(emoji, x + 10, y + 17);
+      ctx.fillText(title, x + 24, y + 17);
 
-      // Status info
+      // ── Thin separator line
+      ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x + 10, y + 23);
+      ctx.lineTo(x + NW - 10, y + 23);
+      ctx.stroke();
+
+      // ── Field label
       ctx.font = '9px Arial';
-      ctx.fillStyle = '#CCC';
+      ctx.fillStyle = cfg.color + 'cc';
+      ctx.fillText(cfg.label, x + 10, y + 34);
+
+      // ── Status badge
+      this.renderStatusBadge(ctx, node, x + NW - 10, y + 34);
+
+      // ── Author / location lines
       if (node.status === 'published') {
-        ctx.fillText(`✓ Published`, node.x + 8, node.y + 50);
+        ctx.font = '9px Arial';
         if (node.authorName) {
-          ctx.fillText(`By ${node.authorName}`, node.x + 8, node.y + 64);
+          ctx.fillStyle = '#b8a8d8'; // soft lavender
+          ctx.fillText(`✍ ${node.authorName}`, x + 10, y + 52);
         }
         if (node.locationName) {
-          ctx.fillText(`@ ${node.locationName}`, node.x + 8, node.y + 78);
+          ctx.fillStyle = '#d8a060'; // warm amber
+          let loc = node.locationName;
+          while (ctx.measureText(`📍 ${loc}`).width > maxTitleW && loc.length > 0) loc = loc.slice(0, -1);
+          if (loc.length < node.locationName.length) loc += '…';
+          ctx.fillText(`📍 ${loc}`, x + 10, y + 66);
         }
       } else {
-        ctx.fillText('Not yet published', node.x + 8, node.y + 50);
+        ctx.font = 'italic 9px Arial';
+        ctx.fillStyle = 'rgba(180,170,200,0.5)';
+        ctx.fillText('Not yet published', x + 10, y + 52);
+      }
+
+      // ── Prerequisite count badge (bottom-right)
+      const prereqCount = node.paper.prerequisitePapers.length;
+      if (prereqCount > 0) {
+        const badgeX = x + NW - 12;
+        const badgeY = y + NH - 12;
+        ctx.font = '8px Arial';
+        ctx.fillStyle = 'rgba(255,255,255,0.12)';
+        ctx.beginPath();
+        ctx.roundRect(badgeX - 16, badgeY - 9, 22, 12, 4);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(200,180,240,0.6)';
+        ctx.textAlign = 'center';
+        ctx.fillText(`↖${prereqCount}`, badgeX - 5, badgeY);
+        ctx.textAlign = 'left';
       }
     }
+  }
+
+  /**
+   * Small pill status badge
+   */
+  private renderStatusBadge(
+    ctx: CanvasRenderingContext2D,
+    node: TechTreeNode,
+    rightX: number,
+    y: number
+  ): void {
+    let label: string;
+    let bgColor: string;
+    let textColor: string;
+
+    switch (node.status) {
+      case 'published':
+        label = '✓ Published';
+        bgColor = 'rgba(76, 175, 80, 0.2)';
+        textColor = '#6ee87a';
+        break;
+      case 'read':
+        label = '👁 Read';
+        bgColor = 'rgba(64, 144, 232, 0.2)';
+        textColor = '#70b8f8';
+        break;
+      default:
+        label = '○ Pending';
+        bgColor = 'rgba(120, 100, 160, 0.15)';
+        textColor = 'rgba(200,180,240,0.5)';
+    }
+
+    ctx.font = '8px Arial';
+    const tw = ctx.measureText(label).width;
+    const ph = 11;
+    const pw = tw + 8;
+    const bx = rightX - pw;
+    const by = y - 10;
+
+    ctx.beginPath();
+    ctx.roundRect(bx, by, pw, ph, 4);
+    ctx.fillStyle = bgColor;
+    ctx.fill();
+    ctx.fillStyle = textColor;
+    ctx.fillText(label, bx + 4, by + 8);
   }
 
   /**
    * Render UI overlay (filters, controls, etc.)
    */
-  private renderOverlay(ctx: CanvasRenderingContext2D, width: number, height: number): void {
-    // Filter panel
-    const panelWidth = 200;
-    const panelHeight = 150;
-    const panelX = width - panelWidth - 20;
-    const panelY = 20;
+  private renderOverlay(ctx: CanvasRenderingContext2D, width: number, height: number, _now: number): void {
+    const panelWidth  = 210;
+    const panelX = width - panelWidth - 16;
+    const panelY = 16;
 
-    ctx.fillStyle = 'rgba(30, 30, 40, 0.95)';
-    ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
+    // Field filter buttons
+    const fields = ['all', ...Object.keys(FIELD_CONFIG)] as Array<ResearchField | 'all'>;
+    const btnH = 20;
+    const gap  = 4;
+    const panelHeight = 16 + (btnH + gap) * fields.length + 60 + 8;
 
-    ctx.strokeStyle = '#666';
+    // Panel background
+    const panelBg = ctx.createLinearGradient(panelX, panelY, panelX, panelY + panelHeight);
+    panelBg.addColorStop(0, 'rgba(20, 16, 36, 0.97)');
+    panelBg.addColorStop(1, 'rgba(12, 10, 24, 0.97)');
+    ctx.beginPath();
+    ctx.roundRect(panelX, panelY, panelWidth, panelHeight, 8);
+    ctx.fillStyle = panelBg;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
     ctx.lineWidth = 1;
-    ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
+    ctx.beginPath();
+    ctx.roundRect(panelX, panelY, panelWidth, panelHeight, 8);
+    ctx.stroke();
 
     // Title
-    ctx.fillStyle = '#FFD700';
-    ctx.font = 'bold 12px Arial';
-    ctx.fillText('Filters', panelX + 10, panelY + 20);
+    ctx.fillStyle = '#d4c080';
+    ctx.font = 'bold 11px Arial';
+    ctx.fillText('🔬 Research Fields', panelX + 10, panelY + 16);
 
-    // Show counts
-    let y = panelY + 40;
-    ctx.font = '10px Arial';
-    ctx.fillStyle = '#CCC';
-    ctx.fillText(`Total: ${this.nodes.size} papers`, panelX + 10, y);
-    y += 16;
+    // Field buttons
+    let fy = panelY + 26;
+    for (const field of fields) {
+      const isActive = this.selectedField === field;
+      const cfg = field === 'all' ? { color: '#aaa', glow: 'rgba(180,180,180,0.3)', emoji: '📚', label: 'All Fields' }
+                                  : getFieldCfg(field);
 
+      ctx.beginPath();
+      ctx.roundRect(panelX + 8, fy, panelWidth - 16, btnH, 5);
+      if (isActive) {
+        ctx.fillStyle = cfg.color + '33';
+      } else {
+        ctx.fillStyle = 'rgba(255,255,255,0.04)';
+      }
+      ctx.fill();
+      if (isActive) {
+        ctx.strokeStyle = cfg.color + '88';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // Color dot
+      ctx.beginPath();
+      ctx.arc(panelX + 18, fy + btnH / 2, 4, 0, Math.PI * 2);
+      ctx.fillStyle = cfg.color;
+      ctx.fill();
+
+      ctx.font = '10px Arial';
+      ctx.fillStyle = isActive ? '#fff' : 'rgba(200,190,220,0.75)';
+      ctx.fillText(`${cfg.emoji} ${cfg.label}`, panelX + 27, fy + 14);
+
+      fy += btnH + gap;
+    }
+
+    // Stats divider
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(panelX + 10, fy + 4);
+    ctx.lineTo(panelX + panelWidth - 10, fy + 4);
+    ctx.stroke();
+    fy += 14;
+
+    // Paper counts
     const publishedCount = Array.from(this.nodes.values()).filter(n => n.status === 'published').length;
-    ctx.fillText(`Published: ${publishedCount}`, panelX + 10, y);
-    y += 16;
-
-    const unpublishedCount = Array.from(this.nodes.values()).filter(n => n.status === 'unpublished').length;
-    ctx.fillText(`Unpublished: ${unpublishedCount}`, panelX + 10, y);
-    y += 20;
-
-    // Instructions
     ctx.font = '9px Arial';
-    ctx.fillStyle = '#999';
-    ctx.fillText('Drag to pan', panelX + 10, y);
-    y += 14;
-    ctx.fillText('Scroll to zoom', panelX + 10, y);
+    ctx.fillStyle = 'rgba(180,170,210,0.7)';
+    ctx.fillText(`${this.nodes.size} papers total`, panelX + 10, fy);
+    fy += 14;
+    ctx.fillStyle = '#6ee87a';
+    ctx.fillText(`✓ ${publishedCount} published`, panelX + 10, fy);
+    fy += 14;
+
+    // Controls hint
+    ctx.font = '8px Arial';
+    ctx.fillStyle = 'rgba(140,130,170,0.5)';
+    ctx.fillText('Drag to pan  •  Scroll to zoom', panelX + 10, fy);
+  }
+
+  /**
+   * Selected paper detail panel (bottom-left)
+   */
+  private renderDetailPanel(ctx: CanvasRenderingContext2D, node: TechTreeNode, _width: number, height: number): void {
+    const cfg = getFieldCfg(node.paper.field);
+    const pw = 320;
+    const ph = 130;
+    const px = 16;
+    const py = height - ph - 16;
+
+    // Background
+    const bg = ctx.createLinearGradient(px, py, px, py + ph);
+    bg.addColorStop(0, 'rgba(18, 14, 34, 0.98)');
+    bg.addColorStop(1, 'rgba(10, 8, 22, 0.98)');
+    ctx.beginPath();
+    ctx.roundRect(px, py, pw, ph, 8);
+    ctx.fillStyle = bg;
+    ctx.fill();
+
+    // Border with field color
+    ctx.strokeStyle = cfg.color + '66';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(px, py, pw, ph, 8);
+    ctx.stroke();
+
+    // Left accent bar
+    ctx.fillStyle = cfg.color + 'bb';
+    ctx.beginPath();
+    ctx.roundRect(px, py + 8, 3, ph - 16, 2);
+    ctx.fill();
+
+    // Title
+    ctx.font = 'bold 12px Arial';
+    ctx.fillStyle = '#f0e8ff';
+    ctx.fillText(`${cfg.emoji} ${node.paper.title}`, px + 12, py + 18);
+
+    // Separator
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(px + 12, py + 24);
+    ctx.lineTo(px + pw - 12, py + 24);
+    ctx.stroke();
+
+    // Details grid
+    let dy = py + 38;
+    ctx.font = '10px Arial';
+
+    if (node.paper.description) {
+      ctx.fillStyle = 'rgba(200,190,220,0.8)';
+      let desc = node.paper.description;
+      if (desc.length > 80) desc = desc.slice(0, 77) + '…';
+      ctx.fillText(desc, px + 12, dy);
+      dy += 16;
+    }
+
+    if (node.authorName) {
+      ctx.fillStyle = '#b8a8d8';
+      ctx.fillText(`✍ Author: ${node.authorName}`, px + 12, dy);
+      dy += 14;
+    }
+
+    if (node.locationName) {
+      ctx.fillStyle = '#d8a060';
+      ctx.fillText(`📍 Location: ${node.locationName}`, px + 12, dy);
+      dy += 14;
+    }
+
+    const prereqs = node.paper.prerequisitePapers.length;
+    ctx.fillStyle = 'rgba(180,170,210,0.6)';
+    ctx.font = '9px Arial';
+    const tier = node.paper.tier ?? node.paper.complexity ?? 1;
+    ctx.fillText(`Tier ${tier}  •  Field: ${cfg.label}  •  Prerequisites: ${prereqs}`, px + 12, py + ph - 10);
   }
 
   /**
@@ -507,16 +878,7 @@ export class TechTreePanel implements IWindowPanel {
    * Get color for field
    */
   private getFieldColor(field: ResearchField): string {
-    const fieldColors: Record<string, string> = {
-      agriculture: '#4CAF50',
-      metallurgy: '#795548',
-      alchemy: '#9C27B0',
-      society: '#2196F3',
-      nature: '#8BC34A',
-      construction: '#FF9800',
-      arcane: '#673AB7',
-    };
-    return fieldColors[field] || '#666';
+    return getFieldCfg(field).color;
   }
 
   /**
