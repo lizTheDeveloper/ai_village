@@ -148,6 +148,8 @@ import {
   UniverseConfigScreen,
   UniverseBrowserScreen,
   PlanetJoinScreen,
+  showGenesisVision,
+  hasShownGenesis,
   type UniverseBrowserResult,
   type GameStartConfig,
   SettlementSelectionScreen,
@@ -5343,6 +5345,22 @@ async function main() {
       console.log('[CreationState] Creation state cleared (genesis complete)');
     } catch (error) {
       console.error('[InitialSave] Failed to create initial snapshot:', error);
+    }
+  }
+
+  // Show Genesis Vision cinematic for new saves (Drive 1: Epic Meaning)
+  if (!loadedCheckpoint) {
+    const genesisUniverseId = gameLoop.universeId || 'local-universe';
+    if (!hasShownGenesis(genesisUniverseId)) {
+      const extConfig = universeConfig as any;
+      await showGenesisVision({
+        universeName: universeConfig?.universeName || 'Unknown Universe',
+        planetName: extConfig?.planetName || 'the new world',
+        magicIntensity: universeConfig?.magicParadigmId || 'unknown',
+        cosmicDeityNames: extConfig?.cosmicDeities?.map((d: any) => d.name) ?? [],
+        universeId: genesisUniverseId,
+        llmProvider: llmProvider,
+      });
     }
   }
 

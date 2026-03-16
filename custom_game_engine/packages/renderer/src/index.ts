@@ -62,6 +62,7 @@ export * from './TimelinePanel.js';
 export * from './UniverseConfigScreen.js';
 export * from './CosmicHubScreen.js';
 export * from './UniverseCreationScreen.js';
+export * from './GenesisCinematicPanel.js';
 export * from './PlanetCreationScreen.js';
 export * from './CosmicHubManager.js';
 export * from './UniverseGalleryScreen.js';
