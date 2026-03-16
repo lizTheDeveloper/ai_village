@@ -9,9 +9,10 @@ describe('GuardDutySystem', () => {
   let eventBus: EventBusImpl;
   let system: GuardDutySystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new GuardDutySystem(eventBus);
+    await system.initialize(world, eventBus);
   });
 
   describe('Alertness Decay', () => {

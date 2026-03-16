@@ -44,10 +44,11 @@ describe('GalacticCouncilSystem', () => {
   let councilEntity: EntityImpl;
   let councilComp: GalacticCouncilComponent;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
     system = new GalacticCouncilSystem();
+    await system.initialize(world, eventBus);
 
     // Create galactic council entity
     councilEntity = world.createEntity() as EntityImpl;

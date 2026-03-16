@@ -11,9 +11,10 @@ describe('MemoryFormationSystem', () => {
   let eventBus: EventBus;
   let agent: any;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new MemoryFormationSystem(eventBus);
+    await system.initialize(world, eventBus);
     agent = world.createEntity();
     agent.addComponent(EpisodicMemoryComponent, {});
   });

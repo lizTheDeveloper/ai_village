@@ -26,7 +26,7 @@ describe('AgentCombatSystem', () => {
   let witness: Entity;
   let mockLLM: any;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
     mockLLM = {
       generateNarrative: vi.fn().mockResolvedValue({
@@ -35,6 +35,7 @@ describe('AgentCombatSystem', () => {
       }),
     };
     system = new AgentCombatSystem(mockLLM, eventBus);
+    await system.initialize(world, eventBus);
 
     // Create attacker
     attacker = world.createEntity();

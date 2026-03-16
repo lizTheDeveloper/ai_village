@@ -11,11 +11,10 @@ describe('StateMutatorSystem', () => {
   let eventBus: EventBusImpl;
   let system: StateMutatorSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new StateMutatorSystem();
-    // Initialize events (BaseSystem requires this for SystemContext)
-    system['events'] = { cleanup: () => {}, emit: () => {} } as unknown;
+    await system.initialize(world, eventBus);
   });
 
   describe('Basic Mutation Application', () => {

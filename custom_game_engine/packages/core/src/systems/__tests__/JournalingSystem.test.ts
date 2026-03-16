@@ -15,10 +15,11 @@ describe('JournalingSystem', () => {
   let eventBus: EventBusImpl;
   let agent: any;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
     system = new JournalingSystem(eventBus);
+    await system.initialize(world, eventBus);
     agent = world.createEntity();
 
     // Add AgentComponent

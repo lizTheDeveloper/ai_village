@@ -25,11 +25,12 @@ describe('AfterlifeNeedsSystem', () => {
   let system: AfterlifeNeedsSystem;
   let stateMutatorSystem: StateMutatorSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     const harness = createMinimalWorld();
     world = harness.world;
     system = new AfterlifeNeedsSystem();
     stateMutatorSystem = new StateMutatorSystem();
+    await system.initialize(world, harness.eventBus);
   });
 
   /**

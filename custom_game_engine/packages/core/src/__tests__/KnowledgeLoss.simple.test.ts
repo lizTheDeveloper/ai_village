@@ -13,10 +13,11 @@ describe('KnowledgeLoss', () => {
   let system: DeathTransitionSystem;
   let eventBus: EventBus;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
     system = new DeathTransitionSystem(eventBus);
+    await system.initialize(world, eventBus);
   });
 
   it('should track unique memories as lost when agent dies', () => {

@@ -11,13 +11,14 @@ describe('HuntingSystem', () => {
   let hunter: Entity;
   let prey: Entity;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
     const mockLLM = vi.fn().mockResolvedValue({
       narrative: 'The hunter tracked the prey through the forest.',
       memorable_details: ['successful hunt'],
     });
     system = new HuntingSystem(eventBus, mockLLM);
+    await system.initialize(world, eventBus);
 
     // Create hunter entity
     hunter = world.createEntity();

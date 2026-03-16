@@ -24,9 +24,10 @@ describe('InjurySystem', () => {
   let system: InjurySystem;
   let agent: Entity;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new InjurySystem();
+    await system.initialize(world, eventBus);
 
     agent = world.createEntity();
     agent.addComponent('position', { x: 0, y: 0, z: 0 });

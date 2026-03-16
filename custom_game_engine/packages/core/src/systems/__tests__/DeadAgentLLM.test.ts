@@ -22,9 +22,10 @@ describe('Dead Agent LLM Prevention', () => {
   let eventBus: EventBusImpl;
   let system: AgentBrainSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new AgentBrainSystem();
+    await system.initialize(world, eventBus);
   });
 
   it('should skip AI processing for dead agents (health = 0)', () => {

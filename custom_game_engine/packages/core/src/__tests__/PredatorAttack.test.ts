@@ -12,10 +12,11 @@ describe.skip('PredatorAttackSystem', () => {
   let agent: Entity;
   let ally: Entity;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     const eventBus = new EventBusImpl();
     world = new World(eventBus);
     system = new PredatorAttackSystem();
+    await system.initialize(world, eventBus);
 
     // Create predator (wolf)
     predator = world.createEntity();

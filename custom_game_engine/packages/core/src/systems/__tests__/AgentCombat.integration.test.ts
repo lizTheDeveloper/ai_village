@@ -14,7 +14,7 @@ import { createCombatStatsComponent } from '../../components/CombatStatsComponen
  */
 
 describe('AgentCombatSystem Integration', () => {
-  it('should resolve agent vs agent combat with skill-based outcome', () => {
+  it('should resolve agent vs agent combat with skill-based outcome', async () => {
     // Create world with real EventBus
     const eventBus = new EventBusImpl();
     const world = new World(eventBus);
@@ -100,6 +100,7 @@ describe('AgentCombatSystem Integration', () => {
 
     // Create and run the system
     const system = new AgentCombatSystem(mockLLM, eventBus);
+    await system.initialize(world, eventBus);
     system.update(world, [attacker, defender], 1);
 
     // Verify combat was resolved
@@ -114,7 +115,7 @@ describe('AgentCombatSystem Integration', () => {
     // But we don't enforce deterministic outcome - it's probability-based
   });
 
-  it('should apply injuries when combat causes damage', () => {
+  it('should apply injuries when combat causes damage', async () => {
     const eventBus = new EventBusImpl();
     const world = new World(eventBus);
 
@@ -194,6 +195,7 @@ describe('AgentCombatSystem Integration', () => {
     );
 
     const system = new AgentCombatSystem(mockLLM, eventBus);
+    await system.initialize(world, eventBus);
     system.update(world, [attacker, defender], 1);
 
     // Check if injuries were applied
@@ -219,7 +221,7 @@ describe('AgentCombatSystem Integration', () => {
     }
   });
 
-  it('should emit combat events through EventBus', () => {
+  it('should emit combat events through EventBus', async () => {
     const eventBus = new EventBusImpl();
     const world = new World(eventBus);
 
@@ -304,6 +306,7 @@ describe('AgentCombatSystem Integration', () => {
     );
 
     const system = new AgentCombatSystem(mockLLM, eventBus);
+    await system.initialize(world, eventBus);
     system.update(world, [attacker, defender], 1);
 
     // Verify events were emitted
@@ -311,7 +314,7 @@ describe('AgentCombatSystem Integration', () => {
     expect(events.some((e) => e.type === 'started')).toBe(true);
   });
 
-  it('should update relationships after combat', () => {
+  it('should update relationships after combat', async () => {
     const eventBus = new EventBusImpl();
     const world = new World(eventBus);
 
@@ -395,6 +398,7 @@ describe('AgentCombatSystem Integration', () => {
     );
 
     const system = new AgentCombatSystem(mockLLM, eventBus);
+    await system.initialize(world, eventBus);
     system.update(world, [attacker, defender], 1);
 
     // Relationship should have degraded after combat

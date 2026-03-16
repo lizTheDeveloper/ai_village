@@ -10,9 +10,10 @@ describe('DominanceChallengeSystem', () => {
   let eventBus: EventBusImpl;
   let system: DominanceChallengeSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new DominanceChallengeSystem(eventBus);
+    await system.initialize(world, eventBus);
   });
 
   describe('Challenge Resolution', () => {

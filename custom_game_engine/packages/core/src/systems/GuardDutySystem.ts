@@ -79,12 +79,8 @@ export class GuardDutySystem extends BaseSystem {
       const duty = entity.getComponent('guard_duty') as GuardDutyComponent | undefined;
       if (!duty) continue;
 
-      // Validate assignment - remove component if invalid
-      if (!this.validateAssignment(duty)) {
-        console.warn('[GuardDutySystem] Removing invalid guard_duty component from entity', entity.id);
-        (entity as EntityImpl).removeComponent('guard_duty');
-        continue;
-      }
+      // Validate assignment - throw on invalid data (no silent fallbacks)
+      this.validateAssignment(duty);
 
       // Decay alertness
       this.decayAlertness(entity, duty, ctx.deltaTime);
@@ -100,35 +96,30 @@ export class GuardDutySystem extends BaseSystem {
   }
 
   /**
-   * Validate guard assignment. Returns false if invalid (component should be removed).
+   * Validate guard assignment. Throws on invalid data (no silent fallbacks).
    */
-  private validateAssignment(duty: GuardDutyComponent): boolean {
+  private validateAssignment(duty: GuardDutyComponent): void {
     if (!duty.assignmentType) {
-      console.warn('[GuardDutySystem] Invalid guard duty: missing assignmentType');
-      return false;
+      throw new Error('Guard assignment type is required');
     }
 
     switch (duty.assignmentType) {
       case 'location':
         if (!duty.targetLocation) {
-          console.warn('[GuardDutySystem] Invalid location guard: missing targetLocation');
-          return false;
+          throw new Error('Location guard assignment requires targetLocation');
         }
         break;
       case 'person':
         if (!duty.targetPerson) {
-          console.warn('[GuardDutySystem] Invalid person guard: missing targetPerson');
-          return false;
+          throw new Error('Person guard assignment requires targetPerson');
         }
         break;
       case 'patrol':
         if (!duty.patrolRoute || duty.patrolRoute.length === 0) {
-          console.warn('[GuardDutySystem] Invalid patrol guard: missing or empty patrolRoute');
-          return false;
+          throw new Error('Patrol assignment requires patrolRoute');
         }
         break;
     }
-    return true;
   }
 
   private decayAlertness(entity: Entity, duty: GuardDutyComponent, deltaTime: number): void {

@@ -25,9 +25,10 @@ describe('MemoryConsolidationSystem', () => {
   let eventBus: EventBus;
   let agent: any;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new MemoryConsolidationSystem(eventBus);
+    await system.initialize(world, eventBus);
     agent = world.createEntity();
     agent.addComponent(EpisodicMemoryComponent, {});
   });

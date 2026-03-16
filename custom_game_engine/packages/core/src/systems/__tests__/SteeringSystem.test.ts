@@ -11,11 +11,13 @@ import type { Component } from '../../ecs/Component.js';
 describe('SteeringSystem', () => {
   let world: World;
   let system: SteeringSystem;
+  let eventBus: EventBusImpl;
 
-  beforeEach(() => {
-    const eventBus = new EventBusImpl();
+  beforeEach(async () => {
+    eventBus = new EventBusImpl();
     world = new World(eventBus);
     system = new SteeringSystem();
+    await system.initialize(world, eventBus);
   });
 
   describe('AC2: Navigation Reaches Targets', () => {

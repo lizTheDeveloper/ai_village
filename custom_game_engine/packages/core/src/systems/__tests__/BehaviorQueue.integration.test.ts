@@ -28,13 +28,14 @@ describe('Behavior Queue System Integration', () => {
   let aiSystem: AgentBrainSystem;
   let agent: EntityImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     // Create real world with EventBus
     eventBus = new EventBusImpl();
     world = new World(eventBus);
 
     // Create AI system
     aiSystem = new AgentBrainSystem();
+    await aiSystem.initialize(world, eventBus);
 
     // Create agent with required components
     // Set thinkInterval=1 to allow agent to think every tick (for faster testing)

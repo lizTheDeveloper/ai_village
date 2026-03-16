@@ -28,10 +28,11 @@ describe('DeathBargainSystem', () => {
   let eventBus: EventBusImpl;
   let mockLLM: LLMProvider;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     system = new DeathBargainSystem();
     eventBus = new EventBusImpl();
     world = new World(eventBus);
+    await system.initialize(world, eventBus);
 
     // Mock LLM provider
     mockLLM = {

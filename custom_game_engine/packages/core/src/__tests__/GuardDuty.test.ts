@@ -23,10 +23,11 @@ describe('GuardDutySystem', () => {
   let threat: Entity;
   let otherGuard: Entity;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
     system = new GuardDutySystem(eventBus);
+    await system.initialize(world, eventBus);
 
     // Create guard
     guard = world.createEntity();
@@ -42,6 +43,7 @@ describe('GuardDutySystem', () => {
     threat.addComponent('position', { x: 5, y: 5, z: 0 });
     threat.addComponent('agent', { name: 'Intruder' });
     threat.addComponent('combat_stats', {
+      combatSkill: 5,
       stealthSkill: 8,
     });
 
@@ -340,16 +342,20 @@ describe('GuardDutySystem', () => {
       });
 
       // Run for enough ticks to decay below threshold
-      // ALERTNESS_DECAY_RATE = 0.0001 per ms, deltaTime = 1ms
-      // Need to drop by 0.01+ to cross threshold
-      // That's 100+ ms of decay
+      // ALERTNESS_DECAY_RATE = 0.0001 per ms
+      // With throttleInterval=100, onUpdate runs every 100 calls
+      // Need to drop by 0.01+ to cross threshold, so use large deltaTime
       for (let i = 0; i < 200; i++) {
-        system.update(world, Array.from(world.entities.values()), 1);
+        system.update(world, Array.from(world.entities.values()), 100);
+        eventBus.flush();
       }
 
       expect(alertnessHandler).toHaveBeenCalledWith(
         expect.objectContaining({
-          guardId: guard.id,
+          type: 'guard:alertness_low',
+          data: expect.objectContaining({
+            guardId: guard.id,
+          }),
         })
       );
     });
@@ -357,42 +363,34 @@ describe('GuardDutySystem', () => {
 
   describe('error handling', () => {
     it('should throw when assignment type is missing', () => {
-      guard.addComponent('guard_duty', {
+      expect(() => guard.addComponent('guard_duty', {
         alertness: 1.0,
         responseRadius: 20,
-      } as Record<string, unknown>);
-
-      expect(() => system.update(world, Array.from(world.entities.values()), 1)).toThrow('Guard assignment type is required');
+      } as Record<string, unknown>)).toThrow('Guard assignment type is required');
     });
 
     it('should throw when location assignment lacks target location', () => {
-      guard.addComponent('guard_duty', {
+      expect(() => guard.addComponent('guard_duty', {
         assignmentType: 'location',
         alertness: 1.0,
         responseRadius: 20,
-      } as Record<string, unknown>);
-
-      expect(() => system.update(world, Array.from(world.entities.values()), 1)).toThrow('Location guard assignment requires targetLocation');
+      } as Record<string, unknown>)).toThrow('Location guard assignment requires targetLocation');
     });
 
     it('should throw when person assignment lacks target person', () => {
-      guard.addComponent('guard_duty', {
+      expect(() => guard.addComponent('guard_duty', {
         assignmentType: 'person',
         alertness: 1.0,
         responseRadius: 20,
-      } as Record<string, unknown>);
-
-      expect(() => system.update(world, Array.from(world.entities.values()), 1)).toThrow('Person guard assignment requires targetPerson');
+      } as Record<string, unknown>)).toThrow('Person guard assignment requires targetPerson');
     });
 
     it('should throw when patrol assignment lacks route', () => {
-      guard.addComponent('guard_duty', {
+      expect(() => guard.addComponent('guard_duty', {
         assignmentType: 'patrol',
         alertness: 1.0,
         responseRadius: 20,
-      } as Record<string, unknown>);
-
-      expect(() => system.update(world, Array.from(world.entities.values()), 1)).toThrow('Patrol assignment requires patrolRoute');
+      } as Record<string, unknown>)).toThrow('Patrol assignment requires patrolRoute');
     });
   });
 });

@@ -11,7 +11,7 @@ import { createPositionComponent } from '../../components/PositionComponent.js';
 import { createMovementComponent } from '../../components/MovementComponent.js';
 import { NeedsComponent } from '../../components/NeedsComponent.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
-import type { World } from '../../ecs/World.js';
+import { World } from '../../ecs/World.js';
 
 import { AgentBrainSystem, createAgentBrainSystem } from '../AgentBrainSystem.js';
 import { BehaviorRegistry } from '../../behavior/BehaviorRegistry.js';
@@ -61,8 +61,11 @@ function createAgentEntity(agent: AgentComponent): EntityImpl {
 describe('AgentBrainSystem', () => {
   let system: AgentBrainSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     system = new AgentBrainSystem();
+    const eventBusForInit = new EventBusImpl();
+    const worldForInit = new World(eventBusForInit);
+    await system.initialize(worldForInit, eventBusForInit);
   });
 
   describe('constructor', () => {

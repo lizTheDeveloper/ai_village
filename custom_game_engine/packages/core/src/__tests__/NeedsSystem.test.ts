@@ -15,11 +15,12 @@ describe('NeedsSystem', () => {
   let system: NeedsSystem;
   let eventBus: EventBusImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl();
     world = new World(eventBus);
 
     system = new NeedsSystem();
+    await system.initialize(world, eventBus);
   });
 
   describe('initialization', () => {

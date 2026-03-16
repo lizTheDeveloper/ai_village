@@ -8,9 +8,10 @@ describe('PredatorAttackSystem', () => {
   let eventBus: EventBusImpl;
   let system: PredatorAttackSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
     system = new PredatorAttackSystem(eventBus);
+    await system.initialize(world, eventBus);
   });
 
   describe('Predator Attack Flow', () => {

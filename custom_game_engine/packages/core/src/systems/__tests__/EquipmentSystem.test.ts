@@ -42,13 +42,14 @@ describe('EquipmentSystem', () => {
   let world: World;
   let eventBus: EventBusImpl;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     // Reset registry
     itemRegistry.clear();
 
     // Create system and world
     system = new EquipmentSystem();
     eventBus = new EventBusImpl(); world = new World(eventBus);
+    await system.initialize(world, eventBus);
 
     // Register test armor items
     itemRegistry.register(

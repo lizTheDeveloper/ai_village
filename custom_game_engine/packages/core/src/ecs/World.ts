@@ -622,6 +622,21 @@ const componentRegistry: Record<string, ComponentFactory> = {
   'combat_stats': (data = {}) => createCombatStatsComponent(data),
   'conflict': (data = {}) => createConflictComponent(data),
   'guard_duty': (data = {}) => createGuardDutyComponent(data),
+  'threat_level': (data = {}) => ({
+    type: 'threat_level' as const,
+    version: 1,
+    ...data,
+  }),
+  'alert': (data = {}) => ({
+    type: 'alert' as const,
+    version: 1,
+    ...data,
+  }),
+  'guard_response': (data = {}) => ({
+    type: 'guard_response' as const,
+    version: 1,
+    ...data,
+  }),
   'skills': (data = {}) => ({
     type: 'skills' as const,
     version: 1,

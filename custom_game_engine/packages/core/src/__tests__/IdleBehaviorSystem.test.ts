@@ -13,10 +13,11 @@ describe('IdleBehaviorSystem', () => {
   let world: World;
   let system: IdleBehaviorSystem;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     const eventBus = new EventBusImpl();
     world = new World(eventBus);
     system = new IdleBehaviorSystem();
+    await system.initialize(world, eventBus);
   });
 
   describe('idle behavior selection', () => {
