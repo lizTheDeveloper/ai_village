@@ -325,13 +325,39 @@ export default defineConfig({
     plugins: [],
   },
   build: {
-    // Enable cache busting in production builds
+    // Target modern browsers (Chrome 92+, Firefox 79+, Safari 15.2+)
+    target: ['chrome92', 'firefox79', 'safari15'],
     rollupOptions: {
+      input: {
+        index: path.resolve(__dirname, 'index.html'),
+        game: path.resolve(__dirname, 'game.html'),
+        'alien-generator': path.resolve(__dirname, 'alien-generator.html'),
+        'interdimensional-cable': path.resolve(__dirname, 'interdimensional-cable.html'),
+        'soul-gallery': path.resolve(__dirname, 'soul-gallery.html'),
+        sprites: path.resolve(__dirname, 'sprites.html'),
+        'shared-worker': path.resolve(__dirname, 'shared-worker.html'),
+      },
       output: {
-        // Add content hash to filenames for cache busting
         entryFileNames: `assets/[name].[hash].js`,
         chunkFileNames: `assets/[name].[hash].js`,
         assetFileNames: `assets/[name].[hash].[ext]`,
+        // Manual chunk splitting — all engine packages in ONE chunk to avoid
+        // TDZ errors from circular deps (core <-> world <-> botany have 30+
+        // circular import cycles)
+        manualChunks(id) {
+          if (id.includes('node_modules/three')) {
+            return 'vendor-three';
+          }
+          if (id.includes('browser-stubs/')) {
+            return 'vendor';
+          }
+          if (id.includes('/packages/') && id.includes('/src/')) {
+            return 'engine';
+          }
+          if (id.includes('node_modules/')) {
+            return 'vendor';
+          }
+        },
       },
     },
   },
