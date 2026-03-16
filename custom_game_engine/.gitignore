@@ -10,6 +10,9 @@ packages/*/src/**/*.js.map
 packages/*/src/**/*.d.ts
 packages/*/src/**/*.d.ts.map
 
+# TypeScript compiled output (tsc --build)
+packages/*/dist/
+
 # Environment variables
 .env
 .env.local
