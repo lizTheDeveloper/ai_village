@@ -7,17 +7,17 @@ describe('ResponseParser', () => {
   describe('parseResponse - Structured JSON', () => {
     it('should parse valid structured response', () => {
       const response = JSON.stringify({
-        thinking: 'I should explore to find food',
-        speaking: 'Time to look around!',
-        action: 'explore'
+        thinking: 'I should gather some resources',
+        speaking: 'Time to collect materials!',
+        action: 'gather'
       });
 
       const result = parser.parseResponse(response);
 
       expect(result).toEqual({
-        thinking: 'I should explore to find food',
-        speaking: 'Time to look around!',
-        action: 'explore',
+        thinking: 'I should gather some resources',
+        speaking: 'Time to collect materials!',
+        action: 'gather',
         parseQuality: 'strict'
       });
     });
@@ -25,9 +25,9 @@ describe('ResponseParser', () => {
     it('should NOT log warnings for valid JSON parsing', () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const response = JSON.stringify({
-        thinking: 'I should explore to find food',
-        speaking: 'Time to look around!',
-        action: 'explore'
+        thinking: 'I should gather some resources',
+        speaking: 'Time to collect materials!',
+        action: 'gather'
       });
 
       parser.parseResponse(response);
@@ -40,15 +40,15 @@ describe('ResponseParser', () => {
 
     it('should handle response with no speaking', () => {
       const response = JSON.stringify({
-        thinking: 'Just going to explore',
+        thinking: 'Just going to gather resources',
         speaking: '',
-        action: 'explore'
+        action: 'gather'
       });
 
       const result = parser.parseResponse(response);
 
       expect(result.speaking).toBe('');
-      expect(result.action).toBe('explore');
+      expect(result.action).toBe('gather');
       expect(result.parseQuality).toBe('strict');
     });
 
@@ -256,14 +256,14 @@ describe('ResponseParser', () => {
 
     it('should return no actionParams for simple string action', () => {
       const response = JSON.stringify({
-        thinking: 'Just exploring',
+        thinking: 'Just picking up an item',
         speaking: '',
-        action: 'explore'
+        action: 'pick'
       });
 
       const result = parser.parseResponse(response);
 
-      expect(result.action).toBe('explore');
+      expect(result.action).toBe('pick');
       expect(result.actionParams).toBeUndefined();
       expect(result.parseQuality).toBe('strict');
     });

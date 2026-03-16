@@ -237,7 +237,7 @@ describe('StructuredPromptBuilder', () => {
       const prompt = builder.buildPrompt(entity, createMockWorld());
 
       // The prompt ends with an instruction asking the agent to make a decision
-      expect(prompt).toMatch(/What will you do\?|What do you want to say\?|What will you build\?/);
+      expect(prompt).toMatch(/What will you do\?|What do you want to say\?|What will you build\?|What should you do\?/);
     });
 
     it('should end with an instruction section', () => {

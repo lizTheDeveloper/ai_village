@@ -187,6 +187,14 @@ describe('Integration: Magic Skill Tree UI', () => {
         unlockedNodes: ['shinto_spirit_sense']
       });
 
+      // Capture the shared skillTreeManager instance
+      const sharedSkillTreeManager = {
+        unlockSkillNode: vi.fn(),
+        evaluateNode: vi.fn(),
+        applyNodeEffects: vi.fn(),
+      };
+      (mockWorld as any).getSkillTreeManager = vi.fn(() => sharedSkillTreeManager);
+
       const panel = new SkillTreePanel(createMockWindowManager());
       panel.setSelectedEntity(entity);
 
@@ -194,8 +202,7 @@ describe('Integration: Magic Skill Tree UI', () => {
       panel.handleClick(150, 200, mockWorld);
 
       // Verify effects applied
-      const skillTreeManager = mockWorld.getSkillTreeManager();
-      expect(skillTreeManager.applyNodeEffects).toHaveBeenCalledWith(
+      expect(sharedSkillTreeManager.applyNodeEffects).toHaveBeenCalledWith(
         entity,
         'shinto',
         'shinto_cleansing_ritual'

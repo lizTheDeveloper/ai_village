@@ -434,9 +434,10 @@ describe('CraftingPanelUI (REQ-CRAFT-001)', () => {
   describe('Error Handling (CLAUDE.md)', () => {
     it('should render placeholder when rendering without active agent', () => {
       panel.show();
+      const fillTextSpy = vi.spyOn(ctx, 'fillText');
       // No agent set - should render placeholder text, not throw
       expect(() => panel.render(ctx)).not.toThrow();
-      expect(ctx.fillText).toHaveBeenCalledWith(
+      expect(fillTextSpy).toHaveBeenCalledWith(
         expect.stringContaining('Select an agent'),
         expect.any(Number),
         expect.any(Number)

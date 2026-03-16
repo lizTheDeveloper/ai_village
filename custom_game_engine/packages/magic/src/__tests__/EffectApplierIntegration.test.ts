@@ -114,7 +114,10 @@ function createMageEntity(world: World, options: {
   entity.addComponent(createSpellKnowledgeComponent());
 
   // Add ManaPoolsComponent (split component - ManaRegenerationManager reads this)
-  entity.addComponent(createManaPoolsComponentWithSource('internal', options.mana ?? 100));
+  // Always use maximum=100 so there's room to regenerate when mana starts below max
+  const manaPoolsComp = createManaPoolsComponentWithSource('internal', 100);
+  manaPoolsComp.manaPools[0].current = options.mana ?? 100;
+  entity.addComponent(manaPoolsComp);
 
   // Add behavior component
   entity.addComponent({

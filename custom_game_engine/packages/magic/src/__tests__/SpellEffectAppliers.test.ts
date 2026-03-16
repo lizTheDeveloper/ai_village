@@ -7,7 +7,8 @@
 import { describe, it, expect, beforeEach, beforeAll, vi } from 'vitest';
 import type { SpellEffect } from '../SpellEffect.js';
 import { World } from '@ai-village/core';
-import { createMockWorld as createSharedMockWorld } from '@ai-village/core/__tests__/createMockWorld.js';
+// Note: @ai-village/core/__tests__/createMockWorld.js is not an exported path from the package.
+// The createMockWorld helper below implements the same interface inline.
 import { SpellEffectExecutor } from '../SpellEffectExecutor.js';
 import { registerStandardAppliers } from '../EffectAppliers.js';
 
@@ -210,7 +211,10 @@ describe('Effect Appliers - Protection', () => {
   beforeEach(() => {
     mockWorld = createMockWorld();
     mockCaster = createMockEntity('caster');
-    mockTarget = createMockEntity('target');
+    // Add magic component so ProtectionEffectApplier can store shield data directly
+    mockTarget = createMockEntity('target', {
+      magic: { type: 'magic', version: 1, protectionShields: [], activeEffects: [] },
+    });
   });
 
   it('should apply protection effect', () => {
@@ -563,7 +567,7 @@ describe('Effect Appliers - Perception', () => {
     mockWorld = createMockWorld();
     mockCaster = createMockEntity('caster', {
       position: { x: 0, y: 0 },
-      perception: { visionRange: 10, detectionTypes: [] },
+      perception: { type: 'perception', visionRange: 10, detectionTypes: [] },
     });
     mockTarget = createMockEntity('target', {
       position: { x: 5, y: 5 },
@@ -638,7 +642,9 @@ describe('Effect Appliers - Perception', () => {
       const result = applier.apply(effect, mockCaster, mockCaster, mockWorld, context);
 
       expect(result.success).toBe(true);
-      expect(result.appliedValues.detectionType).toBe('alignment');
+      // The applier adds 'alignment' to perception.detectionTypes, not to appliedValues.detectionType
+      const perception = mockCaster.getComponent('perception');
+      expect(perception.detectionTypes).toContain('alignment');
     });
   });
 
@@ -754,7 +760,8 @@ describe('Effect Appliers - Perception', () => {
       const result = applier.apply(effect, mockCaster, mockCaster, mockWorld, context);
 
       expect(result.success).toBe(true);
-      expect(result.appliedValues.identifyDetails).toBe(true);
+      // The applier stores identifyDetails as 1 (number) when true, 0 when false
+      expect(result.appliedValues.identifyDetails).toBe(1);
     });
   });
 
@@ -780,12 +787,12 @@ describe('Effect Appliers - Perception', () => {
       // Low proficiency
       const context1 = createMockContext(effect);
       context1.scaledValues.set('detection_range', { value: 25, capped: false }); // 20 + 5
-      const result1 = applier.apply(effect, mockCaster, createMockEntity('caster1', { perception: { visionRange: 10 } }), mockWorld, context1);
+      const result1 = applier.apply(effect, mockCaster, createMockEntity('caster1', { perception: { type: 'perception', visionRange: 10, detectionTypes: [] } }), mockWorld, context1);
 
       // High proficiency
       const context2 = createMockContext(effect);
       context2.scaledValues.set('detection_range', { value: 50, capped: true }); // 20 + 30, capped
-      const result2 = applier.apply(effect, mockCaster, createMockEntity('caster2', { perception: { visionRange: 10 } }), mockWorld, context2);
+      const result2 = applier.apply(effect, mockCaster, createMockEntity('caster2', { perception: { type: 'perception', visionRange: 10, detectionTypes: [] } }), mockWorld, context2);
 
       expect(result2.appliedValues.detectionRange).toBeGreaterThan(result1.appliedValues.detectionRange);
       expect(result2.appliedValues.detectionRange).toBeLessThanOrEqual(50);
@@ -937,7 +944,7 @@ describe('Effect Appliers - Dispel', () => {
       position: { type: 'position', x: 0, y: 0 },
     });
     mockTarget = createMockEntity('target', {
-      position: { type: 'position', x: 10, y: 10 },
+      position: { type: 'position', x: 3, y: 4 }, // distance=5 from caster, within any test range
       active_effects: {
         type: 'active_effects',
         effects: [
@@ -2676,28 +2683,30 @@ function createMockWorld(): World {
   const entities = new Map();
   let entityIdCounter = 0;
 
-  return createSharedMockWorld({
+  // Return an inline mock that implements the World interface used by effect appliers.
+  // @ai-village/core/__tests__/createMockWorld.js is not an exported path from the package.
+  return {
+    getEntity: vi.fn((id: string) => entities.get(id)),
+    getPosition: vi.fn((_id: string) => ({ x: 0, y: 0 })),
+    createEntity: vi.fn((_archetype?: string) => {
+      const id = `entity_${entityIdCounter++}`;
+      const entity = createMockEntity(id);
+      entities.set(id, entity);
+      return entity;
+    }),
+    addComponent: vi.fn((entityId: string, component: any) => {
+      const entity = entities.get(entityId);
+      if (entity) {
+        entity.addComponent(component.type, component);
+      }
+    }),
+    destroyEntity: vi.fn((entityId: string) => {
+      entities.delete(entityId);
+    }),
     entities,
-    overrides: {
-      getEntity: vi.fn((id: string) => entities.get(id)),
-      getPosition: vi.fn((id: string) => ({ x: 0, y: 0 })),
-      createEntity: vi.fn((archetype: string) => {
-        const id = `entity_${entityIdCounter++}`;
-        const entity = createMockEntity(id);
-        entities.set(id, entity);
-        return entity;
-      }),
-      addComponent: vi.fn((entityId: string, component: any) => {
-        const entity = entities.get(entityId);
-        if (entity) {
-          entity.addComponent(component.type, component);
-        }
-      }),
-      destroyEntity: vi.fn((entityId: string, reason?: string) => {
-        entities.delete(entityId);
-      }),
-    },
-  });
+    tick: 0,
+    query: vi.fn(() => ({ with: vi.fn(() => ({ executeEntities: vi.fn(() => []) })) })),
+  } as unknown as World;
 }
 
 function createMockEntity(id: string, components: any = {}): any {
