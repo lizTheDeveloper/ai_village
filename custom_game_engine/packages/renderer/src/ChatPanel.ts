@@ -89,8 +89,11 @@ export class ChatPanel implements IWindowPanel {
     height: number,
     _world?: World
   ): void {
-    // Clear background
-    ctx.fillStyle = '#1a1a1a';
+    // Gradient background
+    const bg = ctx.createLinearGradient(x, y, x, y + height);
+    bg.addColorStop(0, 'rgba(14, 12, 28, 0.97)');
+    bg.addColorStop(1, 'rgba(8, 7, 18, 0.97)');
+    ctx.fillStyle = bg;
     ctx.fillRect(x, y, width, height);
 
     // Calculate layout areas
@@ -151,9 +154,19 @@ export class ChatPanel implements IWindowPanel {
     width: number,
     height: number
   ): void {
-    // Background
-    ctx.fillStyle = '#0a0a0a';
+    // Gradient background
+    const bg = ctx.createLinearGradient(x, y, x, y + height);
+    bg.addColorStop(0, 'rgba(10, 8, 22, 0.6)');
+    bg.addColorStop(1, 'rgba(5, 4, 14, 0.6)');
+    ctx.fillStyle = bg;
     ctx.fillRect(x, y, width, height);
+    // Subtle top border accent
+    ctx.strokeStyle = 'rgba(74, 158, 255, 0.15)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + width, y);
+    ctx.stroke();
 
     // Get messages
     const messages = this.chatNetwork.getAllMessages(this.currentRoomId);
@@ -224,40 +237,65 @@ export class ChatPanel implements IWindowPanel {
   ): void {
     const padding = 10;
 
-    // Message background (alternating)
-    if (message.type !== 'system') {
-      ctx.fillStyle = '#111';
+    // Message background — subtle stripe for non-system messages
+    if (message.type === 'system') {
+      ctx.fillStyle = 'rgba(255, 200, 80, 0.04)';
+      ctx.fillRect(x, y, width, this.MESSAGE_HEIGHT);
+      // Thin left accent for system messages
+      ctx.fillStyle = 'rgba(255, 200, 80, 0.35)';
+      ctx.fillRect(x, y + 4, 2, this.MESSAGE_HEIGHT - 8);
+    } else if (message.type === 'emote') {
+      ctx.fillStyle = 'rgba(255, 158, 255, 0.05)';
+      ctx.fillRect(x, y, width, this.MESSAGE_HEIGHT);
+      ctx.fillStyle = 'rgba(220, 120, 255, 0.35)';
+      ctx.fillRect(x, y + 4, 2, this.MESSAGE_HEIGHT - 8);
+    } else {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.025)';
       ctx.fillRect(x, y, width, this.MESSAGE_HEIGHT);
     }
+    // Subtle separator between messages
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x + padding, y + this.MESSAGE_HEIGHT - 1);
+    ctx.lineTo(x + width - padding, y + this.MESSAGE_HEIGHT - 1);
+    ctx.stroke();
 
     // Timestamp
     const time = new Date(message.timestamp);
     const timeStr = `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`;
 
-    ctx.fillStyle = '#666';
+    ctx.fillStyle = 'rgba(120, 120, 150, 0.7)';
     ctx.font = '10px monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText(timeStr, x + padding, y + padding);
+    ctx.fillText(timeStr, x + padding + 4, y + padding);
 
-    // Display name
-    let nameColor = '#4a9eff';
+    // Display name + type glyph
+    let nameColor = '#6abaff';
+    let glyph = '';
     if (message.type === 'system') {
-      nameColor = '#888';
+      nameColor = 'rgba(255, 200, 80, 0.75)';
+      glyph = '⚙ ';
     } else if (message.type === 'emote') {
-      nameColor = '#ff9eff';
+      nameColor = '#dc7eff';
+      glyph = '✦ ';
     }
 
     ctx.fillStyle = nameColor;
     ctx.font = 'bold 12px monospace';
     ctx.fillText(
-      message.displayName,
+      glyph + message.displayName,
       x + padding + 50,
       y + padding
     );
 
     // Message content
-    ctx.fillStyle = message.type === 'system' ? '#888' : '#ccc';
+    ctx.fillStyle = message.type === 'system'
+      ? 'rgba(200, 185, 120, 0.8)'
+      : message.type === 'emote'
+        ? 'rgba(220, 190, 255, 0.85)'
+        : 'rgba(210, 210, 220, 0.9)';
     ctx.font = '12px monospace';
 
     // Word wrap message
@@ -294,28 +332,48 @@ export class ChatPanel implements IWindowPanel {
     width: number,
     height: number
   ): void {
-    // Background
-    ctx.fillStyle = '#0a0a0a';
+    // Background — slightly lighter than messages area to visually separate
+    const bg = ctx.createLinearGradient(x, y, x + width, y);
+    bg.addColorStop(0, 'rgba(18, 14, 36, 0.7)');
+    bg.addColorStop(1, 'rgba(12, 10, 26, 0.7)');
+    ctx.fillStyle = bg;
     ctx.fillRect(x, y, width, height);
+    // Left border separator
+    ctx.strokeStyle = 'rgba(74, 158, 255, 0.12)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y + height);
+    ctx.stroke();
 
-    // Header
-    ctx.fillStyle = '#2a2a2a';
-    ctx.fillRect(x, y, width, 25);
+    // Header gradient
+    const headerGrad = ctx.createLinearGradient(x, y, x, y + 26);
+    headerGrad.addColorStop(0, 'rgba(40, 30, 70, 0.9)');
+    headerGrad.addColorStop(1, 'rgba(25, 18, 50, 0.9)');
+    ctx.fillStyle = headerGrad;
+    ctx.fillRect(x, y, width, 26);
+    ctx.strokeStyle = 'rgba(74, 158, 255, 0.2)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, y + 26);
+    ctx.lineTo(x + width, y + 26);
+    ctx.stroke();
 
-    ctx.fillStyle = '#4a9eff';
-    ctx.font = 'bold 12px monospace';
+    ctx.fillStyle = '#6abaff';
+    ctx.font = 'bold 11px monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('Members', x + width / 2, y + 12);
+    ctx.fillText('MEMBERS', x + width / 2, y + 13);
 
     // Get members
     const members = this.chatNetwork.getActiveMembers(this.currentRoomId);
 
     if (members.length === 0) {
-      ctx.fillStyle = '#666';
+      ctx.fillStyle = 'rgba(130, 130, 160, 0.5)';
       ctx.font = '11px monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('No members', x + width / 2, y + 50);
+      ctx.textBaseline = 'middle';
+      ctx.fillText('No members', x + width / 2, y + 60);
       return;
     }
 
@@ -342,29 +400,56 @@ export class ChatPanel implements IWindowPanel {
     width: number
   ): void {
     const padding = 5;
+    const dotX = x + padding + 7;
+    const dotY = y + 15;
 
-    // Status indicator
-    let statusColor = '#888';
+    // Subtle row bg on hover effect (every other row)
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+    ctx.fillRect(x, y, width, 30);
+
+    // Status indicator — softer palette with outer glow ring
+    let statusColor: string;
+    let glowColor: string;
     switch (member.status) {
       case 'online':
-        statusColor = '#0f0';
+        statusColor = '#4de89a';
+        glowColor = 'rgba(40, 220, 130, 0.3)';
         break;
       case 'away':
-        statusColor = '#ff0';
+        statusColor = '#f0c040';
+        glowColor = 'rgba(240, 180, 40, 0.3)';
         break;
-      case 'offline':
-        statusColor = '#f00';
+      default: // offline
+        statusColor = 'rgba(120, 100, 120, 0.6)';
+        glowColor = 'rgba(0, 0, 0, 0)';
         break;
     }
 
+    // Glow halo for online/away
+    if (member.status !== 'offline') {
+      ctx.fillStyle = glowColor;
+      ctx.beginPath();
+      ctx.arc(dotX, dotY, 7, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Status dot
     ctx.fillStyle = statusColor;
     ctx.beginPath();
-    ctx.arc(x + padding + 6, y + 15, 5, 0, Math.PI * 2);
+    ctx.arc(dotX, dotY, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Dark inner dot for depth
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+    ctx.beginPath();
+    ctx.arc(dotX - 1, dotY - 1, 1.5, 0, Math.PI * 2);
     ctx.fill();
 
     // Display name
-    ctx.fillStyle = '#ccc';
-    ctx.font = '11px monospace';
+    ctx.fillStyle = member.status === 'offline'
+      ? 'rgba(150, 140, 160, 0.55)'
+      : 'rgba(210, 205, 225, 0.9)';
+    ctx.font = member.status === 'online' ? '11px monospace' : '11px monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
 
@@ -372,15 +457,15 @@ export class ChatPanel implements IWindowPanel {
     let displayName = member.displayName;
     if (ctx.measureText(displayName).width > maxNameWidth) {
       while (
-        ctx.measureText(displayName + '...').width > maxNameWidth &&
+        ctx.measureText(displayName + '…').width > maxNameWidth &&
         displayName.length > 0
       ) {
         displayName = displayName.slice(0, -1);
       }
-      displayName += '...';
+      displayName += '…';
     }
 
-    ctx.fillText(displayName, x + padding + 16, y + 15);
+    ctx.fillText(displayName, x + padding + 18, dotY);
   }
 
   /**
@@ -393,43 +478,89 @@ export class ChatPanel implements IWindowPanel {
     width: number,
     height: number
   ): void {
-    // Background
-    ctx.fillStyle = this.inputFocused ? '#2a2a2a' : '#1a1a1a';
-    ctx.fillRect(x, y, width, height);
+    const radius = 6;
+    const innerX = x + 6;
+    const innerW = width - 12;
+    const innerY = y + 5;
+    const innerH = height - 10;
 
-    // Border
-    ctx.strokeStyle = this.inputFocused ? '#4a9eff' : '#444';
-    ctx.lineWidth = this.inputFocused ? 2 : 1;
-    ctx.strokeRect(x, y, width, height);
+    // Outer separator line
+    ctx.strokeStyle = 'rgba(74, 158, 255, 0.1)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + width, y);
+    ctx.stroke();
 
-    // Input text
-    const displayText = this.messageInput || 'Type a message...';
-    ctx.fillStyle = this.messageInput ? '#fff' : '#666';
-    ctx.font = '14px monospace';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(displayText, x + 10, y + height / 2);
+    // Input box with rounded corners
+    ctx.beginPath();
+    ctx.roundRect(innerX, innerY, innerW, innerH, radius);
 
-    // Cursor
     if (this.inputFocused) {
-      const cursorX = x + 10 + ctx.measureText(this.messageInput).width;
-      ctx.strokeStyle = '#fff';
+      // Glowing background when focused
+      const bg = ctx.createLinearGradient(innerX, innerY, innerX, innerY + innerH);
+      bg.addColorStop(0, 'rgba(40, 30, 70, 0.85)');
+      bg.addColorStop(1, 'rgba(25, 18, 50, 0.85)');
+      ctx.fillStyle = bg;
+      ctx.fill();
+      // Glow border
+      ctx.shadowColor = 'rgba(74, 158, 255, 0.4)';
+      ctx.shadowBlur = 6;
+      ctx.strokeStyle = 'rgba(100, 168, 255, 0.7)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    } else {
+      ctx.fillStyle = 'rgba(20, 16, 40, 0.6)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(80, 70, 110, 0.4)';
       ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(cursorX, y + 8);
-      ctx.lineTo(cursorX, y + height - 8);
       ctx.stroke();
     }
 
-    // Character count
-    ctx.fillStyle = '#666';
+    // Input text / placeholder
+    const displayText = this.messageInput || 'Type a message...';
+    ctx.fillStyle = this.messageInput
+      ? 'rgba(220, 215, 235, 0.95)'
+      : 'rgba(120, 110, 150, 0.55)';
+    ctx.font = '13px monospace';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    // Clip text to input area
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(innerX + 2, innerY, innerW - 50, innerH, radius);
+    ctx.clip();
+    ctx.fillText(displayText, innerX + 10, innerY + innerH / 2);
+    ctx.restore();
+
+    // Blinking cursor — 1 Hz blink via sine wave
+    if (this.inputFocused) {
+      const cursorVisible = Math.sin(performance.now() / 500) > 0;
+      if (cursorVisible) {
+        const textWidth = ctx.measureText(this.messageInput).width;
+        const cursorX = innerX + 10 + textWidth;
+        if (cursorX < innerX + innerW - 50) {
+          ctx.strokeStyle = 'rgba(160, 200, 255, 0.85)';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(cursorX + 1, innerY + 5);
+          ctx.lineTo(cursorX + 1, innerY + innerH - 5);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Character count pill
+    const charCount = `${this.messageInput.length}/500`;
+    const countColor = this.messageInput.length > 450
+      ? 'rgba(255, 120, 100, 0.7)'
+      : 'rgba(100, 95, 130, 0.6)';
+    ctx.fillStyle = countColor;
     ctx.font = '10px monospace';
     ctx.textAlign = 'right';
-    ctx.fillText(
-      `${this.messageInput.length}/500`,
-      x + width - 10,
-      y + height / 2
-    );
+    ctx.textBaseline = 'middle';
+    ctx.fillText(charCount, innerX + innerW - 6, innerY + innerH / 2);
   }
 
   /**
@@ -443,16 +574,26 @@ export class ChatPanel implements IWindowPanel {
     height: number,
     contentHeight: number
   ): void {
-    // Track
-    ctx.fillStyle = '#222';
-    ctx.fillRect(x, y, width, height);
+    // Track — subtle rounded
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+    ctx.beginPath();
+    ctx.roundRect(x, y, width, height, width / 2);
+    ctx.fill();
 
     // Thumb
     const thumbHeight = Math.max(20, (height / contentHeight) * height);
-    const thumbY = y + (this.scrollY / (contentHeight - height)) * (height - thumbHeight);
+    const maxScroll = contentHeight - height;
+    const thumbY = maxScroll > 0
+      ? y + (this.scrollY / maxScroll) * (height - thumbHeight)
+      : y;
 
-    ctx.fillStyle = '#4a9eff';
-    ctx.fillRect(x, thumbY, width, thumbHeight);
+    const thumbGrad = ctx.createLinearGradient(x, thumbY, x + width, thumbY);
+    thumbGrad.addColorStop(0, 'rgba(100, 168, 255, 0.55)');
+    thumbGrad.addColorStop(1, 'rgba(74, 120, 220, 0.45)');
+    ctx.fillStyle = thumbGrad;
+    ctx.beginPath();
+    ctx.roundRect(x, thumbY, width, thumbHeight, width / 2);
+    ctx.fill();
   }
 
   // ============================================================================
