@@ -75,7 +75,7 @@ export default defineConfig({
       // for the core game. Also exclude Node.js builtins handled by browser stubs.
       external: (id: string) => {
         // Externalize optional features not installed in Docker build
-        const externals = ['sharp', 'pixi.js', 'd3', 'chart.js', 'dexie', 'three'];
+        const externals = ['sharp', 'pixi.js', 'd3', 'chart.js', 'dexie'];
         return externals.some(pkg => id === pkg || id.startsWith(pkg + '/'));
       },
       input: {
