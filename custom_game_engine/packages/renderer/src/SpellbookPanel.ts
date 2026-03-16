@@ -34,10 +34,10 @@ type FilterMode = 'all' | 'fire' | 'protection' | 'restoration' | 'divination' |
 // ============================================================================
 
 const COLORS = {
-  background: 'rgba(20, 20, 30, 0.95)',
-  headerBg: 'rgba(40, 40, 60, 0.9)',
-  spellBg: 'rgba(30, 30, 45, 0.8)',
-  spellSelected: 'rgba(50, 50, 80, 0.9)',
+  background: 'rgba(12, 8, 28, 0.97)',
+  headerBg: 'rgba(18, 12, 38, 0.95)',
+  spellBg: 'rgba(20, 15, 38, 0.85)',
+  spellSelected: 'rgba(45, 30, 80, 0.95)',
   text: '#FFFFFF',
   textMuted: '#AAAAAA',
   textDim: '#666666',
@@ -49,7 +49,7 @@ const COLORS = {
   divination: '#AA88FF',
   combat: '#FF4444',
   hotkey: '#FFD700',
-  border: 'rgba(100, 100, 140, 0.5)',
+  border: 'rgba(100, 80, 160, 0.4)',
   profLow: '#FF6666',
   profMed: '#FFAA44',
   profHigh: '#66FF66',
@@ -171,12 +171,35 @@ export class SpellbookPanel implements IWindowPanel {
   }
 
   renderHeader(ctx: CanvasRenderingContext2D, width: number, y: number): number {
-    ctx.fillStyle = COLORS.headerBg;
+    // Grimoire gradient background
+    const headerGrad = ctx.createLinearGradient(0, y, 0, y + SIZES.headerHeight);
+    headerGrad.addColorStop(0, 'rgba(35, 18, 70, 0.98)');
+    headerGrad.addColorStop(1, 'rgba(18, 10, 45, 0.98)');
+    ctx.fillStyle = headerGrad;
     ctx.fillRect(0, y, width, SIZES.headerHeight);
 
-    ctx.fillStyle = COLORS.accent;
-    ctx.font = 'bold 14px monospace';
-    ctx.fillText('SPELLBOOK', SIZES.padding, y + 10);
+    // Bottom separator with arcane glow
+    const sepGrad = ctx.createLinearGradient(0, 0, width, 0);
+    sepGrad.addColorStop(0, 'transparent');
+    sepGrad.addColorStop(0.3, COLORS.accent);
+    sepGrad.addColorStop(0.7, '#CC88FF');
+    sepGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = sepGrad;
+    ctx.fillRect(0, y + SIZES.headerHeight - 1, width, 1);
+
+    // Arcane rune decorations
+    ctx.font = '16px serif';
+    ctx.fillStyle = 'rgba(153, 102, 255, 0.25)';
+    ctx.fillText('✦', 4, y + 8);
+    ctx.fillText('✦', width - 20, y + 8);
+
+    // Title with glow
+    ctx.shadowColor = COLORS.accent;
+    ctx.shadowBlur = 8;
+    ctx.fillStyle = '#C8A0FF';
+    ctx.font = 'bold 13px monospace';
+    ctx.fillText('📖 SPELLBOOK', SIZES.padding + 18, y + 11);
+    ctx.shadowBlur = 0;
 
     // Spell count
     const registry = getSpellRegistry();
@@ -195,40 +218,79 @@ export class SpellbookPanel implements IWindowPanel {
       spellCount += registry.getUnlockedSpellsByParadigm(paradigm.id).length;
     }
 
-    ctx.fillStyle = COLORS.textMuted;
-    ctx.font = '11px monospace';
-    const countText = `${spellCount} spells available`;
+    ctx.fillStyle = 'rgba(180, 140, 255, 0.7)';
+    ctx.font = '10px monospace';
+    const countText = `${spellCount} spells`;
     const countWidth = ctx.measureText(countText).width;
-    ctx.fillText(countText, width - countWidth - SIZES.padding, y + 12);
+    ctx.fillText(countText, width - countWidth - SIZES.padding, y + 13);
 
     return y + SIZES.headerHeight;
   }
 
   private renderManaBar(ctx: CanvasRenderingContext2D, width: number, y: number): number {
-    const barWidth = width - SIZES.padding * 2;
-    const fillWidth = (this.playerMana / this.playerMaxMana) * barWidth;
+    const barX = SIZES.padding;
+    const barY = y + 5;
+    const barW = width - SIZES.padding * 2;
+    const barH = SIZES.manaBarHeight - 10;
+    const pct = this.playerMana / this.playerMaxMana;
+    const fillW = pct * barW;
 
-    // Background
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-    ctx.fillRect(SIZES.padding, y + 4, barWidth, SIZES.manaBarHeight - 8);
+    // Track background
+    ctx.fillStyle = 'rgba(0, 20, 60, 0.7)';
+    ctx.beginPath();
+    (ctx as any).roundRect(barX, barY, barW, barH, 4);
+    ctx.fill();
 
-    // Fill
-    ctx.fillStyle = COLORS.mana;
-    ctx.fillRect(SIZES.padding, y + 4, fillWidth, SIZES.manaBarHeight - 8);
+    // Gradient fill — depleted near 0 goes to dimmer blue
+    if (fillW > 0) {
+      const manaGrad = ctx.createLinearGradient(barX, 0, barX + fillW, 0);
+      manaGrad.addColorStop(0, pct < 0.25 ? '#1a3a6a' : '#1a5acc');
+      manaGrad.addColorStop(0.6, pct < 0.25 ? '#4466aa' : '#4499ff');
+      manaGrad.addColorStop(1, pct < 0.25 ? '#6688bb' : '#88ccff');
+      ctx.fillStyle = manaGrad;
+      ctx.beginPath();
+      (ctx as any).roundRect(barX, barY, fillW, barH, 4);
+      ctx.fill();
+
+      // Shimmer highlight strip at top
+      const shimGrad = ctx.createLinearGradient(barX, barY, barX, barY + barH / 2);
+      shimGrad.addColorStop(0, 'rgba(255,255,255,0.12)');
+      shimGrad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = shimGrad;
+      ctx.beginPath();
+      (ctx as any).roundRect(barX, barY, fillW, barH / 2, 4);
+      ctx.fill();
+    }
+
+    // Animated shimmer pulse (sweeps across full bar when mana > 50%)
+    if (pct > 0.5) {
+      const now = performance.now();
+      const shimmerPos = ((now / 1200) % 1) * barW;
+      const shimGrad2 = ctx.createLinearGradient(barX + shimmerPos - 20, 0, barX + shimmerPos + 20, 0);
+      shimGrad2.addColorStop(0, 'rgba(180,220,255,0)');
+      shimGrad2.addColorStop(0.5, 'rgba(180,220,255,0.18)');
+      shimGrad2.addColorStop(1, 'rgba(180,220,255,0)');
+      ctx.fillStyle = shimGrad2;
+      ctx.beginPath();
+      (ctx as any).roundRect(barX, barY, fillW, barH, 4);
+      ctx.fill();
+    }
 
     // Border
-    ctx.strokeStyle = COLORS.border;
+    ctx.strokeStyle = 'rgba(80, 140, 220, 0.5)';
     ctx.lineWidth = 1;
-    ctx.strokeRect(SIZES.padding, y + 4, barWidth, SIZES.manaBarHeight - 8);
+    ctx.beginPath();
+    (ctx as any).roundRect(barX, barY, barW, barH, 4);
+    ctx.stroke();
 
-    // Text
-    ctx.fillStyle = COLORS.text;
-    ctx.font = 'bold 11px monospace';
+    // Mana text overlay
+    ctx.fillStyle = '#e0f0ff';
+    ctx.font = 'bold 10px monospace';
     ctx.textAlign = 'center';
     ctx.fillText(
-      `MANA: ${Math.floor(this.playerMana)}/${this.playerMaxMana}`,
+      `✨ ${Math.floor(this.playerMana)} / ${this.playerMaxMana} MANA`,
       width / 2,
-      y + 6
+      barY + 3
     );
     ctx.textAlign = 'left';
 
@@ -236,42 +298,74 @@ export class SpellbookPanel implements IWindowPanel {
   }
 
   private renderFilters(ctx: CanvasRenderingContext2D, width: number, y: number): number {
-    const filters: { id: FilterMode; label: string; color: string }[] = [
-      { id: 'all', label: 'All', color: COLORS.text },
-      { id: 'fire', label: 'Fire', color: COLORS.fire },
-      { id: 'protection', label: 'Protect', color: COLORS.protection },
-      { id: 'restoration', label: 'Heal', color: COLORS.restoration },
-      { id: 'divination', label: 'Divine', color: COLORS.divination },
+    const filters: { id: FilterMode; label: string; color: string; emoji: string }[] = [
+      { id: 'all',        label: 'All',    color: '#c8a0ff', emoji: '✦' },
+      { id: 'fire',       label: 'Fire',   color: COLORS.fire,       emoji: '🔥' },
+      { id: 'protection', label: 'Ward',   color: COLORS.protection, emoji: '🛡️' },
+      { id: 'restoration',label: 'Heal',   color: COLORS.restoration,emoji: '💚' },
+      { id: 'divination', label: 'Divine', color: COLORS.divination, emoji: '🔮' },
     ];
 
-    const tabWidth = (width - SIZES.padding * 2) / filters.length;
+    // Strip background
+    const stripGrad = ctx.createLinearGradient(0, y, 0, y + SIZES.filterHeight);
+    stripGrad.addColorStop(0, 'rgba(25, 15, 55, 0.85)');
+    stripGrad.addColorStop(1, 'rgba(15, 10, 40, 0.85)');
+    ctx.fillStyle = stripGrad;
+    ctx.fillRect(0, y, width, SIZES.filterHeight);
+
+    const tabW = Math.floor((width - SIZES.padding * 2) / filters.length);
     let x = SIZES.padding;
 
     for (const f of filters) {
       const isActive = this.filter === f.id;
+      const tw = tabW - 3;
+      const th = SIZES.filterHeight - 6;
+      const ty = y + 3;
 
-      // Tab background
-      ctx.fillStyle = isActive ? 'rgba(100, 100, 140, 0.5)' : 'rgba(40, 40, 60, 0.3)';
-      ctx.fillRect(x, y, tabWidth - 2, SIZES.filterHeight - 4);
+      // Tab pill
+      ctx.beginPath();
+      (ctx as any).roundRect(x, ty, tw, th, 5);
 
-      // Tab text
+      if (isActive) {
+        const activeGrad = ctx.createLinearGradient(x, ty, x, ty + th);
+        activeGrad.addColorStop(0, 'rgba(130, 70, 220, 0.55)');
+        activeGrad.addColorStop(1, 'rgba(80, 40, 150, 0.55)');
+        ctx.fillStyle = activeGrad;
+        ctx.fill();
+
+        // Glow border
+        ctx.shadowColor = f.color;
+        ctx.shadowBlur = 6;
+        ctx.strokeStyle = f.color;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      } else {
+        ctx.fillStyle = 'rgba(40, 28, 70, 0.4)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(100, 70, 160, 0.3)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // Label
       ctx.fillStyle = isActive ? f.color : COLORS.textMuted;
-      ctx.font = isActive ? 'bold 10px monospace' : '10px monospace';
+      ctx.font = isActive ? 'bold 9px monospace' : '9px monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(f.label, x + tabWidth / 2, y + 10);
+      // Emoji + text
+      ctx.fillText(`${f.emoji} ${f.label}`, x + tw / 2, ty + 5);
       ctx.textAlign = 'left';
 
-      // Click region
       this.clickRegions.push({
         x,
-        y,
-        width: tabWidth - 2,
-        height: SIZES.filterHeight - 4,
+        y: ty,
+        width: tw,
+        height: th,
         action: 'filter',
         data: f.id,
       });
 
-      x += tabWidth;
+      x += tabW;
     }
 
     return y + SIZES.filterHeight;
@@ -326,76 +420,145 @@ export class SpellbookPanel implements IWindowPanel {
   ): number {
     const isSelected = this.selectedSpellId === spell.id;
     const rowHeight = SIZES.spellRowHeight;
+    const schoolColor = this.getSchoolColor(spell.school);
+    const cardX = SIZES.padding / 2;
+    const cardY = y + 2;
+    const cardW = width - SIZES.padding;
+    const cardH = rowHeight - 4;
 
-    // Background
-    ctx.fillStyle = isSelected ? COLORS.spellSelected : COLORS.spellBg;
-    ctx.fillRect(SIZES.padding / 2, y + 2, width - SIZES.padding, rowHeight - 4);
+    // Card background gradient
+    const cardGrad = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY);
+    if (isSelected) {
+      cardGrad.addColorStop(0, 'rgba(60, 35, 100, 0.95)');
+      cardGrad.addColorStop(1, 'rgba(35, 20, 65, 0.95)');
+    } else {
+      cardGrad.addColorStop(0, 'rgba(28, 18, 52, 0.88)');
+      cardGrad.addColorStop(1, 'rgba(18, 12, 38, 0.88)');
+    }
+    ctx.fillStyle = cardGrad;
+    ctx.beginPath();
+    (ctx as any).roundRect(cardX, cardY, cardW, cardH, 6);
+    ctx.fill();
 
-    // Border
-    ctx.strokeStyle = isSelected ? COLORS.accent : COLORS.border;
-    ctx.lineWidth = isSelected ? 2 : 1;
-    ctx.strokeRect(SIZES.padding / 2, y + 2, width - SIZES.padding, rowHeight - 4);
+    // 3px school-color left accent bar
+    ctx.fillStyle = schoolColor;
+    ctx.beginPath();
+    (ctx as any).roundRect(cardX, cardY, 3, cardH, [6, 0, 0, 6]);
+    ctx.fill();
+
+    // Card border
+    if (isSelected) {
+      ctx.shadowColor = schoolColor;
+      ctx.shadowBlur = 8;
+      ctx.strokeStyle = schoolColor;
+      ctx.lineWidth = 1.5;
+    } else {
+      ctx.strokeStyle = 'rgba(100, 70, 160, 0.35)';
+      ctx.lineWidth = 1;
+    }
+    ctx.beginPath();
+    (ctx as any).roundRect(cardX, cardY, cardW, cardH, 6);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    const textX = cardX + 10;
 
     // Hotkey badge
     if (state?.hotkey) {
+      ctx.fillStyle = 'rgba(255, 215, 0, 0.15)';
+      ctx.beginPath();
+      (ctx as any).roundRect(textX, cardY + 6, 22, 14, 3);
+      ctx.fill();
       ctx.fillStyle = COLORS.hotkey;
-      ctx.font = 'bold 12px monospace';
-      ctx.fillText(`[${state.hotkey}]`, SIZES.padding, y + 8);
+      ctx.font = 'bold 9px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${state.hotkey}`, textX + 11, cardY + 8);
+      ctx.textAlign = 'left';
     }
 
-    // Spell name
-    ctx.fillStyle = this.getSchoolColor(spell.school);
-    ctx.font = 'bold 12px monospace';
-    ctx.fillText(spell.name, SIZES.padding + (state?.hotkey ? 30 : 0), y + 8);
+    // School emoji + spell name
+    const nameX = textX + (state?.hotkey ? 26 : 0);
+    const schoolEmoji = this.getSchoolEmoji(spell.school);
+    ctx.fillStyle = schoolColor;
+    ctx.font = 'bold 11px monospace';
+    ctx.fillText(`${schoolEmoji} ${spell.name}`, nameX, cardY + 8);
 
-    // Mana cost
-    ctx.fillStyle = COLORS.mana;
-    ctx.font = '11px monospace';
-    const costText = `${spell.manaCost} mana`;
-    const costWidth = ctx.measureText(costText).width;
-    ctx.fillText(costText, width - costWidth - SIZES.padding, y + 8);
+    // Mana cost pill
+    const canCast = this.playerMana >= spell.manaCost;
+    const costText = `✨${spell.manaCost}`;
+    ctx.font = '10px monospace';
+    const costW = ctx.measureText(costText).width + 8;
+    const costX = cardX + cardW - costW - 4;
+    const costY = cardY + 5;
+
+    ctx.fillStyle = canCast ? 'rgba(20, 60, 140, 0.5)' : 'rgba(60, 20, 20, 0.5)';
+    ctx.beginPath();
+    (ctx as any).roundRect(costX, costY, costW, 14, 4);
+    ctx.fill();
+    ctx.fillStyle = canCast ? '#88ccff' : '#ff8888';
+    ctx.fillText(costText, costX + 4, costY + 2);
 
     // Description
-    ctx.fillStyle = COLORS.textMuted;
-    ctx.font = '10px monospace';
-    const desc = spell.description.length > 50
-      ? spell.description.substring(0, 47) + '...'
-      : spell.description;
-    ctx.fillText(desc, SIZES.padding, y + 26);
-
-    // Proficiency bar
-    const proficiency = state?.proficiency ?? 0;
-    const barX = SIZES.padding;
-    const barY = y + 42;
-    const barWidth = 80;
-    const barHeight = 8;
-
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-    ctx.fillRect(barX, barY, barWidth, barHeight);
-
-    ctx.fillStyle = this.getProficiencyColor(proficiency);
-    ctx.fillRect(barX, barY, (proficiency / 100) * barWidth, barHeight);
-
-    ctx.fillStyle = COLORS.textDim;
+    ctx.fillStyle = 'rgba(180, 170, 210, 0.75)';
     ctx.font = '9px monospace';
-    ctx.fillText(`${Math.floor(proficiency)}%`, barX + barWidth + 5, barY);
+    const maxDescLen = Math.floor((cardW - 16) / 5.5);
+    const desc = spell.description.length > maxDescLen
+      ? spell.description.substring(0, maxDescLen - 3) + '...'
+      : spell.description;
+    ctx.fillText(desc, textX, cardY + 24);
 
-    // Mishap chance
+    // Proficiency bar (rounded gradient)
+    const proficiency = state?.proficiency ?? 0;
+    const barX = textX;
+    const barY = cardY + 38;
+    const barWidth = 90;
+    const barHeight = 6;
+    const profColor = this.getProficiencyColor(proficiency);
+
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+    ctx.beginPath();
+    (ctx as any).roundRect(barX, barY, barWidth, barHeight, 3);
+    ctx.fill();
+
+    if (proficiency > 0) {
+      const profGrad = ctx.createLinearGradient(barX, 0, barX + barWidth, 0);
+      profGrad.addColorStop(0, profColor + '88');
+      profGrad.addColorStop(1, profColor);
+      ctx.fillStyle = profGrad;
+      ctx.beginPath();
+      (ctx as any).roundRect(barX, barY, (proficiency / 100) * barWidth, barHeight, 3);
+      ctx.fill();
+    }
+
+    ctx.fillStyle = 'rgba(180, 180, 200, 0.6)';
+    ctx.font = '8px monospace';
+    ctx.fillText(`${Math.floor(proficiency)}%`, barX + barWidth + 4, barY);
+
+    // Mishap warning badge
     const spellRegistry = getSpellRegistry();
     if (spellRegistry) {
       const mishapChance = spellRegistry.getMishapChance(spell.id);
       if (mishapChance > 0.05) {
-        ctx.fillStyle = '#FF6666';
-        ctx.fillText(`${Math.floor(mishapChance * 100)}% mishap`, barX + barWidth + 35, barY);
+        const mishapText = `⚠ ${Math.floor(mishapChance * 100)}%`;
+        const mishapW = ctx.measureText(mishapText).width + 8;
+        const mishapX = barX + barWidth + 26;
+        const mishapY = barY - 1;
+        ctx.fillStyle = 'rgba(180, 40, 40, 0.35)';
+        ctx.beginPath();
+        (ctx as any).roundRect(mishapX, mishapY, mishapW, 10, 3);
+        ctx.fill();
+        ctx.fillStyle = '#FF8888';
+        ctx.font = '8px monospace';
+        ctx.fillText(mishapText, mishapX + 4, mishapY);
       }
     }
 
     // Click region
     this.clickRegions.push({
-      x: SIZES.padding / 2,
-      y: y + 2,
-      width: width - SIZES.padding,
-      height: rowHeight - 4,
+      x: cardX,
+      y: cardY,
+      width: cardW,
+      height: cardH,
       action: 'select_spell',
       data: spell.id,
     });
@@ -415,42 +578,74 @@ export class SpellbookPanel implements IWindowPanel {
     if (!spell) return;
 
     const panelY = height - SIZES.detailHeight;
+    const schoolColor = this.getSchoolColor(spell.school);
+    const canCast = this.playerMana >= spell.manaCost;
 
-    // Background
-    ctx.fillStyle = COLORS.headerBg;
+    // Background gradient
+    const bgGrad = ctx.createLinearGradient(0, panelY, 0, height);
+    bgGrad.addColorStop(0, 'rgba(28, 16, 58, 0.98)');
+    bgGrad.addColorStop(1, 'rgba(15, 10, 35, 0.98)');
+    ctx.fillStyle = bgGrad;
     ctx.fillRect(0, panelY, width, SIZES.detailHeight);
 
-    // Border
-    ctx.strokeStyle = COLORS.accent;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(0, panelY);
-    ctx.lineTo(width, panelY);
-    ctx.stroke();
+    // Top accent border — school color glow
+    const sepGrad = ctx.createLinearGradient(0, 0, width, 0);
+    sepGrad.addColorStop(0, 'transparent');
+    sepGrad.addColorStop(0.25, schoolColor);
+    sepGrad.addColorStop(0.75, schoolColor);
+    sepGrad.addColorStop(1, 'transparent');
+    ctx.shadowColor = schoolColor;
+    ctx.shadowBlur = 6;
+    ctx.fillStyle = sepGrad;
+    ctx.fillRect(0, panelY, width, 2);
+    ctx.shadowBlur = 0;
 
     let y = panelY + SIZES.padding;
 
-    // Spell name
-    ctx.fillStyle = this.getSchoolColor(spell.school);
-    ctx.font = 'bold 14px monospace';
-    ctx.fillText(spell.name, SIZES.padding, y);
+    // Spell name with school emoji
+    const emoji = this.getSchoolEmoji(spell.school);
+    ctx.shadowColor = schoolColor;
+    ctx.shadowBlur = 6;
+    ctx.fillStyle = schoolColor;
+    ctx.font = 'bold 13px monospace';
+    ctx.fillText(`${emoji} ${spell.name}`, SIZES.padding, y);
+    ctx.shadowBlur = 0;
 
-    // Cast button
-    const canCast = this.playerMana >= spell.manaCost;
+    // CAST button with animated pulse when ready
     const castBtnX = width - 80 - SIZES.padding;
     const castBtnY = y - 4;
     const castBtnW = 80;
     const castBtnH = 24;
 
-    ctx.fillStyle = canCast ? COLORS.accent : COLORS.textDim;
+    if (canCast) {
+      const pulse = 0.7 + 0.3 * Math.abs(Math.sin(performance.now() / 500));
+      ctx.shadowColor = COLORS.accent;
+      ctx.shadowBlur = 10 * pulse;
+      const btnGrad = ctx.createLinearGradient(castBtnX, castBtnY, castBtnX, castBtnY + castBtnH);
+      btnGrad.addColorStop(0, `rgba(130, 60, 230, ${0.8 * pulse})`);
+      btnGrad.addColorStop(1, `rgba(80, 30, 160, ${0.8 * pulse})`);
+      ctx.fillStyle = btnGrad;
+    } else {
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = 'rgba(50, 45, 60, 0.7)';
+    }
     ctx.beginPath();
-    ctx.roundRect(castBtnX, castBtnY, castBtnW, castBtnH, 4);
+    (ctx as any).roundRect(castBtnX, castBtnY, castBtnW, castBtnH, 5);
     ctx.fill();
+    ctx.shadowBlur = 0;
 
-    ctx.fillStyle = canCast ? COLORS.text : COLORS.textMuted;
+    if (canCast) {
+      ctx.strokeStyle = `rgba(180, 120, 255, 0.8)`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      (ctx as any).roundRect(castBtnX, castBtnY, castBtnW, castBtnH, 5);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = canCast ? '#e0d0ff' : COLORS.textDim;
     ctx.font = 'bold 11px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('CAST', castBtnX + castBtnW / 2, castBtnY + 7);
+    ctx.fillText('⚡ CAST', castBtnX + castBtnW / 2, castBtnY + 7);
     ctx.textAlign = 'left';
 
     this.clickRegions.push({
@@ -464,42 +659,59 @@ export class SpellbookPanel implements IWindowPanel {
 
     y += 22;
 
-    // Details
-    ctx.fillStyle = COLORS.text;
-    ctx.font = '11px monospace';
-    ctx.fillText(spell.description, SIZES.padding, y);
-    y += 18;
-
-    ctx.fillStyle = COLORS.textMuted;
+    // Description
+    ctx.fillStyle = '#d0c8e8';
     ctx.font = '10px monospace';
+    const maxLen = Math.floor((width - SIZES.padding * 2 - castBtnW - 8) / 5.5);
+    const desc = spell.description.length > maxLen
+      ? spell.description.substring(0, maxLen - 3) + '...'
+      : spell.description;
+    ctx.fillText(desc, SIZES.padding, y);
+    y += 16;
+
+    // Stats grid — technique | form | range
+    ctx.fillStyle = 'rgba(160, 140, 200, 0.6)';
+    ctx.font = '9px monospace';
     ctx.fillText(
-      `Technique: ${spell.technique} | Form: ${spell.form} | Range: ${spell.range} tiles`,
+      `⚙ ${spell.technique}  ·  ${spell.form}  ·  📍${spell.range}t`,
       SIZES.padding,
       y
     );
-    y += 16;
+    y += 14;
 
     ctx.fillText(
-      `Cast time: ${(spell.castTime / 20).toFixed(1)}s | ` +
-      (spell.duration ? `Duration: ${(spell.duration / 20).toFixed(0)}s` : 'Instant'),
+      `⏱ ${(spell.castTime / 20).toFixed(1)}s cast  ·  ` +
+      (spell.duration ? `⏳ ${(spell.duration / 20).toFixed(0)}s duration` : '⚡ Instant'),
       SIZES.padding,
       y
     );
-    y += 16;
+    y += 14;
 
-    // Hotkey assignment
-    ctx.fillStyle = COLORS.hotkey;
-    ctx.font = '10px monospace';
+    // Hotkey assignment hint
+    ctx.fillStyle = 'rgba(255, 215, 0, 0.6)';
+    ctx.font = '9px monospace';
     if (state?.hotkey) {
-      ctx.fillText(`Hotkey: [${state.hotkey}] - Click 1-9 to reassign`, SIZES.padding, y);
+      ctx.fillText(`🔑 Hotkey [${state.hotkey}] — press 1–9 to reassign`, SIZES.padding, y);
     } else {
-      ctx.fillText('Press 1-9 to assign hotkey', SIZES.padding, y);
+      ctx.fillText('🔑 Press 1–9 to assign hotkey', SIZES.padding, y);
     }
-    y += 16;
+    y += 14;
 
-    // Stats
-    ctx.fillStyle = COLORS.textDim;
-    ctx.fillText(`Times cast: ${state?.timesCast ?? 0}`, SIZES.padding, y);
+    // Times cast
+    ctx.fillStyle = 'rgba(140, 120, 180, 0.5)';
+    ctx.font = '9px monospace';
+    ctx.fillText(`✦ Cast ${state?.timesCast ?? 0} times`, SIZES.padding, y);
+  }
+
+  private getSchoolEmoji(school?: string): string {
+    switch (school) {
+      case 'fire': return '🔥';
+      case 'protection': return '🛡️';
+      case 'restoration': return '💚';
+      case 'divination': return '🔮';
+      case 'combat': return '⚔️';
+      default: return '✦';
+    }
   }
 
   private getSchoolColor(school?: string): string {
