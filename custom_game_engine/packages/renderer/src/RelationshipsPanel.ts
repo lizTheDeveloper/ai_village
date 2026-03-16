@@ -208,6 +208,233 @@ export class RelationshipsPanel implements IWindowPanel {
   }
 
   /**
+   * Draw the dark gradient panel background.
+   */
+  private renderPanelBackground(ctx: CanvasRenderingContext2D, x: number, y: number): void {
+    const grad = ctx.createLinearGradient(x, y, x, y + this.panelHeight);
+    grad.addColorStop(0, 'rgba(12,8,28,1)');
+    grad.addColorStop(1, 'rgba(6,4,18,1)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(x, y, this.panelWidth, this.panelHeight);
+  }
+
+  /**
+   * Draw the scrollbar on the right edge.
+   */
+  private renderScrollbar(ctx: CanvasRenderingContext2D, x: number, y: number): void {
+    if (this.maxScrollOffset <= 0) return;
+
+    const sbWidth = 4;
+    const sbX = x + this.panelWidth - sbWidth - 2;
+    const totalContent = this.panelHeight + this.maxScrollOffset;
+    const thumbRatio = this.panelHeight / totalContent;
+    const trackHeight = this.panelHeight - 20; // leave room for help text
+    const thumbHeight = Math.max(20, Math.round(trackHeight * thumbRatio));
+    const thumbTop = y + Math.round((this.scrollOffset / totalContent) * trackHeight);
+
+    // Track
+    ctx.fillStyle = 'rgba(255,255,255,0.07)';
+    ctx.beginPath();
+    (ctx as CanvasRenderingContext2D & { roundRect: (x: number, y: number, w: number, h: number, r: number) => void })
+      .roundRect(sbX, y, sbWidth, trackHeight, 2);
+    ctx.fill();
+
+    // Thumb
+    ctx.fillStyle = 'rgba(150,120,220,0.55)';
+    ctx.beginPath();
+    (ctx as CanvasRenderingContext2D & { roundRect: (x: number, y: number, w: number, h: number, r: number) => void })
+      .roundRect(sbX, thumbTop, sbWidth, thumbHeight, 2);
+    ctx.fill();
+  }
+
+  /**
+   * Render a gradient separator line (fades in from left, fades out to right).
+   */
+  private renderSeparator(ctx: CanvasRenderingContext2D, panelX: number, y: number): void {
+    const x0 = panelX + this.padding;
+    const x1 = panelX + this.panelWidth - this.padding;
+    const grad = ctx.createLinearGradient(x0, y, x1, y);
+    grad.addColorStop(0, 'rgba(255,255,255,0)');
+    grad.addColorStop(0.15, 'rgba(255,255,255,0.25)');
+    grad.addColorStop(0.85, 'rgba(255,255,255,0.25)');
+    grad.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x0, y);
+    ctx.lineTo(x1, y);
+    ctx.stroke();
+  }
+
+  /**
+   * Render a section header card with a colored left accent bar.
+   */
+  private renderSectionHeader(
+    ctx: CanvasRenderingContext2D,
+    panelX: number,
+    y: number,
+    label: string,
+    accentColor: string
+  ): void {
+    const cardX = panelX + this.padding;
+    const cardW = this.panelWidth - this.padding * 2;
+    const cardH = 22;
+
+    // Card gradient background
+    const grad = ctx.createLinearGradient(cardX, y, cardX + cardW, y);
+    grad.addColorStop(0, 'rgba(255,255,255,0.08)');
+    grad.addColorStop(1, 'rgba(255,255,255,0.01)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    (ctx as CanvasRenderingContext2D & { roundRect: (x: number, y: number, w: number, h: number, r: number) => void })
+      .roundRect(cardX, y, cardW, cardH, 3);
+    ctx.fill();
+
+    // Left accent bar
+    ctx.fillStyle = accentColor;
+    ctx.beginPath();
+    (ctx as CanvasRenderingContext2D & { roundRect: (x: number, y: number, w: number, h: number, r: number) => void })
+      .roundRect(cardX, y, 3, cardH, 2);
+    ctx.fill();
+
+    // Label
+    ctx.fillStyle = accentColor;
+    ctx.font = 'bold 13px monospace';
+    ctx.fillText(label, cardX + 10, y + 15);
+  }
+
+  /**
+   * Render a styled horizontal bar (trust or sentiment).
+   * @param value 0..1
+   * @param colorStart gradient start color (css string)
+   * @param colorEnd gradient end color (css string)
+   */
+  private renderStatBar(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    value: number,
+    colorStart: string,
+    colorEnd: string,
+    label: string
+  ): void {
+    const barW = 120;
+    const barH = 10;
+    const fillW = Math.round(value * barW);
+
+    // Dark rounded background
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.beginPath();
+    (ctx as CanvasRenderingContext2D & { roundRect: (x: number, y: number, w: number, h: number, r: number) => void })
+      .roundRect(x, y, barW, barH, 3);
+    ctx.fill();
+
+    // Gradient fill
+    if (fillW > 0) {
+      const grad = ctx.createLinearGradient(x, y, x + barW, y);
+      grad.addColorStop(0, colorStart);
+      grad.addColorStop(1, colorEnd);
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      (ctx as CanvasRenderingContext2D & { roundRect: (x: number, y: number, w: number, h: number, r: number) => void })
+        .roundRect(x, y, fillW, barH, 3);
+      ctx.fill();
+    }
+
+    // Percentage label overlaid at bar end
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '9px monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(label, x + barW - 2, y + barH - 1);
+    ctx.textAlign = 'left';
+  }
+
+  /**
+   * Render a relationship type badge (pill).
+   */
+  private renderTypeBadge(ctx: CanvasRenderingContext2D, x: number, y: number, type: string): void {
+    const badgeColors: Record<string, { bg: string; text: string }> = {
+      ally:     { bg: 'rgba(80,220,160,0.25)', text: '#80FFCC' },
+      rival:    { bg: 'rgba(220,80,80,0.25)',  text: '#FF9999' },
+      friend:   { bg: 'rgba(100,180,255,0.25)', text: '#AADDFF' },
+      enemy:    { bg: 'rgba(180,40,40,0.35)',  text: '#FF6666' },
+      neutral:  { bg: 'rgba(160,160,160,0.18)', text: '#CCCCCC' },
+      stranger: { bg: 'rgba(120,120,140,0.18)', text: '#AAAACC' },
+    };
+    const colors = badgeColors[type.toLowerCase()] ?? { bg: 'rgba(100,100,120,0.25)', text: '#BBBBCC' };
+
+    ctx.font = '10px monospace';
+    const textW = ctx.measureText(type).width;
+    const padH = 5;
+    const padV = 3;
+    const badgeW = textW + padH * 2;
+    const badgeH = 14;
+
+    ctx.fillStyle = colors.bg;
+    ctx.beginPath();
+    (ctx as CanvasRenderingContext2D & { roundRect: (x: number, y: number, w: number, h: number, r: number) => void })
+      .roundRect(x, y - badgeH + padV, badgeW, badgeH, 5);
+    ctx.fill();
+
+    ctx.fillStyle = colors.text;
+    ctx.fillText(type, x + padH, y);
+  }
+
+  /**
+   * Render a filled circle trust indicator with optional glow.
+   */
+  private renderTrustIndicator(
+    ctx: CanvasRenderingContext2D,
+    cx: number,
+    cy: number,
+    score: number
+  ): void {
+    const radius = 6;
+    const color = score >= 0.7 ? '#88FF88' : score >= 0.4 ? '#FFFF88' : '#FF8888';
+    const glowColor = score >= 0.7 ? 'rgba(136,255,136,0.35)' : score >= 0.4 ? 'rgba(255,255,136,0.35)' : 'rgba(255,136,136,0.35)';
+
+    // Glow
+    ctx.shadowColor = glowColor;
+    ctx.shadowBlur = 8;
+
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = 'transparent';
+  }
+
+  /**
+   * Render a small edit button with roundRect corners.
+   */
+  private renderEditButton(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    label: string,
+    color: string
+  ): void {
+    ctx.fillStyle = 'rgba(30, 20, 50, 0.85)';
+    ctx.beginPath();
+    (ctx as CanvasRenderingContext2D & { roundRect: (x: number, y: number, w: number, h: number, r: number) => void })
+      .roundRect(x, y, 16, 14, 3);
+    ctx.fill();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    (ctx as CanvasRenderingContext2D & { roundRect: (x: number, y: number, w: number, h: number, r: number) => void })
+      .roundRect(x, y, 16, 14, 3);
+    ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.font = 'bold 11px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, x + 8, y + 11);
+    ctx.textAlign = 'left';
+  }
+
+  /**
    * Render the relationships panel.
    */
   render(ctx: CanvasRenderingContext2D, _x: number, _y: number, _width: number, _height: number, world?: any): void {
@@ -234,6 +461,9 @@ export class RelationshipsPanel implements IWindowPanel {
 
     const x = 0;
     const y = 0;
+
+    // Draw dark gradient panel background (outside clip/scroll)
+    this.renderPanelBackground(ctx, x, y);
 
     // Get components
     const identity = selectedEntity.components.get('identity') as IdentityComponent | undefined;
@@ -295,9 +525,12 @@ export class RelationshipsPanel implements IWindowPanel {
 
     ctx.restore();
 
+    // Scrollbar (outside scroll area, in panel coords)
+    this.renderScrollbar(ctx, x, y);
+
     // Help text at bottom (outside scroll area)
     const helpY = y + this.panelHeight - 20;
-    ctx.fillStyle = '#888888';
+    ctx.fillStyle = '#666688';
     ctx.font = '11px monospace';
     if (this.devMode) {
       ctx.fillText('DEV MODE | Press R to close | Scroll', x + this.padding, helpY);
@@ -319,17 +552,15 @@ export class RelationshipsPanel implements IWindowPanel {
     this.renderSeparator(ctx, panelX, y);
     y += 10;
 
-    ctx.fillStyle = '#88FFCC';
-    ctx.font = 'bold 14px monospace';
-    ctx.fillText('👥 Social Memory', panelX + this.padding, y);
+    this.renderSectionHeader(ctx, panelX, y, '👥 Social Memory', '#88FFCC');
 
     // Dev mode indicator
     if (this.devMode) {
-      ctx.fillStyle = '#888888';
+      ctx.fillStyle = '#556655';
       ctx.font = '9px monospace';
-      ctx.fillText('(click to edit)', panelX + this.padding + 125, y);
+      ctx.fillText('(click to edit)', panelX + this.padding + 145, y + 14);
     }
-    y += this.lineHeight + 5;
+    y += 28;
 
     const socialMemories = socialMemory.socialMemories as Map<string, SocialMemory> | undefined;
     const relationshipCount = socialMemories ? socialMemories.size : 0;
@@ -368,81 +599,108 @@ export class RelationshipsPanel implements IWindowPanel {
     const agentIdentity = agentEntity?.components.get('identity') as IdentityComponent | undefined;
     const agentName = agentIdentity?.name || agentId.substring(0, 8);
 
-    // Header with emoji and name
+    // Agent entry row background
+    const rowX = panelX + this.padding;
+    const rowW = this.panelWidth - this.padding * 2;
+    const rowStartY = y - 2;
+
+    // Sentiment icon
     const sentimentIcon = socialMem.overallSentiment > 0.3 ? '😊' :
                           socialMem.overallSentiment < -0.3 ? '😠' : '😐';
 
+    // Measure row height ahead of time (rough)
+    let rowH = this.lineHeight; // name
+    rowH += this.lineHeight;   // type badge
+    rowH += this.lineHeight + 4; // trust bar
+    rowH += this.lineHeight + 4; // sentiment bar
+    rowH += this.lineHeight;   // interactions
+    if (socialMem.impressions && socialMem.impressions.length > 0) rowH += this.lineHeight;
+    if (socialMem.knownFacts && socialMem.knownFacts.length > 0) rowH += this.lineHeight;
+    rowH += 8; // bottom spacing
+
+    // Subtle row background
+    ctx.fillStyle = 'rgba(255,255,255,0.03)';
+    ctx.beginPath();
+    (ctx as CanvasRenderingContext2D & { roundRect: (x: number, y: number, w: number, h: number, r: number) => void })
+      .roundRect(rowX, rowStartY, rowW, rowH, 3);
+    ctx.fill();
+
+    // Header with emoji and name
     ctx.fillStyle = '#AAFFDD';
     ctx.font = 'bold 12px monospace';
-    ctx.fillText(`${sentimentIcon} ${agentName}`, panelX + this.padding, y);
-    y += this.lineHeight;
+    ctx.fillText(`${sentimentIcon} ${agentName}`, rowX + 4, y + 12);
+    y += this.lineHeight + 2;
 
-    // Relationship type
-    ctx.fillStyle = '#AAAAAA';
-    ctx.font = '11px monospace';
-    ctx.fillText(`Type: ${socialMem.relationshipType}`, panelX + this.padding + 10, y);
-    y += this.lineHeight;
+    // Relationship type badge
+    ctx.font = '10px monospace';
+    this.renderTypeBadge(ctx, rowX + 14, y + 10, socialMem.relationshipType || 'neutral');
+    y += this.lineHeight + 2;
 
-    // Trust with edit buttons
+    // Trust bar (violet → cyan)
     const trustPercent = Math.round(socialMem.trust * 100);
     const trustLabelX = panelX + this.padding + 10;
-    ctx.fillText(`Trust: ${trustPercent}%`, trustLabelX, y);
+    ctx.fillStyle = '#AAAAAA';
+    ctx.font = '10px monospace';
+    ctx.fillText('Trust', trustLabelX, y + 9);
+    this.renderStatBar(ctx, trustLabelX + 40, y, socialMem.trust, '#7733CC', '#33CCFF', `${trustPercent}%`);
 
     if (this.devMode) {
-      // Draw +/- buttons for trust
-      const trustBtnX = trustLabelX + 90;
-      this.renderEditButton(ctx, trustBtnX, y - 10, '-', '#FF8888');
+      const trustBtnX = trustLabelX + 40 + 124;
+      this.renderEditButton(ctx, trustBtnX, y, '-', '#FF8888');
       this.clickRegions.push({
         x: trustBtnX,
-        y: y - 10,
+        y: y,
         width: 16,
         height: 14,
         action: 'trust_down',
         targetId: agentId,
       });
-
-      this.renderEditButton(ctx, trustBtnX + 20, y - 10, '+', '#88FF88');
+      this.renderEditButton(ctx, trustBtnX + 20, y, '+', '#88FF88');
       this.clickRegions.push({
         x: trustBtnX + 20,
-        y: y - 10,
+        y: y,
         width: 16,
         height: 14,
         action: 'trust_up',
         targetId: agentId,
       });
     }
-    y += this.lineHeight;
+    y += this.lineHeight + 4;
 
-    // Sentiment with edit buttons
-    const sentimentPercent = Math.round((socialMem.overallSentiment + 1) * 50); // Convert -1..1 to 0..100
-    ctx.fillText(`Sentiment: ${sentimentPercent}%`, trustLabelX, y);
+    // Sentiment bar (red → green), convert -1..1 to 0..1
+    const sentimentNorm = (socialMem.overallSentiment + 1) / 2;
+    const sentimentPercent = Math.round(sentimentNorm * 100);
+    ctx.fillStyle = '#AAAAAA';
+    ctx.font = '10px monospace';
+    ctx.fillText('Mood', trustLabelX, y + 9);
+    this.renderStatBar(ctx, trustLabelX + 40, y, sentimentNorm, '#CC3333', '#33CC66', `${sentimentPercent}%`);
 
     if (this.devMode) {
-      // Draw +/- buttons for sentiment
-      const sentimentBtnX = trustLabelX + 110;
-      this.renderEditButton(ctx, sentimentBtnX, y - 10, '-', '#FF8888');
+      const sentimentBtnX = trustLabelX + 40 + 124;
+      this.renderEditButton(ctx, sentimentBtnX, y, '-', '#FF8888');
       this.clickRegions.push({
         x: sentimentBtnX,
-        y: y - 10,
+        y: y,
         width: 16,
         height: 14,
         action: 'sentiment_down',
         targetId: agentId,
       });
-
-      this.renderEditButton(ctx, sentimentBtnX + 20, y - 10, '+', '#88FF88');
+      this.renderEditButton(ctx, sentimentBtnX + 20, y, '+', '#88FF88');
       this.clickRegions.push({
         x: sentimentBtnX + 20,
-        y: y - 10,
+        y: y,
         width: 16,
         height: 14,
         action: 'sentiment_up',
         targetId: agentId,
       });
     }
-    y += this.lineHeight;
+    y += this.lineHeight + 4;
 
     // Interactions count
+    ctx.fillStyle = '#AAAAAA';
+    ctx.font = '11px monospace';
     ctx.fillText(
       `Interactions: ${socialMem.interactionCount}`,
       panelX + this.padding + 10,
@@ -454,7 +712,7 @@ export class RelationshipsPanel implements IWindowPanel {
     if (socialMem.impressions && socialMem.impressions.length > 0) {
       const latestImpression = socialMem.impressions[socialMem.impressions.length - 1];
       if (latestImpression) {
-        ctx.fillStyle = '#888888';
+        ctx.fillStyle = '#777799';
         ctx.font = '10px monospace';
         const truncatedImpression = latestImpression.text.length > 40
           ? latestImpression.text.substring(0, 37) + '...'
@@ -468,7 +726,7 @@ export class RelationshipsPanel implements IWindowPanel {
     if (socialMem.knownFacts && socialMem.knownFacts.length > 0) {
       const fact = socialMem.knownFacts[0];
       if (fact) {
-        ctx.fillStyle = '#777777';
+        ctx.fillStyle = '#666688';
         ctx.font = '10px monospace';
         const truncatedFact = fact.fact.length > 35
           ? fact.fact.substring(0, 32) + '...'
@@ -478,30 +736,8 @@ export class RelationshipsPanel implements IWindowPanel {
       }
     }
 
-    y += 5; // Spacing between entries
+    y += 8; // Spacing between entries
     return y;
-  }
-
-  /**
-   * Render a small edit button
-   */
-  private renderEditButton(
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-    label: string,
-    color: string
-  ): void {
-    ctx.fillStyle = 'rgba(50, 50, 50, 0.8)';
-    ctx.fillRect(x, y, 16, 14);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x, y, 16, 14);
-    ctx.fillStyle = color;
-    ctx.font = 'bold 11px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText(label, x + 8, y + 11);
-    ctx.textAlign = 'left';
   }
 
   /**
@@ -517,17 +753,15 @@ export class RelationshipsPanel implements IWindowPanel {
     this.renderSeparator(ctx, panelX, y);
     y += 10;
 
-    ctx.fillStyle = '#FF88CC';
-    ctx.font = 'bold 14px monospace';
-    ctx.fillText('💕 Familiarity', panelX + this.padding, y);
+    this.renderSectionHeader(ctx, panelX, y, '💕 Familiarity', '#FF88CC');
 
     // Dev mode indicator
     if (this.devMode) {
-      ctx.fillStyle = '#888888';
+      ctx.fillStyle = '#664455';
       ctx.font = '9px monospace';
-      ctx.fillText('(click to edit)', panelX + this.padding + 110, y);
+      ctx.fillText('(click to edit)', panelX + this.padding + 125, y + 14);
     }
-    y += this.lineHeight + 5;
+    y += 28;
 
     const relationships = relationship.relationships;
     ctx.fillStyle = '#AAAAAA';
@@ -547,32 +781,68 @@ export class RelationshipsPanel implements IWindowPanel {
         const targetIdentity = targetEntity?.components.get('identity') as IdentityComponent | undefined;
         const targetName = targetIdentity?.name || targetId.substring(0, 8);
 
-        // Familiarity bar
-        const barWidth = 60;
-        const fillWidth = (rel.familiarity / 100) * barWidth;
+        // Row background
+        const rowX = panelX + this.padding;
+        const rowW = this.panelWidth - this.padding * 2;
+        ctx.fillStyle = 'rgba(255,255,255,0.03)';
+        ctx.beginPath();
+        (ctx as CanvasRenderingContext2D & { roundRect: (x: number, y: number, w: number, h: number, r: number) => void })
+          .roundRect(rowX, y - 12, rowW, this.lineHeight + 6, 3);
+        ctx.fill();
 
+        // Name
         ctx.fillStyle = '#FFAADD';
         ctx.font = '11px monospace';
-        ctx.fillText(`${targetName}:`, panelX + this.padding, y);
+        ctx.fillText(`${targetName}:`, rowX + 4, y);
 
-        // Draw bar background
-        ctx.fillStyle = '#333333';
-        ctx.fillRect(panelX + this.padding + 100, y - 10, barWidth, 12);
+        // Familiarity bar (gradient, rounded, glow if high)
+        const barX = rowX + 100;
+        const barW = 80;
+        const barH = 10;
+        const famNorm = rel.familiarity / 100;
+        const fillW = Math.round(famNorm * barW);
 
-        // Draw bar fill
-        const barColor = rel.familiarity > 70 ? '#88FF88' :
-                         rel.familiarity > 40 ? '#FFFF88' : '#FF8888';
-        ctx.fillStyle = barColor;
-        ctx.fillRect(panelX + this.padding + 100, y - 10, fillWidth, 12);
+        // Bar background
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.beginPath();
+        (ctx as CanvasRenderingContext2D & { roundRect: (x: number, y: number, w: number, h: number, r: number) => void })
+          .roundRect(barX, y - 10, barW, barH, 3);
+        ctx.fill();
 
-        // Draw value
+        // Gradient fill
+        if (fillW > 0) {
+          const barColorStart = rel.familiarity > 70 ? '#228855' : rel.familiarity > 40 ? '#886622' : '#882222';
+          const barColorEnd   = rel.familiarity > 70 ? '#88FF88' : rel.familiarity > 40 ? '#FFFF88' : '#FF8888';
+          const barGrad = ctx.createLinearGradient(barX, y - 10, barX + barW, y - 10);
+          barGrad.addColorStop(0, barColorStart);
+          barGrad.addColorStop(1, barColorEnd);
+          ctx.fillStyle = barGrad;
+          ctx.beginPath();
+          (ctx as CanvasRenderingContext2D & { roundRect: (x: number, y: number, w: number, h: number, r: number) => void })
+            .roundRect(barX, y - 10, fillW, barH, 3);
+          ctx.fill();
+        }
+
+        // Glow on high familiarity
+        if (rel.familiarity > 70) {
+          ctx.shadowColor = 'rgba(136,255,136,0.4)';
+          ctx.shadowBlur = 6;
+          ctx.beginPath();
+          (ctx as CanvasRenderingContext2D & { roundRect: (x: number, y: number, w: number, h: number, r: number) => void })
+            .roundRect(barX, y - 10, fillW, barH, 3);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+          ctx.shadowColor = 'transparent';
+        }
+
+        // Value text
         ctx.fillStyle = '#FFFFFF';
         ctx.font = '10px monospace';
-        ctx.fillText(`${rel.familiarity}%`, panelX + this.padding + 165, y);
+        ctx.fillText(`${rel.familiarity}%`, barX + barW + 4, y);
 
-        // Edit buttons for familiarity
+        // Edit buttons
         if (this.devMode) {
-          const editBtnX = panelX + this.padding + 200;
+          const editBtnX = barX + barW + 30;
           this.renderEditButton(ctx, editBtnX, y - 10, '-', '#FF8888');
           this.clickRegions.push({
             x: editBtnX,
@@ -594,11 +864,11 @@ export class RelationshipsPanel implements IWindowPanel {
           });
         } else {
           // Show interaction count when not in dev mode
-          ctx.fillStyle = '#777777';
-          ctx.fillText(`(${rel.interactionCount} interactions)`, panelX + this.padding + 200, y);
+          ctx.fillStyle = '#666688';
+          ctx.fillText(`(${rel.interactionCount} interactions)`, barX + barW + 30, y);
         }
 
-        y += this.lineHeight + 2;
+        y += this.lineHeight + 4;
       }
     }
 
@@ -618,10 +888,8 @@ export class RelationshipsPanel implements IWindowPanel {
     this.renderSeparator(ctx, panelX, y);
     y += 10;
 
-    ctx.fillStyle = '#88CCFF';
-    ctx.font = 'bold 14px monospace';
-    ctx.fillText('🔒 Trust Network', panelX + this.padding, y);
-    y += this.lineHeight + 5;
+    this.renderSectionHeader(ctx, panelX, y, '🔒 Trust Network', '#88CCFF');
+    y += 28;
 
     const scores = trustNetwork.scores;
     const avgTrust = trustNetwork.getAverageTrustScore();
@@ -643,41 +911,40 @@ export class RelationshipsPanel implements IWindowPanel {
         const agentIdentity = agentEntity?.components.get('identity') as IdentityComponent | undefined;
         const agentName = agentIdentity?.name || agentId.substring(0, 8);
 
-        // Trust level indicator
-        const trustIcon = score >= 0.7 ? '✓' :
-                         score >= 0.4 ? '~' : '✗';
         const trustColor = score >= 0.7 ? '#88FF88' :
                           score >= 0.4 ? '#FFFF88' : '#FF8888';
 
+        // Row background
+        const rowX = panelX + this.padding;
+        const rowW = this.panelWidth - this.padding * 2;
+        ctx.fillStyle = 'rgba(255,255,255,0.03)';
+        ctx.beginPath();
+        (ctx as CanvasRenderingContext2D & { roundRect: (x: number, y: number, w: number, h: number, r: number) => void })
+          .roundRect(rowX, y - 10, rowW, this.lineHeight + 4, 3);
+        ctx.fill();
+
+        // Filled circle trust indicator instead of ✓/~/✗
+        this.renderTrustIndicator(ctx, rowX + 10, y - 2, score);
+
+        // Agent name and score
         ctx.fillStyle = trustColor;
         ctx.font = '11px monospace';
-        ctx.fillText(`${trustIcon} ${agentName}: ${Math.round(score * 100)}%`, panelX + this.padding, y);
+        ctx.fillText(`${agentName}: ${Math.round(score * 100)}%`, rowX + 24, y);
 
-        // Show verification history summary
+        // Verification history summary
         const history = trustNetwork.getVerificationHistory(agentId);
         if (history.length > 0) {
           const correct = history.filter((h: VerificationInfo) => h.result === 'correct').length;
           const failed = history.length - correct;
-          ctx.fillStyle = '#777777';
+          ctx.fillStyle = '#556677';
           ctx.font = '10px monospace';
-          ctx.fillText(`(${correct} correct, ${failed} failed)`, panelX + this.padding + 180, y);
+          ctx.fillText(`(${correct}✓ ${failed}✗)`, rowX + 170, y);
         }
 
-        y += this.lineHeight + 2;
+        y += this.lineHeight + 4;
       }
     }
 
     return y + 5;
-  }
-
-  /**
-   * Render a separator line
-   */
-  private renderSeparator(ctx: CanvasRenderingContext2D, panelX: number, y: number): void {
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-    ctx.beginPath();
-    ctx.moveTo(panelX + this.padding, y);
-    ctx.lineTo(panelX + this.panelWidth - this.padding, y);
-    ctx.stroke();
   }
 }
