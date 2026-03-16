@@ -13,6 +13,9 @@ packages/*/src/**/*.d.ts.map
 # TypeScript compiled output (tsc --build)
 packages/*/dist/
 
+# Vite build output
+demo/dist/
+
 # Environment variables
 .env
 .env.local
