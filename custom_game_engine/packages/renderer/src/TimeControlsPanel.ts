@@ -14,10 +14,10 @@ interface TimeComponent {
  * TimeControlsPanel - Visual controls for time speed and pause/play
  *
  * Provides UI for:
- * - Current time/day display
- * - Speed control buttons (1x, 2x, 4x, 8x)
+ * - Current time/day display with solar arc
+ * - Speed control buttons (1x, 2x, 4x, 8x) with glow
  * - Pause/play toggle
- * - Current phase indicator (dawn/day/dusk/night)
+ * - Current phase indicator with emoji (dawn/day/dusk/night)
  */
 export class TimeControlsPanel implements IWindowPanel {
   private visible: boolean = false;
@@ -32,6 +32,27 @@ export class TimeControlsPanel implements IWindowPanel {
     { speed: 4, label: '4x' },
     { speed: 8, label: '8x' },
   ];
+
+  private readonly PHASE_EMOJIS: Record<string, string> = {
+    dawn: '🌅',
+    day: '☀️',
+    dusk: '🌆',
+    night: '🌙',
+  };
+
+  private readonly PHASE_COLORS: Record<string, string> = {
+    dawn: '#FF9966',
+    day: '#87CEEB',
+    dusk: '#FF6B35',
+    night: '#3A3A8C',
+  };
+
+  private readonly PHASE_TEXT_COLORS: Record<string, string> = {
+    dawn: '#FFF',
+    day: '#003',
+    dusk: '#FFF',
+    night: '#DDD',
+  };
 
   constructor() {}
 
@@ -48,7 +69,7 @@ export class TimeControlsPanel implements IWindowPanel {
   }
 
   getDefaultHeight(): number {
-    return 180;
+    return 230;
   }
 
   isVisible(): boolean {
@@ -86,94 +107,186 @@ export class TimeControlsPanel implements IWindowPanel {
     const padding = 12;
     let y = padding;
 
-    // === TIME DISPLAY ===
+    // === SOLAR ARC ===
+    // Semicircle arc showing where in the day the sun/moon is (0h=left, 12h=top, 24h=right)
+    const arcCenterX = width / 2;
+    const arcCenterY = y + 38;
+    const arcRadius = (width / 2) - padding - 6;
+    const dayFraction = timeComp.timeOfDay / 24; // 0..1
+    // Map: 0h → π (left), 12h → 0 (top), 24h → -π (right)
+    const sunAngle = Math.PI - dayFraction * Math.PI; // π..0 as time goes 0..12, then 0..-π for 12..24
+    const sunX = arcCenterX + arcRadius * Math.cos(sunAngle);
+    const sunY = arcCenterY - arcRadius * Math.sin(sunAngle); // minus = upward in canvas coords
+
+    // Arc track
+    ctx.beginPath();
+    ctx.arc(arcCenterX, arcCenterY, arcRadius, Math.PI, 0, false);
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Completed arc (elapsed portion of day)
+    const elapsedAngleStart = Math.PI;
+    const elapsedAngleEnd = Math.PI - dayFraction * Math.PI;
+    if (dayFraction > 0) {
+      ctx.beginPath();
+      ctx.arc(arcCenterX, arcCenterY, arcRadius, elapsedAngleStart, elapsedAngleEnd, false);
+      const isNight = timeComp.phase === 'night';
+      ctx.strokeStyle = isNight ? 'rgba(150,150,220,0.6)' : 'rgba(255,220,80,0.7)';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+    }
+
+    // Horizon line
+    ctx.beginPath();
+    ctx.moveTo(arcCenterX - arcRadius - 4, arcCenterY);
+    ctx.lineTo(arcCenterX + arcRadius + 4, arcCenterY);
+    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Sun/moon dot — glow then dot
+    const isNight = timeComp.phase === 'night';
+    const bodyColor = isNight ? '#C8C8FF' : '#FFD700';
+    const glowColor = isNight ? 'rgba(180,180,255,0.4)' : 'rgba(255,220,0,0.4)';
+    ctx.beginPath();
+    ctx.arc(sunX, sunY, 8, 0, Math.PI * 2);
+    ctx.fillStyle = glowColor;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(sunX, sunY, 5, 0, Math.PI * 2);
+    ctx.fillStyle = bodyColor;
+    ctx.fill();
+
+    // Time display centred above the arc
     const hours = Math.floor(timeComp.timeOfDay);
     const minutes = Math.floor((timeComp.timeOfDay % 1) * 60);
     const timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-    const dayStr = `Day ${timeComp.day}`;
 
     ctx.fillStyle = '#FFD700';
-    ctx.font = 'bold 18px monospace';
-    ctx.fillText(timeStr, padding, y);
-    y += 22;
+    ctx.font = 'bold 16px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(timeStr, arcCenterX, y + 2);
+    ctx.textAlign = 'left';
 
+    y = arcCenterY + 10;
+
+    // Day counter + phase pill on same line
+    const dayStr = `Day ${timeComp.day}`;
     ctx.fillStyle = '#AAA';
-    ctx.font = '12px monospace';
+    ctx.font = '11px monospace';
     ctx.fillText(dayStr, padding, y);
-    y += 18;
 
-    // === PHASE INDICATOR ===
-    const phaseColors: Record<string, string> = {
-      dawn: '#FFB6C1',
-      day: '#87CEEB',
-      dusk: '#FF8C00',
-      night: '#191970',
-    };
-    const phaseColor = phaseColors[timeComp.phase] || '#666';
-    const phaseLabel = timeComp.phase.charAt(0).toUpperCase() + timeComp.phase.slice(1);
-
-    ctx.fillStyle = phaseColor;
-    ctx.fillRect(padding, y, 40, 14);
-    ctx.fillStyle = '#FFF';
+    // Phase pill with emoji
+    const phaseKey = timeComp.phase;
+    const phaseColor = this.PHASE_COLORS[phaseKey] ?? '#555';
+    const phaseTextColor = this.PHASE_TEXT_COLORS[phaseKey] ?? '#FFF';
+    const phaseEmoji = this.PHASE_EMOJIS[phaseKey] ?? '';
+    const phaseLabel = phaseEmoji + ' ' + (phaseKey.charAt(0).toUpperCase() + phaseKey.slice(1));
     ctx.font = 'bold 10px monospace';
-    ctx.fillText(phaseLabel, padding + 4, y + 11);
+    const pillWidth = ctx.measureText(phaseLabel).width + 10;
+    const pillX = width - padding - pillWidth;
+    const pillY = y - 11;
+    // Rounded pill background
+    const pillRadius = 5;
+    ctx.beginPath();
+    ctx.roundRect(pillX, pillY, pillWidth, 14, pillRadius);
+    ctx.fillStyle = phaseColor;
+    ctx.fill();
+    ctx.fillStyle = phaseTextColor;
+    ctx.fillText(phaseLabel, pillX + 5, pillY + 11);
 
-    y += 22;
+    y += 18;
 
     // === SPEED CONTROLS HEADER ===
     ctx.fillStyle = '#00CED1';
-    ctx.font = 'bold 12px monospace';
-    ctx.fillText('Speed:', padding, y);
-    y += 18;
+    ctx.font = 'bold 11px monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('SPEED', padding, y);
+    y += 16;
 
-    // === SPEED BUTTONS ===
+    // === SPEED BUTTONS (rounded, with glow on active) ===
     const currentSpeed = this.isPaused ? 0 : timeComp.speedMultiplier;
     const buttonWidth = (width - (padding * 2) - (this.buttonPadding * 3)) / 4;
+    const btnRadius = 5;
+    const now = performance.now();
 
     this.speedButtons.forEach((btn, index) => {
-      const x = padding + (index * (buttonWidth + this.buttonPadding));
+      const bx = padding + (index * (buttonWidth + this.buttonPadding));
+      const by = y;
       const isActive = currentSpeed === btn.speed;
 
-      // Button background
-      ctx.fillStyle = isActive ? '#00CED1' : '#333';
-      ctx.fillRect(x, y, buttonWidth, this.buttonHeight);
+      ctx.save();
 
-      // Button border
-      ctx.strokeStyle = isActive ? '#00FFFF' : '#555';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(x, y, buttonWidth, this.buttonHeight);
+      if (isActive) {
+        // Subtle glow: pulse via sin
+        const pulse = 0.5 + 0.25 * Math.sin(now / 400);
+        ctx.shadowColor = '#00FFFF';
+        ctx.shadowBlur = 8 * pulse;
+        ctx.fillStyle = '#00CED1';
+      } else {
+        ctx.fillStyle = '#2A2A2A';
+      }
 
-      // Button label
-      ctx.fillStyle = isActive ? '#000' : '#CCC';
-      ctx.font = 'bold 14px monospace';
-      const textWidth = ctx.measureText(btn.label).width;
-      ctx.fillText(btn.label, x + (buttonWidth - textWidth) / 2, y + 21);
+      ctx.beginPath();
+      ctx.roundRect(bx, by, buttonWidth, this.buttonHeight, btnRadius);
+      ctx.fill();
+
+      // Border
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = isActive ? '#00FFFF' : '#444';
+      ctx.lineWidth = isActive ? 1.5 : 1;
+      ctx.beginPath();
+      ctx.roundRect(bx, by, buttonWidth, this.buttonHeight, btnRadius);
+      ctx.stroke();
+
+      ctx.restore();
+
+      // Label
+      ctx.fillStyle = isActive ? '#000' : '#AAA';
+      ctx.font = isActive ? 'bold 13px monospace' : '13px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(btn.label, bx + buttonWidth / 2, by + this.buttonHeight / 2 + 5);
     });
 
-    y += this.buttonHeight + 12;
+    ctx.textAlign = 'left';
+    y += this.buttonHeight + 10;
 
-    // === PAUSE/PLAY BUTTON ===
-    const pauseButtonY = y;
+    // === PAUSE/PLAY BUTTON (rounded) ===
     const pauseButtonWidth = width - (padding * 2);
-    const pauseLabel = this.isPaused ? '▶ Play' : '⏸ Pause';
+    const pauseLabel = this.isPaused ? '▶  Play' : '⏸  Pause';
+    const pauseRadius = 6;
 
-    ctx.fillStyle = this.isPaused ? '#4CAF50' : '#FF9800';
-    ctx.fillRect(padding, pauseButtonY, pauseButtonWidth, this.buttonHeight);
+    ctx.save();
+    if (this.isPaused) {
+      ctx.shadowColor = '#66FF88';
+      ctx.shadowBlur = 8;
+      ctx.fillStyle = '#2E7D32';
+    } else {
+      ctx.fillStyle = '#5D4037';
+    }
+    ctx.beginPath();
+    ctx.roundRect(padding, y, pauseButtonWidth, this.buttonHeight, pauseRadius);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = this.isPaused ? '#4CAF50' : '#8D6E63';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(padding, y, pauseButtonWidth, this.buttonHeight, pauseRadius);
+    ctx.stroke();
+    ctx.restore();
 
-    ctx.strokeStyle = this.isPaused ? '#66BB6A' : '#FFB74D';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(padding, pauseButtonY, pauseButtonWidth, this.buttonHeight);
-
-    ctx.fillStyle = '#000';
-    ctx.font = 'bold 14px monospace';
-    const pauseLabelWidth = ctx.measureText(pauseLabel).width;
-    ctx.fillText(pauseLabel, padding + (pauseButtonWidth - pauseLabelWidth) / 2, pauseButtonY + 21);
+    ctx.fillStyle = this.isPaused ? '#81C784' : '#BCAAA4';
+    ctx.font = 'bold 13px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(pauseLabel, padding + pauseButtonWidth / 2, y + this.buttonHeight / 2 + 5);
+    ctx.textAlign = 'left';
 
     // === KEYBOARD HINTS ===
-    y += this.buttonHeight + 14;
-    ctx.fillStyle = '#666';
-    ctx.font = '10px monospace';
-    ctx.fillText('Keys: 1-4 for speed, Space to pause', padding, y);
+    y += this.buttonHeight + 12;
+    ctx.fillStyle = '#555';
+    ctx.font = '9px monospace';
+    ctx.fillText('1–4 speed  •  Space pause', padding, y);
   }
 
   /**

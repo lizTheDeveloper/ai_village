@@ -3,7 +3,11 @@
     "id": "shinto",
     "name": "The Way of the Kami",
     "description": "Magic through relationship with the spirits that inhabit all things",
-    "universeIds": ["spirit_world", "animist_realms", "kami_realm"],
+    "universeIds": [
+      "spirit_world",
+      "animist_realms",
+      "kami_realm"
+    ],
     "lore": "In the beginning, there were no divisions. The kami - spirits of all things - walked freely among the living. Every stone has a spirit. Every river, every ancient tree, every crossroads, every sword that has tasted blood. The kami are not gods in the Western sense - they are neighbors, ancestors, the very fabric of reality given voice and will.\n\nTo practice the Way is not to command, but to negotiate. You do not force the river-kami to part; you ask, with proper offerings and pure heart. You do not bind the sword-spirit; you forge a partnership of mutual respect. Break a taboo, accrue pollution, show disrespect - and the kami will turn their faces from you. Or worse.\n\nPurity is everything. Not moral purity, but ritual cleanliness. Death pollutes. Blood pollutes. Broken oaths pollute. The polluted cannot approach the kami, cannot enter sacred spaces, cannot ask for blessings. First, always, comes purification.",
     "sources": [
       {
@@ -196,8 +200,14 @@
         "method": "training",
         "rarity": "uncommon",
         "voluntary": true,
-        "prerequisites": ["shrine_access", "teacher"],
-        "grantsAccess": ["kami_favor", "purity"],
+        "prerequisites": [
+          "shrine_access",
+          "teacher"
+        ],
+        "grantsAccess": [
+          "kami_favor",
+          "purity"
+        ],
         "startingProficiency": 10,
         "description": "Apprenticeship at a shrine, learning ritual forms"
       },
@@ -205,8 +215,14 @@
         "method": "bloodline",
         "rarity": "rare",
         "voluntary": false,
-        "prerequisites": ["kannushi_lineage"],
-        "grantsAccess": ["kami_favor", "purity", "ancestral_connection"],
+        "prerequisites": [
+          "kannushi_lineage"
+        ],
+        "grantsAccess": [
+          "kami_favor",
+          "purity",
+          "ancestral_connection"
+        ],
         "startingProficiency": 25,
         "description": "Born into a priestly family with inherited connections"
       },
@@ -214,13 +230,32 @@
         "method": "chosen",
         "rarity": "legendary",
         "voluntary": false,
-        "grantsAccess": ["kami_favor", "purity", "ancestral_connection"],
+        "grantsAccess": [
+          "kami_favor",
+          "purity",
+          "ancestral_connection"
+        ],
         "startingProficiency": 40,
         "description": "Chosen by a powerful kami for their own purposes"
       }
     ],
-    "availableTechniques": ["perceive", "protect", "enhance", "control", "destroy"],
-    "availableForms": ["fire", "water", "earth", "air", "plant", "animal", "spirit", "body"],
+    "availableTechniques": [
+      "perceive",
+      "protect",
+      "enhance",
+      "control",
+      "destroy"
+    ],
+    "availableForms": [
+      "fire",
+      "water",
+      "earth",
+      "air",
+      "plant",
+      "animal",
+      "spirit",
+      "body"
+    ],
     "forbiddenCombinations": [
       {
         "technique": "destroy",
@@ -272,7 +307,10 @@
     "id": "sympathy",
     "name": "Sympathy",
     "description": "Create links between similar things - what affects one affects the other",
-    "universeIds": ["sympathy_realms", "kingkiller"],
+    "universeIds": [
+      "sympathy_realms",
+      "kingkiller"
+    ],
     "lore": "Everything is connected. Not metaphorically - literally. A doll made in your image is connected to you. A piece of your hair maintains a link to you. Two coins from the same mint share a bond. The sympathist learns to feel these connections and, more importantly, to exploit them.\n\nThe First Law: Energy cannot be created. Move heat from a fire to a candle through a link, and energy is lost to slippage - the imperfection of the connection. The Second Law: The better the link, the less the slippage. A mother's link to her child is stronger than a stranger's. A piece of someone is better than a symbol of them.\n\nSympathy is a science, not an art. It can be taught, measured, calculated. But it is also dangerous. Create a link to the wrong thing, channel too much through yourself, and you will burn from the inside out.",
     "sources": [
       {
@@ -405,14 +443,30 @@
         "method": "study",
         "rarity": "uncommon",
         "voluntary": true,
-        "prerequisites": ["university_admission", "strong_will"],
-        "grantsAccess": ["alar"],
+        "prerequisites": [
+          "university_admission",
+          "strong_will"
+        ],
+        "grantsAccess": [
+          "alar"
+        ],
         "startingProficiency": 15,
         "description": "Formal study at a University"
       }
     ],
-    "availableTechniques": ["control", "perceive", "transform"],
-    "availableForms": ["fire", "body", "mind", "earth", "water", "air"],
+    "availableTechniques": [
+      "control",
+      "perceive",
+      "transform"
+    ],
+    "availableForms": [
+      "fire",
+      "body",
+      "mind",
+      "earth",
+      "water",
+      "air"
+    ],
     "resonantCombinations": [
       {
         "technique": "control",
@@ -440,7 +494,10 @@
     "id": "allomancy",
     "name": "Allomancy",
     "description": "Swallow metals and \"burn\" them for specific powers",
-    "universeIds": ["scadrial", "metal_realms"],
+    "universeIds": [
+      "scadrial",
+      "metal_realms"
+    ],
     "lore": "Allomancy is genetic, passed through bloodlines descended from the original Allomancers. Most Allomancers can burn only one metal - Mistings. Rare individuals called Mistborn can burn all of them.\n\nThe process is simple: swallow a metal (purified and prepared properly), then burn it internally. The metal is consumed, converted directly into power. Each metal grants a specific ability - steel lets you Push on metals, tin enhances senses, brass soothes emotions.\n\nThe power is hereditary and cannot be learned. Either your blood carries the gift, or it doesn't. Snapping - the traumatic event that awakens Allomantic potential - is required to access the power, even in those who carry the genes.",
     "sources": [
       {
@@ -562,8 +619,12 @@
         "method": "born",
         "rarity": "rare",
         "voluntary": false,
-        "prerequisites": ["allomantic_bloodline"],
-        "grantsAccess": ["metal_reserves"],
+        "prerequisites": [
+          "allomantic_bloodline"
+        ],
+        "grantsAccess": [
+          "metal_reserves"
+        ],
         "startingProficiency": 0,
         "description": "Born with latent Allomantic potential"
       },
@@ -571,14 +632,28 @@
         "method": "awakening",
         "rarity": "rare",
         "voluntary": false,
-        "prerequisites": ["allomantic_bloodline", "traumatic_event"],
-        "grantsAccess": ["metal_reserves"],
+        "prerequisites": [
+          "allomantic_bloodline",
+          "traumatic_event"
+        ],
+        "grantsAccess": [
+          "metal_reserves"
+        ],
         "startingProficiency": 10,
         "description": "Snapping - awakening Allomantic potential through trauma"
       }
     ],
-    "availableTechniques": ["enhance", "control", "perceive"],
-    "availableForms": ["body", "mind", "metal", "time"],
+    "availableTechniques": [
+      "enhance",
+      "control",
+      "perceive"
+    ],
+    "availableForms": [
+      "body",
+      "mind",
+      "metal",
+      "time"
+    ],
     "powerScaling": "linear",
     "powerCeiling": 100,
     "allowsGroupCasting": false,
@@ -592,7 +667,10 @@
     "id": "dream",
     "name": "Oneiromancy",
     "description": "Enter, navigate, and manipulate the world of dreams",
-    "universeIds": ["dream_realms", "collective_unconscious"],
+    "universeIds": [
+      "dream_realms",
+      "collective_unconscious"
+    ],
     "lore": "The dream world is not a metaphor. It exists - a vast, shifting landscape built from the sleeping minds of all who dream. The skilled oneiromancer learns to enter this world consciously, to navigate its fluid geography, to shape its substance with imagination.\n\nBut dreams are not harmless. The things that live in the deep dream - nightmares given form, forgotten gods, the collective fears of humanity - they are as real as anything in the waking world. And what happens in dreams can follow you back. Die in a dream, and you may not wake at all.\n\nThe greatest power of the dreamer is not what they can do in dreams, but what they can bring back. Inspiration stolen from sleeping minds, objects dreamed into reality, healing drawn from restful sleep, or curses planted in nightmares.",
     "sources": [
       {
@@ -720,8 +798,12 @@
         "method": "awakening",
         "rarity": "uncommon",
         "voluntary": false,
-        "prerequisites": ["lucid_dream_experience"],
-        "grantsAccess": ["dream_essence"],
+        "prerequisites": [
+          "lucid_dream_experience"
+        ],
+        "grantsAccess": [
+          "dream_essence"
+        ],
         "startingProficiency": 10,
         "description": "Spontaneous lucid dreaming leads to discovery"
       },
@@ -729,14 +811,29 @@
         "method": "training",
         "rarity": "uncommon",
         "voluntary": true,
-        "prerequisites": ["teacher", "meditation_practice"],
-        "grantsAccess": ["dream_essence"],
+        "prerequisites": [
+          "teacher",
+          "meditation_practice"
+        ],
+        "grantsAccess": [
+          "dream_essence"
+        ],
         "startingProficiency": 20,
         "description": "Formal training in dream navigation"
       }
     ],
-    "availableTechniques": ["create", "control", "perceive", "transform"],
-    "availableForms": ["mind", "spirit", "image", "body"],
+    "availableTechniques": [
+      "create",
+      "control",
+      "perceive",
+      "transform"
+    ],
+    "availableForms": [
+      "mind",
+      "spirit",
+      "image",
+      "body"
+    ],
     "resonantCombinations": [
       {
         "technique": "create",
@@ -764,7 +861,10 @@
     "id": "song",
     "name": "The Singing",
     "description": "Music and rhythm shape reality - melodies are spells, harmonies are power",
-    "universeIds": ["song_realms", "musical_spheres"],
+    "universeIds": [
+      "song_realms",
+      "musical_spheres"
+    ],
     "lore": "In the beginning was not the Word - it was the Song. The universe was sung into being, and its fundamental nature is musical. Every object has a resonant frequency. Every soul has a melody. The Singer learns to hear these hidden musics and to add their voice to the cosmic chorus.\n\nDifferent traditions approach the Singing differently. Some use voice alone, the purest form. Others channel through instruments - strings that resonate with fate, drums that beat like the heart of the world, flutes that carry wind's wisdom. Rhythm provides structure; melody provides effect; harmony provides power.\n\nA single voice can light a candle. A choir can raise mountains.",
     "sources": [
       {
@@ -893,8 +993,14 @@
         "method": "training",
         "rarity": "uncommon",
         "voluntary": true,
-        "prerequisites": ["musical_talent", "teacher"],
-        "grantsAccess": ["voice", "resonance"],
+        "prerequisites": [
+          "musical_talent",
+          "teacher"
+        ],
+        "grantsAccess": [
+          "voice",
+          "resonance"
+        ],
         "startingProficiency": 15,
         "description": "Formal training in the Singing"
       },
@@ -902,13 +1008,30 @@
         "method": "born",
         "rarity": "rare",
         "voluntary": false,
-        "grantsAccess": ["voice", "resonance"],
+        "grantsAccess": [
+          "voice",
+          "resonance"
+        ],
         "startingProficiency": 30,
         "description": "Born with perfect pitch and natural resonance"
       }
     ],
-    "availableTechniques": ["create", "control", "enhance", "protect", "destroy"],
-    "availableForms": ["air", "water", "mind", "spirit", "body", "plant", "earth"],
+    "availableTechniques": [
+      "create",
+      "control",
+      "enhance",
+      "protect",
+      "destroy"
+    ],
+    "availableForms": [
+      "air",
+      "water",
+      "mind",
+      "spirit",
+      "body",
+      "plant",
+      "earth"
+    ],
     "resonantCombinations": [
       {
         "technique": "control",
@@ -942,7 +1065,11 @@
     "id": "rune",
     "name": "Runecraft",
     "description": "Carving or drawing specific symbols activates magical effects",
-    "universeIds": ["rune_realms", "nordic_spheres", "glyph_worlds"],
+    "universeIds": [
+      "rune_realms",
+      "nordic_spheres",
+      "glyph_worlds"
+    ],
     "lore": "The First Ones wrote the world into being. Not with words, but with symbols - the Runes. Each Rune is a concept made manifest, a fundamental truth given form. To know a Rune is to know a piece of reality's source code.\n\nRunes are not arbitrary. They were discovered, not invented. The Rune of Fire is not called fire because it represents fire - it IS fire, the concept made visible. To carve it is to invoke that concept.\n\nRunes must be carved or drawn with precision. A crooked line, an incomplete curve, and the Rune fails - or worse, does something unintended. Masters can combine Runes into bindrunes, compound meanings that create complex effects. But each additional Rune multiplies the risk of error.",
     "sources": [
       {
@@ -1076,8 +1203,13 @@
         "method": "study",
         "rarity": "uncommon",
         "voluntary": true,
-        "prerequisites": ["find_runestones", "teacher_or_texts"],
-        "grantsAccess": ["inscription"],
+        "prerequisites": [
+          "find_runestones",
+          "teacher_or_texts"
+        ],
+        "grantsAccess": [
+          "inscription"
+        ],
         "startingProficiency": 15,
         "description": "Study of ancient runestones and texts"
       },
@@ -1085,14 +1217,32 @@
         "method": "revelation",
         "rarity": "rare",
         "voluntary": false,
-        "prerequisites": ["ordeal"],
-        "grantsAccess": ["inscription", "material_resonance"],
+        "prerequisites": [
+          "ordeal"
+        ],
+        "grantsAccess": [
+          "inscription",
+          "material_resonance"
+        ],
         "startingProficiency": 30,
         "description": "Rune knowledge revealed through sacrifice (hanging, etc.)"
       }
     ],
-    "availableTechniques": ["create", "protect", "enhance", "perceive", "control"],
-    "availableForms": ["fire", "water", "earth", "air", "body", "mind"],
+    "availableTechniques": [
+      "create",
+      "protect",
+      "enhance",
+      "perceive",
+      "control"
+    ],
+    "availableForms": [
+      "fire",
+      "water",
+      "earth",
+      "air",
+      "body",
+      "mind"
+    ],
     "resonantCombinations": [
       {
         "technique": "protect",
@@ -1120,7 +1270,10 @@
     "id": "daemon",
     "name": "The Dust and the Daemon",
     "description": "Magic through external souls (daemons) and conscious particles (Dust)",
-    "universeIds": ["lyras_world", "multiverse_realms"],
+    "universeIds": [
+      "lyras_world",
+      "multiverse_realms"
+    ],
     "lore": "In these worlds, the soul is not hidden within - it walks beside you. Your daemon is your soul made manifest, your companion from birth to death, your truest self in animal form. Children's daemons shift freely between forms; at puberty, they settle into a single shape that reflects who you truly are.\n\nAnd there is Dust - Sraf, the Shadows, the particles of consciousness that stream through the universe. Dust is attracted to consciousness, to wisdom, to experience. The Church calls it Original Sin. The scholars know it as something far stranger and more beautiful.\n\nThose who learn to work with Dust can read the alethiometer - the golden compass - asking questions of the universe itself. The subtle knife can cut through the fabric of reality into other worlds. But every use of these powers has consequences. The knife creates Spectres. The readers lose themselves in symbols.",
     "sources": [
       {
@@ -1265,7 +1418,9 @@
         "method": "born",
         "rarity": "common",
         "voluntary": false,
-        "grantsAccess": ["daemon_bond"],
+        "grantsAccess": [
+          "daemon_bond"
+        ],
         "startingProficiency": 0,
         "description": "Everyone is born with a daemon"
       },
@@ -1273,8 +1428,13 @@
         "method": "training",
         "rarity": "rare",
         "voluntary": true,
-        "prerequisites": ["teacher", "natural_talent"],
-        "grantsAccess": ["dust"],
+        "prerequisites": [
+          "teacher",
+          "natural_talent"
+        ],
+        "grantsAccess": [
+          "dust"
+        ],
         "startingProficiency": 20,
         "description": "Training to read the alethiometer or work with Dust"
       },
@@ -1282,14 +1442,28 @@
         "method": "witch_clan",
         "rarity": "rare",
         "voluntary": false,
-        "prerequisites": ["witch_bloodline"],
-        "grantsAccess": ["daemon_bond", "dust"],
+        "prerequisites": [
+          "witch_bloodline"
+        ],
+        "grantsAccess": [
+          "daemon_bond",
+          "dust"
+        ],
         "startingProficiency": 40,
         "description": "Born into a witch clan, can achieve daemon separation"
       }
     ],
-    "availableTechniques": ["perceive", "control", "transform"],
-    "availableForms": ["spirit", "mind", "body", "space"],
+    "availableTechniques": [
+      "perceive",
+      "control",
+      "transform"
+    ],
+    "availableForms": [
+      "spirit",
+      "mind",
+      "body",
+      "space"
+    ],
     "resonantCombinations": [
       {
         "technique": "perceive",
@@ -1326,13 +1500,33 @@
       "type": "nature",
       "rank": "major",
       "domain": "The great mountain and all who dwell upon it",
-      "preferredOfferings": ["sake", "rice", "mountain_flowers"],
-      "taboos": ["cutting_ancient_trees", "polluting_springs", "disrespecting_elders"],
+      "preferredOfferings": [
+        "sake",
+        "rice",
+        "mountain_flowers"
+      ],
+      "taboos": [
+        "cutting_ancient_trees",
+        "polluting_springs",
+        "disrespecting_elders"
+      ],
       "disposition": "neutral",
-      "blessings": ["safe_passage", "hunting_luck", "mineral_finding", "weather_warning"],
-      "curses": ["lost_paths", "rockslides", "predator_attention"],
+      "blessings": [
+        "safe_passage",
+        "hunting_luck",
+        "mineral_finding",
+        "weather_warning"
+      ],
+      "curses": [
+        "lost_paths",
+        "rockslides",
+        "predator_attention"
+      ],
       "shrineLocation": "summit_shrine",
-      "activeSeasons": ["spring", "autumn"],
+      "activeSeasons": [
+        "spring",
+        "autumn"
+      ],
       "description": "Ancient spirit of the mountain, grandfather to lesser spirits of peak and valley",
       "personality": "Stern but fair, respects those who respect the mountain"
     },
@@ -1342,15 +1536,165 @@
       "type": "nature",
       "rank": "regional",
       "domain": "The great river from source to sea",
-      "preferredOfferings": ["fish_released", "flowers", "sake"],
-      "taboos": ["polluting_water", "damming_flow", "taking_too_many_fish"],
+      "preferredOfferings": [
+        "fish_released",
+        "flowers",
+        "sake"
+      ],
+      "taboos": [
+        "polluting_water",
+        "damming_flow",
+        "taking_too_many_fish"
+      ],
       "disposition": "neutral",
-      "blessings": ["safe_crossing", "abundant_fish", "flood_warning", "water_purification"],
-      "curses": ["drowning_currents", "empty_nets", "flash_floods"],
+      "blessings": [
+        "safe_crossing",
+        "abundant_fish",
+        "flood_warning",
+        "water_purification"
+      ],
+      "curses": [
+        "drowning_currents",
+        "empty_nets",
+        "flash_floods"
+      ],
       "shrineLocation": "river_bend_shrine",
-      "activeSeasons": ["summer"],
+      "activeSeasons": [
+        "summer"
+      ],
       "description": "Swift and changeable spirit of the river, life-giver and life-taker",
       "personality": "Mercurial, respects those who understand water's dual nature"
+    },
+    {
+      "id": "crossroads_kami",
+      "name": "The Watcher at Crossings",
+      "type": "place",
+      "rank": "local",
+      "domain": "All crossroads, thresholds, and liminal spaces",
+      "preferredOfferings": [
+        "salt",
+        "coins",
+        "rice_wine"
+      ],
+      "taboos": [
+        "looking_back_after_passing",
+        "arguing_at_crossroads"
+      ],
+      "disposition": "neutral",
+      "blessings": [
+        "safe_travel",
+        "good_direction",
+        "meeting_old_friends"
+      ],
+      "curses": [
+        "getting_lost",
+        "missing_the_path",
+        "delayed_journeys"
+      ],
+      "description": "Ancient guardian of crossroads and transitions, present wherever choices must be made",
+      "personality": "Cryptic but helpful to those who show proper respect"
+    },
+    {
+      "id": "honored_ancestor_kami",
+      "name": "Great-grandmother Flame-of-Evening",
+      "type": "ancestor",
+      "rank": "local",
+      "domain": "The family hearth and lineage memory",
+      "preferredOfferings": [
+        "incense",
+        "cooked_rice",
+        "sake",
+        "family_stories"
+      ],
+      "taboos": [
+        "disrespecting_elders",
+        "forgetting_family_names",
+        "wasting_food"
+      ],
+      "disposition": "friendly",
+      "blessings": [
+        "family_health",
+        "good_harvests",
+        "protection_from_evil",
+        "ancestral_wisdom"
+      ],
+      "curses": [
+        "family_discord",
+        "forgotten_skills",
+        "bad_luck_in_marriage"
+      ],
+      "shrineLocation": "household_altar",
+      "activeSeasons": [
+        "winter"
+      ],
+      "description": "Revered ancestor who became kami upon death, watching over her descendants",
+      "personality": "Warm and protective, stern when family traditions are neglected"
+    },
+    {
+      "id": "hi_no_kami",
+      "name": "Eternal Ember",
+      "type": "elemental",
+      "rank": "regional",
+      "domain": "Fire, hearths, forges, and the creative spark",
+      "preferredOfferings": [
+        "offerings_burned_in_fire",
+        "cedar_wood",
+        "charcoal"
+      ],
+      "taboos": [
+        "urinating_on_fire",
+        "spitting_in_flames",
+        "speaking_ill_of_fire"
+      ],
+      "disposition": "neutral",
+      "blessings": [
+        "warmth_in_cold",
+        "forge_success",
+        "protection_from_fire",
+        "inspiration"
+      ],
+      "curses": [
+        "cold_hearths",
+        "forge_accidents",
+        "fires_that_will_not_start"
+      ],
+      "activeSeasons": [
+        "winter",
+        "autumn"
+      ],
+      "description": "Dual-natured spirit of fire: provider of warmth and destroyer of carelessness",
+      "personality": "Passionate, easily excited, requires constant respect to remain benevolent"
+    },
+    {
+      "id": "kaji_no_kami",
+      "name": "Hands-that-Shape-Metal",
+      "type": "craft",
+      "rank": "local",
+      "domain": "Smithing, carpentry, and all skilled crafts",
+      "preferredOfferings": [
+        "first_fruits_of_labor",
+        "broken_tools",
+        "fine_oil"
+      ],
+      "taboos": [
+        "shoddy_work",
+        "using_tools_carelessly",
+        "not_maintaining_tools"
+      ],
+      "disposition": "neutral",
+      "blessings": [
+        "crafting_success",
+        "tool_durability",
+        "mastery_of_skill",
+        "inspiration"
+      ],
+      "curses": [
+        "broken_tools",
+        "poor_quality_work",
+        "injuries_from_accidents"
+      ],
+      "description": "Spirit of craft and mastery that inhabits well-used tools and workshops",
+      "personality": "Respects hard work and dedication above all things"
     }
   ],
   "allomantic_metals": [

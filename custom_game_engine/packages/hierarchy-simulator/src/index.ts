@@ -81,8 +81,16 @@ export {
 // ============================================================================
 // Renderers
 // ============================================================================
-
-export { HierarchyDOMRenderer } from './renderers/HierarchyDOMRenderer.js';
+//
+// HierarchyDOMRenderer is NOT exported here — it depends on `chart.js` which
+// is marked external in the production Vite build. Importing it via this index
+// would pull chart.js into the main game bundle as an unresolvable bare specifier,
+// causing the browser to fail module resolution and hang at "Initializing...".
+//
+// The standalone hierarchy simulator app imports it directly:
+//   import { HierarchyDOMRenderer } from './renderers/HierarchyDOMRenderer.js';
+//
+// export { HierarchyDOMRenderer } from './renderers/HierarchyDOMRenderer.js';
 
 // ============================================================================
 // Research System

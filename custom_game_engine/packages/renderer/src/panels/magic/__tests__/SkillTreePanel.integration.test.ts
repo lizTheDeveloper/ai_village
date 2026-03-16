@@ -20,6 +20,7 @@ import {
   MagicSkillTreeRegistry,
 } from '@ai-village/core';
 import type { MagicComponent } from '@ai-village/core';
+import type { SkillProgressComponent } from '@ai-village/core/src/components/SkillProgressComponent.js';
 import { SkillTreePanel } from '../SkillTreePanel.js';
 import type { WindowManager } from '../../../WindowManager.js';
 
@@ -52,7 +53,7 @@ describe('SkillTreePanel Backend Integration', () => {
     skillTreeManager = new SkillTreeManager();
     spellLearningManager = new SpellLearningManager();
 
-    skillTreeManager.initialize(world, spellLearningManager);
+    skillTreeManager.initialize(world, eventBus);
     spellLearningManager.initialize(world);
 
     // Create mock window manager (UI infrastructure, not tested here)
@@ -63,6 +64,39 @@ describe('SkillTreePanel Backend Integration', () => {
 
     panel = new SkillTreePanel(mockWindowManager);
   });
+
+  /** Helper: create a MagicComponent with the minimum required fields */
+  function createMagicComponent(knownParadigmIds: string[]): MagicComponent {
+    return {
+      type: CT.Magic,
+      magicUser: true,
+      knownParadigmIds,
+      paradigmState: {},
+      techniqueProficiency: {},
+      formProficiency: {},
+      corruption: 0,
+      favorLevel: {},
+      manaPools: [],
+      resourcePools: {},
+      spellSlots: [],
+      knownSpells: [],
+    };
+  }
+
+  /** Helper: create a SkillProgressComponent for a single paradigm */
+  function createSkillProgressComponent(paradigmId: string, xp: number, unlockedNodes: string[] = []): SkillProgressComponent {
+    return {
+      type: 'skill_progress',
+      version: 1,
+      skillTreeState: {
+        [paradigmId]: {
+          xp,
+          unlockedNodes,
+          nodeProgress: {},
+        },
+      },
+    };
+  }
 
   describe('Node unlocking via backend', () => {
     it('should unlock node through SkillTreeManager and emit event', () => {
@@ -81,29 +115,10 @@ describe('SkillTreePanel Backend Integration', () => {
       );
       registry.register(tree);
 
-      // Create entity with magic
+      // Create entity with magic and skill progress
       const entity = new EntityImpl(createEntityId(), 0);
-      entity.addComponent<MagicComponent>({
-        type: CT.Magic,
-        magicUser: true,
-        knownParadigmIds: ['integration-paradigm'],
-        skillTreeState: {
-          'integration-paradigm': {
-            xp: 100,
-            unlockedNodes: [],
-            nodeProgress: {},
-          },
-        },
-        paradigmState: {},
-        techniqueProficiency: {},
-        formProficiency: {},
-        corruption: 0,
-        favorLevel: {},
-        manaPools: [],
-        resourcePools: {},
-        spellSlots: [],
-        knownSpells: [],
-      });
+      entity.addComponent<MagicComponent>(createMagicComponent(['integration-paradigm']));
+      entity.addComponent<SkillProgressComponent>(createSkillProgressComponent('integration-paradigm', 100));
       world.addEntity(entity);
 
       // Set entity in panel
@@ -111,8 +126,7 @@ describe('SkillTreePanel Backend Integration', () => {
 
       // Track events
       const events: any[] = [];
-      eventBus.on(// @ts-expect-error Testing invalid value validation
-      'magic:skill_node_unlocked', (event) => events.push(event));
+      eventBus.subscribe('magic:skill_node_unlocked', (event) => events.push(event));
 
       // Unlock via backend
       const result = skillTreeManager.unlockSkillNode(entity, 'integration-paradigm', 'test-node', 50);
@@ -126,10 +140,10 @@ describe('SkillTreePanel Backend Integration', () => {
       expect(unlockEvent).toBeDefined();
       expect(unlockEvent?.data.nodeId).toBe('test-node');
 
-      // Verify backend state changed
-      const magic = entity.getComponent<MagicComponent>(CT.Magic);
-      expect(magic?.skillTreeState?.['integration-paradigm']?.xp).toBe(50);
-      expect(magic?.skillTreeState?.['integration-paradigm']?.unlockedNodes).toContain('test-node');
+      // Verify backend state changed (reads from SkillProgressComponent)
+      const skillProgress = entity.getComponent<SkillProgressComponent>(CT.SkillProgressComponent);
+      expect(skillProgress?.skillTreeState?.['integration-paradigm']?.xp).toBe(50);
+      expect(skillProgress?.skillTreeState?.['integration-paradigm']?.unlockedNodes).toContain('test-node');
     });
 
     it('should handle spell unlock when unlocking skill tree node', () => {
@@ -158,40 +172,25 @@ describe('SkillTreePanel Backend Integration', () => {
       registry.register(tree);
 
       const entity = new EntityImpl(createEntityId(), 0);
-      entity.addComponent<MagicComponent>({
-        type: CT.Magic,
-        magicUser: true,
-        knownParadigmIds: ['spell-unlock-paradigm'],
-        skillTreeState: {
-          'spell-unlock-paradigm': {
-            xp: 60,
-            unlockedNodes: [],
-            nodeProgress: {},
-          },
-        },
-        paradigmState: {},
-        techniqueProficiency: {},
-        formProficiency: {},
-        corruption: 0,
-        favorLevel: {},
-        manaPools: [],
-        resourcePools: {},
-        spellSlots: [],
-        knownSpells: [],
-      });
+      entity.addComponent<MagicComponent>(createMagicComponent(['spell-unlock-paradigm']));
+      entity.addComponent<SkillProgressComponent>(createSkillProgressComponent('spell-unlock-paradigm', 60));
       world.addEntity(entity);
 
       panel.setSelectedEntity(entity);
 
       const events: any[] = [];
-      eventBus.on(// @ts-expect-error Testing invalid value validation
-      'magic:spell_unlocked_from_skill_tree', (event) => events.push(event));
+      eventBus.subscribe('magic:spell_unlocked_from_skill_tree', (event) => events.push(event));
 
       // Unlock node
       skillTreeManager.unlockSkillNode(entity, 'spell-unlock-paradigm', 'spell-unlock-node', 40);
 
-      // Handle node unlock (triggers spell learning)
-      skillTreeManager.handleSkillNodeUnlocked(entity, 'spell-unlock-paradigm', 'spell-unlock-node');
+      // Handle node unlock (triggers spell learning) — pass learnSpell callback
+      skillTreeManager.handleSkillNodeUnlocked(
+        entity,
+        'spell-unlock-paradigm',
+        'spell-unlock-node',
+        (e, spellId, proficiency) => spellLearningManager.learnSpell(e, spellId, proficiency)
+      );
 
       // Flush event queue
       eventBus.flush();
@@ -217,39 +216,20 @@ describe('SkillTreePanel Backend Integration', () => {
       registry.register(tree);
 
       const entity = new EntityImpl(createEntityId(), 0);
-      entity.addComponent<MagicComponent>({
-        type: CT.Magic,
-        magicUser: true,
-        knownParadigmIds: ['xp-paradigm'],
-        skillTreeState: {
-          'xp-paradigm': {
-            xp: 0,
-            unlockedNodes: [],
-            nodeProgress: {},
-          },
-        },
-        paradigmState: {},
-        techniqueProficiency: {},
-        formProficiency: {},
-        corruption: 0,
-        favorLevel: {},
-        manaPools: [],
-        resourcePools: {},
-        spellSlots: [],
-        knownSpells: [],
-      });
+      entity.addComponent<MagicComponent>(createMagicComponent(['xp-paradigm']));
+      entity.addComponent<SkillProgressComponent>(createSkillProgressComponent('xp-paradigm', 0));
       world.addEntity(entity);
 
       panel.setSelectedEntity(entity);
 
       // Grant XP multiple times - should accumulate without auto-unlock
       skillTreeManager.grantSkillXP(entity, 'xp-paradigm', 10);
-      let magic = entity.getComponent<MagicComponent>(CT.Magic);
-      expect(magic?.skillTreeState?.['xp-paradigm']?.xp).toBe(10);
+      let skillProgress = entity.getComponent<SkillProgressComponent>(CT.SkillProgressComponent);
+      expect(skillProgress?.skillTreeState?.['xp-paradigm']?.xp).toBe(10);
 
       skillTreeManager.grantSkillXP(entity, 'xp-paradigm', 15);
-      magic = entity.getComponent<MagicComponent>(CT.Magic);
-      expect(magic?.skillTreeState?.['xp-paradigm']?.xp).toBe(25);
+      skillProgress = entity.getComponent<SkillProgressComponent>(CT.SkillProgressComponent);
+      expect(skillProgress?.skillTreeState?.['xp-paradigm']?.xp).toBe(25);
 
       // Verify node is NOT available yet (needs 100 XP)
       const progress = skillTreeManager.getSkillTreeProgress(entity, 'xp-paradigm');
@@ -268,27 +248,8 @@ describe('SkillTreePanel Backend Integration', () => {
       registry.register(tree);
 
       const entity = new EntityImpl(createEntityId(), 0);
-      entity.addComponent<MagicComponent>({
-        type: CT.Magic,
-        magicUser: true,
-        knownParadigmIds: ['deduct-paradigm'],
-        skillTreeState: {
-          'deduct-paradigm': {
-            xp: 50,
-            unlockedNodes: [],
-            nodeProgress: {},
-          },
-        },
-        paradigmState: {},
-        techniqueProficiency: {},
-        formProficiency: {},
-        corruption: 0,
-        favorLevel: {},
-        manaPools: [],
-        resourcePools: {},
-        spellSlots: [],
-        knownSpells: [],
-      });
+      entity.addComponent<MagicComponent>(createMagicComponent(['deduct-paradigm']));
+      entity.addComponent<SkillProgressComponent>(createSkillProgressComponent('deduct-paradigm', 50));
       world.addEntity(entity);
 
       panel.setSelectedEntity(entity);
@@ -297,8 +258,8 @@ describe('SkillTreePanel Backend Integration', () => {
       skillTreeManager.unlockSkillNode(entity, 'deduct-paradigm', 'deduct-node', 30);
 
       // Verify XP deducted
-      const magic = entity.getComponent<MagicComponent>(CT.Magic);
-      expect(magic?.skillTreeState?.['deduct-paradigm']?.xp).toBe(20);
+      const skillProgress = entity.getComponent<SkillProgressComponent>(CT.SkillProgressComponent);
+      expect(skillProgress?.skillTreeState?.['deduct-paradigm']?.xp).toBe(20);
     });
   });
 
@@ -324,23 +285,14 @@ describe('SkillTreePanel Backend Integration', () => {
       registry.register(tree2);
 
       const entity = new EntityImpl(createEntityId(), 0);
-      entity.addComponent<MagicComponent>({
-        type: CT.Magic,
-        magicUser: true,
-        knownParadigmIds: ['paradigm1', 'paradigm2'],
+      entity.addComponent<MagicComponent>(createMagicComponent(['paradigm1', 'paradigm2']));
+      entity.addComponent<SkillProgressComponent>({
+        type: 'skill_progress',
+        version: 1,
         skillTreeState: {
           paradigm1: { xp: 50, unlockedNodes: [], nodeProgress: {} },
           paradigm2: { xp: 80, unlockedNodes: [], nodeProgress: {} },
         },
-        paradigmState: {},
-        techniqueProficiency: {},
-        formProficiency: {},
-        corruption: 0,
-        favorLevel: {},
-        manaPools: [],
-        resourcePools: {},
-        spellSlots: [],
-        knownSpells: [],
       });
       world.addEntity(entity);
 
@@ -349,17 +301,17 @@ describe('SkillTreePanel Backend Integration', () => {
       // Unlock node in paradigm1
       skillTreeManager.unlockSkillNode(entity, 'paradigm1', 'p1-node', 20);
 
-      const magic = entity.getComponent<MagicComponent>(CT.Magic);
+      const skillProgress = entity.getComponent<SkillProgressComponent>(CT.SkillProgressComponent);
 
       // Paradigm1 XP should be deducted
-      expect(magic?.skillTreeState?.paradigm1?.xp).toBe(30);
+      expect(skillProgress?.skillTreeState?.paradigm1?.xp).toBe(30);
 
       // Paradigm2 XP should be unchanged
-      expect(magic?.skillTreeState?.paradigm2?.xp).toBe(80);
+      expect(skillProgress?.skillTreeState?.paradigm2?.xp).toBe(80);
 
       // Only paradigm1 node should be unlocked
-      expect(magic?.skillTreeState?.paradigm1?.unlockedNodes).toContain('p1-node');
-      expect(magic?.skillTreeState?.paradigm2?.unlockedNodes).not.toContain('p1-node');
+      expect(skillProgress?.skillTreeState?.paradigm1?.unlockedNodes).toContain('p1-node');
+      expect(skillProgress?.skillTreeState?.paradigm2?.unlockedNodes).not.toContain('p1-node');
     });
   });
 
@@ -384,27 +336,8 @@ describe('SkillTreePanel Backend Integration', () => {
       registry.register(tree);
 
       const entity = new EntityImpl(createEntityId(), 0);
-      entity.addComponent<MagicComponent>({
-        type: CT.Magic,
-        magicUser: true,
-        knownParadigmIds: ['chain-paradigm'],
-        skillTreeState: {
-          'chain-paradigm': {
-            xp: 100,
-            unlockedNodes: [],
-            nodeProgress: {},
-          },
-        },
-        paradigmState: {},
-        techniqueProficiency: {},
-        formProficiency: {},
-        corruption: 0,
-        favorLevel: {},
-        manaPools: [],
-        resourcePools: {},
-        spellSlots: [],
-        knownSpells: [],
-      });
+      entity.addComponent<MagicComponent>(createMagicComponent(['chain-paradigm']));
+      entity.addComponent<SkillProgressComponent>(createSkillProgressComponent('chain-paradigm', 100));
       world.addEntity(entity);
 
       panel.setSelectedEntity(entity);
@@ -434,15 +367,15 @@ describe('SkillTreePanel Backend Integration', () => {
       skillTreeManager.unlockSkillNode(entity, 'chain-paradigm', 'advanced', 30);
 
       // Verify all unlocked
-      const magic = entity.getComponent<MagicComponent>(CT.Magic);
-      expect(magic?.skillTreeState?.['chain-paradigm']?.unlockedNodes).toEqual([
+      const skillProgress = entity.getComponent<SkillProgressComponent>(CT.SkillProgressComponent);
+      expect(skillProgress?.skillTreeState?.['chain-paradigm']?.unlockedNodes).toEqual([
         'base',
         'intermediate',
         'advanced',
       ]);
 
       // Verify XP spent correctly (10 + 20 + 30 = 60)
-      expect(magic?.skillTreeState?.['chain-paradigm']?.xp).toBe(40);
+      expect(skillProgress?.skillTreeState?.['chain-paradigm']?.xp).toBe(40);
     });
   });
 
@@ -459,52 +392,36 @@ describe('SkillTreePanel Backend Integration', () => {
       registry.register(tree);
 
       const entity = new EntityImpl(createEntityId(), 0);
-      entity.addComponent<MagicComponent>({
-        type: CT.Magic,
-        magicUser: true,
-        knownParadigmIds: ['event-paradigm'],
-        skillTreeState: {
-          'event-paradigm': {
-            xp: 30,
-            unlockedNodes: [],
-            nodeProgress: {},
-          },
-        },
-        paradigmState: {},
-        techniqueProficiency: {},
-        formProficiency: {},
-        corruption: 0,
-        favorLevel: {},
-        manaPools: [],
-        resourcePools: {},
-        spellSlots: [],
-        knownSpells: [],
-      });
+      entity.addComponent<MagicComponent>(createMagicComponent(['event-paradigm']));
+      entity.addComponent<SkillProgressComponent>(createSkillProgressComponent('event-paradigm', 30));
       world.addEntity(entity);
 
       panel.setSelectedEntity(entity);
 
-      // Track if panel can detect state change
-      // (In real implementation, panel would listen to event and call refresh())
-      const initialState = JSON.stringify(entity.getComponent<MagicComponent>(CT.Magic)?.skillTreeState);
+      // Track initial state
+      const initialState = JSON.stringify(
+        entity.getComponent<SkillProgressComponent>(CT.SkillProgressComponent)?.skillTreeState
+      );
 
       // Unlock from backend
       skillTreeManager.unlockSkillNode(entity, 'event-paradigm', 'event-node', 15);
 
       // State should have changed
-      const updatedState = JSON.stringify(entity.getComponent<MagicComponent>(CT.Magic)?.skillTreeState);
+      const updatedState = JSON.stringify(
+        entity.getComponent<SkillProgressComponent>(CT.SkillProgressComponent)?.skillTreeState
+      );
       expect(updatedState).not.toBe(initialState);
 
       // Verify node unlocked in component
-      const magic = entity.getComponent<MagicComponent>(CT.Magic);
-      expect(magic?.skillTreeState?.['event-paradigm']?.unlockedNodes).toContain('event-node');
+      const skillProgress = entity.getComponent<SkillProgressComponent>(CT.SkillProgressComponent);
+      expect(skillProgress?.skillTreeState?.['event-paradigm']?.unlockedNodes).toContain('event-node');
     });
   });
 
   describe('Edge cases', () => {
     it('should handle entity with no magic component gracefully', () => {
       const entity = new EntityImpl(createEntityId(), 0);
-      // No magic component added
+      // No magic component or skill progress component added
       world.addEntity(entity);
 
       panel.setSelectedEntity(entity);
@@ -516,23 +433,8 @@ describe('SkillTreePanel Backend Integration', () => {
 
     it('should handle paradigm with no registered tree', () => {
       const entity = new EntityImpl(createEntityId(), 0);
-      entity.addComponent<MagicComponent>({
-        type: CT.Magic,
-        magicUser: true,
-        knownParadigmIds: ['nonexistent-paradigm'],
-        skillTreeState: {
-          'nonexistent-paradigm': { xp: 50, unlockedNodes: [], nodeProgress: {} },
-        },
-        paradigmState: {},
-        techniqueProficiency: {},
-        formProficiency: {},
-        corruption: 0,
-        favorLevel: {},
-        manaPools: [],
-        resourcePools: {},
-        spellSlots: [],
-        knownSpells: [],
-      });
+      entity.addComponent<MagicComponent>(createMagicComponent(['nonexistent-paradigm']));
+      entity.addComponent<SkillProgressComponent>(createSkillProgressComponent('nonexistent-paradigm', 50));
       world.addEntity(entity);
 
       panel.setSelectedEntity(entity);
@@ -554,27 +456,8 @@ describe('SkillTreePanel Backend Integration', () => {
       registry.register(tree);
 
       const entity = new EntityImpl(createEntityId(), 0);
-      entity.addComponent<MagicComponent>({
-        type: CT.Magic,
-        magicUser: true,
-        knownParadigmIds: ['exact-paradigm'],
-        skillTreeState: {
-          'exact-paradigm': {
-            xp: 50, // Exact amount
-            unlockedNodes: [],
-            nodeProgress: {},
-          },
-        },
-        paradigmState: {},
-        techniqueProficiency: {},
-        formProficiency: {},
-        corruption: 0,
-        favorLevel: {},
-        manaPools: [],
-        resourcePools: {},
-        spellSlots: [],
-        knownSpells: [],
-      });
+      entity.addComponent<MagicComponent>(createMagicComponent(['exact-paradigm']));
+      entity.addComponent<SkillProgressComponent>(createSkillProgressComponent('exact-paradigm', 50));
       world.addEntity(entity);
 
       panel.setSelectedEntity(entity);
@@ -584,9 +467,9 @@ describe('SkillTreePanel Backend Integration', () => {
       expect(result).toBe(true);
 
       // Should have 0 XP remaining
-      const magic = entity.getComponent<MagicComponent>(CT.Magic);
-      expect(magic?.skillTreeState?.['exact-paradigm']?.xp).toBe(0);
-      expect(magic?.skillTreeState?.['exact-paradigm']?.unlockedNodes).toContain('exact-node');
+      const skillProgress = entity.getComponent<SkillProgressComponent>(CT.SkillProgressComponent);
+      expect(skillProgress?.skillTreeState?.['exact-paradigm']?.xp).toBe(0);
+      expect(skillProgress?.skillTreeState?.['exact-paradigm']?.unlockedNodes).toContain('exact-node');
     });
   });
 });
