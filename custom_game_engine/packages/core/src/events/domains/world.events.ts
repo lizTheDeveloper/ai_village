@@ -11,6 +11,7 @@ export interface WorldEvents {
   // === World & Time Events ===
   'world:tick:start': { tick: number };
   'world:tick:end': { tick: number };
+  'world:tick:perf_warning': { phase: string; duration: number; threshold: number };
   'world:loaded': { tick: number; entityCount: number };  // Emitted after world state is restored from save
   'world:time:hour': { hour: number; day: number };
   'world:time:day': { day: number; season: string };

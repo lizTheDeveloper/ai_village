@@ -53,6 +53,9 @@ export class GameLoop {
   private profiler: SystemProfiler | null = null;
   private profilingEnabled = false;
 
+  // Performance mark/measure threshold in ms (default 16ms = one 60fps frame)
+  private perfThresholdMs = 16;
+
   constructor() {
     this.eventBus = new EventBusImpl();
     this._systemRegistry = new SystemRegistry();
@@ -95,6 +98,45 @@ export class GameLoop {
 
   set universeId(id: string) {
     this._universeId = id;
+  }
+
+  set perfThreshold(ms: number) {
+    this.perfThresholdMs = ms;
+  }
+
+  /**
+   * Safely emit a performance mark. Wrapped in try-catch because some
+   * environments (Node test runners) may not support the full Performance API.
+   */
+  private perfMark(name: string): void {
+    try {
+      performance.mark(name);
+    } catch {
+      // Silently ignore — Performance API not available in this environment
+    }
+  }
+
+  /**
+   * Safely emit a performance measure between two marks, then check against
+   * the configured threshold and emit a warning event if exceeded.
+   * Returns the measured duration in ms, or -1 if measurement failed.
+   */
+  private perfMeasure(measureName: string, startMark: string, endMark: string): number {
+    try {
+      const entry = performance.measure(measureName, startMark, endMark);
+      const duration = entry.duration;
+      if (duration > this.perfThresholdMs) {
+        this.eventBus.emit({
+          type: 'world:tick:perf_warning',
+          source: 'world',
+          data: { phase: measureName, duration, threshold: this.perfThresholdMs },
+        });
+      }
+      return duration;
+    } catch {
+      // Silently ignore — Performance API not available in this environment
+      return -1;
+    }
   }
 
   start(): void {
@@ -181,6 +223,7 @@ export class GameLoop {
 
   private executeTick(): void {
     const tickStart = performance.now();
+    this.perfMark('tick:total:start');
 
     // Update profiler if enabled
     if (this.profilingEnabled && this.profiler) {
@@ -209,6 +252,7 @@ export class GameLoop {
     }
 
     // Execute each system
+    this.perfMark('tick:systems:start');
     for (const system of systems) {
       const systemStart = performance.now();
 
@@ -279,20 +323,59 @@ export class GameLoop {
     }
 
     // Capture systems phase timing
+    this.perfMark('tick:systems:end');
+    this.perfMeasure('tick:systems', 'tick:systems:start', 'tick:systems:end');
     const systemsEndTime = performance.now();
     const totalSystemsTime = systemsEndTime - tickStart;
 
+    // Emit per-category measures from the systems that just ran
+    {
+      const categoryTotals = new Map<string, number>();
+      for (const { id, time } of systemTimings) {
+        const sys = this._systemRegistry.get(id);
+        const category = sys?.metadata?.category;
+        if (category !== undefined) {
+          categoryTotals.set(category, (categoryTotals.get(category) ?? 0) + time);
+        }
+      }
+      for (const [category, totalMs] of categoryTotals) {
+        try {
+          // Use a synthetic PerformanceMeasure-compatible approach since we don't
+          // have real marks at per-category granularity — create a measure with a
+          // known start time instead of mark names.
+          const measureName = `tick:cat:${category}`;
+          performance.measure(measureName, { start: systemsEndTime - totalSystemsTime, duration: totalMs });
+          if (totalMs > this.perfThresholdMs) {
+            this.eventBus.emit({
+              type: 'world:tick:perf_warning',
+              source: 'world',
+              data: { phase: measureName, duration: totalMs, threshold: this.perfThresholdMs },
+            });
+          }
+        } catch {
+          // Silently ignore — Performance API not available in this environment
+        }
+      }
+    }
+
     // Process actions
+    this.perfMark('tick:actions:start');
     const actionStart = performance.now();
     this._actionQueue.process(this._world);
     const actionTime = performance.now() - actionStart;
+    this.perfMark('tick:actions:end');
+    this.perfMeasure('tick:actions', 'tick:actions:start', 'tick:actions:end');
 
     // Flush events
+    this.perfMark('tick:event_flush:start');
     const flushStart = performance.now();
     this.eventBus.flush();
     const flushTime = performance.now() - flushStart;
+    this.perfMark('tick:event_flush:end');
+    this.perfMeasure('tick:event_flush', 'tick:event_flush:start', 'tick:event_flush:end');
 
     // Check for time-based events (hour, day, season, year)
+    this.perfMark('tick:time_events:start');
     const timeEventsStart = performance.now();
     const prevGameTime = this._world.gameTime;
 
@@ -371,6 +454,8 @@ export class GameLoop {
     this.eventBus.flush();
     const flush2Time = performance.now() - flush2Start;
     const timeEventsTime = performance.now() - timeEventsStart;
+    this.perfMark('tick:time_events:end');
+    this.perfMeasure('tick:time_events', 'tick:time_events:start', 'tick:time_events:end');
 
     // Prune event history periodically to prevent memory leaks
     // Keep last 5000 ticks of history, prune every 1000 ticks
@@ -382,6 +467,8 @@ export class GameLoop {
 
     // Update stats using exponential moving average for responsiveness
     const tickTime = performance.now() - tickStart;
+    this.perfMark('tick:total:end');
+    this.perfMeasure('tick:total', 'tick:total:start', 'tick:total:end');
     this.tickCount++;
     // EMA: weights recent ticks more heavily (reflects ~last 3 seconds)
     // First tick uses actual value, then blends with EMA

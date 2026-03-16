@@ -510,3 +510,39 @@ If you're an agent and unsure about the workflow:
 - Look at `openspec/archive/` for examples of completed proposals
 - Post questions to the `coordination` channel
 - Tag the `architect` agent for workflow clarification
+
+---
+
+## Performance
+
+### Fleet Size Assumptions
+- Design maximum: ~50 robots (agents) per universe
+- Tests validate performance at this fleet size
+- O(n²) patterns (e.g., all-pairs distance checks) become critical above 50 agents
+
+### Spatial Grid Usage
+- `SimulationScheduler` provides Dwarf Fortress-style entity culling
+- Three modes: ALWAYS (agents, buildings), PROXIMITY (plants, animals — 15 tile radius), PASSIVE (resources — zero cost)
+- Achieves ~97% entity reduction (120 active out of 4,260 total)
+- Systems should use `world.simulationScheduler.filterActiveEntities()` for PROXIMITY entities
+
+### Tick Pipeline Phases
+The GameLoop executes at fixed 20 TPS (50ms budget per tick):
+1. **Systems** — All registered systems in priority order (1-999)
+2. **Actions** — Action queue processing
+3. **Event flush** — EventBus flush
+4. **Time events** — Hour/day/season/year boundary checks + tick advance
+5. **Final flush** — Post-tick event flush
+
+Each phase is instrumented with `performance.mark/measure` (visible in browser DevTools under "tick:{phase}").
+
+### Performance Thresholds
+- **Total tick budget:** 50ms (20 TPS)
+- **Per-system budget:** 5ms (guideline from PERFORMANCE.md)
+- **Perf warning threshold:** 16ms per phase (configurable via `GameLoop.setPerfThreshold()`)
+- **Smoke test thresholds:** median tick < 100ms, no single system > 50ms (conservative for CI)
+
+### Profiling
+- `SystemProfiler` tracks per-system execution time with rolling window stats (avg, max, p99, stddev)
+- Enable via `gameLoop.enableProfiling()`, export with `gameLoop.exportProfilingMarkdown()`
+- GameLoop already emits console.warn for ticks exceeding 50ms with full phase breakdown
