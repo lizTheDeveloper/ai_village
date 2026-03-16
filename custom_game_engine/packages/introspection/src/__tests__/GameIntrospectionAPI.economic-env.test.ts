@@ -15,6 +15,7 @@ import { GameIntrospectionAPI } from '../api/GameIntrospectionAPI.js';
 import type { ComponentRegistry } from '../registry/ComponentRegistry.js';
 import type { MutationService } from '../mutation/MutationService.js';
 import type { World } from '@ai-village/core';
+import { createMockWorld as createSharedMockWorld } from '../../../core/src/__tests__/createMockWorld.js';
 
 // Type helpers for testing
 type MockComponentRegistry = Pick<ComponentRegistry, 'get' | 'getAll' | 'register' | 'clear'>;
@@ -57,35 +58,23 @@ function createMockWorld(): World {
     }),
   };
 
-  return {
+  return createSharedMockWorld({
     tick: 5000,
-    timeEntity: null,
-    eventBus: {
-      emit: vi.fn(),
-      subscribe: vi.fn(),
-      unsubscribe: vi.fn(),
+    entities,
+    overrides: {
+      getEntity: vi.fn((id: string) => entities.get(id)),
+      addEntity: vi.fn((entity: EntityImpl) => {
+        entities.set(entity.id, entity);
+      }),
+      removeEntity: vi.fn((id: string) => {
+        entities.delete(id);
+      }),
+      getSystem: vi.fn((name: string) => {
+        if (name === 'chunk') return mockChunkSystem;
+        return null;
+      }),
     },
-    query: vi.fn().mockReturnValue({
-      with: vi.fn().mockReturnThis(),
-      without: vi.fn().mockReturnThis(),
-      executeEntities: vi.fn().mockReturnValue([]),
-      execute: vi.fn().mockReturnValue([]),
-    }),
-    getEntity: vi.fn((id: string) => entities.get(id)),
-    addEntity: vi.fn((entity: EntityImpl) => {
-      entities.set(entity.id, entity);
-    }),
-    removeEntity: vi.fn((id: string) => {
-      entities.delete(id);
-    }),
-    simulationScheduler: {
-      filterActiveEntities: vi.fn((entities) => entities),
-    },
-    getSystem: vi.fn((name: string) => {
-      if (name === 'chunk') return mockChunkSystem;
-      return null;
-    }),
-  } as World;
+  });
 }
 
 /**

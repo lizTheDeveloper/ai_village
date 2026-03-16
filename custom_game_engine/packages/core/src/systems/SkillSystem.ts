@@ -71,7 +71,7 @@ import { syncPrioritiesWithSkills } from '../components/AgentComponent.js';
 export class SkillSystem extends BaseSystem {
   public readonly id = 'skill' as const;
   public readonly priority = 200; // Run after most game systems
-  public readonly requiredComponents = [] as const;
+  public readonly requiredComponents: string[] = [] as const;
   // PERF: Skip entirely when no agents have skills
   public readonly activationComponents = ['skills', 'agent'] as const;
   protected readonly throttleInterval = 20; // NORMAL - 1 second

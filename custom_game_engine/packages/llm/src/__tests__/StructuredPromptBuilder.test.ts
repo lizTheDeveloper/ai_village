@@ -1,34 +1,30 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { StructuredPromptBuilder } from '../StructuredPromptBuilder';
+import { createMockWorld as createSharedMockWorld } from '@ai-village/core/__tests__/createMockWorld.js';
 
 describe('StructuredPromptBuilder', () => {
   const builder = new StructuredPromptBuilder();
 
   function createMockWorld(): any {
-    const mockQueryBuilder = {
-      with: () => mockQueryBuilder,
-      without: () => mockQueryBuilder,
-      executeEntities: () => [],
-      execute: () => [],
-    };
-    return {
-      getEntity: (id: string) => {
-        // Return a minimal mock entity
-        const components = new Map([
-          ['identity', { name: `Agent${id}` }],
-          ['position', { x: 0, y: 0 }],
-          ['agent', { state: 'idle' }]
-        ]);
-        return {
-          id,
-          components,
-          getComponent: (type: string) => components.get(type)
-        };
-      },
-      query: () => mockQueryBuilder,
+    return createSharedMockWorld({
       tick: 0,
-      time: { hour: 12, day: 1 },
-    };
+      overrides: {
+        getEntity: vi.fn((id: string) => {
+          // Return a minimal mock entity
+          const components = new Map([
+            ['identity', { name: `Agent${id}` }],
+            ['position', { x: 0, y: 0 }],
+            ['agent', { state: 'idle' }]
+          ]);
+          return {
+            id,
+            components,
+            getComponent: (type: string) => components.get(type)
+          };
+        }),
+        time: { hour: 12, day: 1 },
+      },
+    });
   }
 
   function createMockEntity(overrides?: any): any {

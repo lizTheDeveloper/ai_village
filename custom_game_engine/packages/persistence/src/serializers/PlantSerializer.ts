@@ -18,7 +18,7 @@ export class PlantSerializer extends BaseComponentSerializer<PlantComponent> {
 
     // Fallback for plain objects (legacy data from old saves)
     // Extract fields manually - validate required arrays exist
-    const plainObj = component as Record<string, unknown>;
+    const plainObj = component as unknown as { type: string; version: number; [key: string]: unknown };
 
     // Validate required arrays exist (empty array is valid, but must be array)
     if (!Array.isArray(plainObj.diseases)) {
@@ -45,7 +45,7 @@ export class PlantSerializer extends BaseComponentSerializer<PlantComponent> {
       seedsProduced: plainObj.seedsProduced ?? 0,
       planted: plainObj.planted,
       tileEntityId: plainObj.tileEntityId,
-    } as PlantComponentData;
+    } as unknown as PlantComponentData;
   }
 
   protected deserializeData(data: unknown): PlantComponent {

@@ -328,7 +328,7 @@ function orientTowardTargetWithContext(
 function handleLostTargetWithContext(
   ctx: BehaviorContext,
   purpose: string
-): void {
+): ContextBehaviorResult | void {
   const searchStartTick = ctx.getState<number>('searchStartTick') ?? ctx.tick;
 
   // Check if search timeout exceeded

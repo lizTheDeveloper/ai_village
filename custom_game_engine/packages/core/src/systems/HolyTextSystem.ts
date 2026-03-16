@@ -50,7 +50,7 @@ export const DEFAULT_HOLY_TEXT_CONFIG: HolyTextConfig = {
 export class HolyTextSystem extends BaseSystem {
   public readonly id = 'HolyTextSystem';
   public readonly priority = 82;
-  public readonly requiredComponents = [];
+  public readonly requiredComponents: string[] = [];
   // Only run when deity components exist (O(1) activation check)
   public readonly activationComponents = ['deity'] as const;
   protected readonly throttleInterval = THROTTLE.SLOW; // Every 5 seconds at 20 TPS

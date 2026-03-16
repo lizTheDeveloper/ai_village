@@ -19,7 +19,7 @@ import { PlantTargeting, findNearestPlant, findNearestEdiblePlant } from '../Pla
 import { BuildingTargeting, findNearestBuilding, findNearestStorageBuilding } from '../BuildingTargeting.js';
 import { AgentTargeting, findNearestAgent, findConversationPartner } from '../AgentTargeting.js';
 import { ThreatTargeting, assessThreats, findNearestThreat } from '../ThreatTargeting.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 // Type helpers for testing
 type EntityWithMethods = {

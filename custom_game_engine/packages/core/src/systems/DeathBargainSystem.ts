@@ -91,12 +91,16 @@ import {
 
 // Import needs and health component types
 interface NeedsComponent {
+  type: string;
+  version: number;
   hunger: number;
   warmth: number;
   [key: string]: unknown;
 }
 
 interface HealthComponent {
+  type: string;
+  version: number;
   current: number;
   max: number;
   [key: string]: unknown;
@@ -136,6 +140,8 @@ interface ChatRoomMessage {
 
 // Episodic memory type
 interface EpisodicMemoryComponent {
+  type: string;
+  version: number;
   memories?: Array<{
     description: string;
     importance: number;

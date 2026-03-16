@@ -68,7 +68,7 @@ interface AdviceGiven {
 export class CompanionSystem extends BaseSystem {
   public readonly id = 'companion_system';
   public readonly priority = 950; // Low priority - runs after most systems
-  public readonly requiredComponents = []; // Global system
+  public readonly requiredComponents: string[] = []; // Global system
   // Only run when companion components exist (O(1) activation check)
   public readonly activationComponents = ['companion'] as const;
   public enabled = true;
@@ -332,11 +332,9 @@ export class CompanionSystem extends BaseSystem {
     evolveToNextTier(companionComp, this.worldRef.tick);
 
     // Update sprite path for new tier
-    const renderableComp = companionEntity.getComponent(CT.Renderable) as
-      | { spritePath: string }
-      | undefined;
+    const renderableComp = companionEntity.getComponent<import('../components/RenderableComponent.js').RenderableComponent>(CT.Renderable);
     if (renderableComp) {
-      renderableComp.spritePath = getCompanionSpritePath(
+      renderableComp.spriteId = getCompanionSpritePath(
         companionComp.evolutionTier,
         companionComp.currentEmotion
       );

@@ -512,14 +512,20 @@ export class BackgroundUniverseManager {
       id: `${civ.id}_leader`,
       name: `Leader of ${civ.name}`,
       role: 'civilization_leader',
-      location: civ.capital,
+      location: civ.capital
+        ? { x: (civ.capital as { lon?: number; x?: number }).lon ?? (civ.capital as { x?: number }).x ?? 0,
+            y: (civ.capital as { lat?: number; y?: number }).lat ?? (civ.capital as { y?: number }).y ?? 0 }
+        : undefined,
     }));
 
     // Extract major structures from megastructures
-    const majorStructures = planet.megastructures.map((mega) => ({
-      type: mega.type,
-      location: typeof mega.location === 'string' ? { x: 0, y: 0 } : mega.location,
-    }));
+    const majorStructures = planet.megastructures.map((mega) => {
+      const loc = mega.location as { lat?: number; lon?: number; x?: number; y?: number } | string;
+      const location = typeof loc === 'string'
+        ? { x: 0, y: 0 }
+        : { x: loc.lon ?? loc.x ?? 0, y: loc.lat ?? loc.y ?? 0 };
+      return { type: mega.type as string, location };
+    });
 
     return {
       targetPopulation: planet.population.total,

@@ -748,5 +748,5 @@ export function buildBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
 
   // Delegate to BuildBehavior class - it only uses tick/getEntity/eventBus from world
   // Using world adapter to avoid exposing full World interface to behaviors
-  return behavior.execute(ctx.entity, worldAdapter as World);
+  return behavior.execute(ctx.entity, worldAdapter as unknown as World);
 }

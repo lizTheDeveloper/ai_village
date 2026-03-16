@@ -27,7 +27,7 @@ import type { SleepComponent } from '../components/SleepComponent.js';
 export class EntityAwakenerSystem implements System {
   readonly id = 'EntityAwakenerSystem';
   readonly priority = 5; // Very early - before other systems
-  readonly requiredComponents = []; // Processes all entities
+  readonly requiredComponents: string[] = []; // Processes all entities
 
   readonly metadata = {
     category: 'infrastructure' as const,

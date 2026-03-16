@@ -183,7 +183,7 @@ export class VisionDeliverySystem {
    * Emit an event through the world's event bus
    */
   private emitEvent(type: string, source: string, data: Record<string, unknown>): void {
-    this.world.eventBus.emit({ type, source, data });
+    (this.world.eventBus as unknown as { emit: (event: Record<string, unknown>) => void }).emit({ type, source, data });
   }
 
 
@@ -257,6 +257,7 @@ export class VisionDeliverySystem {
       targetName: this.getTargetName(targetId),
       content: content.subject,
       powerType: method,
+      symbols: content.symbols || [],
       cost,
       timestamp: this.world.tick,
       wasReceived: false,

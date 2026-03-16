@@ -14,7 +14,7 @@ import { ComponentType as CT } from '../../types/ComponentType.js';
 import { createDynastyComponent } from '../../components/DynastyComponent.js';
 import { createAgentComponent } from '../../components/AgentComponent.js';
 import { selectHeir, type HeirCandidate } from '../EmpireDynastyManager.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 describe('EmpireDynastyManager', () => {
   let world: World;

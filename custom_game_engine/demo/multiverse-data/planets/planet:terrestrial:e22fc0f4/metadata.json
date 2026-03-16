@@ -1,0 +1,17 @@
+{
+  "id": "planet:terrestrial:e22fc0f4",
+  "name": "Nyx Beta",
+  "type": "terrestrial",
+  "seed": "Nyx Beta-1772936950104-0or3fdcnekyc",
+  "createdAt": 1772936950105,
+  "lastAccessedAt": 1772936950105,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "Nyx Beta-1772936950104-0or3fdcnekyc",
+    "type": "terrestrial"
+  },
+  "universeId": "universe:1772936932843",
+  "artStyle": "16-bit SNES pixel art"
+}

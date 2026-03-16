@@ -103,7 +103,7 @@ export const DEFAULT_CONVERSION_CONFIG: ConversionConfig = {
 export class ConversionWarfareSystem extends BaseSystem {
   public readonly id = 'ConversionWarfareSystem';
   public readonly priority = 79;
-  public readonly requiredComponents = [] as const;
+  public readonly requiredComponents: string[] = [] as const;
   // Only run when deity components exist (O(1) activation check)
   public readonly activationComponents = ['deity'] as const;
   protected readonly throttleInterval = 300; // ~15 seconds at 20 TPS

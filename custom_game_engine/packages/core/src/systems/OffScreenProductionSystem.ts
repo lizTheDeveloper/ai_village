@@ -29,7 +29,7 @@ import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 export class OffScreenProductionSystem extends BaseSystem {
   public readonly id = 'off_screen_production';
   public readonly priority = 49; // Before automation systems (50+)
-  public readonly requiredComponents = [] as const; // Processes all entities, filters internally
+  public readonly requiredComponents: string[] = [] as const; // Processes all entities, filters internally
   // Lazy activation: Skip entire system when no chunk_production_state exists
   public readonly activationComponents = ['chunk_production_state'] as const;
 

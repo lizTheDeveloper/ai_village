@@ -92,7 +92,7 @@ export interface ColonizationScheduledEvent {
 export class ParasiticReproductionSystem extends BaseSystem {
   public readonly id: SystemId = 'ParasiticReproductionSystem';
   public readonly priority = 51; // Run after normal ReproductionSystem
-  public readonly requiredComponents = [] as const;
+  public readonly requiredComponents: string[] = [] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
 
   private config: ParasiticReproductionConfig;

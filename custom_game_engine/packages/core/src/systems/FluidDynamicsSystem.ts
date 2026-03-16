@@ -85,7 +85,7 @@ export class FluidDynamicsSystem extends BaseSystem {
     let tilesProcessed = 0;
 
     // Get world tile accessor
-    const worldWithTiles = ctx.world as {
+    const worldWithTiles = ctx.world as typeof ctx.world & {
       getTileAt?: (x: number, y: number, z?: number) => Tile | undefined;
       setTileAt?: (x: number, y: number, z: number, tile: Tile) => void;
     };

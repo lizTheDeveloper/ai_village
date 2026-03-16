@@ -696,6 +696,7 @@ export class BuildingPlacementUI {
       const labelMap: Record<BuildingCategory, string> = {
         residential: 'Res',
         production: 'Pro',
+        crafting: 'Crf',
         storage: 'Sto',
         commercial: 'Com',
         community: 'Cmn',

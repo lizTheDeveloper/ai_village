@@ -1,0 +1,18 @@
+{
+  "id": "planet:terrestrial:1440263",
+  "name": "Miranda",
+  "type": "terrestrial",
+  "seed": "universe:main:homeworld:1773443454981",
+  "createdAt": 1773443455131,
+  "lastAccessedAt": 1773443455131,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1773443454981",
+    "type": "terrestrial"
+  },
+  "universeId": "default",
+  "artStyle": "snes",
+  "createdBy": "player:3c3fec66-35fa-4406-8b2a-43f0af8852ae"
+}

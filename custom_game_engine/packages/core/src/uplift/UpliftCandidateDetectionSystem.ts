@@ -50,7 +50,7 @@ const BASE_GENERATION_ESTIMATES: Record<string, number> = {
 export class UpliftCandidateDetectionSystem extends BaseSystem {
   readonly id = 'UpliftCandidateDetectionSystem';
   readonly priority = 555;
-  readonly requiredComponents = [] as const; // Queries all animals
+  readonly requiredComponents: string[] = [] as const; // Queries all animals
   // Only run when animal components exist (O(1) activation check)
   readonly activationComponents = ['animal'] as const;
 

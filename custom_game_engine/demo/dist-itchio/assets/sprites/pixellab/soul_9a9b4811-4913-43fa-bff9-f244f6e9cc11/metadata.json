@@ -1,0 +1,19 @@
+{
+  "id": "soul_9a9b4811-4913-43fa-bff9-f244f6e9cc11",
+  "category": "animals",
+  "size": 48,
+  "description": "9a9b4811-4913-43fa-bff9-f244f6e9cc11 soul",
+  "generated_at": "2026-01-05T01:58:16.577Z",
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "original_description": "human character named Maple",
+  "enriched_at": "2026-01-30T00:40:22.653Z"
+}

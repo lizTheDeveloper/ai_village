@@ -50,7 +50,7 @@ export class ParentingSystem extends BaseSystem {
 
   public readonly name = 'ParentingSystem';
   private config: ParentingSystemConfig;
-  protected readonly throttleInterval: number;
+  declare protected readonly throttleInterval: number;
 
   constructor(config: Partial<ParentingSystemConfig> = {}) {
     super();

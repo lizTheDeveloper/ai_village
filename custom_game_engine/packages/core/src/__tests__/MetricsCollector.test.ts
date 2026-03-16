@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { MetricsCollector } from '../metrics/MetricsCollector';
-import { World } from '../World';
+import { World } from '../ecs/World.js';
 import { EventBusImpl } from '../events/EventBus.js';
 
 describe('MetricsCollector', () => {

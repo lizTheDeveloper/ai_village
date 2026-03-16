@@ -80,6 +80,8 @@ export * from './AnimalComponent.js';
 export { AnimalComponent } from './AnimalComponent.js';
 export * from './BioluminescentComponent.js';
 export { BioluminescentComponent } from './BioluminescentComponent.js';
+export * from './AnimalGroupComponent.js';
+export * from './WorkingAnimalComponent.js';
 export * from './MeetingComponent.js';
 export * from './EpisodicMemoryComponent.js';
 export { EpisodicMemoryComponent } from './EpisodicMemoryComponent.js';
@@ -582,6 +584,8 @@ export * from './CensusBureauComponent.js';
 export * from './HealthClinicComponent.js';
 export * from './TownHallComponent.js';
 export * from './WarehouseComponent.js';
+export * from './BuildingUpgradeComponent.js';
+export * from './VillageComponent.js';
 export * from './WeatherStationComponent.js';
 
 // City Director Component (City-level strategic management)
@@ -1345,6 +1349,8 @@ export { createBlockadeComponent } from './BlockadeComponent.js';
 // Mining Operation (Stellar Resource Extraction)
 export * from './MiningOperationComponent.js';
 export { createMiningOperationComponent, type MiningOperationComponent } from './MiningOperationComponent.js';
+export * from './TradeRouteComponent.js';
+export * from './InterVillageCaravanComponent.js';
 
 // Megastructure (Grand Strategy - 09-MEGASTRUCTURES.md)
 export * from './MegastructureComponent.js';

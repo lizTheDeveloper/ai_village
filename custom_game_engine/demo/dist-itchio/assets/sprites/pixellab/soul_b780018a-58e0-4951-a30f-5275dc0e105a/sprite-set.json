@@ -1,0 +1,16 @@
+{
+  "entityId": "b780018a-58e0-4951-a30f-5275dc0e105a",
+  "tier": 1,
+  "config": {
+    "size": 16,
+    "directions": 1,
+    "animations": [],
+    "detail": "low detail",
+    "shading": "flat shading"
+  },
+  "sprites": [
+    "sprites/south.png"
+  ],
+  "animations": [],
+  "generatedAt": 1767575281794
+}

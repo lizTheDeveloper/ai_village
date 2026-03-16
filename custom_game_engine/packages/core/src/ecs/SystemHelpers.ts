@@ -55,7 +55,7 @@ import type { World } from './World.js';
  * class AutoSaveSystem extends ThrottledSystem {
  *   readonly id = 'auto_save';
  *   readonly priority = 999;
- *   readonly requiredComponents = [];
+ *   readonly requiredComponents: string[] = [];
  *   readonly throttleInterval = 6000; // Every 5 minutes (6000 ticks)
  *
  *   protected updateThrottled(world: World, entities: Entity[], deltaTime: number): void {

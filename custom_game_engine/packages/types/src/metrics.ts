@@ -16,6 +16,12 @@ export interface PerformanceStats {
   readonly maxTickTimeMs: number;
   /** Total number of ticks executed */
   readonly tickCount: number;
+  /** 95th percentile tick time in milliseconds */
+  readonly p95TickTimeMs?: number;
+  /** 99th percentile tick time in milliseconds */
+  readonly p99TickTimeMs?: number;
+  /** Total number of active entities */
+  readonly entityCount?: number;
 }
 
 /**

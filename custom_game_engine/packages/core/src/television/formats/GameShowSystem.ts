@@ -354,7 +354,7 @@ export class GameShowManager {
         correctAnswers: 0,
         incorrectAnswers: 0,
         status: 'active',
-        lifelinesUsed: [],
+        lifelinesUsed: [] as string[],
         audienceFavorability: 50 + Math.random() * 20, // 50-70 starting
       };
     });

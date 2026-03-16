@@ -68,7 +68,7 @@ interface PendingLLMMyth {
 export class MythGenerationSystem extends BaseSystem {
   public readonly id: SystemId = 'myth_generation';
   public readonly priority: number = 118; // After prayer answering
-  public readonly requiredComponents = [];
+  public readonly requiredComponents: string[] = [];
   // Only run when deity components exist (O(1) activation check)
   public readonly activationComponents = ['deity'] as const;
   protected readonly throttleInterval = 100; // Every 100 ticks (5 seconds at 20 TPS)

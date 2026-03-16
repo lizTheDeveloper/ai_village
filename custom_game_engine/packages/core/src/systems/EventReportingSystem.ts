@@ -45,7 +45,7 @@ interface EventScore {
 export class EventReportingSystem extends BaseSystem {
   readonly id = 'EventReportingSystem';
   readonly priority = 75;  // After NewsroomSystem (70)
-  readonly requiredComponents = [] as const;
+  readonly requiredComponents: string[] = [] as const;
   // PERF: Skip entirely when no news reporting infrastructure exists
   // Uses 'recording' as proxy for active news recording in progress
   readonly activationComponents = ['recording'] as const;

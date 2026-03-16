@@ -701,7 +701,7 @@ export class MovementSystem extends BaseSystem {
     y: number
   ): boolean {
     // Extended world interface with tile access
-    const worldWithTerrain = world as {
+    const worldWithTerrain = world as typeof world & {
       getTerrainAt?: (x: number, y: number) => string | null;
       getTileAt?: (x: number, y: number) => Tile | undefined;
       getChunkManager?: () => {
@@ -729,8 +729,9 @@ export class MovementSystem extends BaseSystem {
     if (typeof worldWithTerrain.getTileAt === 'function') {
       const tile = worldWithTerrain.getTileAt(Math.floor(x), Math.floor(y));
 
-      if (tile?.fluid && tile.fluid.type === 'water') {
-        const depth = tile.fluid.depth;
+      const tileWithFluid = tile as (typeof tile & { fluid?: { type: string; depth: number } }) | undefined;
+      if (tileWithFluid?.fluid && tileWithFluid.fluid.type === 'water') {
+        const depth = tileWithFluid.fluid.depth;
 
         // Shallow water (depth 1-2): Wadeable, no blocking
         // Movement penalty applied by AgentSwimmingSystem instead

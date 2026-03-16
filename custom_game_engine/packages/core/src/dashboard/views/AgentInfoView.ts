@@ -190,9 +190,10 @@ export const AgentInfoView: DashboardView<AgentInfoViewData> = {
       const skillsComp = entity.getComponent<SkillsComponent>(CT.Skills);
 
       const skills: SkillInfo[] = [];
-      if (skillsComp?.skills) {
-        for (const [name, data] of skillsComp.skills.entries()) {
-          skills.push({ name, level: data.level, experience: data.experience });
+      if (skillsComp?.levels) {
+        for (const [name, level] of Object.entries(skillsComp.levels)) {
+          const experience = skillsComp.experience?.[name as keyof typeof skillsComp.experience] ?? 0;
+          skills.push({ name, level: level as number, experience: experience as number });
         }
         skills.sort((a, b) => b.level - a.level); // Sort by level descending
       }
@@ -217,8 +218,8 @@ export const AgentInfoView: DashboardView<AgentInfoViewData> = {
         available: true,
         name: identity?.name || null,
         agentId: selectedEntityId,
-        currentBehavior: agent.currentBehavior || null,
-        currentAction: agent.currentAction || null,
+        currentBehavior: (agent.behavior as string) || null,
+        currentAction: null,
         needs,
         skills: skills.slice(0, 5), // Top 5 skills
         inventory,
@@ -226,7 +227,7 @@ export const AgentInfoView: DashboardView<AgentInfoViewData> = {
         position: posComp?.x !== undefined && posComp?.y !== undefined
           ? { x: posComp.x, y: posComp.y }
           : null,
-        age: agent.age || null,
+        age: null,
       };
     } catch (error) {
       emptyData.unavailableReason = `Error: ${error instanceof Error ? error.message : String(error)}`;

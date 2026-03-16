@@ -46,7 +46,7 @@ const DEFAULT_SCALE_LIMITS: ScaleLimits = {
 export class PlotAssignmentSystem extends BaseSystem {
   readonly id = 'plot_assignment' as const;
   readonly priority = 85;
-  readonly requiredComponents = [] as const;
+  readonly requiredComponents: string[] = [] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private tickCounter = 0;

@@ -12,8 +12,8 @@ import { createPositionComponent } from '../../../components/PositionComponent.j
 import { createMovementComponent } from '../../../components/MovementComponent.js';
 import type { AnimalComponent } from '../../../components/AnimalComponent.js';
 
+import { EventBusImpl } from '../../../events/EventBus.js';
 import {
-import { EventBusImpl } from '../events/EventBus.js';
   GrazeBehavior,
   FleeBehavior,
   RestBehavior,

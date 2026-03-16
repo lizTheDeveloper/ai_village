@@ -58,7 +58,7 @@ export class UpliftedSpeciesRegistry {
 export class UpliftedSpeciesRegistrationSystem extends BaseSystem {
   readonly id = 'UpliftedSpeciesRegistrationSystem';
   readonly priority = 570;
-  readonly requiredComponents = [] as const;
+  readonly requiredComponents: string[] = [] as const;
   // Only run when uplift program components exist (O(1) activation check)
   readonly activationComponents = [CT.UpliftProgram] as const;
 

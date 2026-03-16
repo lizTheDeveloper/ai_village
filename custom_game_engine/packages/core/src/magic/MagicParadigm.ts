@@ -281,7 +281,8 @@ export type MagicLawType =
   | 'secrecy'              // Known magic loses power
   | 'territory'            // Magic tied to specific places/domains
   | 'bloodline'            // Power inherited through lineage
-  | 'material';            // Specific materials required/forbidden
+  | 'material'             // Specific materials required/forbidden
+  | 'truth_costs';         // Speaking truth exacts a cost
 
 /** How strictly a law is enforced */
 export type LawStrictness =
@@ -307,6 +308,9 @@ export interface MagicLaw {
 
   /** Cost multiplier for attempting to break this law */
   circumventionCostMultiplier?: number;
+
+  /** Human-readable description of the circumvention cost */
+  circumventionCost?: string;
 
   /** Flavor description */
   description?: string;
@@ -404,6 +408,9 @@ export interface MagicRisk {
 
   /** Can this be mitigated with skill/preparation? */
   mitigatable: boolean;
+
+  /** Human-readable description of mitigation strategy */
+  mitigation?: string;
 
   /** Skill check to avoid (if mitigatable) */
   mitigationSkill?: string;

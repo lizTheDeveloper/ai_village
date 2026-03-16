@@ -1,4 +1,5 @@
-const WS_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_LLM_PROXY_URL as string)?.replace(/^http/, 'ws') || 'ws://localhost:8766';
+const _viteUrl = typeof import.meta !== 'undefined' ? (import.meta as { env?: { VITE_LLM_PROXY_URL?: string } }).env?.VITE_LLM_PROXY_URL : undefined;
+const WS_URL = (_viteUrl ? _viteUrl.replace(/^http/, 'ws') : undefined) || 'ws://localhost:8766';
 const RECONNECT_DELAY = 3000;
 const MAX_RECONNECT_ATTEMPTS = 10;
 

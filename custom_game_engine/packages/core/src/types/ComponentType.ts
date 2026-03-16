@@ -92,6 +92,8 @@ export enum ComponentType {
   WeatherStation = 'weather_station',
   Shop = 'shop',
   Warehouse = 'warehouse',
+  BuildingUpgrade = 'building_upgrade',
+  Village = 'village',
 
   // Automation & Production
   Power = 'power',
@@ -122,6 +124,8 @@ export enum ComponentType {
   TradeNetwork = 'trade_network',  // Tier 3: Network topology
   Blockade = 'blockade',  // Strategic chokepoint blockades
   MiningOperation = 'mining_operation',  // Stellar mining operations at phenomena
+  TradeRoute = 'trade_route',
+  InterVillageCaravan = 'inter_village_caravan',
 
   // Research & Technology
   ResearchState = 'research_state',
@@ -154,6 +158,8 @@ export enum ComponentType {
   // Animals
   Animal = 'animal',
   Bioluminescent = 'bioluminescent',
+  AnimalGroup = 'animal_group',
+  WorkingAnimal = 'working_animal',
 
   // Body Parts, Species & Genetics
   Body = 'body',

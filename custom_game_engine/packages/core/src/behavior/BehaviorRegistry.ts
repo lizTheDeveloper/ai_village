@@ -176,9 +176,12 @@ export class BehaviorRegistry {
       if (meta.usesContext) {
         // Modern handler - create context and pass it
         const ctx = createBehaviorContext(entity, world);
-        const result = (meta.handler as ContextBehaviorHandler)(ctx);
+        const result = (meta.handler as ContextBehaviorHandler)(ctx) as BehaviorResult | undefined;
         // Safety: ensure result is valid even if handler doesn't return properly
-        return result ?? { complete: false };
+        if (result !== undefined && result !== null) {
+          return result;
+        }
+        return { complete: false };
       } else {
         // Legacy handler - call directly
         (meta.handler as BehaviorHandler)(entity, world);

@@ -1,0 +1,1507 @@
+{
+  "recordingId": "combat_wolf-vs-dog_1767527432348",
+  "title": "WOLF VS GUARD DOG - Territorial Battle",
+  "description": "A wild wolf challenges a loyal guard dog defending its territory",
+  "combatId": "wolf-vs-dog",
+  "recordedBy": "Combat Arena System",
+  "recordedAt": 1767527432348,
+  "duration": 200,
+  "quality": 0.95,
+  "frames": [
+    {
+      "tick": 0,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 350,
+          "y": 300,
+          "facingAngle": 180,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 50
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 270,
+          "y": 300,
+          "facingAngle": 0,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 30
+        }
+      ]
+    },
+    {
+      "tick": 5,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 348.68477119388893,
+          "y": 311.3926754451569,
+          "facingAngle": -166.8292682926829,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 49.999999999999986
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 270.7891372836666,
+          "y": 293.16439473290586,
+          "facingAngle": 13.170731707317094,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 30.000000000000025
+        }
+      ]
+    },
+    {
+      "tick": 10,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 344.8082778480528,
+          "y": 322.185991893348,
+          "facingAngle": -153.65853658536585,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 50.00000000000002
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 273.11503329116834,
+          "y": 286.6884048639912,
+          "facingAngle": 26.341463414634156,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 29.999999999999996
+        }
+      ]
+    },
+    {
+      "tick": 15,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 338.5744589910971,
+          "y": 331.812122116328,
+          "facingAngle": -140.48780487804873,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 49.99999999999998
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 276.8553246053417,
+          "y": 280.9127267302032,
+          "facingAngle": 39.512195121951244,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 30.000000000000014
+        }
+      ]
+    },
+    {
+      "tick": 20,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 330.3112705483319,
+          "y": 339.7646435636713,
+          "facingAngle": -127.31707317073172,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 49.999999999999986
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 281.8132376710009,
+          "y": 276.1412138617972,
+          "facingAngle": 52.682926829268304,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 29.999999999999986
+        }
+      ]
+    },
+    {
+      "tick": 25,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 320.453431858567,
+          "y": 345.6251808238275,
+          "facingAngle": -114.14634146341463,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 50.00000000000002
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 287.7279408848598,
+          "y": 272.6248915057035,
+          "facingAngle": 65.85365853658537,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 30.00000000000002
+        }
+      ]
+    },
+    {
+      "tick": 30,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 309.5195554582334,
+          "y": 349.0854159998427,
+          "facingAngle": -100.97560975609758,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 49.99999999999998
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 294.28826672505994,
+          "y": 270.5487504000944,
+          "facingAngle": 79.02439024390243,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 29.99999999999998
+        }
+      ]
+    },
+    {
+      "tick": 35,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 298.08486331549824,
+          "y": 349.9633090525405,
+          "facingAngle": -87.80487804878048,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 50.00000000000002
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 301.1490820107011,
+          "y": 270.0220145684757,
+          "facingAngle": 92.19512195121953,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 30.000000000000004
+        }
+      ]
+    },
+    {
+      "tick": 40,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 286.7509248901669,
+          "y": 348.21267477265707,
+          "facingAngle": -74.63414634146342,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 50.00000000000002
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 307.94944506589985,
+          "y": 271.07239513640576,
+          "facingAngle": 105.3658536585366,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 30.00000000000001
+        }
+      ]
+    },
+    {
+      "tick": 45,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 276.11400907438684,
+          "y": 343.9256125455471,
+          "facingAngle": -61.46341463414632,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 49.999999999999986
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 314.3315945553679,
+          "y": 273.64463247267173,
+          "facingAngle": 118.53658536585368,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 29.99999999999999
+        }
+      ]
+    },
+    {
+      "tick": 50,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 266.73371499172174,
+          "y": 337.32766108059815,
+          "facingAngle": -48.29268292682929,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 50.00000000000001
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 319.95977100496697,
+          "y": 277.60340335164113,
+          "facingAngle": 131.70731707317074,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 29.999999999999993
+        }
+      ]
+    },
+    {
+      "tick": 55,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 259.1035319616641,
+          "y": 328.76593301093106,
+          "facingAngle": -35.12195121951221,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 50.00000000000004
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 324.53788082300156,
+          "y": 282.7404401934414,
+          "facingAngle": 144.8780487804878,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 30.000000000000032
+        }
+      ]
+    },
+    {
+      "tick": 60,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 253.62487744489528,
+          "y": 318.6908535920384,
+          "facingAngle": -21.951219512195113,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 49.99999999999998
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 327.82507353306283,
+          "y": 288.7854878447769,
+          "facingAngle": 158.04878048780486,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 30
+        }
+      ]
+    },
+    {
+      "tick": 65,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 250.58597881098257,
+          "y": 307.63246421094374,
+          "facingAngle": -8.780487804878064,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 50.00000000000001
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 329.64841271341044,
+          "y": 295.4205214734337,
+          "facingAngle": 171.21951219512192,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 29.99999999999999
+        }
+      ]
+    },
+    {
+      "tick": 70,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 250.14670994081297,
+          "y": 296.1725373581752,
+          "facingAngle": 4.390243902439054,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 50.00000000000001
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 329.91197403551223,
+          "y": 302.29647758509486,
+          "facingAngle": -175.60975609756096,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 30.000000000000018
+        }
+      ]
+    },
+    {
+      "tick": 75,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 252.33018039725346,
+          "y": 284.9139700702404,
+          "facingAngle": 17.56097560975608,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 50.00000000000001
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 328.60189176164795,
+          "y": 309.05161795785574,
+          "facingAngle": -162.43902439024393,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 30.00000000000002
+        }
+      ]
+    },
+    {
+      "tick": 80,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 257.02151965063996,
+          "y": 274.44906602764445,
+          "facingAngle": 30.731707317073212,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 50
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 325.78708820961606,
+          "y": 315.3305603834133,
+          "facingAngle": -149.26829268292684,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 30.000000000000007
+        }
+      ]
+    },
+    {
+      "tick": 85,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 263.9739203199606,
+          "y": 265.3283749603879,
+          "facingAngle": 43.902439024390205,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 50.00000000000003
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 321.6156478080236,
+          "y": 320.80297502376726,
+          "facingAngle": -136.09756097560978,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 29.999999999999996
+        }
+      ]
+    },
+    {
+      "tick": 90,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 272.82162249993894,
+          "y": 258.0317286934025,
+          "facingAngle": 57.073170731707314,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 50.00000000000001
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 316.3070265000366,
+          "y": 325.1809627839585,
+          "facingAngle": -122.92682926829269,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 29.999999999999968
+        }
+      ]
+    },
+    {
+      "tick": 95,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 283.09915607957487,
+          "y": 252.94299760102191,
+          "facingAngle": 70.2439024390244,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 50
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 310.1405063522551,
+          "y": 328.2342014393868,
+          "facingAngle": -109.75609756097563,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 29.999999999999982
+        }
+      ]
+    },
+    {
+      "tick": 100,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 294.26582873007993,
+          "y": 250.32989551201626,
+          "facingAngle": 83.4146341463414,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 49.999999999999986
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 303.440502761952,
+          "y": 329.80206269279023,
+          "facingAngle": -96.58536585365859,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 29.99999999999998
+        }
+      ]
+    },
+    {
+      "tick": 105,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 305.73417126992,
+          "y": 250.32989551201626,
+          "facingAngle": 96.58536585365854,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 49.99999999999998
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 296.559497238048,
+          "y": 329.80206269279023,
+          "facingAngle": -83.41463414634147,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 29.99999999999998
+        }
+      ]
+    },
+    {
+      "tick": 110,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 316.90084392042513,
+          "y": 252.94299760102191,
+          "facingAngle": 109.75609756097562,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 50
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 289.8594936477449,
+          "y": 328.2342014393868,
+          "facingAngle": -70.24390243902438,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 29.999999999999982
+        }
+      ]
+    },
+    {
+      "tick": 115,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 327.17837750006106,
+          "y": 258.0317286934025,
+          "facingAngle": 122.92682926829269,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 50.00000000000001
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 283.69297349996333,
+          "y": 325.1809627839585,
+          "facingAngle": -57.073170731707286,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 30.000000000000004
+        }
+      ]
+    },
+    {
+      "tick": 120,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 336.02607968003935,
+          "y": 265.3283749603879,
+          "facingAngle": 136.09756097560975,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 49.99999999999999
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 278.3843521919764,
+          "y": 320.80297502376726,
+          "facingAngle": -43.902439024390254,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 29.999999999999996
+        }
+      ]
+    },
+    {
+      "tick": 125,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 342.97848034936004,
+          "y": 274.44906602764445,
+          "facingAngle": 149.26829268292678,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 50
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 274.212911790384,
+          "y": 315.33056038341334,
+          "facingAngle": -30.731707317073226,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 29.99999999999999
+        }
+      ]
+    },
+    {
+      "tick": 130,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 347.66981960274654,
+          "y": 284.9139700702404,
+          "facingAngle": 162.43902439024393,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 50.00000000000001
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 271.3981082383521,
+          "y": 309.0516179578558,
+          "facingAngle": -17.560975609756113,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 29.999999999999986
+        }
+      ]
+    },
+    {
+      "tick": 135,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 349.85329005918703,
+          "y": 296.17253735817525,
+          "facingAngle": 175.60975609756102,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 50.00000000000001
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 270.08802596448777,
+          "y": 302.29647758509486,
+          "facingAngle": -4.390243902438997,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 30.000000000000018
+        }
+      ]
+    },
+    {
+      "tick": 140,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 349.41402118901743,
+          "y": 307.63246421094374,
+          "facingAngle": -171.21951219512195,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 50.00000000000001
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 270.35158728658956,
+          "y": 295.4205214734338,
+          "facingAngle": 8.78048780487805,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 29.99999999999998
+        }
+      ]
+    },
+    {
+      "tick": 145,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 346.3751225551048,
+          "y": 318.69085359203837,
+          "facingAngle": -158.04878048780498,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 50.00000000000002
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 272.17492646693717,
+          "y": 288.785487844777,
+          "facingAngle": 21.951219512195035,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 29.99999999999998
+        }
+      ]
+    },
+    {
+      "tick": 150,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 340.8964680383359,
+          "y": 328.765933010931,
+          "facingAngle": -144.87804878048786,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 50.00000000000001
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 275.46211917699844,
+          "y": 282.7404401934414,
+          "facingAngle": 35.12195121951216,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 30.000000000000032
+        }
+      ]
+    },
+    {
+      "tick": 155,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 333.26628500827826,
+          "y": 337.32766108059815,
+          "facingAngle": -131.70731707317074,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 50.00000000000001
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 280.04022899503303,
+          "y": 277.60340335164113,
+          "facingAngle": 48.29268292682927,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 29.999999999999993
+        }
+      ]
+    },
+    {
+      "tick": 160,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 323.8859909256131,
+          "y": 343.9256125455471,
+          "facingAngle": -118.53658536585363,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 49.99999999999996
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 285.6684054446321,
+          "y": 273.64463247267173,
+          "facingAngle": 61.46341463414638,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 29.99999999999999
+        }
+      ]
+    },
+    {
+      "tick": 165,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 313.24907510983314,
+          "y": 348.212674772657,
+          "facingAngle": -105.36585365853668,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 49.99999999999998
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 292.0505549341001,
+          "y": 271.07239513640576,
+          "facingAngle": 74.63414634146332,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 30.000000000000025
+        }
+      ]
+    },
+    {
+      "tick": 170,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 301.9151366845018,
+          "y": 349.9633090525405,
+          "facingAngle": -92.19512195121959,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 50.00000000000002
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 298.8509179892989,
+          "y": 270.0220145684757,
+          "facingAngle": 87.80487804878045,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 30.000000000000004
+        }
+      ]
+    },
+    {
+      "tick": 175,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 290.4804445417666,
+          "y": 349.0854159998427,
+          "facingAngle": -79.02439024390243,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 49.99999999999998
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 305.71173327494006,
+          "y": 270.5487504000944,
+          "facingAngle": 100.97560975609758,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 29.99999999999998
+        }
+      ]
+    },
+    {
+      "tick": 180,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 279.546568141433,
+          "y": 345.62518082382746,
+          "facingAngle": -65.85365853658534,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 49.99999999999997
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 312.2720591151402,
+          "y": 272.6248915057035,
+          "facingAngle": 114.14634146341469,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 30.00000000000002
+        }
+      ]
+    },
+    {
+      "tick": 185,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 269.68872945166805,
+          "y": 339.76464356367126,
+          "facingAngle": -52.68292682926821,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 49.99999999999998
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 318.1867623289992,
+          "y": 276.1412138617972,
+          "facingAngle": 127.31707317073179,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 30.000000000000018
+        }
+      ]
+    },
+    {
+      "tick": 190,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 261.4255410089029,
+          "y": 331.812122116328,
+          "facingAngle": -39.51219512195125,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 49.99999999999998
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 323.1446753946583,
+          "y": 280.9127267302032,
+          "facingAngle": 140.48780487804876,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 30.000000000000014
+        }
+      ]
+    },
+    {
+      "tick": 195,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 255.19172215194726,
+          "y": 322.18599189334805,
+          "facingAngle": -26.341463414634234,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 49.99999999999999
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 326.88496670883166,
+          "y": 286.6884048639912,
+          "facingAngle": 153.6585365853658,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 29.999999999999996
+        }
+      ]
+    },
+    {
+      "tick": 200,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 251.31522880611107,
+          "y": 311.3926754451569,
+          "facingAngle": -13.170731707317099,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 49.999999999999986
+        },
+        {
+          "entityId": "dog_1",
+          "entityType": "guard_dog",
+          "x": 329.2108627163334,
+          "y": 293.16439473290586,
+          "facingAngle": 166.8292682926829,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 30.000000000000025
+        }
+      ]
+    }
+  ],
+  "combatLog": [
+    {
+      "tick": 15,
+      "attacker": "Shadow",
+      "defender": "Rex",
+      "action": "pounces on",
+      "damage": 20,
+      "renderableOperation": {
+        "actorType": "gray_wolf",
+        "actor": "Shadow",
+        "action": "pounces on",
+        "weapon": "claws",
+        "target": "Rex"
+      }
+    },
+    {
+      "tick": 35,
+      "attacker": "Rex",
+      "defender": "Shadow",
+      "action": "tackles",
+      "damage": 18,
+      "renderableOperation": {
+        "actorType": "guard_dog",
+        "actor": "Rex",
+        "action": "tackles",
+        "weapon": "body",
+        "target": "Shadow"
+      }
+    },
+    {
+      "tick": 55,
+      "attacker": "Shadow",
+      "defender": "Rex",
+      "action": "bites",
+      "damage": 25,
+      "renderableOperation": {
+        "actorType": "gray_wolf",
+        "actor": "Shadow",
+        "action": "bites",
+        "weapon": "fangs",
+        "target": "Rex"
+      }
+    },
+    {
+      "tick": 75,
+      "attacker": "Rex",
+      "defender": "Shadow",
+      "action": "guard-bites",
+      "damage": 22,
+      "renderableOperation": {
+        "actorType": "guard_dog",
+        "actor": "Rex",
+        "action": "guard-bites",
+        "weapon": "teeth",
+        "target": "Shadow"
+      }
+    },
+    {
+      "tick": 95,
+      "attacker": "Shadow",
+      "defender": "Rex",
+      "action": "snaps at",
+      "damage": 15,
+      "renderableOperation": {
+        "actorType": "gray_wolf",
+        "actor": "Shadow",
+        "action": "snaps at",
+        "weapon": "jaws",
+        "target": "Rex"
+      }
+    },
+    {
+      "tick": 115,
+      "attacker": "Rex",
+      "defender": "Shadow",
+      "action": "charges at",
+      "damage": 28,
+      "renderableOperation": {
+        "actorType": "guard_dog",
+        "actor": "Rex",
+        "action": "charges at",
+        "weapon": "body slam",
+        "target": "Shadow"
+      }
+    },
+    {
+      "tick": 135,
+      "attacker": "Shadow",
+      "defender": "Rex",
+      "action": "lunges at",
+      "damage": 30,
+      "renderableOperation": {
+        "actorType": "gray_wolf",
+        "actor": "Shadow",
+        "action": "lunges at",
+        "weapon": "fangs",
+        "target": "Rex"
+      }
+    },
+    {
+      "tick": 155,
+      "attacker": "Rex",
+      "defender": "Shadow",
+      "action": "defends against",
+      "damage": 12,
+      "renderableOperation": {
+        "actorType": "guard_dog",
+        "actor": "Rex",
+        "action": "defends against",
+        "weapon": "teeth",
+        "target": "Shadow"
+      }
+    },
+    {
+      "tick": 175,
+      "attacker": "Shadow",
+      "defender": "Rex",
+      "action": "bites",
+      "damage": 35,
+      "renderableOperation": {
+        "actorType": "gray_wolf",
+        "actor": "Shadow",
+        "action": "bites",
+        "weapon": "powerful bite",
+        "target": "Rex"
+      }
+    },
+    {
+      "tick": 195,
+      "attacker": "Rex",
+      "defender": "Shadow",
+      "action": "tackles",
+      "damage": 25,
+      "renderableOperation": {
+        "actorType": "guard_dog",
+        "actor": "Rex",
+        "action": "tackles",
+        "weapon": "desperate tackle",
+        "target": "Shadow"
+      }
+    }
+  ]
+}

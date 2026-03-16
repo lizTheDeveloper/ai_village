@@ -71,7 +71,7 @@ export interface CookingCompletedEventData {
 export class CookingSystem extends BaseSystem {
   public readonly id = 'cooking' as const;
   public readonly priority = 56; // Just after CraftingSystem (55)
-  public readonly requiredComponents = [] as const;
+  public readonly requiredComponents: string[] = [] as const;
   // PERF: Event-driven system - subscribes to crafting:completed, no per-tick work
   // High throttle ensures onUpdate() is rarely called (it does nothing anyway)
   protected readonly throttleInterval: number = 6000; // 5 minutes

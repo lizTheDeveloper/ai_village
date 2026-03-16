@@ -128,9 +128,14 @@ export class PlantSystem extends BaseSystem {
   private registerEventListeners(): void {
     // Weather events
     this.events.subscribe('weather:rain', (event: unknown) => {
-      const e = event as { data?: { intensity?: string } };
+      const e = event as { data?: { intensity?: string | number } };
       const intensity = e.data?.intensity;
-      this.weatherRainIntensity = intensity || 'light';
+      if (typeof intensity === 'number') {
+        // Map numeric intensity (0-1) to string category
+        this.weatherRainIntensity = intensity >= 0.67 ? 'heavy' : intensity >= 0.33 ? 'moderate' : 'light';
+      } else {
+        this.weatherRainIntensity = (intensity as string) || 'light';
+      }
     });
 
     this.events.subscribe('weather:frost', (event: unknown) => {

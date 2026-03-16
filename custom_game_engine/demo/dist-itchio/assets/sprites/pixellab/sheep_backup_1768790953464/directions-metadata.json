@@ -1,0 +1,16 @@
+{
+  "id": "sheep",
+  "name": "sheep",
+  "size": 48,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-03T23:27:11.181Z"
+}

@@ -108,7 +108,7 @@ interface PrayerCluster {
 export class SacredSiteSystem extends BaseSystem {
   public readonly id: SystemId = 'sacred_site';
   public readonly priority: number = 118; // After PrayerAnsweringSystem (117)
-  public readonly requiredComponents = [];
+  public readonly requiredComponents: string[] = [];
   // Lazy activation: Skip entire system when no sacred_site exists
   public readonly activationComponents = ['sacred_site'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
@@ -244,9 +244,9 @@ export class SacredSiteSystem extends BaseSystem {
   // ============================================================================
 
   private handlePrayerOffered(
-    data: { agentId: string; deityId: string; prayerType: string; urgency: string; prayerId: string }
+    data: { agentId: string; deityId: string; prayerType: string; urgency?: string; prayerId?: string }
   ): void {
-    const prayerId = data.prayerId;
+    const prayerId = data.prayerId ?? `prayer_${Date.now()}`;
     // Get agent position (prayer:offered doesn't include position)
     let position: { x: number; y: number } | undefined;
     {

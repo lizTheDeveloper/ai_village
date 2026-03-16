@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../World.js';
+import { World } from '../ecs/World.js';
 import { DominanceChallengeSystem } from '../systems/DominanceChallengeSystem.js';
 import { createConflictComponent } from '../components/ConflictComponent.js';
 import { createDominanceRankComponent } from '../components/DominanceRankComponent.js';

@@ -19,7 +19,7 @@ import type { World } from '../ecs/World.js';
 export class QueryCacheMonitorSystem extends BaseSystem {
   readonly id = 'query_cache_monitor' as const;
   readonly priority = 990; // Late utility
-  readonly requiredComponents = [] as const; // No entity filtering needed
+  readonly requiredComponents: string[] = [] as const; // No entity filtering needed
 
   // Use throttleInterval for efficient skip (avoids SystemContext creation)
   protected readonly throttleInterval = 6000; // Every 5 minutes (6000 ticks @ 20 TPS)

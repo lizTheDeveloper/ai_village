@@ -4,9 +4,10 @@
  * Need: 14 more appliers
  */
 
-import { describe, it, expect, beforeEach, beforeAll } from 'vitest';
+import { describe, it, expect, beforeEach, beforeAll, vi } from 'vitest';
 import type { SpellEffect } from '../SpellEffect.js';
 import { World } from '@ai-village/core';
+import { createMockWorld as createSharedMockWorld } from '@ai-village/core/__tests__/createMockWorld.js';
 import { SpellEffectExecutor } from '../SpellEffectExecutor.js';
 import { registerStandardAppliers } from '../EffectAppliers.js';
 
@@ -2656,27 +2657,28 @@ function createMockWorld(): World {
   const entities = new Map();
   let entityIdCounter = 0;
 
-  return {
+  return createSharedMockWorld({
     entities,
-    tick: (ticks: number) => {},
-    getEntity: (id: string) => entities.get(id),
-    getPosition: (id: string) => ({ x: 0, y: 0 }),
-    createEntity: (archetype: string) => {
-      const id = `entity_${entityIdCounter++}`;
-      const entity = createMockEntity(id);
-      entities.set(id, entity);
-      return entity;
+    overrides: {
+      getEntity: vi.fn((id: string) => entities.get(id)),
+      getPosition: vi.fn((id: string) => ({ x: 0, y: 0 })),
+      createEntity: vi.fn((archetype: string) => {
+        const id = `entity_${entityIdCounter++}`;
+        const entity = createMockEntity(id);
+        entities.set(id, entity);
+        return entity;
+      }),
+      addComponent: vi.fn((entityId: string, component: any) => {
+        const entity = entities.get(entityId);
+        if (entity) {
+          entity.addComponent(component.type, component);
+        }
+      }),
+      destroyEntity: vi.fn((entityId: string, reason?: string) => {
+        entities.delete(entityId);
+      }),
     },
-    addComponent: (entityId: string, component: any) => {
-      const entity = entities.get(entityId);
-      if (entity) {
-        entity.addComponent(component.type, component);
-      }
-    },
-    destroyEntity: (entityId: string, reason?: string) => {
-      entities.delete(entityId);
-    },
-  } as Record<string, unknown>;
+  });
 }
 
 function createMockEntity(id: string, components: any = {}): any {

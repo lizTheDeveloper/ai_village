@@ -1,0 +1,16 @@
+{
+  "id": "dog",
+  "name": "dog",
+  "size": 48,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-03T23:32:18.383Z"
+}

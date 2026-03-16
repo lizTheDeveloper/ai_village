@@ -31,7 +31,7 @@ interface AnimationJob {
 export class SoulAnimationProgressionSystem extends BaseSystem {
   readonly id = 'soul_animation_progression';
   readonly priority = 905; // Run after PixelLabSpriteGenerationSystem (900)
-  readonly requiredComponents = [] as const;
+  readonly requiredComponents: string[] = [] as const;
   // Lazy activation: Skip entire system when no soul_animation exists
   public readonly activationComponents = ['soul_animation'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds // Event-driven

@@ -28,7 +28,7 @@ import type { PrayerConfig } from '../divinity/UniverseConfig.js';
 export class PrayerAnsweringSystem extends BaseSystem {
   public readonly id: SystemId = 'prayer_answering';
   public readonly priority: number = 117; // After prayer generation
-  public readonly requiredComponents = [];
+  public readonly requiredComponents: string[] = [];
   // Only run when deity components exist (O(1) activation check)
   public readonly activationComponents = ['deity'] as const;
 

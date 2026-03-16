@@ -54,6 +54,8 @@ export interface StorageStats {
  * Building type interface
  */
 interface BuildingComp {
+  type: string;
+  version: number;
   buildingType: string;
   isComplete: boolean;
 }

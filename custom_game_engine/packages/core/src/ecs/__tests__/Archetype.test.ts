@@ -4,14 +4,14 @@
 
 import { describe, it, expect } from 'vitest';
 import { World } from '../World.js';
-import { TypedEventBus } from '../../events/TypedEventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
 
 describe('Archetype System', () => {
   let world: World;
 
   beforeEach(() => {
-    const eventBus = new TypedEventBus();
+    const eventBus = new EventBusImpl();
     world = new World(eventBus);
   });
 

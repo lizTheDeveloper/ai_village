@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../../World.js';
+import { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import { EntityImpl } from '../../ecs/Entity.js';
 
@@ -15,7 +15,7 @@ import type { SexualityComponent } from '../SexualityComponent.js';
 import type { PersonalityComponent } from '../../components/PersonalityComponent.js';
 import type { RelationshipComponent } from '../../components/RelationshipComponent.js';
 import { updateRelationship } from '../../components/RelationshipComponent.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 describe('Courtship Compatibility Calculations', () => {
   let world: World;

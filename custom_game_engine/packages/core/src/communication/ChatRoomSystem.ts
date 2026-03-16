@@ -77,7 +77,7 @@ function saveDivineChatMessages(messages: ChatMessage[]): void {
 export class ChatRoomSystem extends BaseSystem {
   readonly id = 'chat_room' as const;
   readonly priority: number = 50;
-  readonly requiredComponents = [] as const;
+  readonly requiredComponents: string[] = [] as const;
   // Only run when chat room components exist (O(1) activation check)
   readonly activationComponents = [ComponentType.ChatRoom] as const;
 

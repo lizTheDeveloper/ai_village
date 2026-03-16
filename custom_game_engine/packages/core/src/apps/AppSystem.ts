@@ -799,7 +799,7 @@ export function resetAppManager(): void {
 export class AppSystem extends BaseSystem {
   readonly id = 'AppSystem';
   readonly priority = 72;
-  readonly requiredComponents = [] as const;
+  readonly requiredComponents: string[] = [] as const;
 
   protected readonly throttleInterval = 20 * 60; // Every minute
 

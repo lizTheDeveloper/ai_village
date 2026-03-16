@@ -53,6 +53,8 @@ export type { PossessionStatus } from './systems/PossessionSystem.js';
 export type { CastingState } from './systems/CastingState.js';
 // Resolve duplicate exports between systems and components
 export { addShipToSquadron } from './systems/SquadronSystem.js';
+// Resolve FeatureFlags ambiguity: systems/FeatureFlags wins (specific game feature flags)
+export type { FeatureFlags } from './systems/FeatureFlags.js';
 export type { Season } from './types.js';
 // System helper base classes
 export { ThrottledSystem, FilteredSystem, ThrottledFilteredSystem } from './ecs/SystemHelpers.js';
@@ -98,6 +100,8 @@ export {
 // ============================================================================
 // Magic & Divine Systems
 // ============================================================================
+// Resolve NegotiationOffer ambiguity: components/NegotiationComponent wins
+export type { NegotiationOffer } from './components/NegotiationComponent.js';
 export * from './magic/index.js';
 export * from './archetypes/index.js';
 

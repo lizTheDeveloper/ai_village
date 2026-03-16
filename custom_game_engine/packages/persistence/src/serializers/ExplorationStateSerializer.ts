@@ -26,7 +26,9 @@ export class ExplorationStateSerializer extends BaseComponentSerializer<Explorat
   }
 
   protected serializeData(component: ExplorationStateComponent): SerializedExplorationState {
-    const componentAny = component as {
+    const componentAny = component as unknown as {
+      type: string;
+      version: number;
       _exploredSectors: Map<string, SectorInfo>;
       _explorationRadius: number;
       _spiralState?: {
@@ -55,7 +57,9 @@ export class ExplorationStateSerializer extends BaseComponentSerializer<Explorat
     const component = new ExplorationStateComponent();
 
     // Access private fields
-    const componentAny = component as {
+    const componentAny = component as unknown as {
+      type: string;
+      version: number;
       _exploredSectors: Map<string, SectorInfo>;
       _explorationRadius: number;
       _spiralState?: {

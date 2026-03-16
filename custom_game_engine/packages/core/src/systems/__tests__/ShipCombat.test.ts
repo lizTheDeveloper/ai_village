@@ -16,7 +16,7 @@ import { ShipCombatSystem } from '../ShipCombatSystem.js';
 import type { SpaceshipComponent } from '../../navigation/SpaceshipComponent.js';
 import type { ShipCrewComponent } from '../../components/ShipCrewComponent.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 describe('ShipCombatSystem', () => {
   let world: World;

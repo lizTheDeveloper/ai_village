@@ -161,6 +161,4 @@ export interface IEntity {
   readonly id: EntityId;
   hasComponent(type: string): boolean;
   getComponent<T>(type: string): T | undefined;
-  addComponent(component: unknown): void;
-  removeComponent(type: string): boolean;
 }

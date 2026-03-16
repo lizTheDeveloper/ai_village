@@ -60,7 +60,7 @@ export interface GameSetupConfig {
 }
 
 export interface GameSetupResult {
-  soilSystem: SoilSystem;
+  soilSystem: SoilSystem | undefined;
   craftingSystem: CraftingSystem;
   systemRegistration: SystemRegistrationResult;
   metricsSystem: MetricsCollectionSystem | null;
@@ -106,12 +106,14 @@ export async function setupGameSystems(
 
   // 3. Set up plant species lookup (injected from world package)
   // PlantSystem has setSpeciesLookup method but it's not in the System interface
-  if ('setSpeciesLookup' in result.plantSystem && typeof result.plantSystem.setSpeciesLookup === 'function') {
+  if (result.plantSystem && 'setSpeciesLookup' in result.plantSystem && typeof result.plantSystem.setSpeciesLookup === 'function') {
     result.plantSystem.setSpeciesLookup(getPlantSpecies);
   }
 
   // 4. Register action handlers (these are separate from systems)
-  gameLoop.actionRegistry.register(new TillActionHandler(result.soilSystem));
+  if (result.soilSystem) {
+    gameLoop.actionRegistry.register(new TillActionHandler(result.soilSystem));
+  }
   gameLoop.actionRegistry.register(new PlantActionHandler());
   gameLoop.actionRegistry.register(new GatherSeedsActionHandler());
   gameLoop.actionRegistry.register(new HarvestActionHandler());
@@ -144,9 +146,6 @@ export async function setupGameSystems(
       liveEntityAPI.attach(streamClient);
     }
   }
-
-  // 8. Initialize governance data system
-  result.governanceDataSystem.initialize(gameLoop.world, gameLoop.world.eventBus);
 
   return {
     soilSystem: result.soilSystem,

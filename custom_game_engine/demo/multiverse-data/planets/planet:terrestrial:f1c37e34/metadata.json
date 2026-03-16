@@ -1,0 +1,17 @@
+{
+  "id": "planet:terrestrial:f1c37e34",
+  "name": "Ether Major",
+  "type": "terrestrial",
+  "seed": "Ether Major-1772936506054-v9p7ow98c7p",
+  "createdAt": 1772936506059,
+  "lastAccessedAt": 1772936506059,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "Ether Major-1772936506054-v9p7ow98c7p",
+    "type": "terrestrial"
+  },
+  "universeId": "universe:1772936470965",
+  "artStyle": "16-bit SNES pixel art"
+}

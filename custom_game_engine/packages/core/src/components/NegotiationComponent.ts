@@ -412,7 +412,7 @@ export function getDefaultDeadlineTicks(
     critical: 0.25,
   };
 
-  return Math.floor(baseDeadlines[type] * priorityMultipliers[priority]);
+  return Math.floor((baseDeadlines[type] ?? 20000) * (priorityMultipliers[priority] ?? 1.0));
 }
 
 /**

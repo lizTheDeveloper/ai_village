@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { StateMutatorSystem } from '../StateMutatorSystem.js';
-import { World } from '../../World.js';
+import { World } from '../../ecs/World.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
 import type { NeedsComponent } from '../../components/NeedsComponent.js';
 import { setMutationRate, clearMutationRate, createMutationVectorComponent } from '../../components/MutationVectorComponent.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 describe('StateMutatorSystem', () => {
   let world: World;

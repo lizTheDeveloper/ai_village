@@ -3,9 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../../../../core/src/World.js';
+import { World, EventBusImpl } from '@ai-village/core';
 import {
-import { EventBusImpl } from '@ai-village/core';
   RejectedArtifactSystem,
   type RejectedArtifactComponent,
   type CorruptedEffectComponent,

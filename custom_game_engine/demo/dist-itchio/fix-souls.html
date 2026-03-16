@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fix Corrupted Souls</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        #output {
+            white-space: pre-wrap;
+            background: #000;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background: #0e639c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1177bb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Fix Corrupted Souls in IndexedDB</h1>
+    <p>This will scan all saves in IndexedDB and remove <code>&lt;think&gt;</code> tags from soul creation data.</p>
+    <button onclick="fixAllSouls()">Fix All Corrupted Souls</button>
+    <div id="output"></div>
+
+    <script>
+        const output = document.getElementById('output');
+
+        function log(msg) {
+            output.textContent += msg + '\n';
+            console.log(msg);
+        }
+
+        async function fixAllSouls() {
+            output.textContent = '';
+            log('🔍 Opening IndexedDB...\n');
+
+            const dbRequest = indexedDB.open('ai-village-saves', 1);
+
+            dbRequest.onerror = () => {
+                log('❌ Failed to open IndexedDB');
+            };
+
+            dbRequest.onsuccess = async (event) => {
+                const db = event.target.result;
+                const tx = db.transaction('saves', 'readwrite');
+                const store = tx.objectStore('saves');
+                const getAllRequest = store.getAll();
+
+                getAllRequest.onsuccess = async () => {
+                    const saves = getAllRequest.result;
+                    log(`Found ${saves.length} saves\n`);
+
+                    let totalCorrupted = 0;
+                    let totalFixed = 0;
+
+                    for (const save of saves) {
+                        const key = save.key || save.metadata?.name || 'unknown';
+                        log(`\n📦 ${key}`);
+
+                        if (!save.data?.world?.entities) {
+                            log('   ⏭️  No entities');
+                            continue;
+                        }
+
+                        let fixedInSave = 0;
+                        const corruptedNames = [];
+
+                        for (const entity of save.data.world.entities) {
+                            if (!entity.components?.soul_creation_event) continue;
+
+                            const event = entity.components.soul_creation_event;
+                            const name = entity.components?.soul_identity?.true_name || 'Unknown';
+                            let wasCorrupted = false;
+
+                            // Fix statements with <think> tags
+                            if (event.creationDebate?.statements) {
+                                for (const stmt of event.creationDebate.statements) {
+                                    if (stmt.statement?.includes('<think>')) {
+                                        stmt.statement = stmt.statement.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+                                        wasCorrupted = true;
+                                        fixedInSave++;
+                                    }
+                                }
+                            }
+
+                            // Fix transcript thoughts
+                            if (event.conversationTranscript) {
+                                for (const ex of event.conversationTranscript) {
+                                    if (ex.thoughts) {
+                                        delete ex.thoughts;
+                                        wasCorrupted = true;
+                                        fixedInSave++;
+                                    }
+                                }
+                            }
+
+                            if (wasCorrupted) {
+                                corruptedNames.push(name);
+                                totalCorrupted++;
+
+                                // Mark as fixed (Conservation of Game Matter)
+                                if (!entity.components.corruption_history) {
+                                    entity.components.corruption_history = { corruptions: [] };
+                                }
+                                entity.components.corruption_history.corruptions.push({
+                                    type: 'thinking_data_removed',
+                                    cleaned_at: Date.now(),
+                                    cleaner: 'fix_souls_html_script'
+                                });
+                            }
+                        }
+
+                        if (fixedInSave > 0) {
+                            log(`   ⚠️  ${corruptedNames.length} corrupted souls: ${corruptedNames.join(', ')}`);
+                            log(`   🔧 ${fixedInSave} fixes applied`);
+
+                            // Save back to IndexedDB
+                            await new Promise((resolve) => {
+                                const putRequest = store.put(save);
+                                putRequest.onsuccess = () => {
+                                    log(`   ✅ Saved!`);
+                                    resolve();
+                                };
+                                putRequest.onerror = () => {
+                                    log(`   ❌ Save failed!`);
+                                    resolve();
+                                };
+                            });
+
+                            totalFixed += fixedInSave;
+                        } else {
+                            log(`   ✅ Clean`);
+                        }
+                    }
+
+                    log('\n' + '='.repeat(60));
+                    log(`📊 TOTAL: ${totalCorrupted} corrupted souls, ${totalFixed} fixes applied`);
+                    log('='.repeat(60) + '\n');
+
+                    if (totalFixed > 0) {
+                        log('✅ All corrupted souls have been fixed and saved!');
+                    } else {
+                        log('✅ No corrupted souls found!');
+                    }
+
+                    db.close();
+                };
+
+                getAllRequest.onerror = () => {
+                    log('❌ Failed to read saves');
+                    db.close();
+                };
+            };
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "id": "planet:terrestrial:1144eb5c",
+  "name": "Terra V",
+  "type": "terrestrial",
+  "seed": "Terra V-1772937074356-qis0amx389k",
+  "createdAt": 1772937074357,
+  "lastAccessedAt": 1772937074357,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "Terra V-1772937074356-qis0amx389k",
+    "type": "terrestrial"
+  },
+  "universeId": "universe:1772937059269",
+  "artStyle": "16-bit SNES pixel art"
+}

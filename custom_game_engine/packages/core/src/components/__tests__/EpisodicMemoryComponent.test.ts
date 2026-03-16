@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { World } from '../../ecs/World.js';
 import type { EntityImpl } from '../../ecs/Entity.js';
 import { EpisodicMemoryComponent } from '../EpisodicMemoryComponent.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 describe('EpisodicMemoryComponent', () => {
   let world: World;

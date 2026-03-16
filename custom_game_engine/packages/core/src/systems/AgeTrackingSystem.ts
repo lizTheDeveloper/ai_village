@@ -70,7 +70,7 @@ export class AgeTrackingSystem extends BaseSystem {
   public readonly id = 'AgeTrackingSystem';
   public readonly name = 'AgeTrackingSystem';
   public readonly priority = 180;
-  public readonly requiredComponents = [] as const;
+  public readonly requiredComponents: string[] = [] as const;
   public readonly activationComponents = ['agent', 'animal'] as const;
   protected readonly throttleInterval = THROTTLE.SLOW;
 

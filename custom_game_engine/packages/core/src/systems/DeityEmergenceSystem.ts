@@ -120,7 +120,7 @@ export interface AgentPerception {
 export class DeityEmergenceSystem extends BaseSystem {
   public readonly id = 'DeityEmergenceSystem';
   public readonly priority = 100;
-  public readonly requiredComponents = [] as const;
+  public readonly requiredComponents: string[] = [] as const;
   // Only run when spiritual components exist (need believers to form new deities)
   public readonly activationComponents = ['spiritual'] as const;
   protected readonly throttleInterval = DEFAULT_EMERGENCE_CONFIG.checkInterval; // ~1 minute at 20 TPS

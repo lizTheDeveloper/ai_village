@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../../World';
+import { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity';
 
 // Import classes and types
@@ -10,7 +10,7 @@ import type {
   MatingBehavior,
 } from '../courtship/types';
 import type { CourtshipStateMachine } from '../courtship';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 describe('CourtshipSystem', () => {
   let world: World;

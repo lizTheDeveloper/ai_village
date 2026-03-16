@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../World.js';
+import { World } from '../ecs/World.js';
 import { GuardDutySystem } from '../systems/GuardDutySystem.js';
 import { createGuardDutyComponent } from '../components/GuardDutyComponent.js';
 import { EventBusImpl } from '../events/EventBus.js';

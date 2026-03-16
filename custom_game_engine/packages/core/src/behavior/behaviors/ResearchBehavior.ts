@@ -273,11 +273,8 @@ export class ResearchBehavior extends BaseBehavior {
    * Get ResearchSystem from world
    */
   private getResearchSystem(world: World): ResearchSystem | null {
-    interface WorldWithSystems extends World {
-      getSystem?: (name: string) => unknown;
-    }
-    const system = (world as WorldWithSystems).getSystem?.('research');
-    return (system as ResearchSystem) ?? null;
+    const system = world.getSystem?.('research');
+    return (system as ResearchSystem | undefined) ?? null;
   }
 
   /**

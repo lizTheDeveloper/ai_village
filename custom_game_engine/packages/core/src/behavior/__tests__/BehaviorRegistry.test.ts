@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
 import { createMovementComponent } from '../../components/MovementComponent.js';
-import type { World } from '../../ecs/World.js';
+import { createMockWorld } from '../../__tests__/createMockWorld.js';
 
 import {
   BehaviorRegistry,
@@ -24,22 +24,6 @@ function createMockEntity(): EntityImpl {
   entity.addComponent(createPositionComponent(50, 50));
   entity.addComponent(createMovementComponent());
   return entity;
-}
-
-// Helper to create a mock world
-function createMockWorld(): World {
-  return {
-    tick: 100,
-    eventBus: {
-      emit: vi.fn(),
-      subscribe: vi.fn(),
-      unsubscribe: vi.fn(),
-    },
-    query: vi.fn().mockReturnValue({
-      with: vi.fn().mockReturnThis(),
-      executeEntities: vi.fn().mockReturnValue([]),
-    }),
-  } as World;
 }
 
 describe('BehaviorRegistry', () => {

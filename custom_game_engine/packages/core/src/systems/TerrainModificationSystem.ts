@@ -110,7 +110,7 @@ export const DEFAULT_TERRAIN_POWER_CONFIG: TerrainPowerConfig = {
 export class TerrainModificationSystem extends BaseSystem {
   public readonly id = 'TerrainModificationSystem';
   public readonly priority = 70;
-  public readonly requiredComponents = [];
+  public readonly requiredComponents: string[] = [];
   // Lazy activation: Skip entire system when no terrain_modification exists
   public readonly activationComponents = ['terrain_modification'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds

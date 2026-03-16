@@ -107,15 +107,14 @@ export interface GovernanceEvents {
   };
 
   'governance:directive_delegated': {
-    directiveId: string;
-    fromTier: PoliticalTier;
-    toTier: PoliticalTier;
-    fromEntityId: EntityId;
-    toEntityIds: EntityId[];
+    governorId: EntityId;
+    subordinateId: EntityId;
+    directive: string;
+    targetTier: PoliticalTier;
     tick: number;
   };
 
-  'governance:directive_accepted': {
+  'governance:directive_acknowledged_by_entity': {
     directiveId: string;
     entityId: EntityId;
     tick: number;
@@ -458,6 +457,10 @@ export interface GovernanceEvents {
     totalExpenditure: number;
     surplus: number;
     treasuryBalance: number;
+    provincialTaxRevenue?: number;
+    tradeRevenue?: number;
+    stateEnterpriseRevenue?: number;
+    customsDuties?: number;
     tick: number;
   };
 
@@ -1115,6 +1118,152 @@ export interface GovernanceEvents {
     directive: string;
     origin: string;
     implementationPlan?: string;
+    tick: number;
+  };
+
+  // === Missing Nation Events ===
+  'nation:alliance_proposed': {
+    nationId: EntityId;
+    nationName: string;
+    targetNationId: EntityId;
+    targetNationName: string;
+    acceptanceChance: number;
+    tick: number;
+  };
+
+  'nation:policy_effects_updated': {
+    nationId: EntityId;
+    nationName: string;
+    activePolicies: string[];
+    modifiers: string[];
+    tick: number;
+  };
+
+  'nation:posture_changed': {
+    nationId: EntityId;
+    nationName: string;
+    oldPosture: string;
+    newPosture: string;
+    tick: number;
+  };
+
+  'nation:rebellion_imminent': {
+    nationId: EntityId;
+    nationName: string;
+    rebellionRisk: number;
+    stability: number;
+    legitimacy: number;
+    factors: Array<{ name: string; impact: number }>;
+    tick: number;
+  };
+
+  'nation:research_capacity_changed': {
+    nationId: EntityId;
+    nationName: string;
+    previousCapacity: number;
+    newCapacity: number;
+    universitiesCount: number;
+    researcherPopulation: number;
+    tick: number;
+  };
+
+  'nation:tech_advancement': {
+    nationId: EntityId;
+    nationName: string;
+    researchId: string;
+    researchName: string;
+    field: string;
+    tier: number;
+    unlockCount: number;
+    tick: number;
+  };
+
+  'nation:treaty_accepted': {
+    nationId: EntityId;
+    nationName: string;
+    targetNationId: EntityId;
+    treatyId: string;
+    treatyType: string;
+    tick: number;
+  };
+
+  'nation:treaty_negotiation_expired': {
+    nationId: EntityId;
+    targetNationId: EntityId;
+    treatyType: string;
+    tick: number;
+  };
+
+  'nation:treaty_rejected': {
+    nationId: EntityId;
+    targetNationId: EntityId;
+    treatyType: string;
+    tick: number;
+  };
+
+  /** Catch-all for template-literal nation unlock events (`nation:${string}_unlocked`) */
+  [key: `nation:${string}_unlocked`]: {
+    nationId: EntityId;
+    nationName: string;
+    unlockType: string;
+    unlockId: string;
+    researchId: string;
+    researchName: string;
+    tick: number;
+  };
+
+  // === Missing Governance Events ===
+  'governance:directive_refused': {
+    governorId: EntityId;
+    directive: string;
+    origin: string;
+    refusalReason: string;
+    tick: number;
+  };
+
+  'governance:negotiation_requested': {
+    governorId: EntityId;
+    originTier: string;
+    directive: string;
+    negotiationPoints: string[];
+    tick: number;
+  };
+
+  // === Village/Caravan Events ===
+  'village:news_received': {
+    villageId: EntityId;
+    villageName: string;
+    newsId: string;
+    newsType: string;
+    description: string;
+    sourceVillageId: EntityId;
+    sourceVillageName: string;
+    importance: number;
+    tick: number;
+  };
+
+  'village:status_changed': {
+    villageId: EntityId;
+    villageName: string;
+    oldStatus: string;
+    newStatus: string;
+    tick: number;
+  };
+
+  'caravan:arrived': {
+    caravanId: EntityId;
+    routeId: string;
+    sourceVillageId: EntityId;
+    targetVillageId: EntityId;
+    cargo: unknown;
+    tick: number;
+  };
+
+  'caravan:lost': {
+    caravanId: EntityId;
+    routeId: string;
+    sourceVillageId: EntityId;
+    targetVillageId: EntityId;
     tick: number;
   };
 }

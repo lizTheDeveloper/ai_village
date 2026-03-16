@@ -164,7 +164,7 @@ const SPECIES_CATEGORIES: Record<string, string[]> = {
 export class ReincarnationSystem extends BaseSystem {
   readonly id: SystemId = 'reincarnation';
   readonly priority: number = 120; // Run after DeathTransitionSystem
-  readonly requiredComponents = [] as const;
+  readonly requiredComponents: string[] = [] as const;
   // Lazy activation: Skip entire system when no reincarnation exists
   public readonly activationComponents = ['reincarnation'] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds // Event-driven, doesn't need entity iteration

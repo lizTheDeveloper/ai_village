@@ -116,7 +116,7 @@ export interface BirthOutcome {
 export class MidwiferySystem extends BaseSystem {
   public readonly id: SystemId = 'midwifery';
   public readonly priority = 45; // Run before general NeedsSystem
-  public readonly requiredComponents = [] as const;
+  public readonly requiredComponents: string[] = [] as const;
 
   // Lazy activation: Skip entire system when no reproductive components exist in world
   // System handles pregnancy → labor → postpartum → infant → nursing lifecycle

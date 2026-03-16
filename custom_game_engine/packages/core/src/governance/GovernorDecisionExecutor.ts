@@ -991,7 +991,7 @@ function executeProvinceEnactLaw(
     description: action.parameters?.description as string ?? '',
     enactedTick: world.tick,
     scope,
-    effects: [],
+    effects: [] as { type: string; magnitude: number; description: string }[],
   };
 
   (provinceEntity as EntityImpl).updateComponent<ProvinceGovernanceComponent>(CT.ProvinceGovernance, (current) => ({

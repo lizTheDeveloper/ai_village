@@ -276,8 +276,8 @@ export class CanonEventRecorder {
     return allRecipes.map(recipe => ({
       id: recipe.id,
       name: recipe.name,
-      discoveredBy: undefined, // Recipe discovery tracking could be added later
-      discoveredAt: undefined,
+      discoveredBy: undefined as string | undefined, // Recipe discovery tracking could be added later
+      discoveredAt: undefined as number | undefined,
       definition: {
         category: recipe.category,
         description: recipe.description,
@@ -300,12 +300,12 @@ export class CanonEventRecorder {
 
     return allItems.map(item => ({
       id: item.id,
-      name: item.name,
-      createdBy: undefined, // Item creation tracking could be added later
-      createdAt: undefined,
+      name: item.displayName,
+      createdBy: undefined as string | undefined, // Item creation tracking could be added later
+      createdAt: undefined as number | undefined,
       definition: {
         category: item.category,
-        description: item.description,
+        description: undefined as string | undefined,
         weight: item.weight,
         stackSize: item.stackSize,
         isEdible: item.isEdible,

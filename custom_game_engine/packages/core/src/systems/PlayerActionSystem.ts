@@ -25,7 +25,7 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 export class PlayerActionSystem extends BaseSystem {
   public readonly id = 'player_action' as const;
   public readonly priority = 6;
-  public readonly requiredComponents = [] as const;
+  public readonly requiredComponents: string[] = [] as const;
   public readonly activationComponents = ['player_control'] as const;
   protected readonly throttleInterval = 0; // EVERY_TICK - critical responsiveness
 

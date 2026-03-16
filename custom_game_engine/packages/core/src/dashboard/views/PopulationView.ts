@@ -91,8 +91,8 @@ export const PopulationView: DashboardView<PopulationViewData> = {
         const needs = entity.getComponent<NeedsComponent>(CT.Needs);
 
         if (agent) {
-          // Age tracking
-          totalAge += agent.age || 0;
+          // Age tracking (age not tracked in AgentComponent)
+          totalAge += 0;
 
           // Behavior tracking
           const behavior = agent.behavior || 'idle';

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../World.js';
+import { World } from '../ecs/World.js';
 import { PredatorAttackSystem } from '../systems/PredatorAttackSystem.js';
 import { EventBusImpl } from '../events/EventBus.js';
 

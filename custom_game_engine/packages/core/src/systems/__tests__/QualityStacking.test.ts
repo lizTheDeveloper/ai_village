@@ -8,7 +8,7 @@ import {
   getItemCount
 } from '../../components/InventoryComponent';
 import type { InventoryComponent, InventorySlot } from '../../components/InventoryComponent';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 describe('Quality-Based Stacking Integration', () => {
   let world: World;

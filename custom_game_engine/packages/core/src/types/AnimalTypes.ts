@@ -14,7 +14,7 @@ export type ActivityPattern = 'diurnal' | 'nocturnal' | 'crepuscular';
 
 export type AnimalLifeStage = 'infant' | 'juvenile' | 'adult' | 'elder';
 
-export type AnimalState = 'idle' | 'sleeping' | 'eating' | 'drinking' | 'foraging' | 'fleeing';
+export type AnimalState = 'idle' | 'sleeping' | 'eating' | 'drinking' | 'foraging' | 'fleeing' | 'hunting';
 
 export type ProductionType = 'continuous' | 'periodic' | 'terminal';
 

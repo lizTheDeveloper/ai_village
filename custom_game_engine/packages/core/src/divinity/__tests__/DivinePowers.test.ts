@@ -8,6 +8,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import type { Deity } from '../DeityTypes.js';
 import type { DivinePower, Prayer, DivineVision, ActiveBlessing, ActiveCurse } from '../DivinePowerTypes.js';
 import type { World } from '../../ecs/World.js';
+import { createMockWorld } from '../../__tests__/createMockWorld.js';
 
 describe('Divine Power - Miracles', () => {
   let deity: Deity;
@@ -508,9 +509,7 @@ function createMockDeity(id: string): Deity {
   } as Record<string, unknown>;
 }
 
-function createMockWorld(): World {
-  return {} as Partial<World> as World;
-}
+// createMockWorld imported from ../../__tests__/createMockWorld.js
 
 function createMockBeliever(id: string, deityId: string): any {
   return {

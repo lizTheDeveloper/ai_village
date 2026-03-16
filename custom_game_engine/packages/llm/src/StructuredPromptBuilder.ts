@@ -386,7 +386,7 @@ export class StructuredPromptBuilder {
     }
 
     // Get agent position for distance calculation
-    const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
+    const agentPos = agent.components.get('position') as { type: string; version: number; x: number; y: number } | undefined;
 
     // Find visible animals
     const visibleAnimals: Array<{ id: string; species: string; distance: number }> = [];
@@ -399,7 +399,7 @@ export class StructuredPromptBuilder {
       if (animal) {
         // Calculate actual distance between agent and animal
         // PERFORMANCE: sqrt needed here because distance value is shown in prompt
-        const animalPos = entity.components.get('position') as { x: number; y: number } | undefined;
+        const animalPos = entity.components.get('position') as { type: string; version: number; x: number; y: number } | undefined;
         const distance = agentPos && animalPos
           ? Math.sqrt((agentPos.x - animalPos.x) ** 2 + (agentPos.y - animalPos.y) ** 2)
           : 0;
@@ -1321,7 +1321,7 @@ export class StructuredPromptBuilder {
    * to prevent simultaneous duplicate construction.
    */
   private hasCampfireInChunk(agent: Entity, world: World): boolean {
-    const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
+    const agentPos = agent.components.get('position') as { type: string; version: number; x: number; y: number } | undefined;
     if (!agentPos) return false;
 
     // FAST PATH: O(1) lookup using world.spatialQuery
@@ -2119,7 +2119,7 @@ export class StructuredPromptBuilder {
         const hasWildAnimals = vision.seenAnimals.some(animalId => {
           const animal = _world.getEntity(animalId);
           if (!animal) return false;
-          const animalComp = animal.components.get('animal') as { wild: boolean } | undefined;
+          const animalComp = animal.components.get('animal') as { type: string; version: number; wild: boolean } | undefined;
           return animalComp?.wild === true;
         });
         if (hasWildAnimals) {

@@ -531,8 +531,8 @@ export class TVPostProductionSystem extends BaseSystem {
     // Get crew from production crew Map
     const editor = production.crew.get('editor')?.[0] ?? 'unknown_editor';
     const soundDesigner = production.crew.get('sound_engineer')?.[0];
-    const vfxArtist = undefined; // No VFX role defined - handled by generic crew
-    const colorist = undefined; // No colorist role defined - handled by generic crew
+    const vfxArtist: string | undefined = undefined; // No VFX role defined - handled by generic crew
+    const colorist: string | undefined = undefined; // No colorist role defined - handled by generic crew
 
     const job: PostProductionJob = {
       id: `post_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,

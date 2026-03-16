@@ -27,7 +27,7 @@ import type {
 export class PlayerInputSystem extends BaseSystem {
   public readonly id = 'player_input' as const;
   public readonly priority = 4; // Very high priority - run before PossessionSystem
-  public readonly requiredComponents = [] as const;
+  public readonly requiredComponents: string[] = [] as const;
   // Only run when player_control components exist (O(1) activation check)
   public readonly activationComponents = ['player_control'] as const;
   protected readonly throttleInterval = 0; // EVERY_TICK - critical player responsiveness

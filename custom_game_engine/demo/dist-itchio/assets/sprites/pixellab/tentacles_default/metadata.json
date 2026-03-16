@@ -1,0 +1,11 @@
+{
+  "id": "tentacles_default",
+  "category": "humanoids",
+  "type": "character",
+  "size": 48,
+  "description": "default tentacles",
+  "generated_at": "2026-01-03T22:10:47.212Z",
+  "usage_usd": 0,
+  "original_description": "Tentacles humanoid character, simple clothing, pixel art",
+  "enriched_at": "2026-01-30T00:40:22.657Z"
+}

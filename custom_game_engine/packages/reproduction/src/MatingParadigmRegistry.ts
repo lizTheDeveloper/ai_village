@@ -53,20 +53,20 @@ export const VAIL_TEMPERAMENT: TemperamentDefinition = {
 // Paradigm Constants (loaded from JSON)
 // ============================================================================
 
-export const HUMAN_PARADIGM: MatingParadigm = paradigmData.human_standard as MatingParadigm;
-export const KEMMER_PARADIGM: MatingParadigm = paradigmData.kemmer as MatingParadigm;
-export const HIVE_PARADIGM: MatingParadigm = paradigmData.hive as MatingParadigm;
-export const OPPORTUNISTIC_PARADIGM: MatingParadigm = paradigmData.opportunistic as MatingParadigm;
-export const MYSTIF_PARADIGM: MatingParadigm = paradigmData.mystif as MatingParadigm;
-export const QUANTUM_PARADIGM: MatingParadigm = paradigmData.quantum as MatingParadigm;
-export const TEMPORAL_PARADIGM: MatingParadigm = paradigmData.temporal as MatingParadigm;
-export const ASEXUAL_PARADIGM: MatingParadigm = paradigmData.asexual as MatingParadigm;
-export const HIVEMIND_PARADIGM: MatingParadigm = paradigmData.hivemind as MatingParadigm;
-export const POLYAMOROUS_PARADIGM: MatingParadigm = paradigmData.polyamorous as MatingParadigm;
-export const THREE_SEX_PARADIGM: MatingParadigm = paradigmData.three_sex as MatingParadigm;
-export const PARASITIC_HIVEMIND_PARADIGM: MatingParadigm = paradigmData.parasitic_hivemind as MatingParadigm;
-export const SYMBIOTIC_PARADIGM: MatingParadigm = paradigmData.symbiotic as MatingParadigm;
-export const UNRAVELING_PARADIGM: MatingParadigm = paradigmData.unraveling as MatingParadigm;
+export const HUMAN_PARADIGM: MatingParadigm = paradigmData.human_standard as unknown as MatingParadigm;
+export const KEMMER_PARADIGM: MatingParadigm = paradigmData.kemmer as unknown as MatingParadigm;
+export const HIVE_PARADIGM: MatingParadigm = paradigmData.hive as unknown as MatingParadigm;
+export const OPPORTUNISTIC_PARADIGM: MatingParadigm = paradigmData.opportunistic as unknown as MatingParadigm;
+export const MYSTIF_PARADIGM: MatingParadigm = paradigmData.mystif as unknown as MatingParadigm;
+export const QUANTUM_PARADIGM: MatingParadigm = paradigmData.quantum as unknown as MatingParadigm;
+export const TEMPORAL_PARADIGM: MatingParadigm = paradigmData.temporal as unknown as MatingParadigm;
+export const ASEXUAL_PARADIGM: MatingParadigm = paradigmData.asexual as unknown as MatingParadigm;
+export const HIVEMIND_PARADIGM: MatingParadigm = paradigmData.hivemind as unknown as MatingParadigm;
+export const POLYAMOROUS_PARADIGM: MatingParadigm = paradigmData.polyamorous as unknown as MatingParadigm;
+export const THREE_SEX_PARADIGM: MatingParadigm = paradigmData.three_sex as unknown as MatingParadigm;
+export const PARASITIC_HIVEMIND_PARADIGM: MatingParadigm = paradigmData.parasitic_hivemind as unknown as MatingParadigm;
+export const SYMBIOTIC_PARADIGM: MatingParadigm = paradigmData.symbiotic as unknown as MatingParadigm;
+export const UNRAVELING_PARADIGM: MatingParadigm = paradigmData.unraveling as unknown as MatingParadigm;
 
 // ============================================================================
 // Registry

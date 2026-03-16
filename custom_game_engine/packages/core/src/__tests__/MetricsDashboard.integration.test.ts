@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../World';
+import { World } from '../ecs/World.js';
 import { MetricsCollector } from '../metrics/MetricsCollector';
 import { MetricsDashboard } from '../metrics/MetricsDashboard';
 import { MetricsAnalysis } from '../metrics/MetricsAnalysis';

@@ -12,6 +12,7 @@ import { EntityImpl, createEntityId } from '@ai-village/core';
 import { ComponentRegistry } from '../registry/ComponentRegistry.js';
 import { defineComponent } from '../types/ComponentSchema.js';
 import type { World } from '@ai-village/core';
+import { createMockWorld as createSharedMockWorld } from '../../../core/src/__tests__/createMockWorld.js';
 
 // Type helpers for testing
 type EntityWithMethods = {
@@ -331,27 +332,21 @@ function createMockWorld(buildingRegistry?: MockBuildingRegistry): World {
     return queryObj;
   });
 
-  return {
+  return createSharedMockWorld({
     tick: 100,
-    timeEntity: null,
-    buildingRegistry,
-    eventBus: {
-      emit: vi.fn(),
-      subscribe: vi.fn(),
-      unsubscribe: vi.fn(),
+    entities,
+    overrides: {
+      buildingRegistry,
+      query: queryFn,
+      getEntity: vi.fn((id: string) => entities.get(id)),
+      addEntity: vi.fn((entity: EntityImpl) => {
+        entities.set(entity.id, entity);
+      }),
+      removeEntity: vi.fn((id: string) => {
+        entities.delete(id);
+      }),
     },
-    query: queryFn,
-    getEntity: vi.fn((id: string) => entities.get(id)),
-    addEntity: vi.fn((entity: EntityImpl) => {
-      entities.set(entity.id, entity);
-    }),
-    removeEntity: vi.fn((id: string) => {
-      entities.delete(id);
-    }),
-    simulationScheduler: {
-      filterActiveEntities: vi.fn((entities) => entities),
-    },
-  } as World;
+  });
 }
 
 /**

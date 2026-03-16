@@ -8,6 +8,7 @@ import { ComponentRegistry } from '../../registry/ComponentRegistry.js';
 import { MutationService } from '../../mutation/MutationService.js';
 import type { World, Entity } from '@ai-village/core';
 import type { EntityChangeEvent } from '../../types/IntrospectionTypes.js';
+import { createMockWorld } from '../../../../core/src/__tests__/createMockWorld.js';
 
 // Mock types for testing
 type MockWorld = Pick<World, 'tick' | 'query'> & {
@@ -18,23 +19,6 @@ type MockWorld = Pick<World, 'tick' | 'query'> & {
 type MockEntity = Pick<Entity, 'id' | 'hasComponent' | 'getComponent' | 'updateComponent'> & {
   components: Map<string, Record<string, unknown>>;
 };
-
-// Mock World
-function createMockWorld(): World {
-  const entities = new Map<string, Entity>();
-
-  const world = {
-    tick: 100,
-    entities,
-    getEntity: (id: string) => entities.get(id),
-    query: () => ({
-      with: () => ({ executeEntities: () => [] }),
-      executeEntities: () => [],
-    }),
-  } as MockWorld;
-
-  return world as World;
-}
 
 // Mock Entity
 function createMockEntity(id: string, components: Map<string, Record<string, unknown>>): Entity {

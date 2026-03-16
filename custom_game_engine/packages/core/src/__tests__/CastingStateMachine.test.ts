@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../World.js';
+import { World } from '../ecs/World.js';
 import { MagicSystem } from '../systems/MagicSystem.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { createMagicUserComponent } from '../components/MagicComponent.js';

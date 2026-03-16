@@ -7,6 +7,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import type { Deity, DeityIdentity, DivineDomain, EmergencePhase } from '../DeityTypes.js';
 import type { World } from '../../ecs/World.js';
+import { createMockWorld } from '../../__tests__/createMockWorld.js';
 
 describe('Deity Emergence', () => {
   let mockWorld: World;
@@ -420,9 +421,7 @@ describe('Divine Form Development', () => {
 });
 
 // Helper functions
-function createMockWorld(): World {
-  return {} as Record<string, unknown>;
-}
+// createMockWorld imported from ../../__tests__/createMockWorld.js
 
 function createMockDeity(id: string): Deity {
   return {

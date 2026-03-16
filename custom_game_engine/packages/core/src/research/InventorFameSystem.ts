@@ -749,7 +749,7 @@ export class InventorFameManager {
 export class InventorFameSystem extends BaseSystem {
   readonly id = 'InventorFameSystem';
   readonly priority = 54; // Just after ResearchSystem (55)
-  readonly requiredComponents = [] as const;
+  readonly requiredComponents: string[] = [] as const;
   protected readonly throttleInterval = 100; // Every 5 seconds
 
   private manager: InventorFameManager = new InventorFameManager();

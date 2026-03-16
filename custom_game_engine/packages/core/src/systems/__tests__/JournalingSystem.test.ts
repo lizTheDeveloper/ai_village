@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { World } from '../../World';
+import { World } from '../../ecs/World.js';
 import { JournalingSystem } from '../JournalingSystem';
 import { EpisodicMemoryComponent } from '../../components/EpisodicMemoryComponent';
 import { SemanticMemoryComponent } from '../../components/SemanticMemoryComponent';

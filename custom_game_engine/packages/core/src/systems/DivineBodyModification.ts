@@ -147,7 +147,7 @@ export class DivineBodyModification extends BaseSystem {
   public readonly id = 'DivineBodyModification';
   public readonly name = 'DivineBodyModification';
   public readonly priority = 73;
-  public readonly requiredComponents = [];
+  public readonly requiredComponents: string[] = [];
   // Only run when deity components exist (O(1) activation check)
   public readonly activationComponents = ['deity'] as const;
 

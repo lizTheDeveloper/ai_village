@@ -1,0 +1,31 @@
+{
+  "id": "human_male_blonde_light",
+  "name": "Human Male - Blonde Hair Light Skin",
+  "pixellab_id": "0990e35a-2212-4df3-9279-fb40697e4f3d",
+  "species": "human",
+  "gender": "male",
+  "hair_color": "blonde",
+  "skin_tone": "light",
+  "size": 48,
+  "directions": 8,
+  "view": "high top-down",
+  "style": {
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+  },
+  "rotations": [
+    "south",
+    "south-west",
+    "west",
+    "north-west",
+    "north",
+    "north-east",
+    "east",
+    "south-east"
+  ],
+  "animations": {},
+  "description": "male blonde light human",
+  "enriched_at": "2026-01-30T00:40:22.609Z",
+  "original_description": "male blonde light human, detailed pixels, rich 256-color palette, smooth gradient shading like Chrono Trigger or Secret of Mana, high top-down perspective, transparent background, pixel art"
+}

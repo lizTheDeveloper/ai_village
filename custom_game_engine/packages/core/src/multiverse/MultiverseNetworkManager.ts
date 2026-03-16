@@ -1279,7 +1279,7 @@ export class MultiverseNetworkManager {
         deltas.push({
           componentType: type,
           operation: 'add',
-          data: component as Record<string, unknown> | undefined,
+          data: component ? JSON.parse(JSON.stringify(component)) as Record<string, unknown> : undefined,
         });
       }
     }
@@ -1305,7 +1305,7 @@ export class MultiverseNetworkManager {
           deltas.push({
             componentType: type,
             operation: 'update',
-            data: current as Record<string, unknown> | undefined,
+            data: current ? JSON.parse(JSON.stringify(current)) as Record<string, unknown> : undefined,
           });
         }
       }

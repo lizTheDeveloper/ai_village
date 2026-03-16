@@ -42,6 +42,7 @@ import {
   addEraSnapshot,
 } from '../components/TimeCompressionSnapshotComponent.js';
 import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
+import type { TechnologyUnlockComponent } from '../components/TechnologyUnlockComponent.js';
 import type { SoulLinkComponent } from '../components/SoulLinkComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 
@@ -553,12 +554,7 @@ export class TimeCompressionSystem extends BaseSystem {
     const techUnlockEntities = world.query().with(CT.TechnologyUnlock).executeEntities();
 
     if (techUnlockEntities.length > 0) {
-      const techUnlock = techUnlockEntities[0]!.components.get(CT.TechnologyUnlock) as {
-        unlockedBuildings: Map<string, { era: string }>;
-        unlockedTechnologies: Map<string, unknown>;
-        internetResearchBoostEnabled: boolean;
-        universityCollaborationEnabled: boolean;
-      } | undefined;
+      const techUnlock = techUnlockEntities[0]!.getComponent<TechnologyUnlockComponent>(CT.TechnologyUnlock);
 
       if (techUnlock) {
         // Calculate tech level based on highest era unlocked

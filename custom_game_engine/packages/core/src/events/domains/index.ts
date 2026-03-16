@@ -7,6 +7,7 @@
 export * from './action.events.js';
 export * from './agent.events.js';
 export * from './animal.events.js';
+export * from './avatar.events.js';
 export * from './building.events.js';
 export * from './cognitive.events.js';
 export * from './combat.events.js';

@@ -21,6 +21,7 @@ import type { PlantComponent } from '../../components/PlantComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
+import type { ITile } from '@ai-village/types';
 
 /**
  * ChunkSpatialQuery is now available via world.spatialQuery
@@ -35,7 +36,7 @@ import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '.
  * Some World implementations have tile access, others don't.
  */
 interface WorldWithGetTileAt extends World {
-  getTileAt: (x: number, y: number) => { terrain?: string; tilled?: boolean; plantability?: number } | undefined;
+  getTileAt: (x: number, y: number) => ITile | undefined;
 }
 
 /**
@@ -831,7 +832,7 @@ export function tillBehaviorWithContext(ctx: import('../BehaviorContext.js').Beh
   const worldProxy: WorldProxy = {
     tick: ctx.tick,
     getTileAt: getTileAtFn,
-    eventBus: { emit: (e: unknown) => ctx.emit(e) }
+    eventBus: { emit: (e: unknown) => ctx.emit(e as Parameters<typeof ctx.emit>[0]) }
   };
   return behavior.execute(ctx.entity, worldProxy as World);
 }
@@ -857,7 +858,7 @@ export function plantBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
     tick: ctx.tick,
     getTileAt: getTileAtFn,
     getEntity: (id: string) => ctx.getEntity(id),
-    eventBus: { emit: (e: unknown) => ctx.emit(e) },
+    eventBus: { emit: (e: unknown) => ctx.emit(e as Parameters<typeof ctx.emit>[0]) },
   };
 
   return behavior.execute(ctx.entity, worldProxy as World);
@@ -875,18 +876,14 @@ export function waterBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
 
   for (const { entity: plantEntity, distance } of nearbyPlants) {
     const plantImpl = plantEntity as EntityImpl;
-    interface PlantWithHydration extends Component {
-      stage?: string;
-      _hydration?: number;
-      hydration?: number;
-    }
-    const plant = plantImpl.getComponent(ComponentType.Plant) as PlantWithHydration | undefined;
+    const plant = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
     const plantPos = plantImpl.getComponent(ComponentType.Position);
 
     if (!plant || !plantPos) continue;
     if (plant.stage === 'dead' || plant.stage === 'decay') continue;
 
-    const hydration = plant._hydration ?? plant.hydration ?? 50;
+    const plantAny = plant as unknown as Record<string, unknown>;
+    const hydration = (plantAny._hydration as number | undefined) ?? (plantAny.hydration as number | undefined) ?? 50;
     if (hydration >= HYDRATION_THRESHOLD) continue;
 
     const priority = distance + (hydration / 10);

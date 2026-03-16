@@ -41,15 +41,14 @@ import { DeityComponent } from '../components/DeityComponent.js';
  * @returns The object typed as Component
  * @throws Error if type or version fields are missing
  */
-function asComponent(obj: { type: string; version?: number; [key: string]: unknown }): Component {
+function asComponent<T extends { type: string; version?: number }>(obj: T): Component {
   if (typeof obj.type !== 'string' || obj.type.length === 0) {
     throw new Error('Component must have a non-empty type field');
   }
-  // Default version to 1 if not provided
   if (obj.version === undefined) {
-    obj.version = 1;
+    return { ...obj, version: 1 } as { type: string; version: number } as Component;
   }
-  return obj as Component;
+  return obj as { type: string; version: number } as Component;
 }
 
 /**
@@ -72,7 +71,7 @@ export interface ChunkSpawnInfo {
 export class GodCraftedDiscoverySystem extends BaseSystem {
   readonly id = 'god_crafted_discovery';
   readonly priority = 100; // Run after most other systems
-  readonly requiredComponents = [] as const;
+  readonly requiredComponents: string[] = [] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds // No per-tick entity processing
 
   /** Universe ID for this system instance */
@@ -202,7 +201,7 @@ export class GodCraftedDiscoverySystem extends BaseSystem {
       case 'legendary_item': {
         const itemData = content.data as LegendaryItemData;
         // Power level based on number of legendary powers (1 power = ~3, 2 = ~5, 3+ = ~7+)
-        const powerCount = itemData.lore?.powers?.length ?? 0;
+        const powerCount = itemData.legendary?.powers?.length ?? 0;
         return Math.min(10, 1 + powerCount * 2);
       }
       case 'technology': {

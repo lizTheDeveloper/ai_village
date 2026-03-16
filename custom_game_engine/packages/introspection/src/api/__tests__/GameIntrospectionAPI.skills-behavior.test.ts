@@ -12,6 +12,7 @@ import { GameIntrospectionAPI } from '../GameIntrospectionAPI.js';
 import { ComponentRegistry } from '../../registry/ComponentRegistry.js';
 import { MutationService } from '../../mutation/MutationService.js';
 import type { World, Entity } from '@ai-village/core';
+import { createMockWorld } from '../../../../core/src/__tests__/createMockWorld.js';
 
 // ============================================================================
 // Mock Setup
@@ -30,22 +31,6 @@ interface AgentComponent {
   behaviorQueue: BehaviorQueueItem[];
   currentQueueIndex: number;
   behaviorCompleted: boolean;
-}
-
-// Mock World
-function createMockWorld(): World {
-  const entities = new Map<string, Entity>();
-
-  const world: Partial<World> = {
-    tick: 100,
-    getEntity: (id: string) => entities.get(id),
-    query: () => ({
-      with: () => ({ executeEntities: () => [] }),
-      executeEntities: () => [],
-    }),
-  };
-
-  return world as World;
 }
 
 // Mock Entity

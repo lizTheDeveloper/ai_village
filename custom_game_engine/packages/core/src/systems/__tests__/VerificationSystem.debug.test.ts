@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../../World';
+import { World } from '../../ecs/World.js';
 import { VerificationSystem } from '../VerificationSystem';
 
 import { ComponentType } from '../../types/ComponentType.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 describe('VerificationSystem Debug', () => {
   let world: World;
   let eventBus: EventBusImpl;

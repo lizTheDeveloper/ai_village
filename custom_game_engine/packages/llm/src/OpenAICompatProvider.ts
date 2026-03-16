@@ -306,7 +306,7 @@ export class OpenAICompatProvider implements LLMProvider {
           function: {
             name: 'till',
             description: 'Prepare soil for planting (requires farming skill level 1)',
-            parameters: { type: 'object', properties: {}, required: [] }
+            parameters: { type: 'object', properties: {}, required: [] as string[] }
           }
         },
         {
@@ -314,7 +314,7 @@ export class OpenAICompatProvider implements LLMProvider {
           function: {
             name: 'farm',
             description: 'Work on farming tasks (requires farming skill level 1)',
-            parameters: { type: 'object', properties: {}, required: [] }
+            parameters: { type: 'object', properties: {}, required: [] as string[] }
           }
         },
         {
@@ -338,7 +338,7 @@ export class OpenAICompatProvider implements LLMProvider {
           function: {
             name: 'explore',
             description: 'Systematically explore unknown areas to find new resources',
-            parameters: { type: 'object', properties: {}, required: [] }
+            parameters: { type: 'object', properties: {}, required: [] as string[] }
           }
         },
 
@@ -353,7 +353,7 @@ export class OpenAICompatProvider implements LLMProvider {
               properties: {
                 topic: { type: 'string', description: 'Research topic or technology to investigate' }
               },
-              required: []
+              required: [] as string[]
             }
           }
         },
@@ -369,7 +369,7 @@ export class OpenAICompatProvider implements LLMProvider {
               properties: {
                 target: { type: 'string', description: 'Type of animal to tame: chicken, cow, sheep, etc.' }
               },
-              required: []
+              required: [] as string[]
             }
           }
         },
@@ -383,7 +383,7 @@ export class OpenAICompatProvider implements LLMProvider {
               properties: {
                 target: { type: 'string', description: 'Animal to house' }
               },
-              required: []
+              required: [] as string[]
             }
           }
         },
@@ -397,7 +397,7 @@ export class OpenAICompatProvider implements LLMProvider {
               properties: {
                 target: { type: 'string', description: 'Animal to hunt: deer, boar, rabbit, etc.' }
               },
-              required: []
+              required: [] as string[]
             }
           }
         },
@@ -411,7 +411,7 @@ export class OpenAICompatProvider implements LLMProvider {
               properties: {
                 target: { type: 'string', description: 'Animal to butcher' }
               },
-              required: []
+              required: [] as string[]
             }
           }
         },
@@ -484,7 +484,7 @@ export class OpenAICompatProvider implements LLMProvider {
           function: {
             name: 'attend_meeting',
             description: 'Attend an ongoing meeting',
-            parameters: { type: 'object', properties: {}, required: [] }
+            parameters: { type: 'object', properties: {}, required: [] as string[] }
           }
         },
         {
@@ -516,7 +516,7 @@ export class OpenAICompatProvider implements LLMProvider {
                 farming: { type: 'number', description: 'Priority 0-100' },
                 social: { type: 'number', description: 'Priority 0-100' }
               },
-              required: []
+              required: [] as string[]
             }
           }
         },
@@ -571,7 +571,7 @@ export class OpenAICompatProvider implements LLMProvider {
           function: {
             name: 'sleep_until_queue_complete',
             description: 'Pause executor until all queued tasks complete',
-            parameters: { type: 'object', properties: {}, required: [] }
+            parameters: { type: 'object', properties: {}, required: [] as string[] }
           }
         }
       ];

@@ -190,8 +190,7 @@ export class CreationEffectApplier implements EffectApplier<CreationEffect> {
     if (createdEntityIds.length > 0) {
       appliedValues['createdEntityCount'] = createdEntityIds.length;
       // Store the actual IDs in a special key
-      (appliedValues as { _createdEntityIds: string })._createdEntityIds =
-        createdEntityIds.join('|');
+      // Note: _createdEntityIds stored separately for metadata (not in numeric appliedValues)
     }
 
     return {

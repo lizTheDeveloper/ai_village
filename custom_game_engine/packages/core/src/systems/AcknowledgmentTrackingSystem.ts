@@ -292,8 +292,8 @@ export class AcknowledgmentTrackingSystem extends BaseSystem {
 
     if (historyEntities.length > 0) {
       // Cache the ID for future lookups
-      this.cachedHistoryEntityId = historyEntities[0].id;
-      return historyEntities[0] as EntityImpl;
+      this.cachedHistoryEntityId = historyEntities[0]!.id;
+      return historyEntities[0]! as EntityImpl;
     }
 
     // History entity should exist, log warning if not

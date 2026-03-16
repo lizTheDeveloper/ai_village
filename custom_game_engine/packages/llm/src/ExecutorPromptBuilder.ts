@@ -193,7 +193,7 @@ export class ExecutorPromptBuilder {
    * to prevent simultaneous duplicate construction.
    */
   private hasCampfireInChunk(agent: Entity, world: World): boolean {
-    const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
+    const agentPos = agent.components.get('position') as { type: string; version: number; x: number; y: number } | undefined;
     if (!agentPos) return false;
 
     // FAST PATH: O(1) lookup using world.spatialQuery

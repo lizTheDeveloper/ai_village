@@ -55,7 +55,10 @@ export type MagicForm =
   | 'void'        // Emptiness, entropy
   | 'time'        // Temporal effects (rare)
   | 'space'       // Spatial effects (rare)
-  | 'metal';      // Metallic substances (allomancy)
+  | 'metal'       // Metallic substances (allomancy)
+  | 'sound'       // Audio, resonance, vibration
+  | 'text'        // Written word, language, narrative
+  | 'emotion';    // Feelings, moods, psychological states
 
 /** A composed spell (Technique + Form) */
 export interface ComposedSpell {

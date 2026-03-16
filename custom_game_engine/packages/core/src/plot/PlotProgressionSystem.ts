@@ -39,7 +39,7 @@ import { getNarrativePressureSystem } from '../narrative/NarrativePressureSystem
 export class PlotProgressionSystem extends BaseSystem {
   readonly id = 'plot_progression' as const;
   readonly priority = 86;
-  readonly requiredComponents = [] as const;
+  readonly requiredComponents: string[] = [] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   protected onUpdate(ctx: SystemContext): void {

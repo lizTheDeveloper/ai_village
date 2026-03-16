@@ -124,7 +124,7 @@ export class ViewRegistry {
    * @returns The view definition or undefined if not found
    */
   tryGet<TData extends ViewData = ViewData>(id: string): DashboardView<TData> | undefined {
-    return this.views.get(id) as DashboardView<TData> | undefined;
+    return this.views.get(id) as unknown as DashboardView<TData> | undefined;
   }
 
   /**

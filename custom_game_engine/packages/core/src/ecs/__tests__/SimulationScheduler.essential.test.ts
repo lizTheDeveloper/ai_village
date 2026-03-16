@@ -9,7 +9,7 @@ import { EntityImpl, createEntityId } from '../Entity.js';
 import type { World } from '../World.js';
 import type { Entity } from '../Entity.js';
 import type { ComponentType } from '../../types/ComponentType.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 describe('SimulationScheduler - Essential Entity Tracking', () => {
   let world: World;

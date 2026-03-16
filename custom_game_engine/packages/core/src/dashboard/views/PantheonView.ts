@@ -11,7 +11,7 @@ import type {
   RenderBounds,
   RenderTheme,
 } from '../types.js';
-import type { DeityComponent } from '../../components/DeityComponent.js';
+import type { DeityComponent, DivineDomain } from '../../components/DeityComponent.js';
 import { calculateInitialRelationship } from '../../divinity/DeityRelations.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
 
@@ -118,7 +118,7 @@ export const PantheonView: DashboardView<PantheonViewData> = {
         const belief = deityComp.belief?.currentBelief ?? 0;
         totalBelief += belief;
 
-        const identity = deityComp.identity ?? { primaryName: 'Unknown', domain: null, perceivedAlignment: 'neutral' };
+        const identity = deityComp.identity ?? { primaryName: 'Unknown', domain: undefined as DivineDomain | undefined, perceivedAlignment: 'neutral' as const };
         const summary: DeitySummary = {
           id: entity.id,
           name: identity.primaryName,

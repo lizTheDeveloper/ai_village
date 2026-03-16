@@ -445,7 +445,7 @@ export class FatesCouncilSystem extends BaseSystem {
       name: angelComp.name || angel.id,
       activePlots: plotLines?.active.map(p => p.instance_id) || [],
       completedPlots: plotLines?.completed.length || 0,
-      wisdom: angelComp.rank === 'archangel' ? 80 : angelComp.rank === 'principality' ? 60 : 40,
+      wisdom: angelComp.rank === 'arch' || angelComp.rank === 'supreme' ? 80 : angelComp.rank === 'greater' ? 60 : 40,
       recentActions,
       storyPotential,
       needsChallenge: angelComp.totalServiceTime > 10000 && !angelComp.currentOrders,
@@ -565,7 +565,6 @@ export class FatesCouncilSystem extends BaseSystem {
     // Get identity for basic info
     const identity = entity.getComponent<IdentityComponent>(CT.Identity);
     if (identity) {
-      if (identity.profession) contextParts.push(identity.profession);
       if (identity.age !== undefined) contextParts.push(`age ${Math.floor(identity.age)}`);
     }
 

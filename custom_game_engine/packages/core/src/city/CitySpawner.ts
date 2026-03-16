@@ -24,20 +24,27 @@ import { container } from '../di/Container.js';
 // Agent creation functions - lazy loaded to avoid circular dependency with @ai-village/agents
 // WanderingAgentOptions matches the type exported from @ai-village/agents
 type WanderingAgentOptions = {
+  name?: string;
+  profession?: string;
+  startingGold?: number;
+  personality?: unknown;
   believedDeity?: string;
   guaranteedSkills?: Partial<Record<SkillId, SkillLevel>>;
 };
 type AgentModule = {
-  createLLMAgent: (world: WorldMutator, x: number, y: number, speed: number) => string;
-  createWanderingAgent: (world: WorldMutator, x: number, y: number, speed?: number, options?: WanderingAgentOptions) => string;
+  createLLMAgent: (world: WorldMutator, x: number, y: number, options?: { name?: string; profession?: string }) => string;
+  createWanderingAgent: (world: WorldMutator, x: number, y: number, options?: WanderingAgentOptions) => string;
 };
 let _agentModule: AgentModule | null = null;
 async function getAgentModule(): Promise<AgentModule> {
   if (!_agentModule) {
     // Dynamic import to break circular dependency: core -> agents -> core
     // The agents package exports these functions, so we can safely cast to AgentModule
-    const module = await import('@ai-village/agents');
-    _agentModule = module as AgentModule;
+    const module = await import('@ai-village/agents') as { createLLMAgent?: unknown; createWanderingAgent?: unknown; [key: string]: unknown };
+    _agentModule = {
+      createLLMAgent: module.createLLMAgent as AgentModule['createLLMAgent'],
+      createWanderingAgent: module.createWanderingAgent as AgentModule['createWanderingAgent'],
+    };
   }
   return _agentModule!;
 }
@@ -162,7 +169,7 @@ function findWorkplaceForProfession(
     if (buildings && buildings.length > 0) {
       // Round-robin assignment: use modulo to distribute agents across buildings of same type
       const buildingIndex = Math.floor(Math.random() * buildings.length);
-      return buildings[buildingIndex];
+      return buildings[buildingIndex]!;
     }
   }
 
@@ -170,7 +177,7 @@ function findWorkplaceForProfession(
   for (const [buildingType, buildings] of buildingLookup.entries()) {
     if (buildingType !== 'house' && buildingType !== 'tent' && buildings.length > 0) {
       const buildingIndex = Math.floor(Math.random() * buildings.length);
-      return buildings[buildingIndex];
+      return buildings[buildingIndex]!;
     }
   }
 

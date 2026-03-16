@@ -979,7 +979,7 @@ export class ClarketechManager {
 export class ClarketechSystem extends BaseSystem {
   readonly id = 'ClarketechSystem';
   readonly priority = 60;
-  readonly requiredComponents = [] as const;
+  readonly requiredComponents: string[] = [] as const;
   protected readonly throttleInterval = 100; // Every 5 seconds
 
   private manager: ClarketechManager = new ClarketechManager();

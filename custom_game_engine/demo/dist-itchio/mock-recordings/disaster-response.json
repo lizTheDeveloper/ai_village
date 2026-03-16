@@ -1,0 +1,551 @@
+{
+  "recordingId": "rec_disaster_001",
+  "title": "BREAKING NEWS - Earthquake Hits Village",
+  "description": "Emergency response teams coordinate rescue during catastrophic earthquake",
+  "recordedBy": "Emergency Broadcast System",
+  "recordedAt": 1704758800000,
+  "duration": 16,
+  "quality": 0.85,
+  "frames": [
+    {
+      "tick": 0,
+      "cameraX": 1000,
+      "cameraY": 1000,
+      "cameraAngle": 180,
+      "cameraZoom": 0.75,
+      "entities": [
+        {
+          "entityId": "building_1",
+          "entityType": "building",
+          "x": 970,
+          "y": 970,
+          "facingAngle": 0,
+          "animation": { "state": "shaking", "frame": 0 },
+          "distanceFromCamera": 42
+        },
+        {
+          "entityId": "building_2",
+          "entityType": "building",
+          "x": 1030,
+          "y": 970,
+          "facingAngle": 0,
+          "animation": { "state": "shaking", "frame": 1 },
+          "distanceFromCamera": 42
+        },
+        {
+          "entityId": "villager_1",
+          "entityType": "villager",
+          "x": 990,
+          "y": 1000,
+          "facingAngle": 270,
+          "animation": { "state": "running", "frame": 0 },
+          "distanceFromCamera": 14
+        },
+        {
+          "entityId": "villager_2",
+          "entityType": "villager",
+          "x": 1010,
+          "y": 1000,
+          "facingAngle": 90,
+          "animation": { "state": "running", "frame": 1 },
+          "distanceFromCamera": 14
+        },
+        {
+          "entityId": "child_1",
+          "entityType": "child",
+          "x": 980,
+          "y": 1010,
+          "facingAngle": 225,
+          "animation": { "state": "panic_running", "frame": 0 },
+          "distanceFromCamera": 28
+        },
+        {
+          "entityId": "parent",
+          "entityType": "villager",
+          "x": 975,
+          "y": 1005,
+          "facingAngle": 225,
+          "animation": { "state": "chasing", "frame": 0 },
+          "distanceFromCamera": 35
+        },
+        {
+          "entityId": "debris_1",
+          "entityType": "debris",
+          "x": 985,
+          "y": 985,
+          "facingAngle": 0,
+          "animation": { "state": "falling", "frame": 0 },
+          "distanceFromCamera": 21
+        }
+      ]
+    },
+    {
+      "tick": 4,
+      "cameraX": 1002,
+      "cameraY": 1003,
+      "cameraAngle": 175,
+      "cameraZoom": 0.8,
+      "entities": [
+        {
+          "entityId": "building_1",
+          "entityType": "building",
+          "x": 970,
+          "y": 970,
+          "facingAngle": 0,
+          "animation": { "state": "collapsing", "frame": 2 },
+          "distanceFromCamera": 46
+        },
+        {
+          "entityId": "building_2",
+          "entityType": "building",
+          "x": 1030,
+          "y": 970,
+          "facingAngle": 0,
+          "animation": { "state": "damaged", "frame": 1 },
+          "distanceFromCamera": 42
+        },
+        {
+          "entityId": "villager_1",
+          "entityType": "villager",
+          "x": 980,
+          "y": 1005,
+          "facingAngle": 225,
+          "animation": { "state": "running", "frame": 3 },
+          "distanceFromCamera": 28
+        },
+        {
+          "entityId": "villager_2",
+          "entityType": "villager",
+          "x": 1020,
+          "y": 1005,
+          "facingAngle": 135,
+          "animation": { "state": "running", "frame": 2 },
+          "distanceFromCamera": 22
+        },
+        {
+          "entityId": "child_1",
+          "entityType": "child",
+          "x": 970,
+          "y": 1020,
+          "facingAngle": 225,
+          "animation": { "state": "panic_running", "frame": 2 },
+          "distanceFromCamera": 42
+        },
+        {
+          "entityId": "parent",
+          "entityType": "villager",
+          "x": 972,
+          "y": 1015,
+          "facingAngle": 225,
+          "animation": { "state": "reaching", "frame": 1 },
+          "distanceFromCamera": 40
+        },
+        {
+          "entityId": "debris_1",
+          "entityType": "debris",
+          "x": 985,
+          "y": 990,
+          "facingAngle": 0,
+          "animation": { "state": "crashed", "frame": 1 },
+          "distanceFromCamera": 18
+        },
+        {
+          "entityId": "debris_2",
+          "entityType": "debris",
+          "x": 995,
+          "y": 985,
+          "facingAngle": 0,
+          "animation": { "state": "falling", "frame": 1 },
+          "distanceFromCamera": 20
+        },
+        {
+          "entityId": "dust_cloud",
+          "entityType": "particle_effect",
+          "x": 970,
+          "y": 975,
+          "facingAngle": 0,
+          "animation": { "state": "expanding", "frame": 0 },
+          "distanceFromCamera": 48
+        }
+      ]
+    },
+    {
+      "tick": 8,
+      "cameraX": 1005,
+      "cameraY": 1008,
+      "cameraAngle": 170,
+      "cameraZoom": 0.85,
+      "entities": [
+        {
+          "entityId": "building_1",
+          "entityType": "building",
+          "x": 970,
+          "y": 970,
+          "facingAngle": 0,
+          "animation": { "state": "rubble", "frame": 0 },
+          "distanceFromCamera": 54
+        },
+        {
+          "entityId": "building_2",
+          "entityType": "building",
+          "x": 1030,
+          "y": 970,
+          "facingAngle": 0,
+          "animation": { "state": "on_fire", "frame": 2 },
+          "distanceFromCamera": 48
+        },
+        {
+          "entityId": "villager_1",
+          "entityType": "villager",
+          "x": 965,
+          "y": 1015,
+          "facingAngle": 225,
+          "animation": { "state": "helping_injured", "frame": 0 },
+          "distanceFromCamera": 52
+        },
+        {
+          "entityId": "villager_2",
+          "entityType": "villager",
+          "x": 1025,
+          "y": 1015,
+          "facingAngle": 135,
+          "animation": { "state": "calling_for_help", "frame": 1 },
+          "distanceFromCamera": 26
+        },
+        {
+          "entityId": "child_1",
+          "entityType": "child",
+          "x": 960,
+          "y": 1025,
+          "facingAngle": 180,
+          "animation": { "state": "crying", "frame": 0 },
+          "distanceFromCamera": 57
+        },
+        {
+          "entityId": "parent",
+          "entityType": "villager",
+          "x": 962,
+          "y": 1023,
+          "facingAngle": 180,
+          "animation": { "state": "comforting", "frame": 0 },
+          "distanceFromCamera": 55
+        },
+        {
+          "entityId": "debris_1",
+          "entityType": "debris",
+          "x": 985,
+          "y": 992,
+          "facingAngle": 0,
+          "animation": { "state": "settled", "frame": 0 },
+          "distanceFromCamera": 20
+        },
+        {
+          "entityId": "debris_2",
+          "entityType": "debris",
+          "x": 995,
+          "y": 990,
+          "facingAngle": 0,
+          "animation": { "state": "settled", "frame": 1 },
+          "distanceFromCamera": 22
+        },
+        {
+          "entityId": "dust_cloud",
+          "entityType": "particle_effect",
+          "x": 975,
+          "y": 980,
+          "facingAngle": 0,
+          "animation": { "state": "dissipating", "frame": 2 },
+          "distanceFromCamera": 50
+        },
+        {
+          "entityId": "fire_fighter_1",
+          "entityType": "emergency",
+          "x": 1040,
+          "y": 990,
+          "facingAngle": 270,
+          "animation": { "state": "running", "frame": 0 },
+          "distanceFromCamera": 45
+        },
+        {
+          "entityId": "fire_fighter_2",
+          "entityType": "emergency",
+          "x": 1045,
+          "y": 995,
+          "facingAngle": 270,
+          "animation": { "state": "running", "frame": 1 },
+          "distanceFromCamera": 50
+        }
+      ]
+    },
+    {
+      "tick": 12,
+      "cameraX": 1008,
+      "cameraY": 1012,
+      "cameraAngle": 165,
+      "cameraZoom": 0.9,
+      "entities": [
+        {
+          "entityId": "building_1",
+          "entityType": "building",
+          "x": 970,
+          "y": 970,
+          "facingAngle": 0,
+          "animation": { "state": "rubble", "frame": 1 },
+          "distanceFromCamera": 59
+        },
+        {
+          "entityId": "building_2",
+          "entityType": "building",
+          "x": 1030,
+          "y": 970,
+          "facingAngle": 0,
+          "animation": { "state": "on_fire", "frame": 5 },
+          "distanceFromCamera": 50
+        },
+        {
+          "entityId": "villager_1",
+          "entityType": "villager",
+          "x": 960,
+          "y": 1020,
+          "facingAngle": 225,
+          "animation": { "state": "bandaging", "frame": 2 },
+          "distanceFromCamera": 60
+        },
+        {
+          "entityId": "villager_2",
+          "entityType": "villager",
+          "x": 1028,
+          "y": 1020,
+          "facingAngle": 90,
+          "animation": { "state": "directing", "frame": 0 },
+          "distanceFromCamera": 26
+        },
+        {
+          "entityId": "child_1",
+          "entityType": "child",
+          "x": 955,
+          "y": 1028,
+          "facingAngle": 180,
+          "animation": { "state": "being_comforted", "frame": 1 },
+          "distanceFromCamera": 65
+        },
+        {
+          "entityId": "parent",
+          "entityType": "villager",
+          "x": 957,
+          "y": 1026,
+          "facingAngle": 180,
+          "animation": { "state": "holding_child", "frame": 1 },
+          "distanceFromCamera": 63
+        },
+        {
+          "entityId": "debris_1",
+          "entityType": "debris",
+          "x": 985,
+          "y": 992,
+          "facingAngle": 0,
+          "animation": { "state": "settled", "frame": 0 },
+          "distanceFromCamera": 25
+        },
+        {
+          "entityId": "debris_2",
+          "entityType": "debris",
+          "x": 995,
+          "y": 990,
+          "facingAngle": 0,
+          "animation": { "state": "settled", "frame": 1 },
+          "distanceFromCamera": 26
+        },
+        {
+          "entityId": "dust_cloud",
+          "entityType": "particle_effect",
+          "x": 980,
+          "y": 985,
+          "facingAngle": 0,
+          "animation": { "state": "fading", "frame": 0 },
+          "distanceFromCamera": 45
+        },
+        {
+          "entityId": "fire_fighter_1",
+          "entityType": "emergency",
+          "x": 1032,
+          "y": 980,
+          "facingAngle": 0,
+          "animation": { "state": "hosing_fire", "frame": 2 },
+          "distanceFromCamera": 40
+        },
+        {
+          "entityId": "fire_fighter_2",
+          "entityType": "emergency",
+          "x": 1038,
+          "y": 985,
+          "facingAngle": 315,
+          "animation": { "state": "hosing_fire", "frame": 3 },
+          "distanceFromCamera": 42
+        },
+        {
+          "entityId": "medic_1",
+          "entityType": "emergency",
+          "x": 990,
+          "y": 1015,
+          "facingAngle": 225,
+          "animation": { "state": "treating_injured", "frame": 0 },
+          "distanceFromCamera": 22
+        },
+        {
+          "entityId": "injured_1",
+          "entityType": "villager",
+          "x": 988,
+          "y": 1018,
+          "facingAngle": 180,
+          "animation": { "state": "lying_down", "frame": 0 },
+          "distanceFromCamera": 24
+        }
+      ]
+    },
+    {
+      "tick": 16,
+      "cameraX": 1010,
+      "cameraY": 1015,
+      "cameraAngle": 160,
+      "cameraZoom": 0.95,
+      "entities": [
+        {
+          "entityId": "building_1",
+          "entityType": "building",
+          "x": 970,
+          "y": 970,
+          "facingAngle": 0,
+          "animation": { "state": "rubble", "frame": 2 },
+          "distanceFromCamera": 64
+        },
+        {
+          "entityId": "building_2",
+          "entityType": "building",
+          "x": 1030,
+          "y": 970,
+          "facingAngle": 0,
+          "animation": { "state": "fire_controlled", "frame": 1 },
+          "distanceFromCamera": 52
+        },
+        {
+          "entityId": "villager_1",
+          "entityType": "villager",
+          "x": 955,
+          "y": 1022,
+          "facingAngle": 225,
+          "animation": { "state": "resting", "frame": 0 },
+          "distanceFromCamera": 67
+        },
+        {
+          "entityId": "villager_2",
+          "entityType": "villager",
+          "x": 1030,
+          "y": 1022,
+          "facingAngle": 90,
+          "animation": { "state": "coordinating", "frame": 2 },
+          "distanceFromCamera": 25
+        },
+        {
+          "entityId": "child_1",
+          "entityType": "child",
+          "x": 952,
+          "y": 1030,
+          "facingAngle": 180,
+          "animation": { "state": "calmed", "frame": 0 },
+          "distanceFromCamera": 70
+        },
+        {
+          "entityId": "parent",
+          "entityType": "villager",
+          "x": 954,
+          "y": 1028,
+          "facingAngle": 180,
+          "animation": { "state": "protective", "frame": 0 },
+          "distanceFromCamera": 68
+        },
+        {
+          "entityId": "debris_1",
+          "entityType": "debris",
+          "x": 985,
+          "y": 992,
+          "facingAngle": 0,
+          "animation": { "state": "settled", "frame": 0 },
+          "distanceFromCamera": 28
+        },
+        {
+          "entityId": "debris_2",
+          "entityType": "debris",
+          "x": 995,
+          "y": 990,
+          "facingAngle": 0,
+          "animation": { "state": "settled", "frame": 1 },
+          "distanceFromCamera": 29
+        },
+        {
+          "entityId": "fire_fighter_1",
+          "entityType": "emergency",
+          "x": 1028,
+          "y": 975,
+          "facingAngle": 0,
+          "animation": { "state": "extinguishing", "frame": 5 },
+          "distanceFromCamera": 45
+        },
+        {
+          "entityId": "fire_fighter_2",
+          "entityType": "emergency",
+          "x": 1035,
+          "y": 980,
+          "facingAngle": 315,
+          "animation": { "state": "extinguishing", "frame": 6 },
+          "distanceFromCamera": 46
+        },
+        {
+          "entityId": "medic_1",
+          "entityType": "emergency",
+          "x": 990,
+          "y": 1015,
+          "facingAngle": 225,
+          "animation": { "state": "stabilizing", "frame": 2 },
+          "distanceFromCamera": 26
+        },
+        {
+          "entityId": "injured_1",
+          "entityType": "villager",
+          "x": 988,
+          "y": 1018,
+          "facingAngle": 180,
+          "animation": { "state": "being_treated", "frame": 1 },
+          "distanceFromCamera": 27
+        },
+        {
+          "entityId": "medic_2",
+          "entityType": "emergency",
+          "x": 1005,
+          "y": 1020,
+          "facingAngle": 180,
+          "animation": { "state": "assessing", "frame": 0 },
+          "distanceFromCamera": 8
+        },
+        {
+          "entityId": "rescue_leader",
+          "entityType": "emergency",
+          "x": 1000,
+          "y": 1010,
+          "facingAngle": 90,
+          "animation": { "state": "commanding", "frame": 1 },
+          "distanceFromCamera": 10
+        },
+        {
+          "entityId": "smoke",
+          "entityType": "particle_effect",
+          "x": 1030,
+          "y": 975,
+          "facingAngle": 0,
+          "animation": { "state": "rising", "frame": 3 },
+          "distanceFromCamera": 48
+        }
+      ]
+    }
+  ]
+}

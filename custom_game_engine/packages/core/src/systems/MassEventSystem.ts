@@ -143,7 +143,7 @@ export const DEFAULT_MASS_EVENT_CONFIG: MassEventConfig = {
 export class MassEventSystem extends BaseSystem {
   public readonly id = 'MassEventSystem';
   public readonly priority = 73;
-  public readonly requiredComponents = [];
+  public readonly requiredComponents: string[] = [];
   // Only run when deity components exist (O(1) activation check)
   public readonly activationComponents = ['deity'] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds

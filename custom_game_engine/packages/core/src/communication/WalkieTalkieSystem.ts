@@ -561,7 +561,7 @@ export class WalkieTalkieManager {
 export class WalkieTalkieSystem extends BaseSystem {
   readonly id = 'WalkieTalkieSystem';
   readonly priority = 68;
-  readonly requiredComponents = [] as const;
+  readonly requiredComponents: string[] = [] as const;
 
   protected readonly throttleInterval = 50; // MEDIUM - 2.5 seconds (communication can be slightly delayed)
 

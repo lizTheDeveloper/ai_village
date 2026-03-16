@@ -302,7 +302,7 @@ export class ProtectionEffectApplier implements EffectApplier<ProtectionEffect> 
       absorption: finalAbsorption,
       remainingAbsorption: finalAbsorption,
       damageReduction: effect.damageReduction ?? 0,
-      protectsAgainst: effect.protectsAgainst,
+      protectsAgainst: effect.protectsAgainst === 'all' ? ['all'] : effect.protectsAgainst as string[] | undefined,
       appliedAt: context.tick,
       expiresAt: context.spell.duration ? context.tick + context.spell.duration : undefined,
     };

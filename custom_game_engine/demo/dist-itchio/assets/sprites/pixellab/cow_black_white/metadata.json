@@ -1,0 +1,22 @@
+{
+  "id": "cow_black_white",
+  "name": "black and white spotted cow",
+  "size": 64,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-05T10:24:41.327Z",
+  "generation_method": "reference_workflow",
+  "notes": "South first, east with south ref, west flipped from east, others with south ref",
+  "description": "black white cow, large bovine with spotted or solid coat, sturdy build, gentle eyes, domesticated farm animal, healthy well-fed appearance, earthy brown and golden tones, grass-stained",
+  "category": "animal",
+  "original_description": "black and white spotted cow",
+  "enriched_at": "2026-01-30T00:40:22.578Z"
+}

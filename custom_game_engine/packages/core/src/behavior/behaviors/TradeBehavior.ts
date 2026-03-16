@@ -292,17 +292,13 @@ export class TradeBehavior extends BaseBehavior {
    * Get the trading system from the world.
    */
   private getTradingSystem(world: World): TradingSystem | null {
-    // The trading system should be accessible via world property
-    interface WorldWithSystems extends World {
-      getSystem?: (name: string) => unknown;
-      tradingSystem?: TradingSystem;
-    }
-    const worldWithSystems = world as WorldWithSystems;
-    const system = worldWithSystems.getSystem?.('trading');
+    // The trading system should be accessible via world.getSystem
+    const system = world.getSystem?.('trading');
     if (system) {
       return system as TradingSystem;
     }
-    return worldWithSystems.tradingSystem ?? null;
+    // Fallback: check for tradingSystem property on world implementation
+    return ((world as { tradingSystem?: TradingSystem }).tradingSystem) ?? null;
   }
 }
 
@@ -455,16 +451,11 @@ function handleExecuteTrade(ctx: BehaviorContext, state: Record<string, unknown>
 
   // Get trading system - access via the entity's world reference
   const world = ctx.world;
-  interface WorldWithSystems extends World {
-    getSystem?: (name: string) => unknown;
-    tradingSystem?: TradingSystem;
-  }
   interface TradingSystemLike {
     buyFromShop(world: World, agentId: string, shopId: string, itemId: string, quantity: number): { success: boolean; reason?: string };
     sellToShop(world: World, agentId: string, shopId: string, itemId: string, quantity: number): { success: boolean; reason?: string };
   }
-  const worldWithSystems = world as WorldWithSystems;
-  const tradingSystem = (worldWithSystems.getSystem?.('trading') ?? worldWithSystems.tradingSystem) as TradingSystemLike | undefined;
+  const tradingSystem = (world.getSystem?.('trading') ?? (world as { tradingSystem?: TradingSystemLike }).tradingSystem) as TradingSystemLike | undefined;
 
   if (!tradingSystem) {
     return ctx.complete('Trading system not available');

@@ -26,7 +26,7 @@ export interface InitiateCombatState {
   /** Reason for combat (for narrative/social consequences) */
   cause: 'jealousy_rival' | 'jealousy_infidelity' | 'jealousy_ex' |
          'honor_duel' | 'territory_dispute' | 'revenge' | 'defense' |
-         'courtship_display' | 'robbery';
+         'courtship_display' | 'robbery' | 'challenge';
 
   /** Is this lethal combat? */
   lethal?: boolean;
@@ -39,7 +39,7 @@ export interface InitiateCombatState {
 const VALID_COMBAT_CAUSES = [
   'jealousy_rival', 'jealousy_infidelity', 'jealousy_ex',
   'honor_duel', 'territory_dispute', 'revenge', 'defense',
-  'courtship_display', 'robbery'
+  'courtship_display', 'robbery', 'challenge'
 ] as const;
 
 /**
@@ -72,7 +72,7 @@ function isInitiateCombatState(state: unknown): state is InitiateCombatState {
  * Partial type guard for InitiateCombatState that allows missing cause.
  * Used when 'challenge' default is acceptable.
  */
-function hasRequiredCombatFields(state: unknown): state is { targetId: string; cause?: string; lethal?: boolean; surprise?: boolean } {
+function hasRequiredCombatFields(state: unknown): state is { targetId: string; cause?: InitiateCombatState['cause']; lethal?: boolean; surprise?: boolean } {
   if (typeof state !== 'object' || state === null) {
     return false;
   }

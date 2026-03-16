@@ -910,6 +910,16 @@ export interface MiscEvents {
     exportPath?: string;
   };
 
+  // === Fates/Plot Events ===
+  'fates:narrative_connection_woven': {
+    plot1InstanceId: string;
+    plot2InstanceId: string;
+    entity1Id: EntityId;
+    entity2Id: EntityId;
+    connection: string;
+    wovenAtTick: number;
+  };
+
   // === Test Events ===
   'test:event': {
     [key: string]: unknown;

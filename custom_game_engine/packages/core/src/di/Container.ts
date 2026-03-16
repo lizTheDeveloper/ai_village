@@ -55,6 +55,7 @@ export interface AgentFactory {
       profession?: string;
       startingGold?: number;
       personality?: unknown;
+      guaranteedSkills?: Record<string, number>;
     }
   ): string;
 }

@@ -13,7 +13,7 @@ import type { SystemContext } from '../ecs/SystemContext.js';
 export class EventCoalescingMonitorSystem extends BaseSystem {
   readonly id = 'event_coalescing_monitor';
   readonly priority = 998; // Run late, after most systems
-  readonly requiredComponents = []; // No entity processing
+  readonly requiredComponents: string[] = []; // No entity processing
 
   // Use throttleInterval for efficient skip (avoids SystemContext creation)
   protected readonly throttleInterval = 6000; // Every 5 minutes (6000 ticks @ 20 TPS)

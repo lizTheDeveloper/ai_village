@@ -56,7 +56,7 @@ export class FallbackProvider implements LLMProvider {
       throw new Error('FallbackProvider requires at least one provider');
     }
 
-    this.providers = providers.map(provider => ({
+    this.providers = providers.map((provider): ProviderState => ({
       provider,
       failureCount: 0,
       lastFailure: null,

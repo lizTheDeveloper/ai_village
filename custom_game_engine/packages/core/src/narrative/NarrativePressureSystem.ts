@@ -28,7 +28,7 @@ export class NarrativePressureSystem extends BaseSystem {
   static readonly PRIORITY = 80;
   readonly id = 'narrative_pressure' as const;
   readonly priority = NarrativePressureSystem.PRIORITY;
-  readonly requiredComponents = [] as const;
+  readonly requiredComponents: string[] = [] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   // Active attractors by ID

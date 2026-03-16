@@ -7,6 +7,13 @@ import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SteeringBehavior, SteeringComponent } from '../components/SteeringComponent.js';
 import type { VelocityComponent } from '../components/VelocityComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
+import type { Component } from '../ecs/Component.js';
+
+/** Minimal collision component shape used for obstacle avoidance */
+interface CollisionComponent extends Component {
+  type: 'collision';
+  radius: number;
+}
 import { getSteering, getVelocity, getPosition } from '../utils/componentHelpers.js';
 import { setComponentProperties } from '../utils/componentUtils.js';
 
@@ -316,7 +323,7 @@ export class SteeringSystem extends BaseSystem {
           if (!e || !e.components.has('collision')) continue;
 
           const obstaclePos = getPosition(e);
-          const collision = e.components.get('collision') as { radius: number } | undefined;
+          const collision = e.getComponent<CollisionComponent>('collision' as ComponentType);
           if (!obstaclePos || !collision) continue;
 
           // Quick distance check to filter out far obstacles BEFORE detailed checks

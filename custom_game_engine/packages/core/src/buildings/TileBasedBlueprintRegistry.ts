@@ -415,13 +415,27 @@ export function validateTileBasedBlueprint(blueprint: TileBasedBlueprint): void 
  * Create a tile-based blueprint with calculated properties.
  */
 export function createTileBasedBlueprint(
-  config: Omit<TileBasedBlueprint, 'width' | 'height' | 'resourceCost'> & {
+  config: Omit<TileBasedBlueprint, 'width' | 'height' | 'resourceCost' | 'allowCustomMaterials' | 'techRequired' | 'terrainRequired' | 'terrainForbidden' | 'buildTimePerTile' | 'tier' | 'functionality'> & {
     resourceCost?: ResourceCost[];
+    allowCustomMaterials?: boolean;
+    techRequired?: string[];
+    terrainRequired?: string[];
+    terrainForbidden?: string[];
+    buildTimePerTile?: number;
+    tier?: number;
+    functionality?: BuildingFunction[];
   }
 ): TileBasedBlueprint {
   const { width, height } = calculateDimensions(config.layoutString);
 
   const blueprint: TileBasedBlueprint = {
+    allowCustomMaterials: false,
+    techRequired: [],
+    terrainRequired: [],
+    terrainForbidden: [],
+    buildTimePerTile: 10,
+    tier: 1,
+    functionality: [],
     ...config,
     width,
     height,

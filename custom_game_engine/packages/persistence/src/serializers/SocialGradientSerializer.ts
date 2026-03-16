@@ -16,7 +16,7 @@ export class SocialGradientSerializer extends BaseComponentSerializer<SocialGrad
   }
 
   protected serializeData(component: SocialGradientComponent): SerializedSocialGradient {
-    const componentAny = component as {
+    const componentAny = component as unknown as { type: string; version: number;
       _gradients: Gradient[];
       _gradientCounter: number;
     };
@@ -34,7 +34,7 @@ export class SocialGradientSerializer extends BaseComponentSerializer<SocialGrad
     const component = new SocialGradientComponent();
 
     // Access private fields
-    const componentAny = component as {
+    const componentAny = component as unknown as { type: string; version: number;
       _gradients: Gradient[];
       _gradientCounter: number;
     };

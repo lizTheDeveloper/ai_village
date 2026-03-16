@@ -20,6 +20,7 @@ import {
   type MoodComponent,
   type StressState,
   type Trauma,
+  type EmotionalState,
   applyMoodChange,
   updateMoodFactor,
   createStressState,
@@ -50,7 +51,7 @@ import { createOutcomeAttractor } from '../narrative/NarrativePressureTypes.js';
  * Key: entityId, Value: { originalState, expirationTick }
  */
 const temporaryEmotionalStates = new Map<string, {
-  originalState: string;
+  originalState: EmotionalState;
   expirationTick: number;
 }>();
 

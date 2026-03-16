@@ -1344,9 +1344,7 @@ export type {
   // Effect types
   EffectExpression,
   TargetSelector,
-  TargetFilter,
   EffectOperation,
-  DamageType,
   LocationExpression,
   DirectionExpression,
   Condition,
@@ -1355,7 +1353,6 @@ export type {
 
 export type {
   // Interpreter types
-  EffectContext,
   EffectResult,
   InterpreterOptions,
 } from './EffectInterpreter.js';

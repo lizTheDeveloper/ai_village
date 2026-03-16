@@ -21,7 +21,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 export class RealmManager extends BaseSystem {
   readonly id: SystemId = 'realm_manager';
   readonly priority: number = 50;
-  readonly requiredComponents = [] as const;
+  readonly requiredComponents: string[] = [] as const;
   // Lazy activation: Skip entire system when no realms exist in world
   public readonly activationComponents = ['realm'] as const;
 

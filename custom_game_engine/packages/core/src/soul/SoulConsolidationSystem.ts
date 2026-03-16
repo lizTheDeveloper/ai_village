@@ -26,7 +26,7 @@ import { plotLineRegistry } from '../plot/PlotLineRegistry.js';
 export class SoulConsolidationSystem extends BaseSystem {
   readonly id = 'soul_consolidation' as const;
   readonly priority = 106;
-  readonly requiredComponents = [] as const;
+  readonly requiredComponents: string[] = [] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   protected onUpdate(_ctx: SystemContext): void {

@@ -19,7 +19,7 @@ export class SpatialMemorySerializer extends BaseComponentSerializer<SpatialMemo
   }
 
   protected serializeData(component: SpatialMemoryComponent): SerializedSpatialMemory {
-    const componentAny = component as {
+    const componentAny = component as unknown as { type: string; version: number;
       _resourceMemories: ResourceLocationMemory[];
       _memoryCounter: number;
     };
@@ -43,7 +43,7 @@ export class SpatialMemorySerializer extends BaseComponentSerializer<SpatialMemo
     });
 
     // Access private fields
-    const componentAny = component as {
+    const componentAny = component as unknown as { type: string; version: number;
       _resourceMemories: ResourceLocationMemory[];
       _memoryCounter: number;
     };

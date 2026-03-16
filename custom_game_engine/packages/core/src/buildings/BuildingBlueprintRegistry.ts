@@ -37,6 +37,7 @@ import { SHIPYARD_BLUEPRINTS } from './ShipyardBlueprints.js';
  */
 export type BuildingCategory =
   | 'production'    // Crafting, processing
+  | 'crafting'      // Workbenches, forges, specific craft stations
   | 'storage'       // Warehouses, silos
   | 'residential'   // Agent homes, tents, shelters
   | 'commercial'    // Shops, markets

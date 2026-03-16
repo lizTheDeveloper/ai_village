@@ -8,6 +8,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import type { DeityBeliefState, BeliefGeneration, BeliefActivity } from '../BeliefTypes.js';
 import type { Deity } from '../DeityTypes.js';
 import type { World } from '../../ecs/World.js';
+import { createMockWorld } from '../../__tests__/createMockWorld.js';
 
 describe('Belief Generation', () => {
   let mockDeity: Deity;
@@ -459,9 +460,7 @@ function createBeliever(id: string, belief: any): any {
   };
 }
 
-function createMockWorld(): World {
-  return {} as Partial<World> as World;
-}
+// createMockWorld imported from ../../__tests__/createMockWorld.js
 
 function calculateBeliefGeneration(believer: any, activity: BeliefActivity, deity: Deity): BeliefGeneration {
   const base = activity.intensity * activity.duration * believer.faith * believer.devotion;

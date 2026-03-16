@@ -58,6 +58,46 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
 import type { MoodComponent } from '../components/MoodComponent.js';
 
+// Component types for pack/hive/position mechanics (unregistered in ComponentType enum)
+interface PositionHolderComp {
+  type: string;
+  version: number;
+  position: string;
+  authority: number;
+}
+interface PackMemberComp {
+  type: string;
+  version: number;
+  packId: string;
+}
+interface PackMindComp {
+  type: string;
+  version: number;
+  packId: string;
+  bodiesInPack: string[];
+  coherence: number;
+  dissolved?: boolean;
+}
+interface HiveQueenComp {
+  type: string;
+  version: number;
+  hiveId: string;
+}
+interface HiveWorkerComp {
+  type: string;
+  version: number;
+  hiveId: string;
+}
+interface HiveCombatComp {
+  type: string;
+  version: number;
+  hiveId: string;
+  queen: string;
+  workers: string[];
+  queenDead?: boolean;
+  collapseTriggered?: boolean;
+}
+
 // Legacy test format types for backward compatibility
 interface LegacyInventoryComponent {
   type: 'inventory';
@@ -815,9 +855,7 @@ export class DeathTransitionSystem extends BaseSystem {
    */
   private checkPowerVacuum(world: World, entity: Entity): void {
     // Check if entity held a position
-    const positionHolder = entity.components.get('position_holder') as
-      | { position: string; authority: number }
-      | undefined;
+    const positionHolder = entity.components.get('position_holder') as PositionHolderComp | undefined;
 
     if (!positionHolder) {
       return; // No position held, no power vacuum
@@ -887,9 +925,7 @@ export class DeathTransitionSystem extends BaseSystem {
    */
   private handlePackDeath(world: World, entity: Entity): void {
     // Check if entity is part of a pack
-    const packMember = entity.components.get('pack_member') as
-      | { packId: string }
-      | undefined;
+    const packMember = entity.components.get('pack_member') as PackMemberComp | undefined;
 
     if (!packMember) {
       return; // Not a pack member, nothing to do
@@ -901,9 +937,7 @@ export class DeathTransitionSystem extends BaseSystem {
       .executeEntities();
 
     for (const packMindEntity of packMinds) {
-      const packCombat = packMindEntity.components.get('pack_combat') as
-        | { packId: string; bodiesInPack: string[]; coherence: number; dissolved?: boolean }
-        | undefined;
+      const packCombat = packMindEntity.components.get('pack_combat') as PackMindComp | undefined;
 
       if (!packCombat || packCombat.packId !== packMember.packId) {
         continue;
@@ -933,9 +967,9 @@ export class DeathTransitionSystem extends BaseSystem {
       // Force update the component
       const mutator = world as WorldMutator;
       mutator.addComponent(packMindEntity.id, {
+        ...packCombat,
         type: 'pack_combat',
         version: 1,
-        ...packCombat,
       });
 
       // Emit event for pack member death
@@ -961,15 +995,11 @@ export class DeathTransitionSystem extends BaseSystem {
    */
   private handleHiveDeath(world: World, entity: Entity): void {
     // Check if entity is a hive queen
-    const hiveQueen = entity.components.get('hive_queen') as
-      | { hiveId: string }
-      | undefined;
+    const hiveQueen = entity.components.get('hive_queen') as HiveQueenComp | undefined;
 
     if (!hiveQueen) {
       // Not a queen, check if it's a worker
-      const hiveWorker = entity.components.get('hive_worker') as
-        | { hiveId: string }
-        | undefined;
+      const hiveWorker = entity.components.get('hive_worker') as HiveWorkerComp | undefined;
 
       if (!hiveWorker) {
         return; // Not part of a hive
@@ -981,9 +1011,7 @@ export class DeathTransitionSystem extends BaseSystem {
         .executeEntities();
 
       for (const hiveEntity of hives) {
-        const hiveCombat = hiveEntity.components.get('hive_combat') as
-          | { hiveId: string; workers: string[] }
-          | undefined;
+        const hiveCombat = hiveEntity.components.get('hive_combat') as HiveCombatComp | undefined;
 
         if (!hiveCombat || hiveCombat.hiveId !== hiveWorker.hiveId) {
           continue;
@@ -997,9 +1025,9 @@ export class DeathTransitionSystem extends BaseSystem {
           // Update component
           const mutator = world as WorldMutator;
           mutator.addComponent(hiveEntity.id, {
+            ...hiveCombat,
             type: 'hive_combat',
             version: 1,
-            ...hiveCombat,
           });
         }
 
@@ -1015,9 +1043,7 @@ export class DeathTransitionSystem extends BaseSystem {
       .executeEntities();
 
     for (const hiveEntity of hives) {
-      const hiveCombat = hiveEntity.components.get('hive_combat') as
-        | { hiveId: string; queen: string; workers: string[]; queenDead?: boolean; collapseTriggered?: boolean }
-        | undefined;
+      const hiveCombat = hiveEntity.components.get('hive_combat') as HiveCombatComp | undefined;
 
       if (!hiveCombat || hiveCombat.hiveId !== hiveQueen.hiveId) {
         continue;
@@ -1035,9 +1061,9 @@ export class DeathTransitionSystem extends BaseSystem {
       // Update component
       const mutator = world as WorldMutator;
       mutator.addComponent(hiveEntity.id, {
+        ...hiveCombat,
         type: 'hive_combat',
         version: 1,
-        ...hiveCombat,
       });
 
       // Emit event for hive collapse

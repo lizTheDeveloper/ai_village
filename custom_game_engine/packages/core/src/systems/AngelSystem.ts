@@ -56,7 +56,7 @@ export class AngelSystem extends BaseSystem {
   public readonly id = 'AngelSystem';
   public readonly name = 'AngelSystem';
   public readonly priority = 74;
-  public readonly requiredComponents = [];
+  public readonly requiredComponents: string[] = [];
   // Only run when angel components exist (O(1) activation check)
   public readonly activationComponents = ['angel'] as const;
 

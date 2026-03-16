@@ -25,7 +25,7 @@ function loadParadigmsFromJSON(): Record<string, CourtshipParadigm> {
     }
   }
 
-  return paradigmsData as Record<string, CourtshipParadigm>;
+  return paradigmsData as unknown as Record<string, CourtshipParadigm>;
 }
 
 const loadedParadigms = loadParadigmsFromJSON();

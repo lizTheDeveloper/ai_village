@@ -210,6 +210,16 @@ export class SoilSystem extends BaseSystem {
           intensity: normalizedIntensity,
         },
       });
+      // Snow means below-freezing temperatures: emit frost event for plant damage
+      // Temperature range: -3°C (light snow) to -10°C (heavy snow)
+      const frostTemperature = -(3 + normalizedIntensity * 7);
+      world.eventBus.emit({
+        type: 'weather:frost',
+        source: 'soil-system',
+        data: {
+          temperature: frostTemperature,
+        },
+      });
       // Apply snow to all outdoor tiles
       this.handleSnowEvent(world, normalizedIntensity);
     }

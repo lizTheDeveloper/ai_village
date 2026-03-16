@@ -9,6 +9,7 @@ import type {
 } from '../NetworkProtocol.js';
 import type { WorldMutator } from '../../ecs/World.js';
 import type { Entity, EntityId } from '../../ecs/Entity.js';
+import { createMockWorld as createBaseMockWorld } from '../../__tests__/createMockWorld.js';
 
 // Type helpers for testing
 type EntityWithMethods = {
@@ -131,13 +132,17 @@ class MockWebSocketServer {
 
 // Mock World for testing
 function createMockWorld(): WorldMutator {
-  return {
-    entities: new Map(),
-    tick: 0n,
-    update: vi.fn(),
-    getEntity: vi.fn(),
-    destroyEntity: vi.fn(),
-  } as WorldMutator;
+  return createBaseMockWorld({
+    overrides: {
+      destroyEntity: vi.fn(),
+      advanceTick: vi.fn(),
+      setTick: vi.fn(),
+      setFeature: vi.fn(),
+      addComponent: vi.fn(),
+      updateComponent: vi.fn(),
+      removeComponent: vi.fn(),
+    },
+  }) as unknown as WorldMutator;
 }
 
 // Type-safe accessors for private NetworkManager internals

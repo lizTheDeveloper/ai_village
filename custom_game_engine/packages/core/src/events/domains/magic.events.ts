@@ -8,8 +8,10 @@ export interface MagicEvents {
     agentId: EntityId;
     deityId: EntityId;
     prayerType: string;
-    urgency: string;
-    prayerId: string;
+    urgency?: string;
+    prayerId?: string;
+    answered?: boolean;
+    duration?: number;
   };
   'prayer:answered': {
     agentId: EntityId;
@@ -571,6 +573,13 @@ export interface MagicEvents {
     spellId: string;
     agentId: string;
     nodeId: string;
+  };
+
+  'magic:experiment_requested': {
+    agentId: EntityId;
+    technique: string;
+    form: string;
+    source: string;
   };
 }
 

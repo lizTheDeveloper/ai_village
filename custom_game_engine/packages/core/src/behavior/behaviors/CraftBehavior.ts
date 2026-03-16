@@ -387,7 +387,7 @@ export function craftBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
   const world: MinimalWorldWithCrafting = {
     tick: ctx.tick,
     getEntity: (id: string) => ctx.getEntity(id),
-    eventBus: { emit: (e: unknown) => ctx.emit(e) },
+    eventBus: { emit: (e: unknown) => ctx.emit(e as Parameters<typeof ctx.emit>[0]) },
     craftingSystem: (ctx.world as WorldWithCrafting).craftingSystem,
   };
 

@@ -35,7 +35,7 @@ const MIRROR_MAP: Record<string, string> = {
 export class PixelLabSpriteGenerationSystem extends BaseSystem {
   readonly id: SystemId = 'pixellab_sprite_generation';
   readonly priority = 900; // Run late, after other systems
-  readonly requiredComponents = [] as const; // Event-driven
+  readonly requiredComponents: string[] = [] as const; // Event-driven
   // Lazy activation: Skip entire system when no pixellab_request exists
   public readonly activationComponents = ['pixellab_request'] as const;
 
@@ -331,7 +331,7 @@ export class PixelLabSpriteGenerationSystem extends BaseSystem {
   private getDirectionImagePath(characterId: string, direction: string): string {
     // Browser compatibility: return placeholder path
     if (typeof window !== 'undefined') {
-      const base = import.meta.env?.BASE_URL ?? '/';
+      const base = (import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/';
       return `${base}assets/sprites/pixellab/${characterId}/rotations/${direction}.png`;
     }
 

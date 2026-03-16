@@ -3,6 +3,7 @@ import type { World } from '@ai-village/core/src/ecs/World.js';
 import type { Entity } from '@ai-village/core/src/ecs/Entity.js';
 import type { MagicSkillTree } from '@ai-village/core/src/magic/MagicSkillTree.js';
 import type { WindowManager } from '../../../WindowManager.js';
+import { createMockWorld as createSharedMockWorld } from '@ai-village/core/__tests__/createMockWorld.js';
 import { SkillTreePanel } from '../SkillTreePanel.js';
 import { MagicSkillTreeRegistry } from '@ai-village/magic';
 import { ParadigmTreeView } from '../ParadigmTreeView.js';
@@ -986,20 +987,22 @@ function createMockWorld(): World {
     };
   });
 
-  return {
-    getEventBus: vi.fn(() => ({
-      emit: eventBusEmit,
-      on: vi.fn(),
-    })),
-    getSkillTreeManager: vi.fn(() => ({
-      unlockSkillNode,
-      evaluateNode,
-      applyNodeEffects,
-    })),
-    getRegistry: vi.fn(() => ({
-      getTree: vi.fn(),
-    })),
-  } as Record<string, unknown>;
+  return createSharedMockWorld({
+    overrides: {
+      getEventBus: vi.fn(() => ({
+        emit: eventBusEmit,
+        on: vi.fn(),
+      })),
+      getSkillTreeManager: vi.fn(() => ({
+        unlockSkillNode,
+        evaluateNode,
+        applyNodeEffects,
+      })),
+      getRegistry: vi.fn(() => ({
+        getTree: vi.fn(),
+      })),
+    },
+  });
 }
 
 function createMockMagicEntity(config: {

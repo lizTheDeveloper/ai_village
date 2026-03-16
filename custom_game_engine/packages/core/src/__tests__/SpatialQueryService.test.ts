@@ -2,18 +2,19 @@
  * Test that SpatialQueryService types are exported correctly
  */
 
+import { describe, it, expectTypeOf } from 'vitest';
 import type { World, SpatialQueryService } from '../index.js';
 
-// This test file just verifies types compile correctly
-export function testSpatialQueryServiceTypes(world: World) {
-  // Should be able to access spatialQuery from world
-  const spatialQuery: SpatialQueryService | null = world.spatialQuery;
+describe('SpatialQueryService', () => {
+  it('should have correct type shape on World', () => {
+    // This test verifies types compile correctly — no runtime assertions needed
+    expectTypeOf<World>().toHaveProperty('spatialQuery');
+  });
 
-  if (spatialQuery) {
-    // Should have all required methods
-    const _results = spatialQuery.getEntitiesInRadius(0, 0, 10, ['agent']);
-    const _nearest = spatialQuery.getNearestEntity(0, 0, ['plant']);
-    const _hasEntity = spatialQuery.hasEntityInRadius(0, 0, 10, ['building']);
-    const _count = spatialQuery.countEntitiesInRadius(0, 0, 10, ['resource']);
-  }
-}
+  it('should expose required query methods', () => {
+    expectTypeOf<SpatialQueryService>().toHaveProperty('getEntitiesInRadius');
+    expectTypeOf<SpatialQueryService>().toHaveProperty('getNearestEntity');
+    expectTypeOf<SpatialQueryService>().toHaveProperty('hasEntityInRadius');
+    expectTypeOf<SpatialQueryService>().toHaveProperty('countEntitiesInRadius');
+  });
+});

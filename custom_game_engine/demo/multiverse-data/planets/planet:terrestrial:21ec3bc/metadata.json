@@ -1,0 +1,18 @@
+{
+  "id": "planet:terrestrial:21ec3bc",
+  "name": "Alpha Theia",
+  "type": "terrestrial",
+  "seed": "universe:main:homeworld:1773448159174",
+  "createdAt": 1773448159234,
+  "lastAccessedAt": 1773448159235,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "universe:main:homeworld:1773448159174",
+    "type": "terrestrial"
+  },
+  "universeId": "default",
+  "artStyle": "nes",
+  "createdBy": "player:0be603ba-b939-4e0d-aff6-fc5b9f684300"
+}

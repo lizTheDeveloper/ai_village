@@ -79,7 +79,7 @@ export class ProfessionWorkSimulationSystem extends BaseSystem {
   // Singleton entity caching
   private timeEntityId: string | null = null;
 
-  protected readonly throttleInterval: number;
+  declare protected readonly throttleInterval: number;
 
   constructor(config: Partial<ProfessionWorkConfig> = {}) {
     super();

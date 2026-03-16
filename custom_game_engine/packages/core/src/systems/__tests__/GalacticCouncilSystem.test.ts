@@ -21,7 +21,7 @@ import type {
 } from '../../components/GalacticCouncilComponent.js';
 import type { SpeciesComponent } from '../../components/SpeciesComponent.js';
 import type { NavyComponent } from '../../components/NavyComponent.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 // Type helpers for testing
 type EntityWithMethods = {

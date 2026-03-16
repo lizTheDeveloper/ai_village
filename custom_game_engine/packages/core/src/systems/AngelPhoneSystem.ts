@@ -115,7 +115,7 @@ function getStateKey(_world: World): string {
 export class AngelPhoneSystem extends BaseSystem {
   public readonly id = 'angel_phone' as const;
   public readonly priority = 180; // After brain systems, before UI
-  public readonly requiredComponents = [] as const;
+  public readonly requiredComponents: string[] = [] as const;
   public readonly activationComponents = ['angel_messaging'] as const;
 
   protected readonly throttleInterval = PHONE_SYSTEM_UPDATE_INTERVAL;

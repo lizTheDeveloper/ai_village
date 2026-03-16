@@ -29,7 +29,7 @@ import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
 export class PrayerSystem extends BaseSystem {
   public readonly id: SystemId = 'prayer';
   public readonly priority: number = 116; // After belief generation
-  public readonly requiredComponents = [] as const;
+  public readonly requiredComponents: string[] = [] as const;
   // Only run when spiritual components exist (need agents who can pray)
   // This system handles both: prayers to existing deities AND proto_deity_belief events for deity emergence
   public readonly activationComponents = ['spiritual'] as const;
@@ -131,16 +131,14 @@ export class PrayerSystem extends BaseSystem {
     // Extract nearby spirits and deities for cosmology resolution
     // Note: Converting ECS components to interface types for CosmologyInteraction
     const nearbySpirits: Spirit[] = nearbyEntities
-      .filter(e => e.components.has(CT.Spirit))
+      .filter(e => e.components.has(CT.Spirit) && e.getComponent<SpiritComponent>(CT.Spirit) !== undefined)
       .map(e => {
-        const spiritComp = e.getComponent<SpiritComponent>(CT.Spirit);
+        const spiritComp = e.getComponent<SpiritComponent>(CT.Spirit)!;
         return {
           id: e.id,
           entityType: 'spirit' as const,
-          magnitude: spiritComp?.magnitude ?? 'minor',
-          totalRespect: spiritComp?.totalRespect ?? 0,
           ...spiritComp,
-        } as Spirit;
+        } as unknown as Spirit;
       });
 
     const nearbyDeities: Deity[] = nearbyEntities

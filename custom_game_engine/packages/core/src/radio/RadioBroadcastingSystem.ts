@@ -41,7 +41,7 @@ export interface RadioListenerState {
 export class RadioBroadcastingSystem extends BaseSystem {
   readonly id = 'RadioBroadcastingSystem';
   readonly priority = 70;
-  readonly requiredComponents = [] as const; // Operates on radio stations
+  readonly requiredComponents: string[] = [] as const; // Operates on radio stations
 
   protected readonly throttleInterval = 20; // Every second at 20 TPS
 

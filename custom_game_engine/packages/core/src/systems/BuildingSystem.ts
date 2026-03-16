@@ -10,7 +10,7 @@ import { createBuildingComponent } from '../components/BuildingComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
 import { createRenderableComponent } from '../components/RenderableComponent.js';
-import { createInventoryComponent } from '../components/InventoryComponent.js';
+import { createInventoryComponent, type InventoryComponent } from '../components/InventoryComponent.js';
 import { createShopComponent, type ShopType } from '../components/ShopComponent.js';
 import type { GameEvent } from '../events/GameEvent.js';
 import { createTownHallComponent } from '../components/TownHallComponent.js';
@@ -744,7 +744,7 @@ export class BuildingSystem extends BaseSystem {
     let nearestDistanceSquared = Infinity;
 
     for (const agent of agents) {
-      const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
+      const agentPos = agent.getComponent<PositionComponent>(CT.Position);
       if (!agentPos) continue;
 
       const dx = agentPos.x - position.x;
@@ -769,12 +769,7 @@ export class BuildingSystem extends BaseSystem {
     agent: Entity,
     resourceCost: Record<string, number>
   ): boolean {
-    const inventory = agent.components.get('inventory') as {
-      slots: Array<{ itemId: string | null; quantity: number }>;
-      maxSlots: number;
-      maxWeight: number;
-      currentWeight: number;
-    } | undefined;
+    const inventory = agent.getComponent<InventoryComponent>(CT.Inventory);
 
     if (!inventory) {
       throw new Error(`Agent ${agent.id} missing InventoryComponent`);
@@ -842,10 +837,8 @@ export class BuildingSystem extends BaseSystem {
     const availability = new Map<string, Array<{ storage: Entity, slotIndex: number, quantity: number }>>();
 
     for (const storage of storageBuildings) {
-      const building = storage.components.get('building') as { isComplete: boolean; buildingType: string } | undefined;
-      const inventory = storage.components.get('inventory') as {
-        slots: Array<{ itemId: string | null; quantity: number }>;
-      } | undefined;
+      const building = storage.getComponent<BuildingComponent>(CT.Building);
+      const inventory = storage.getComponent<InventoryComponent>(CT.Inventory);
 
       // Only count complete storage buildings
       if (!building?.isComplete) continue;
@@ -885,9 +878,7 @@ export class BuildingSystem extends BaseSystem {
       for (const source of sources) {
         if (remainingToRemove <= 0) break;
 
-        const inventory = source.storage.components.get('inventory') as {
-          slots: Array<{ itemId: string | null; quantity: number }>;
-        } | undefined;
+        const inventory = source.storage.getComponent<InventoryComponent>(CT.Inventory);
 
         const slot = inventory?.slots?.[source.slotIndex];
         if (slot) {

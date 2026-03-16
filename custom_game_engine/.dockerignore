@@ -1,0 +1,10 @@
+node_modules
+dist
+dist-itchio
+.git
+.env
+devlogs
+docs
+openspec
+scripts/sprite-generation-queue.json
+*.log

@@ -175,7 +175,7 @@ export function handleSpawnEntity(
   }
 
   // Create the entity
-  const entity = ctx.world.createEntity();
+  const entity = ctx.world.createEntity() as any;
   const entityId = entity.id;
 
   // Set position via component

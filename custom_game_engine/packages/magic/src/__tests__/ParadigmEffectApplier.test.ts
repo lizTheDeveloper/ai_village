@@ -9,11 +9,12 @@
  * - Paradigm teaching
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ParadigmEffectApplier } from '../appliers/ParadigmEffectApplier.js';
 import type { ParadigmEffect } from '../SpellEffect.js';
 import type { EffectContext } from '../SpellEffectExecutor.js';
 import type { Entity, MagicComponent, World } from '@ai-village/core';
+import { createMockWorld as createSharedMockWorld } from '@ai-village/core/__tests__/createMockWorld.js';
 
 // Type helpers for testing
 type EntityWithMethods = {
@@ -34,11 +35,11 @@ type WorldWithMethods = Record<string, unknown> & {
 // =============================================================================
 
 function createMockWorld(): World {
-  return {
-    entities: new Map(),
-    getEntity: (id: string) => undefined,
-    tick: () => {},
-  } as Record<string, unknown>;
+  return createSharedMockWorld({
+    overrides: {
+      getEntity: vi.fn((id: string) => undefined),
+    },
+  });
 }
 
 function createMockEntity(id: string, hasMagic: boolean = true): Entity {

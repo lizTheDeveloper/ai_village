@@ -14,6 +14,7 @@ import type {
 import { EffectInterpreter } from '../EffectInterpreter.js';
 import type { Entity } from '@ai-village/core';
 import type { World } from '@ai-village/core';
+import { createMockWorld as createSharedMockWorld } from '@ai-village/core/__tests__/createMockWorld.js';
 
 // ============================================================================
 // MOCK HELPERS
@@ -71,23 +72,25 @@ function createMockEntity(overrides: Partial<any> = {}): Entity {
 function createMockWorld(entities: Entity[] = []): World {
   const entityMap = new Map(entities.map(e => [e.id, e]));
 
-  return {
-    getEntity: (id: string) => entityMap.get(id),
-    query: () => ({
-      with: vi.fn().mockReturnThis(),
-      without: vi.fn().mockReturnThis(),
-      executeEntities: () => entities
-    }),
-    createEntity: vi.fn(() => createMockEntity()),
-    removeEntity: vi.fn(),
-    addComponent: vi.fn((entityId: string, component: any) => {
-      const entity = entityMap.get(entityId);
-      if (entity) {
-        entity.components.set(component.type, component);
-      }
-    }),
-    tick: 0
-  };
+  return createSharedMockWorld({
+    tick: 0,
+    overrides: {
+      getEntity: vi.fn((id: string) => entityMap.get(id)),
+      query: vi.fn(() => ({
+        with: vi.fn().mockReturnThis(),
+        without: vi.fn().mockReturnThis(),
+        executeEntities: () => entities
+      })),
+      createEntity: vi.fn(() => createMockEntity()),
+      removeEntity: vi.fn(),
+      addComponent: vi.fn((entityId: string, component: any) => {
+        const entity = entityMap.get(entityId);
+        if (entity) {
+          entity.components.set(component.type, component);
+        }
+      }),
+    },
+  });
 }
 
 function createMockContext(overrides: Partial<EffectContext> = {}): EffectContext {

@@ -1,0 +1,31 @@
+Device: mps
+
+=== TalkerNN (72,966 params) ===
+  Loaded 8813 samples (skipped 0)
+  Training on 7051 samples, validating on 1762
+  Class weights: ['0.24', '5.08', '1.54', '25.77', '1.37', '6.96']
+  Epoch   1: train_loss=1.5803 train_acc=0.262 val_loss=1.4415 val_acc=0.233
+  Epoch  10: train_loss=1.2481 train_acc=0.400 val_loss=1.2954 val_acc=0.383
+  Epoch  20: train_loss=1.1531 train_acc=0.435 val_loss=1.2786 val_acc=0.487
+  Epoch  30: train_loss=1.1126 train_acc=0.466 val_loss=1.3785 val_acc=0.467
+  Early stopping at epoch 38 (patience=25)
+  Exported weights/talker_nn.json (1565.5 KB)
+  Inference: 0.231ms per tick at 50 agents (target <0.5ms)
+  Final: val_acc=0.444 val_loss=1.3205
+
+=== ExecutorNN (278,797 params) ===
+  Loaded 17139 samples (skipped 0)
+  Training on 13712 samples, validating on 3427
+  Class weights: ['0.38', '0.89', '0.12', '22.73', '131.86', '1318.62', '1318.62', '188.37', '14.03', '15.16', '1318.62', '1.77', '1318.62']
+  Epoch   1: train_loss=1.6935 train_acc=0.344 val_loss=1.3074 val_acc=0.256
+  Epoch  10: train_loss=1.2200 train_acc=0.412 val_loss=1.2910 val_acc=0.540
+  Epoch  20: train_loss=1.1395 train_acc=0.434 val_loss=1.1479 val_acc=0.421
+  Epoch  30: train_loss=1.0833 train_acc=0.446 val_loss=1.1958 val_acc=0.392
+  Epoch  40: train_loss=1.0701 train_acc=0.483 val_loss=1.3483 val_acc=0.534
+  Early stopping at epoch 45 (patience=25)
+  Exported weights/executor_nn.json (6145.2 KB)
+  Inference: 0.337ms per tick at 50 agents (target <1ms)
+  Final: val_acc=0.456 val_loss=1.3206
+
+Metrics saved to weights/training_metrics.json
+Training complete.

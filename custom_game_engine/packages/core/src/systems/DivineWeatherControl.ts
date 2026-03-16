@@ -116,7 +116,7 @@ export const DEFAULT_WEATHER_CONTROL_CONFIG: WeatherControlConfig = {
 export class DivineWeatherControl extends BaseSystem {
   public readonly id = 'DivineWeatherControl';
   public readonly priority = 72;
-  public readonly requiredComponents = [] as const;
+  public readonly requiredComponents: string[] = [] as const;
   // Only run when deity components exist (O(1) activation check)
   public readonly activationComponents = ['deity'] as const;
 

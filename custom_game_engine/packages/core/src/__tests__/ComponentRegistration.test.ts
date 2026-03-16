@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../World.js';
+import { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 
 // Phase 1
@@ -60,10 +60,10 @@ import {
   type TimelineMergerOperationComponent,
 } from '../components/TimelineMergerOperationComponent.js';
 import {
-import { EventBusImpl } from '../events/EventBus.js';
   createInvasionComponent,
   type InvasionComponent,
 } from '../components/InvasionComponent.js';
+import { EventBusImpl } from '../events/EventBus.js';
 
 describe('Component Registration - Phase 1-4', () => {
   let world: World;

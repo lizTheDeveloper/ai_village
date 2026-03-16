@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../../World';
+import { World } from '../../ecs/World.js';
 import { AgentBrainSystem } from '../AgentBrainSystem';
 import { ComponentType as CT } from '../../types/ComponentType.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
@@ -15,7 +15,7 @@ import type { NeedsComponent } from '../../components/NeedsComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { MovementComponent } from '../../components/MovementComponent.js';
 import type { AfterlifeComponent } from '../../components/AfterlifeComponent.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 describe('Dead Agent LLM Prevention', () => {
   let world: World;

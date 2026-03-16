@@ -112,7 +112,7 @@ export class SpeciesCreationSystem extends BaseSystem {
   public readonly id = 'SpeciesCreationSystem';
   public readonly name = 'SpeciesCreationSystem';
   public readonly priority = 71;
-  public readonly requiredComponents = [];
+  public readonly requiredComponents: string[] = [];
   // Lazy activation: Skip entire system when no species exists
   public readonly activationComponents = ['species'] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds

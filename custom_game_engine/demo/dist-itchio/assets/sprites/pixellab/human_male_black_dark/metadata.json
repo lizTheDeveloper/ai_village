@@ -1,0 +1,31 @@
+{
+  "id": "human_male_black_dark",
+  "name": "Human Male - Black Hair Dark Skin",
+  "pixellab_id": "ae25e95a-b41b-4946-ba48-437afb05a828",
+  "species": "human",
+  "gender": "male",
+  "hair_color": "black",
+  "skin_tone": "dark",
+  "size": 48,
+  "directions": 8,
+  "view": "high top-down",
+  "style": {
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+  },
+  "rotations": [
+    "south",
+    "south-west",
+    "west",
+    "north-west",
+    "north",
+    "north-east",
+    "east",
+    "south-east"
+  ],
+  "animations": {},
+  "description": "male black dark human",
+  "enriched_at": "2026-01-30T00:40:22.608Z",
+  "original_description": "male black dark human, detailed pixels, rich 256-color palette, smooth gradient shading like Chrono Trigger or Secret of Mana, high top-down perspective, transparent background, pixel art"
+}

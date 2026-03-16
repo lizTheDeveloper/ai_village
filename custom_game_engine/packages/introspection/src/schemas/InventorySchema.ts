@@ -207,7 +207,7 @@ export const InventorySchema = autoRegister(
     createDefault: () => ({
       type: 'inventory',
       version: 1,
-      slots: Array.from({ length: 24 }, () => ({ itemId: null, quantity: 0 })),
+      slots: Array.from({ length: 24 }, (): InventorySlot => ({ itemId: null, quantity: 0 })),
       maxSlots: 24,
       maxWeight: 100,
       currentWeight: 0,

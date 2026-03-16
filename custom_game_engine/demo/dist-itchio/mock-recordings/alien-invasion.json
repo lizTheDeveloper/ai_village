@@ -1,0 +1,146 @@
+{
+  "recordingId": "rec_alien_invasion_001",
+  "title": "ALIEN INVASION - Breaking News",
+  "description": "Field reporter captures alien landing in village square",
+  "recordedBy": "Sarah Chen",
+  "recordedAt": 1704326400000,
+  "duration": 10,
+  "quality": 0.95,
+  "frames": [
+    {
+      "tick": 0,
+      "cameraX": 500,
+      "cameraY": 500,
+      "cameraAngle": 180,
+      "cameraZoom": 1.0,
+      "entities": [
+        {
+          "entityId": "alien_001",
+          "entityType": "alien",
+          "x": 520,
+          "y": 480,
+          "facingAngle": 90,
+          "animation": { "state": "idle", "frame": 0 },
+          "distanceFromCamera": 28
+        },
+        {
+          "entityId": "villager_001",
+          "entityType": "villager",
+          "x": 480,
+          "y": 520,
+          "facingAngle": 270,
+          "animation": { "state": "walking", "frame": 0 },
+          "distanceFromCamera": 28
+        }
+      ]
+    },
+    {
+      "tick": 10,
+      "cameraX": 500,
+      "cameraY": 500,
+      "cameraAngle": 180,
+      "cameraZoom": 1.0,
+      "entities": [
+        {
+          "entityId": "alien_001",
+          "entityType": "alien",
+          "x": 525,
+          "y": 485,
+          "facingAngle": 90,
+          "animation": { "state": "walking", "frame": 1 },
+          "distanceFromCamera": 35
+        },
+        {
+          "entityId": "villager_001",
+          "entityType": "villager",
+          "x": 475,
+          "y": 525,
+          "facingAngle": 270,
+          "animation": { "state": "walking", "frame": 1 },
+          "distanceFromCamera": 35
+        }
+      ]
+    },
+    {
+      "tick": 20,
+      "cameraX": 500,
+      "cameraY": 500,
+      "cameraAngle": 180,
+      "cameraZoom": 1.0,
+      "entities": [
+        {
+          "entityId": "alien_001",
+          "entityType": "alien",
+          "x": 530,
+          "y": 490,
+          "facingAngle": 90,
+          "animation": { "state": "walking", "frame": 2 },
+          "distanceFromCamera": 42
+        },
+        {
+          "entityId": "villager_001",
+          "entityType": "villager",
+          "x": 470,
+          "y": 530,
+          "facingAngle": 270,
+          "animation": { "state": "running", "frame": 2 },
+          "distanceFromCamera": 42
+        }
+      ]
+    },
+    {
+      "tick": 30,
+      "cameraX": 502,
+      "cameraY": 498,
+      "cameraAngle": 180,
+      "cameraZoom": 1.0,
+      "entities": [
+        {
+          "entityId": "alien_001",
+          "entityType": "alien",
+          "x": 535,
+          "y": 495,
+          "facingAngle": 90,
+          "animation": { "state": "walking", "frame": 3 },
+          "distanceFromCamera": 49
+        },
+        {
+          "entityId": "villager_001",
+          "entityType": "villager",
+          "x": 465,
+          "y": 535,
+          "facingAngle": 270,
+          "animation": { "state": "running", "frame": 3 },
+          "distanceFromCamera": 52
+        }
+      ]
+    },
+    {
+      "tick": 40,
+      "cameraX": 505,
+      "cameraY": 495,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "alien_001",
+          "entityType": "alien",
+          "x": 540,
+          "y": 500,
+          "facingAngle": 45,
+          "animation": { "state": "idle", "frame": 0 },
+          "distanceFromCamera": 49
+        },
+        {
+          "entityId": "villager_001",
+          "entityType": "villager",
+          "x": 460,
+          "y": 540,
+          "facingAngle": 270,
+          "animation": { "state": "running", "frame": 4 },
+          "distanceFromCamera": 63
+        }
+      ]
+    }
+  ]
+}

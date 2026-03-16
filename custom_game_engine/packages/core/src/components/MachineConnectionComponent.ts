@@ -51,7 +51,7 @@ export function createMachineConnectionComponent(
   for (let i = 0; i < inputCount; i++) {
     inputs.push({
       offset: { x: -1, y: 0 },
-      items: [],
+      items: [] as ItemInstance[],
       capacity: slotCapacity,
     });
   }
@@ -59,7 +59,7 @@ export function createMachineConnectionComponent(
   for (let i = 0; i < outputCount; i++) {
     outputs.push({
       offset: { x: 1, y: 0 },
-      items: [],
+      items: [] as ItemInstance[],
       capacity: slotCapacity,
     });
   }
@@ -85,12 +85,12 @@ export function createCustomConnection(
     inputs: inputs.map(config => ({
       offset: config.offset,
       filter: config.filter,
-      items: [],
+      items: [] as ItemInstance[],
       capacity: config.capacity,
     })),
     outputs: outputs.map(config => ({
       offset: config.offset,
-      items: [],
+      items: [] as ItemInstance[],
       capacity: config.capacity,
     })),
   };

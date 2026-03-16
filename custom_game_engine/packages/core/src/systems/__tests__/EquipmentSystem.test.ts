@@ -8,7 +8,7 @@ import { defineItem } from '../../items/ItemDefinition.js';
 import type { ArmorTrait } from '../../items/traits/ArmorTrait.js';
 import { World } from '../../ecs/World.js';
 import { EntityImpl } from '../../ecs/Entity.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 /**
  * Helper to create a basic BodyComponent for testing

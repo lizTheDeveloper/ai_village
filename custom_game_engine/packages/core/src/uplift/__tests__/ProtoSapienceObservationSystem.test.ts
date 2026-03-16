@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../../World.js';
+import { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { ProtoSapienceObservationSystem } from '../ProtoSapienceObservationSystem.js';

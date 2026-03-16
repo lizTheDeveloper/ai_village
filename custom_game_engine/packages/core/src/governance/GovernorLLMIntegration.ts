@@ -397,6 +397,7 @@ export function executeDirectiveInterpretation(
           issuedTick: world.tick,
           issuerAgentId: governor.id,
           priority: directive.priority,
+          requiresAcknowledgment: false,
         };
 
         world.eventBus.emit({

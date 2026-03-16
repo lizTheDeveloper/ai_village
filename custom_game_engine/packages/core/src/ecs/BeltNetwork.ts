@@ -257,8 +257,8 @@ export class BeltNetworkManager {
     const segmentId = `segment_${this.nextSegmentId++}`;
     const segment: BeltNetworkSegment = {
       id: segmentId,
-      headEntityId: chain[0].id,
-      tailEntityId: chain[chain.length - 1].id,
+      headEntityId: chain[0]!.id,
+      tailEntityId: chain[chain.length - 1]!.id,
       beltIds: chain.map(c => c.id),
       direction,
       totalCapacity,

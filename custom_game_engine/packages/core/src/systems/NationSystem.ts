@@ -1356,10 +1356,10 @@ export class NationSystem extends BaseSystem {
             }
 
             if (effect.modifierType === 'multiplicative') {
-              policyModifiers[effect.target].push(effect.value);
+              policyModifiers[effect.target]!.push(effect.value);
             } else if (effect.modifierType === 'additive') {
               // Store additive modifiers as 1 + value for unified multiplication
-              policyModifiers[effect.target].push(1 + effect.value);
+              policyModifiers[effect.target]!.push(1 + effect.value);
             } else if (effect.modifierType === 'replacement') {
               // Replacement overwrites - use as direct multiplier
               policyModifiers[effect.target] = [effect.value];
@@ -2133,7 +2133,7 @@ export class NationSystem extends BaseSystem {
    */
   private _onResearchCompleted(data: {
     researchId: string;
-    researchName: string;
+    researchName?: string;
     researchers: string[];
     unlocks: Array<{ type: string; id: string }>;
     tick: number;
@@ -2160,7 +2160,7 @@ export class NationSystem extends BaseSystem {
     }
     this._pendingResearchCompletions.push({
       researchId: data.researchId,
-      researchName: data.researchName,
+      researchName: data.researchName ?? data.researchId,
       field: research.field,
       tier: research.tier,
       unlocks: data.unlocks,

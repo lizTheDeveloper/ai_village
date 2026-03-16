@@ -430,7 +430,8 @@ export class LiveEntityAPI {
    * Spawn an agent at the specified location
    */
   private async handleSpawnAgent(action: ActionRequest): Promise<ActionResponse> {
-    const { name, x, y, useLLM, speed, believedDeity } = action.params;
+    const { name: nameParam, x, y, useLLM, speed, believedDeity } = action.params;
+    const name = typeof nameParam === 'string' ? nameParam : undefined;
 
     if (typeof x !== 'number' || typeof y !== 'number') {
       return {

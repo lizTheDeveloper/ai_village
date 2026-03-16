@@ -118,7 +118,7 @@ export interface DetectionEvent {
 export class ColonizationSystem extends BaseSystem {
   public readonly id: SystemId = 'ColonizationSystem';
   public readonly priority = 48; // Run before reproduction systems
-  public readonly requiredComponents = [] as const;
+  public readonly requiredComponents: string[] = [] as const;
   protected readonly throttleInterval = 200; // VERY_SLOW - 10 seconds
 
   private config: ColonizationConfig;

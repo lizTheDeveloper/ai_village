@@ -1,0 +1,22 @@
+{
+  "id": "cat_orange",
+  "name": "orange tabby cat",
+  "size": 64,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-05T10:52:33.367Z",
+  "generation_method": "reference_workflow",
+  "notes": "South first, east with south ref, west flipped from east, others with south ref",
+  "description": "orange cat, graceful feline with whiskers, pointed ears, swishing tail, woodland earth tones, dappled sunlight, leaf-covered",
+  "category": "animal",
+  "original_description": "orange tabby cat",
+  "enriched_at": "2026-01-30T00:40:22.562Z"
+}

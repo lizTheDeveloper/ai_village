@@ -39,7 +39,7 @@ const BELIEF_RATES_PER_HOUR: Record<BeliefActivity, number> = {
 export class BeliefGenerationSystem extends BaseSystem {
   public readonly id: SystemId = 'belief_generation';
   public readonly priority: number = 115; // After belief formation
-  public readonly requiredComponents = [];
+  public readonly requiredComponents: string[] = [];
   // Only run when spiritual components exist (need believers to generate belief)
   // Early-exits efficiently when no deities exist yet (see onUpdate implementation)
   public readonly activationComponents = ['spiritual'] as const;

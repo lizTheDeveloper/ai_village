@@ -47,6 +47,9 @@ export class NotificationModal {
   private queue: NotificationContent[] = [];
   private currentNotification: NotificationContent | null = null;
   private autoDismissTimeout: number | null = null;
+  private isDismissing = false;
+  private currentTheme: NotificationTheme | null = null;
+  private progressBarEl: HTMLDivElement | null = null;
 
   constructor() {
     this.container = document.createElement('div');
@@ -57,14 +60,14 @@ export class NotificationModal {
 
     // Add ESC key listener to dismiss modal
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this.container.style.display === 'flex') {
+      if (e.key === 'Escape' && this.currentNotification && !this.isDismissing) {
         this.dismiss();
       }
     });
 
     // Click outside to dismiss
     this.container.addEventListener('click', (e) => {
-      if (e.target === this.container) {
+      if (e.target === this.container && !this.isDismissing) {
         this.dismiss();
       }
     });
@@ -90,6 +93,7 @@ export class NotificationModal {
   private createContentArea(): HTMLDivElement {
     const content = document.createElement('div');
     content.style.cssText = `
+      position: relative;
       width: 90%;
       max-width: 800px;
       max-height: 85vh;
@@ -99,25 +103,35 @@ export class NotificationModal {
       border: 2px solid #ffd700;
       border-radius: 12px;
       box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
-      animation: slideIn 0.3s ease-out;
+      animation: notifSlideIn 0.3s ease-out;
     `;
 
-    // Add slide-in animation
+    // Add animations
     const style = document.createElement('style');
     style.textContent = `
-      @keyframes slideIn {
-        from {
-          opacity: 0;
-          transform: translateY(-20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+      @keyframes notifSlideIn {
+        from { opacity: 0; transform: translateY(-20px) scale(0.97); }
+        to   { opacity: 1; transform: translateY(0)    scale(1);    }
+      }
+      @keyframes notifSlideOut {
+        from { opacity: 1; transform: translateY(0)    scale(1);    }
+        to   { opacity: 0; transform: translateY(-12px) scale(0.97); }
       }
       @keyframes pulse {
         0%, 100% { opacity: 0.6; }
-        50% { opacity: 1; }
+        50%       { opacity: 1;   }
+      }
+      @keyframes notifShimmer {
+        0%   { background-position: -200% center; }
+        100% { background-position:  200% center; }
+      }
+      .notif-shimmer-title {
+        background: linear-gradient(90deg, #FFD700 25%, #FFF8DC 50%, #FFD700 75%);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: notifShimmer 2.5s linear infinite;
       }
     `;
     document.head.appendChild(style);
@@ -130,14 +144,22 @@ export class NotificationModal {
    */
   show(notification: NotificationContent): void {
     // If already showing a notification, queue this one
-    if (this.currentNotification) {
+    if (this.currentNotification || this.isDismissing) {
       this.queue.push(notification);
       return;
     }
 
     this.currentNotification = notification;
     this.container.style.display = 'flex';
+    this.container.style.opacity = '1';
+
+    // Force animation re-trigger for subsequent shows
+    this.contentArea.style.animation = 'none';
+    void this.contentArea.offsetWidth; // trigger reflow
+    this.contentArea.style.animation = 'notifSlideIn 0.3s ease-out';
+
     this.render();
+    this.renderProgressBar(notification);
 
     // Setup auto-dismiss if specified
     if (notification.autoDismiss && notification.autoDismiss > 0) {
@@ -151,23 +173,37 @@ export class NotificationModal {
    * Dismiss the current notification
    */
   dismiss(): void {
+    if (this.isDismissing || !this.currentNotification) return;
+    this.isDismissing = true;
+
     if (this.autoDismissTimeout) {
       clearTimeout(this.autoDismissTimeout);
       this.autoDismissTimeout = null;
     }
 
-    if (this.currentNotification?.onDismiss) {
-      this.currentNotification.onDismiss();
-    }
-
-    this.container.style.display = 'none';
+    const onDismiss = this.currentNotification.onDismiss;
     this.currentNotification = null;
 
-    // Show next notification in queue
-    if (this.queue.length > 0) {
-      const next = this.queue.shift()!;
-      setTimeout(() => this.show(next), 200);
-    }
+    // Animate out: slide content up, fade overlay
+    this.contentArea.style.animation = 'notifSlideOut 0.22s ease-in forwards';
+    this.container.style.transition = 'opacity 0.22s ease-in';
+    this.container.style.opacity = '0';
+
+    window.setTimeout(() => {
+      this.isDismissing = false;
+      this.container.style.display = 'none';
+      this.container.style.transition = '';
+      this.container.style.opacity = '1';
+      this.progressBarEl = null;
+
+      if (onDismiss) onDismiss();
+
+      // Show next notification in queue
+      if (this.queue.length > 0) {
+        const next = this.queue.shift()!;
+        window.setTimeout(() => this.show(next), 100);
+      }
+    }, 230);
   }
 
   /**
@@ -178,6 +214,44 @@ export class NotificationModal {
   }
 
   /**
+   * Render an auto-dismiss countdown bar at the bottom of the content area.
+   * Animates from full width to zero over the autoDismiss duration.
+   */
+  private renderProgressBar(notification: NotificationContent): void {
+    // Remove any previous bar
+    this.progressBarEl?.remove();
+    this.progressBarEl = null;
+
+    if (!notification.autoDismiss || notification.autoDismiss <= 0) return;
+
+    const theme = this.currentTheme;
+    const barColor = theme?.borderColor ?? '#ffd700';
+    const duration = notification.autoDismiss;
+
+    const bar = document.createElement('div');
+    bar.style.cssText = `
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      width: 100%;
+      background: ${barColor};
+      border-radius: 0 0 10px 10px;
+      opacity: 0.75;
+      transition: width ${duration}ms linear;
+    `;
+    this.contentArea.appendChild(bar);
+    this.progressBarEl = bar;
+
+    // Start the shrink in the next two frames (ensures transition fires)
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        bar.style.width = '0%';
+      });
+    });
+  }
+
+  /**
    * Render the notification content
    */
   private render(): void {
@@ -185,10 +259,17 @@ export class NotificationModal {
 
     const notif = this.currentNotification;
     const theme = this.getTheme(notif.type);
+    this.currentTheme = theme;
+
+    const isAchievement = notif.type === 'achievement';
+    const titleClass = isAchievement ? 'class="notif-shimmer-title"' : '';
+    const titleStyle = isAchievement
+      ? `font-size: 26px; margin: 0; letter-spacing: 0.03em;`
+      : `color: ${theme.titleColor}; font-size: 24px; margin: 0; text-shadow: 0 0 10px ${theme.glowColor};`;
 
     let html = `
       <div style="text-align: center; margin-bottom: 25px;">
-        <h1 style="color: ${theme.titleColor}; font-size: 24px; margin: 0; text-shadow: 0 0 10px ${theme.glowColor};">
+        <h1 ${titleClass} style="${titleStyle}">
           ${notif.icon || theme.icon} ${notif.title} ${notif.icon || theme.icon}
         </h1>
         ${notif.subtitle ? `

@@ -62,7 +62,7 @@ export class AvatarSystem extends BaseSystem {
   public readonly id = 'AvatarSystem';
   public readonly name = 'AvatarSystem';
   public readonly priority = 75;
-  public readonly requiredComponents = [];
+  public readonly requiredComponents: string[] = [];
   // Only run when avatar components exist (O(1) activation check)
   public readonly activationComponents = ['avatar'] as const;
 

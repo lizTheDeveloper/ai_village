@@ -12,6 +12,8 @@ import type { Component } from '@ai-village/core';
 // ============================================================================
 
 export interface PositionComponentData {
+  type: string;
+  version: number;
   x: number;
   y: number;
   z?: number;

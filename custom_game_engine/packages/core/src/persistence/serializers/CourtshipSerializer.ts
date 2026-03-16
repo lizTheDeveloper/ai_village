@@ -63,18 +63,19 @@ export class CourtshipSerializer extends BaseComponentSerializer<CourtshipCompon
     const serialized = data as SerializedCourtship;
 
     // Provide default paradigm for older saves that don't have it
-    const defaultParadigm = {
+    const defaultParadigm: CourtshipParadigm = {
       type: 'romantic' as const,
-      requiredTactics: [],
+      requiredTactics: [] as string[],
       optionalTactics: ['gifts', 'quality_time', 'compliments'],
-      forbiddenTactics: [],
+      forbiddenTactics: [] as string[],
       minimumTactics: 1,
       typicalDuration: [100, 500] as [number, number],
       locationRequirement: null,
       matingBehavior: {
-        requiresPrivacy: true,
-        seasonalRestriction: null,
-        cooldownTicks: 1000,
+        type: 'private_location' as const,
+        bothMustBePresent: true,
+        privateSpace: true,
+        duration: 1000,
       },
     };
 

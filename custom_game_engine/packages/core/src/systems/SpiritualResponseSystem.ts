@@ -26,7 +26,7 @@ import type { IdentityComponent } from '../components/IdentityComponent.js';
 export class SpiritualResponseSystem extends BaseSystem {
   public readonly id: SystemId = 'spiritual_response';
   public readonly priority: number = 117; // After PrayerSystem (116)
-  public readonly requiredComponents = [] as const;
+  public readonly requiredComponents: string[] = [] as const;
   // PERF: Skip entirely when no spiritual agents exist
   public readonly activationComponents = ['spiritual'] as const;
   // PERF: Event-driven system - onUpdate is no-op, so skip it entirely.

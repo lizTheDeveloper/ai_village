@@ -47,7 +47,7 @@ export interface ToolWearOptions {
 export class DurabilitySystem extends BaseSystem {
   public readonly id: SystemId = 'durability';
   public readonly priority: number = 56; // After CraftingSystem (55)
-  public readonly requiredComponents = [] as const; // Manual processing, not entity-based
+  public readonly requiredComponents: string[] = [] as const; // Manual processing, not entity-based
   // PERF: Event-driven system - called via applyToolWear(), no per-tick work
   // High throttle ensures onUpdate() is rarely called (it does nothing anyway)
   protected readonly throttleInterval: number = 6000; // 5 minutes

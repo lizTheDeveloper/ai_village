@@ -1,0 +1,2195 @@
+{
+  "recordingId": "combat_dragon-vs-knight_1767527000000",
+  "title": "DRAGON VS KNIGHT - Epic Battle",
+  "description": "A brave knight faces a fearsome fire dragon in mortal combat",
+  "combatId": "dragon-vs-knight",
+  "recordedBy": "Combat Arena System",
+  "recordedAt": 1767527000000,
+  "duration": 150,
+  "quality": 0.95,
+  "frames": [
+    {
+      "tick": 0,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 310,
+          "y": 300,
+          "facingAngle": 180,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 0
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 290,
+          "y": 300,
+          "facingAngle": 0,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 3.67394039744206e-15
+        }
+      ]
+    },
+    {
+      "tick": 5,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 311.93427412732996,
+          "y": 306.5822681790169,
+          "facingAngle": -151.12136493495507,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 6.582268179016932
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 288.06572587267004,
+          "y": 293.4177318209831,
+          "facingAngle": 28.87863506504492,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 6.582268179016924
+        }
+      ]
+    },
+    {
+      "tick": 10,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 310.7908720390135,
+          "y": 313.5329200183447,
+          "facingAngle": -128.56813770249474,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 13.532920018344718
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 289.2091279609865,
+          "y": 286.4670799816553,
+          "facingAngle": 51.43186229750527,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 13.53292001834472
+        }
+      ]
+    },
+    {
+      "tick": 15,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 306.2982878278601,
+          "y": 320.45155018041345,
+          "facingAngle": -107.1168118147776,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 20.45155018041346
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 293.7017121721399,
+          "y": 279.54844981958655,
+          "facingAngle": 72.88318818522241,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 20.451550180413456
+        }
+      ]
+    },
+    {
+      "tick": 20,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 298.4232396071727,
+          "y": 326.8897279581493,
+          "facingAngle": -86.64413173414785,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 26.889727958149333
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 301.5767603928273,
+          "y": 273.1102720418507,
+          "facingAngle": 93.35586826585217,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 26.889727958149322
+        }
+      ]
+    },
+    {
+      "tick": 25,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 287.4017685319604,
+          "y": 332.3908816951431,
+          "facingAngle": -68.74676343055248,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 32.39088169514309
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 312.5982314680396,
+          "y": 267.6091183048569,
+          "facingAngle": 111.25323656944755,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 32.39088169514309
+        }
+      ]
+    },
+    {
+      "tick": 30,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 273.7415963540781,
+          "y": 336.5345601226031,
+          "facingAngle": -54.2941476910703,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 36.534560122603104
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 326.2584036459219,
+          "y": 263.4654398773969,
+          "facingAngle": 125.70585230892969,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 36.534560122603104
+        }
+      ]
+    },
+    {
+      "tick": 35,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 258.19387121087027,
+          "y": 338.97973849559105,
+          "facingAngle": -42.9962558359631,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 38.97973849559107
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 341.80612878912973,
+          "y": 261.02026150440895,
+          "facingAngle": 137.0037441640369,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 38.97973849559108
+        }
+      ]
+    },
+    {
+      "tick": 40,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 241.69638869951888,
+          "y": 339.50179209948925,
+          "facingAngle": -34.11837786259956,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 39.50179209948924
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 358.30361130048107,
+          "y": 260.49820790051075,
+          "facingAngle": 145.88162213740046,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 39.50179209948924
+        }
+      ]
+    },
+    {
+      "tick": 45,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 225.29412228421387,
+          "y": 338.0184365586699,
+          "facingAngle": -26.971918055865657,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 38.01843655866994
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 374.7058777157861,
+          "y": 261.9815634413301,
+          "facingAngle": 153.02808194413436,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 38.01843655866994
+        }
+      ]
+    },
+    {
+      "tick": 50,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 210.04592042248237,
+          "y": 334.6012478989553,
+          "facingAngle": -21.039466887631566,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 34.601247898955314
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 389.9540795775176,
+          "y": 265.3987521010447,
+          "facingAngle": 158.96053311236844,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 34.60124789895533
+        }
+      ]
+    },
+    {
+      "tick": 55,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 196.92811132945818,
+          "y": 329.4711518715627,
+          "facingAngle": -15.95672266555502,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 29.47115187156272
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 403.0718886705418,
+          "y": 270.5288481284373,
+          "facingAngle": 164.04327733444498,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 29.47115187156273
+        }
+      ]
+    },
+    {
+      "tick": 60,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 186.74623891263542,
+          "y": 322.9782737431305,
+          "facingAngle": -11.46916578607139,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 22.978273743130497
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 413.2537610873646,
+          "y": 277.0217262568695,
+          "facingAngle": 168.5308342139286,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 22.9782737431305
+        }
+      ]
+    },
+    {
+      "tick": 65,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 180.065165438333,
+          "y": 315.5684972245805,
+          "facingAngle": -7.3960921210796995,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 15.568497224580478
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 419.934834561667,
+          "y": 284.4315027754195,
+          "facingAngle": 172.6039078789203,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 15.568497224580483
+        }
+      ]
+    },
+    {
+      "tick": 70,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 177.16544954903503,
+          "y": 307.74073080731944,
+          "facingAngle": -3.6058707168829467,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 7.740730807319433
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 422.83455045096497,
+          "y": 292.25926919268056,
+          "facingAngle": 176.39412928311708,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 7.74073080731942
+        }
+      ]
+    },
+    {
+      "tick": 75,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 178.03055711792086,
+          "y": 300,
+          "facingAngle": 0,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 4.406857393097824e-15
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 421.96944288207914,
+          "y": 300,
+          "facingAngle": 180,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 8.813714786195648e-15
+        }
+      ]
+    },
+    {
+      "tick": 80,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 182.36554150347035,
+          "y": 292.81192602578193,
+          "facingAngle": 3.496720794317627,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 7.188073974218066
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 417.63445849652965,
+          "y": 307.18807397421807,
+          "facingAngle": -176.50327920568236,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 7.188073974218048
+        }
+      ]
+    },
+    {
+      "tick": 85,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 189.643870165233,
+          "y": 286.5638598316777,
+          "facingAngle": 6.941741059056937,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 13.4361401683223
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 410.356129834767,
+          "y": 313.4361401683223,
+          "facingAngle": -173.05825894094306,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 13.436140168322297
+        }
+      ]
+    },
+    {
+      "tick": 90,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 199.1756106421679,
+          "y": 281.53695983581594,
+          "facingAngle": 10.377074619883281,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 18.46304016418404
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 400.8243893578321,
+          "y": 318.463040164184,
+          "facingAngle": -169.62292538011673,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 18.463040164184036
+        }
+      ]
+    },
+    {
+      "tick": 95,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 210.18768425005607,
+          "y": 277.89197194189046,
+          "facingAngle": 13.828880207794944,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 22.108028058109547
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 389.812315749944,
+          "y": 322.10802805810954,
+          "facingAngle": -166.17111979220508,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 22.108028058109536
+        }
+      ]
+    },
+    {
+      "tick": 100,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 221.90567962875485,
+          "y": 275.6696048564431,
+          "facingAngle": 17.304496175094936,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 24.330395143556952
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 378.0943203712452,
+          "y": 324.3303951435569,
+          "facingAngle": -162.69550382490505,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 24.33039514355695
+        }
+      ]
+    },
+    {
+      "tick": 105,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 233.62693991145892,
+          "y": 274.804451256158,
+          "facingAngle": 20.787014729775507,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 25.19554874384201
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 366.3730600885411,
+          "y": 325.195548743842,
+          "facingAngle": -159.2129852702245,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 25.19554874384201
+        }
+      ]
+    },
+    {
+      "tick": 110,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 244.77624659514646,
+          "y": 275.14965314361876,
+          "facingAngle": 24.227450086974123,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 24.850346856381254
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 355.22375340485354,
+          "y": 324.85034685638124,
+          "facingAngle": -155.7725499130259,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 24.850346856381254
+        }
+      ]
+    },
+    {
+      "tick": 115,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 254.9381781709202,
+          "y": 276.5081865709895,
+          "facingAngle": 27.5341166568435,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 23.49181342901052
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 345.0618218290798,
+          "y": 323.4918134290105,
+          "facingAngle": -152.4658833431565,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 23.49181342901052
+        }
+      ]
+    },
+    {
+      "tick": 120,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 263.8637230137865,
+          "y": 278.66592395825575,
+          "facingAngle": 30.556683031523395,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 21.334076041744236
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 336.1362769862135,
+          "y": 321.33407604174425,
+          "facingAngle": -149.4433169684766,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 21.334076041744236
+        }
+      ]
+    },
+    {
+      "tick": 125,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 271.4524739276116,
+          "y": 281.42161260466503,
+          "facingAngle": 33.055595368883615,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 18.57838739533498
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 328.5475260723884,
+          "y": 318.57838739533497,
+          "facingAngle": -146.94440463111638,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 18.57838739533497
+        }
+      ]
+    },
+    {
+      "tick": 130,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 277.715195650502,
+          "y": 284.60957842980645,
+          "facingAngle": 34.62989093391467,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 15.390421570193535
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 322.284804349498,
+          "y": 315.39042157019355,
+          "facingAngle": -145.37010906608532,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 15.390421570193535
+        }
+      ]
+    },
+    {
+      "tick": 135,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 282.72425010840874,
+          "y": 288.1122202995785,
+          "facingAngle": 34.532617019467956,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 11.887779700421499
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 317.27574989159126,
+          "y": 311.8877797004215,
+          "facingAngle": -145.46738298053205,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 11.887779700421499
+        }
+      ]
+    },
+    {
+      "tick": 140,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 286.560912920465,
+          "y": 291.86101640337074,
+          "facingAngle": 31.199947465400644,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 8.138983596629249
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 313.439087079535,
+          "y": 308.13898359662926,
+          "facingAngle": -148.8000525345994,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 8.138983596629235
+        }
+      ]
+    },
+    {
+      "tick": 145,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 289.2688086041395,
+          "y": 295.82657853111294,
+          "facingAngle": 21.25134202246614,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 4.173421468887046
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 310.73119139586055,
+          "y": 304.17342146888706,
+          "facingAngle": -158.74865797753387,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 4.1734214688870654
+        }
+      ]
+    },
+    {
+      "tick": 150,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 290.82151450673723,
+          "y": 300,
+          "facingAngle": 0,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 4.999193707702299e-15
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 309.17848549326277,
+          "y": 300,
+          "facingAngle": 180,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 7.498790561553448e-15
+        }
+      ]
+    },
+    {
+      "tick": 155,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 291.1100133766419,
+          "y": 304.36910154677383,
+          "facingAngle": -26.17241989972557,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 4.369101546773812
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 308.8899866233581,
+          "y": 295.63089845322617,
+          "facingAngle": 153.82758010027445,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 4.369101546773828
+        }
+      ]
+    },
+    {
+      "tick": 160,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 289.9524600338804,
+          "y": 308.8939906278632,
+          "facingAngle": -41.51496067272119,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 8.89399062786319
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 310.0475399661196,
+          "y": 291.10600937213684,
+          "facingAngle": 138.4850393272788,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 8.89399062786317
+        }
+      ]
+    },
+    {
+      "tick": 165,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 287.12513739043123,
+          "y": 313.48649558609515,
+          "facingAngle": -46.32913113051378,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 13.48649558609514
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 312.87486260956877,
+          "y": 286.51350441390485,
+          "facingAngle": 133.6708688694862,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 13.486495586095122
+        }
+      ]
+    },
+    {
+      "tick": 170,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 282.4100335796516,
+          "y": 317.9974944497977,
+          "facingAngle": -45.656091077394024,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 17.997494449797706
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 317.5899664203484,
+          "y": 282.0025055502023,
+          "facingAngle": 134.34390892260598,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 17.997494449797706
+        }
+      ]
+    },
+    {
+      "tick": 175,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 275.6516776037492,
+          "y": 322.2150044545352,
+          "facingAngle": -42.37680471349894,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 22.215004454535173
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 324.34832239625075,
+          "y": 277.7849955454648,
+          "facingAngle": 137.62319528650104,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 22.21500445453517
+        }
+      ]
+    },
+    {
+      "tick": 180,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 266.81413691379265,
+          "y": 325.87429618569513,
+          "facingAngle": -37.94276800609022,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 25.874296185695155
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 333.18586308620735,
+          "y": 274.12570381430487,
+          "facingAngle": 142.0572319939098,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 25.87429618569515
+        }
+      ]
+    },
+    {
+      "tick": 185,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 256.02866832104576,
+          "y": 328.6794737900277,
+          "facingAngle": -33.11364415252758,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 28.67947379002769
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 343.9713316789543,
+          "y": 271.3205262099723,
+          "facingAngle": 146.88635584747243,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 28.679473790027693
+        }
+      ]
+    },
+    {
+      "tick": 190,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 243.6234982177171,
+          "y": 330.3341809498198,
+          "facingAngle": -28.283106961903695,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 30.334180949819828
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 356.37650178228284,
+          "y": 269.6658190501802,
+          "facingAngle": 151.71689303809632,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 30.33418094981983
+        }
+      ]
+    },
+    {
+      "tick": 195,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 230.12946569452578,
+          "y": 330.57760815341715,
+          "facingAngle": -23.635743646559156,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 30.577608153417135
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 369.8705343054742,
+          "y": 269.42239184658285,
+          "facingAngle": 156.36425635344085,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 30.57760815341714
+        }
+      ]
+    },
+    {
+      "tick": 200,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 216.25848769428785,
+          "y": 329.221006818852,
+          "facingAngle": -19.236071283138514,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 29.22100681885203
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 383.74151230571215,
+          "y": 270.778993181148,
+          "facingAngle": 160.7639287168615,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 29.22100681885203
+        }
+      ]
+    },
+    {
+      "tick": 205,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 202.8555544153727,
+          "y": 326.1796056354855,
+          "facingAngle": -15.082418167846878,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 26.179605635485476
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 397.1444455846273,
+          "y": 273.8203943645145,
+          "facingAngle": 164.9175818321531,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 26.17960563548548
+        }
+      ]
+    },
+    {
+      "tick": 210,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 190.8287138687013,
+          "y": 321.49522790558115,
+          "facingAngle": -11.138743308442912,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 21.495227905581174
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 409.1712861312987,
+          "y": 278.5047720944188,
+          "facingAngle": 168.8612566915571,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 21.495227905581178
+        }
+      ]
+    },
+    {
+      "tick": 215,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 181.06473026587818,
+          "y": 315.3459797575562,
+          "facingAngle": -7.352139279090106,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 15.34597975755623
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 418.9352697341218,
+          "y": 284.6540202424438,
+          "facingAngle": 172.6478607209099,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 15.345979757556234
+        }
+      ]
+    },
+    {
+      "tick": 220,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 174.34034432273722,
+          "y": 308.04097813394844,
+          "facingAngle": -3.6613725686003584,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 8.040978133948432
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 425.6596556772628,
+          "y": 291.95902186605156,
+          "facingAngle": 176.33862743139966,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 8.040978133948437
+        }
+      ]
+    },
+    {
+      "tick": 225,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 171.24000046450521,
+          "y": 300,
+          "facingAngle": 0,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 1.4467977199798606e-14
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 428.7599995354948,
+          "y": 300,
+          "facingAngle": 180,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 1.9290636266398143e-14
+        }
+      ]
+    },
+    {
+      "tick": 230,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 172.09039126511163,
+          "y": 291.7199007231277,
+          "facingAngle": 3.7038165603187263,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 8.28009927687233
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 427.90960873488837,
+          "y": 308.2800992768723,
+          "facingAngle": -176.29618343968127,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 8.280099276872324
+        }
+      ]
+    },
+    {
+      "tick": 235,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 176.92025817245695,
+          "y": 283.7314013117179,
+          "facingAngle": 7.529669380447491,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 16.268598688282125
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 423.07974182754305,
+          "y": 316.2685986882821,
+          "facingAngle": -172.47033061955253,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 16.268598688282122
+        }
+      ]
+    },
+    {
+      "tick": 240,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 185.4508276366368,
+          "y": 276.55114056523416,
+          "facingAngle": 11.568938834761127,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 23.44885943476581
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 414.5491723633632,
+          "y": 323.44885943476584,
+          "facingAngle": -168.4310611652389,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 23.448859434765808
+        }
+      ]
+    },
+    {
+      "tick": 245,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 197.11846036070637,
+          "y": 270.6345501365823,
+          "facingAngle": 15.930321293159679,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 29.365449863417723
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 402.88153963929363,
+          "y": 329.3654498634177,
+          "facingAngle": -164.06967870684034,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 29.36544986341772
+        }
+      ]
+    },
+    {
+      "tick": 250,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 211.12705891905307,
+          "y": 266.33504550408423,
+          "facingAngle": 20.74662245807486,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 33.66495449591577
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 388.87294108094693,
+          "y": 333.66495449591577,
+          "facingAngle": -159.25337754192518,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 33.66495449591577
+        }
+      ]
+    },
+    {
+      "tick": 255,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 226.52405858570228,
+          "y": 263.87424079476267,
+          "facingAngle": 26.181862800156903,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 36.12575920523732
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 373.4759414142977,
+          "y": 336.12575920523733,
+          "facingAngle": -153.81813719984308,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 36.12575920523732
+        }
+      ]
+    },
+    {
+      "tick": 260,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 242.29091876526934,
+          "y": 263.3264957627818,
+          "facingAngle": 32.43552218262464,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 36.67350423721822
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 357.70908123473066,
+          "y": 336.6735042372182,
+          "facingAngle": -147.56447781737538,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 36.67350423721822
+        }
+      ]
+    },
+    {
+      "tick": 265,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 257.4373273551764,
+          "y": 264.61927848874564,
+          "facingAngle": 39.73545118326861,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 35.380721511254386
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 342.5626726448236,
+          "y": 335.38072151125436,
+          "facingAngle": -140.2645488167314,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 35.380721511254386
+        }
+      ]
+    },
+    {
+      "tick": 270,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 271.08805197521207,
+          "y": 267.5488248023968,
+          "facingAngle": 48.30097878123617,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 32.45117519760322
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 328.91194802478793,
+          "y": 332.4511751976032,
+          "facingAngle": -131.69902121876385,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 32.45117519760322
+        }
+      ]
+    },
+    {
+      "tick": 275,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 282.5525486799651,
+          "y": 271.80866588522053,
+          "facingAngle": 58.24687800432892,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 28.191334114779455
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 317.4474513200349,
+          "y": 328.19133411477947,
+          "facingAngle": -121.75312199567108,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 28.19133411477946
+        }
+      ]
+    },
+    {
+      "tick": 280,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 291.3698995254868,
+          "y": 277.02703592488405,
+          "facingAngle": 69.41064107807908,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 22.972964075115947
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 308.63010047451326,
+          "y": 322.97296407511595,
+          "facingAngle": -110.58935892192093,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 22.97296407511595
+        }
+      ]
+    },
+    {
+      "tick": 285,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 297.3250489904984,
+          "y": 282.80816963423285,
+          "facingAngle": 81.15601736191337,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 17.19183036576714
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 302.6749510095016,
+          "y": 317.19183036576715,
+          "facingAngle": -98.84398263808664,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 17.19183036576714
+        }
+      ]
+    },
+    {
+      "tick": 290,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 300.4361728379247,
+          "y": 288.7721845376883,
+          "facingAngle": 92.22468054607731,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 11.22781546231169
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 299.5638271620753,
+          "y": 311.2278154623117,
+          "facingAngle": -87.77531945392269,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 11.227815462311694
+        }
+      ]
+    },
+    {
+      "tick": 295,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 300.91680793013313,
+          "y": 294.58864918757894,
+          "facingAngle": 99.61591778141045,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 5.411350812421051
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 299.08319206986687,
+          "y": 305.41135081242106,
+          "facingAngle": -80.38408221858957,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 5.411350812421054
+        }
+      ]
+    },
+    {
+      "tick": 300,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "dragon_1",
+          "entityType": "fire_dragon",
+          "x": 299.1195777822126,
+          "y": 300,
+          "facingAngle": 0,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 1.2030826741291221e-14
+        },
+        {
+          "entityId": "knight_1",
+          "entityType": "dragon_slayer_knight",
+          "x": 300.8804222177874,
+          "y": 300,
+          "facingAngle": 180,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 1.5038533426614028e-14
+        }
+      ]
+    }
+  ],
+  "combatLog": [
+    {
+      "tick": 15,
+      "attacker": "Ignis the Fire Dragon",
+      "defender": "Sir Aldric",
+      "action": "breathes fire at",
+      "damage": 25,
+      "renderableOperation": {
+        "actorType": "fire_dragon",
+        "actor": "Ignis",
+        "action": "breathes fire at",
+        "weapon": "fire breath",
+        "target": "knight"
+      }
+    },
+    {
+      "tick": 40,
+      "attacker": "Sir Aldric",
+      "defender": "Ignis",
+      "action": "thrusts sword at",
+      "damage": 30,
+      "renderableOperation": {
+        "actorType": "dragon_slayer_knight",
+        "actor": "Sir Aldric",
+        "action": "thrusts sword at",
+        "weapon": "flaming sword",
+        "target": "dragon"
+      }
+    },
+    {
+      "tick": 65,
+      "attacker": "Ignis the Fire Dragon",
+      "defender": "Sir Aldric",
+      "action": "swipes tail at",
+      "damage": 35,
+      "renderableOperation": {
+        "actorType": "fire_dragon",
+        "actor": "Ignis",
+        "action": "swipes tail at",
+        "weapon": "tail",
+        "target": "knight"
+      }
+    },
+    {
+      "tick": 90,
+      "attacker": "Sir Aldric",
+      "defender": "Ignis",
+      "action": "slashes at",
+      "damage": 28,
+      "renderableOperation": {
+        "actorType": "dragon_slayer_knight",
+        "actor": "Sir Aldric",
+        "action": "slashes at",
+        "weapon": "flaming sword",
+        "target": "dragon"
+      }
+    },
+    {
+      "tick": 115,
+      "attacker": "Ignis the Fire Dragon",
+      "defender": "Sir Aldric",
+      "action": "breathes fire at",
+      "damage": 30,
+      "renderableOperation": {
+        "actorType": "fire_dragon",
+        "actor": "Ignis",
+        "action": "breathes fire at",
+        "weapon": "fire breath",
+        "target": "knight"
+      }
+    },
+    {
+      "tick": 140,
+      "attacker": "Sir Aldric",
+      "defender": "Ignis",
+      "action": "thrusts sword at",
+      "damage": 45,
+      "renderableOperation": {
+        "actorType": "dragon_slayer_knight",
+        "actor": "Sir Aldric",
+        "action": "thrusts sword at",
+        "weapon": "flaming sword",
+        "target": "dragon heart"
+      }
+    },
+    {
+      "tick": 165,
+      "attacker": "Ignis the Fire Dragon",
+      "defender": "Sir Aldric",
+      "action": "swipes tail at",
+      "damage": 20,
+      "renderableOperation": {
+        "actorType": "fire_dragon",
+        "actor": "Ignis",
+        "action": "swipes tail at",
+        "weapon": "tail",
+        "target": "knight shield"
+      }
+    },
+    {
+      "tick": 190,
+      "attacker": "Sir Aldric",
+      "defender": "Ignis",
+      "action": "slashes at",
+      "damage": 55,
+      "renderableOperation": {
+        "actorType": "dragon_slayer_knight",
+        "actor": "Sir Aldric",
+        "action": "slashes at",
+        "weapon": "flaming sword",
+        "target": "dragon neck"
+      }
+    },
+    {
+      "tick": 215,
+      "attacker": "Ignis the Fire Dragon",
+      "defender": "Sir Aldric",
+      "action": "breathes fire at",
+      "damage": 40,
+      "renderableOperation": {
+        "actorType": "fire_dragon",
+        "actor": "Ignis",
+        "action": "breathes fire at",
+        "weapon": "inferno breath",
+        "target": "knight"
+      }
+    },
+    {
+      "tick": 240,
+      "attacker": "Sir Aldric",
+      "defender": "Ignis",
+      "action": "thrusts sword at",
+      "damage": 60,
+      "renderableOperation": {
+        "actorType": "dragon_slayer_knight",
+        "actor": "Sir Aldric",
+        "action": "thrusts sword at",
+        "weapon": "flaming sword",
+        "target": "dragon"
+      }
+    },
+    {
+      "tick": 265,
+      "attacker": "Ignis the Fire Dragon",
+      "defender": "Sir Aldric",
+      "action": "swipes tail at",
+      "damage": 15,
+      "renderableOperation": {
+        "actorType": "fire_dragon",
+        "actor": "Ignis",
+        "action": "swipes tail at",
+        "weapon": "tail",
+        "target": "knight"
+      }
+    },
+    {
+      "tick": 290,
+      "attacker": "Sir Aldric",
+      "defender": "Ignis",
+      "action": "slashes at",
+      "damage": 70,
+      "renderableOperation": {
+        "actorType": "dragon_slayer_knight",
+        "actor": "Sir Aldric",
+        "action": "slashes at",
+        "weapon": "flaming sword",
+        "target": "dragon"
+      }
+    }
+  ]
+}

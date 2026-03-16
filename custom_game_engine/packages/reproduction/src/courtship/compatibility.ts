@@ -4,7 +4,7 @@
  * Functions to calculate compatibility between two agents for courtship purposes.
  */
 
-import type { Entity } from '@ai-village/core';
+import type { Entity, EntityImpl } from '@ai-village/core';
 import type { World } from '@ai-village/core';
 import type { SexualityComponent } from '../SexualityComponent';
 import type { RelationshipComponent } from '@ai-village/core';

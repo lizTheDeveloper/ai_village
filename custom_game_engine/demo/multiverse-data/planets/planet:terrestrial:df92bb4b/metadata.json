@@ -1,0 +1,17 @@
+{
+  "id": "planet:terrestrial:df92bb4b",
+  "name": "Vega Major",
+  "type": "terrestrial",
+  "seed": "Vega Major-1772936844139-vlpmky65wj",
+  "createdAt": 1772936844139,
+  "lastAccessedAt": 1772936844139,
+  "saveCount": 0,
+  "chunkCount": 0,
+  "hasBiosphere": false,
+  "config": {
+    "seed": "Vega Major-1772936844139-vlpmky65wj",
+    "type": "terrestrial"
+  },
+  "universeId": "universe:1772936795799",
+  "artStyle": "16-bit SNES pixel art"
+}

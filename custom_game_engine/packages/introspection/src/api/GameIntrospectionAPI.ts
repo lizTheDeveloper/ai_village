@@ -2053,7 +2053,7 @@ export class GameIntrospectionAPI {
         }
 
         // Verify entity supports component mutation methods
-        if (!this.isEntityMutator(entity)) {
+        if (!('addComponent' in entity)) {
           console.warn(`[Snapshot] Entity ${entityId} does not support component mutation, skipping restore`);
           continue;
         }
@@ -2061,7 +2061,7 @@ export class GameIntrospectionAPI {
         // Remove all current components
         const currentComponentTypes = Array.from(entity.components.keys());
         for (const componentType of currentComponentTypes) {
-          entityImpl.removeComponent(componentType as string);
+          (entity as any).removeComponent(componentType as string);
         }
 
         // Restore components from snapshot
@@ -2073,7 +2073,7 @@ export class GameIntrospectionAPI {
           // Restore Maps and Sets if needed
           const restoredData = this.deserializeComponent(clonedData, componentType as string);
 
-          entityImpl.addComponent(restoredData);
+          (entity as any).addComponent(restoredData);
         }
 
         // Invalidate cache for this entity
@@ -2816,9 +2816,9 @@ export class GameIntrospectionAPI {
     // Check if MutationService has a getInstance method through property detection
     const service = this.mutationService;
     if (
+      service != null &&
       typeof service === 'object' &&
-      service !== null &&
-      'getInstance' in service &&
+      'getInstance' in (service as object) &&
       typeof (service as { getInstance: unknown }).getInstance === 'function'
     ) {
       const getInstance = (service as { getInstance: () => unknown }).getInstance;

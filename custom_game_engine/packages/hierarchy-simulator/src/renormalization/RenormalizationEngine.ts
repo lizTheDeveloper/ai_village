@@ -778,7 +778,7 @@ export class RenormalizationEngine {
       tick: e.tick,
       description: e.description,
       tierId,
-      consequences: [],
+      consequences: [] as string[],
     }));
   }
 

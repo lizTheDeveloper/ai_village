@@ -19,7 +19,7 @@ const ONE_DAY_MS = 86400000;
 export class ReflectionSystem extends BaseSystem {
   public readonly id = CT.Reflection;
   public readonly priority = 110;
-  public readonly requiredComponents = [] as const;
+  public readonly requiredComponents: string[] = [] as const;
   // Only run when reflection components exist (O(1) activation check)
   public readonly activationComponents = ['reflection'] as const;
   protected readonly throttleInterval = 100; // SLOW - 5 seconds
