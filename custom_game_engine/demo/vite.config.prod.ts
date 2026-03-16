@@ -73,7 +73,11 @@ export default defineConfig({
       // Exclude modules not in package.json — optional features (PixiJS renderer,
       // d3 timeline, chart.js hierarchy viz, dexie IndexedDB) that aren't required
       // for the core game. Also exclude Node.js builtins handled by browser stubs.
-      external: ['sharp', 'pixi.js', 'd3', 'chart.js', 'dexie'],
+      external: (id: string) => {
+        // Externalize optional features not installed in Docker build
+        const externals = ['sharp', 'pixi.js', 'd3', 'chart.js', 'dexie', 'three'];
+        return externals.some(pkg => id === pkg || id.startsWith(pkg + '/'));
+      },
       input: {
         index: path.resolve(__dirname, 'game.html'),
       },
@@ -85,7 +89,6 @@ export default defineConfig({
         // (core <-> world <-> botany have 30+ circular import cycles that cause
         // ReferenceError: Cannot access 'X' before initialization when split)
         manualChunks(id) {
-          if (id.includes('node_modules/three')) return 'vendor-three';
           // Browser stubs for fs/path MUST be in vendor chunk — node_modules
           // code imports these, and putting them in engine causes TDZ errors
           // when vendor initializes before engine

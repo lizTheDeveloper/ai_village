@@ -1,12 +1,12 @@
-version: "3.8"
-
 services:
   mvee:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.prebuilt
     container_name: mvee-game
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/ || exit 1"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/mvee/', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -18,12 +18,14 @@ services:
       - coolify
     labels:
       - traefik.enable=true
-      - traefik.http.routers.mvee.rule=Host(`mvee.multiversestudios.xyz`)
+      - traefik.http.routers.mvee.rule=Host(`play.multiversestudios.xyz`) && PathPrefix(`/mvee`)
       - traefik.http.routers.mvee.entrypoints=https
       - traefik.http.routers.mvee.tls.certresolver=letsencrypt
-      - traefik.http.routers.mvee-http.rule=Host(`mvee.multiversestudios.xyz`)
+      - traefik.http.routers.mvee.priority=300
+      - traefik.http.routers.mvee-http.rule=Host(`play.multiversestudios.xyz`) && PathPrefix(`/mvee`)
       - traefik.http.routers.mvee-http.entrypoints=http
       - traefik.http.routers.mvee-http.middlewares=mvee-redirect
+      - traefik.http.routers.mvee-http.priority=300
       - traefik.http.middlewares.mvee-redirect.redirectscheme.scheme=https
       - traefik.http.middlewares.mvee-redirect.redirectscheme.permanent=true
       - traefik.http.services.mvee.loadbalancer.server.port=3000
