@@ -174,7 +174,7 @@ export class WildPlantPopulationSystem extends BaseSystem {
       if (entityId && this.lastWorld) {
         const entity = this.lastWorld.getEntity(entityId);
         if (entity) {
-          const plant = entity.components.get('plant') as {
+          const plant = entity.getComponent(CT.Plant) as {
             speciesId?: string;
             seedsProduced?: number;
             stage?: string;

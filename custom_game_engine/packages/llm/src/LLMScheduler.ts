@@ -20,14 +20,15 @@
 
 import type { Entity } from '@ai-village/core';
 import type { World } from '@ai-village/core';
-import type {
-  AgentComponent,
-  NeedsComponent,
-  ConversationComponent,
-  VisionComponent,
-  CircadianComponent,
-  GoalsComponent,
-  PersonalityComponent,
+import {
+  CT,
+  type AgentComponent,
+  type NeedsComponent,
+  type ConversationComponent,
+  type VisionComponent,
+  type CircadianComponent,
+  type GoalsComponent,
+  type PersonalityComponent,
 } from '@ai-village/core';
 import { StructuredPromptBuilder } from './StructuredPromptBuilder.js';
 import { TalkerPromptBuilder } from './TalkerPromptBuilder.js';
@@ -184,11 +185,11 @@ export class LLMScheduler {
    * We alternate between them to allow natural conversation + productivity.
    */
   selectLayer(agent: Entity, world: World): LayerSelection {
-    const needs = agent.components.get('needs') as NeedsComponent | undefined;
-    const agentComp = agent.components.get('agent') as AgentComponent | undefined;
-    const conversation = agent.components.get('conversation') as ConversationComponent | undefined;
-    const vision = agent.components.get('vision') as VisionComponent | undefined;
-    const goals = agent.components.get('goals') as GoalsComponent | undefined;
+    const needs = agent.getComponent(CT.Needs) as NeedsComponent | undefined;
+    const agentComp = agent.getComponent(CT.Agent) as AgentComponent | undefined;
+    const conversation = agent.getComponent(CT.Conversation) as ConversationComponent | undefined;
+    const vision = agent.getComponent(CT.Vision) as VisionComponent | undefined;
+    const goals = agent.getComponent(CT.Goals) as GoalsComponent | undefined;
 
     // PRIORITY 1: Critical needs (survival)
     if (needs) {
@@ -322,8 +323,8 @@ export class LLMScheduler {
     let adjustedCooldown = config.cooldownMs;
 
     if (agent && layer === 'talker') {
-      const conversationComp = agent.components.get('conversation') as ConversationComponent | undefined;
-      const personalityComp = agent.components.get('personality') as PersonalityComponent | undefined;
+      const conversationComp = agent.getComponent(CT.Conversation) as ConversationComponent | undefined;
+      const personalityComp = agent.getComponent(CT.Personality) as PersonalityComponent | undefined;
       const isInConversation = conversationComp?.isActive && (conversationComp.partnerId !== null || conversationComp.participantIds.length > 0);
 
       // Extroversion determines how frequently the Talker speaks

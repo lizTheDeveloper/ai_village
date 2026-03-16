@@ -574,7 +574,7 @@ export class TemperatureSystem extends BaseSystem {
 
     if (isDangerous && !wasDangerous) {
       // Entered dangerous temperature range
-      const needsComp = entity.components.get('needs') as NeedsComponent | undefined;
+      const needsComp = entity.getComponent(CT.Needs) as NeedsComponent | undefined;
       const health = needsComp?.health ?? 100;
       ctx.emit('temperature:danger', {
         agentId: entity.id,

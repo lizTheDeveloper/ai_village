@@ -16,6 +16,7 @@
  */
 
 import type { Entity, World } from '@ai-village/core';
+import { CT } from '@ai-village/core';
 
 // Import types - these need to be exported from @ai-village/core governance module
 // For now, define locally to avoid circular dependency
@@ -104,7 +105,7 @@ export class GovernorPromptBuilder {
     world: World
   ): string {
     // Extract governor personality/traits if available
-    const personality = governor.components.get('personality') as
+    const personality = governor.getComponent(CT.Personality) as
       | { traits?: string[] }
       | undefined;
     const traits = personality?.traits ?? [];
@@ -179,7 +180,7 @@ Your vote will be recorded and influence the outcome. Choose wisely.`;
       contextSummary = `Error building context: ${error}`;
     }
 
-    const personality = governor.components.get('personality') as
+    const personality = governor.getComponent(CT.Personality) as
       | { traits?: string[] }
       | undefined;
     const traits = personality?.traits ?? [];
@@ -267,7 +268,7 @@ WARNING: Refusing a directive from higher authority can damage relations and may
       contextSummary = `Error building context: ${error}`;
     }
 
-    const personality = governor.components.get('personality') as
+    const personality = governor.getComponent(CT.Personality) as
       | { traits?: string[] }
       | undefined;
     const traits = personality?.traits ?? [];
@@ -341,7 +342,7 @@ Act decisively - lives may depend on your decision.`;
       contextSummary = `Error building context: ${error}`;
     }
 
-    const personality = governor.components.get('personality') as
+    const personality = governor.getComponent(CT.Personality) as
       | { traits?: string[] }
       | undefined;
     const traits = personality?.traits ?? [];

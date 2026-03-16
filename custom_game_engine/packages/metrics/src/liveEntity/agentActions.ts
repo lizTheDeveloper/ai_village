@@ -14,6 +14,7 @@
  */
 
 import type { World, WorldMutator } from '@ai-village/core';
+import { CT } from '@ai-village/core';
 import { createLLMAgent, createWanderingAgent } from '@ai-village/agents';
 import { spawnCity, getCityTemplates, type CitySpawnConfig } from '@ai-village/core';
 import type { ActionRequest, ActionResponse, WorldWithRuntimeProps } from './types.js';
@@ -59,7 +60,7 @@ export function handleSetLLMConfig(
     };
   }
 
-  const agentComp = entity.components.get('agent');
+  const agentComp = entity.getComponent(CT.Agent);
   if (!agentComp || !isAgentComponent(agentComp)) {
     return {
       requestId: action.requestId,
@@ -125,7 +126,7 @@ export function handleSetSkill(
     };
   }
 
-  const skillsComp = entity.components.get('skills');
+  const skillsComp = entity.getComponent(CT.Skills);
   if (!skillsComp || !isSkillsComponent(skillsComp)) {
     return {
       requestId: action.requestId,
@@ -300,7 +301,7 @@ export function handleSpawnAgent(
     if (name && typeof name === 'string') {
       const entity = ctx.world.getEntity(agentId);
       if (entity) {
-        const identityComp = entity.components.get('identity');
+        const identityComp = entity.getComponent(CT.Identity);
         const identity = identityComp && isIdentityComponent(identityComp) ? identityComp : undefined;
         if (identity) {
           identity.name = name;
@@ -356,7 +357,7 @@ export function handleTeleport(
     };
   }
 
-  const positionComp = entity.components.get('position');
+  const positionComp = entity.getComponent(CT.Position);
   const position = positionComp && isPositionComponent(positionComp) ? positionComp : undefined;
   if (!position) {
     return {
@@ -419,7 +420,7 @@ export function handleSetNeed(
     };
   }
 
-  const needsComp = entity.components.get('needs');
+  const needsComp = entity.getComponent(CT.Needs);
   const needs = needsComp && isNeedsComponent(needsComp) ? needsComp : undefined;
   if (!needs) {
     return {
@@ -488,7 +489,7 @@ export function handleGiveItem(
     };
   }
 
-  const inventoryComp = entity.components.get('inventory');
+  const inventoryComp = entity.getComponent(CT.Inventory);
   if (!inventoryComp || !isInventoryComponent(inventoryComp)) {
     return {
       requestId: action.requestId,
@@ -576,7 +577,7 @@ export function handleTriggerBehavior(
     };
   }
 
-  const agentComp = entity.components.get('agent');
+  const agentComp = entity.getComponent(CT.Agent);
   const agent = agentComp && isAgentComponent(agentComp) ? agentComp : undefined;
   if (!agent) {
     return {
@@ -689,17 +690,17 @@ export function handleFindAgentByName(
 
   const normalizedSearch = name.toLowerCase();
   const matches = agents.filter((entity) => {
-    const identityComp = entity.getComponent('identity');
+    const identityComp = entity.getComponent(CT.Identity);
     const identity = identityComp && isIdentityComponent(identityComp) ? identityComp : undefined;
     return identity?.name?.toLowerCase().includes(normalizedSearch);
   });
 
   const results = matches.map((entity) => {
-    const identityComp = entity.getComponent('identity');
+    const identityComp = entity.getComponent(CT.Identity);
     const identity = identityComp && isIdentityComponent(identityComp) ? identityComp : undefined;
-    const positionComp = entity.getComponent('position');
+    const positionComp = entity.getComponent(CT.Position);
     const position = positionComp && isPositionComponent(positionComp) ? positionComp : undefined;
-    const agentComp = entity.getComponent('agent');
+    const agentComp = entity.getComponent(CT.Agent);
     const agent = agentComp && isAgentComponent(agentComp) ? agentComp : undefined;
 
     return {

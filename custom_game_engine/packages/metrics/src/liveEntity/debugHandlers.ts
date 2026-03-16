@@ -10,6 +10,7 @@
  */
 
 import type { World } from '@ai-village/core';
+import { CT } from '@ai-village/core';
 import type { ActionRequest, ActionResponse, AgentDebugManagerInterface } from './types.js';
 import { isIdentityComponent } from './types.js';
 
@@ -54,7 +55,7 @@ export function handleDebugStartLogging(
     };
   }
 
-  const identityComp = entity.getComponent('identity');
+  const identityComp = entity.getComponent(CT.Identity);
   const identity = identityComp && isIdentityComponent(identityComp) ? identityComp : undefined;
   const agentName = identity?.name || 'Unknown';
 
@@ -127,7 +128,7 @@ export function handleDebugListAgents(
   // Get agent names for each tracked ID
   const agentsWithNames = trackedAgents.map(agentId => {
     const entity = ctx.world.getEntity(agentId);
-    const identityComp = entity?.getComponent('identity');
+    const identityComp = entity?.getComponent(CT.Identity);
     const identity = identityComp && isIdentityComponent(identityComp) ? identityComp : undefined;
     return {
       id: agentId,
