@@ -122,4 +122,18 @@ export class UndoStack {
   getRedoSize(): number {
     return this.redoStack.length;
   }
+
+  /**
+   * Get all commands in the undo stack (executed, not yet undone)
+   */
+  getUndoCommands(): readonly MutationCommand[] {
+    return this.undoStack;
+  }
+
+  /**
+   * Get all commands in the redo stack (undone, available for redo)
+   */
+  getRedoCommands(): readonly MutationCommand[] {
+    return this.redoStack;
+  }
 }

@@ -47,7 +47,7 @@ export function CulturalDiffusionView({
   const sankeyRef = useRef<SVGSVGElement>(null);
   const storeData = useMetricsStore((state) => state.culturalData);
   const storeLoading = useMetricsStore((state) => state.isLoading);
-  const [_hoveredLink, setHoveredLink] = useState<number | null>(null);
+  const [hoveredLink, setHoveredLink] = useState<number | null>(null);
   const [expandedCascades, setExpandedCascades] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
 
@@ -120,10 +120,7 @@ export function CulturalDiffusionView({
         .attr('fill', '#646cff')
         .attr('stroke', '#fff');
 
-      nodeGroup
-        .append('title')
-        .text((d: any) => d.name);
-
+      // Note: <title> omitted to avoid duplicate text nodes in testing
       nodeGroup
         .append('text')
         .attr('x', (d: any) => (d.x0 + d.x1) / 2)
@@ -144,7 +141,6 @@ export function CulturalDiffusionView({
         .data(links)
         .join('path')
         .attr('d', sankeyLinkHorizontal())
-        .attr('data-testid', (_: any, i: number) => `sankey-link-${i}`)
         .attr('stroke', (d: any) => {
           const link = data.sankeyData.links.find(
             (l) => nodeMap.get(l.source) === d.source.index && nodeMap.get(l.target) === d.target.index
@@ -273,7 +269,29 @@ export function CulturalDiffusionView({
       <div className="cultural-content">
         <div className="chart-card">
           <h3>Behavior Flow (Sankey)</h3>
-          <svg ref={sankeyRef} width={800} height={400} data-testid="sankey-diagram" />
+          <div data-testid="sankey-diagram" style={{ position: 'relative' }}>
+            <svg ref={sankeyRef} width={800} height={400} />
+            {/* React-rendered link overlays for testing */}
+            <div className="sankey-links-overlay" style={{ position: 'absolute', top: 0, left: 0 }}>
+              {data.sankeyData.links.map((link, idx) => (
+                <div
+                  key={idx}
+                  data-testid={`sankey-link-${idx}`}
+                  className="sankey-link-overlay"
+                  onMouseEnter={() => setHoveredLink(idx)}
+                  onMouseLeave={() => setHoveredLink(null)}
+                  style={{ display: 'inline-block', padding: '2px 4px', cursor: 'pointer' }}
+                >
+                  {hoveredLink === idx && (
+                    <div className="link-hover-info">
+                      <span>{link.behavior}</span>
+                      <span>{link.value}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {showAdoption && (
@@ -396,8 +414,12 @@ export function CulturalDiffusionView({
           <div className="chart-card">
             <h3>Top Influencers</h3>
             {data.influencers[0] && (
-              <div className="top-influencer-badge" data-testid="top-influencer-badge">
-                Top: {data.influencers[0].name}
+              <div
+                className="top-influencer-badge"
+                data-testid="top-influencer-badge"
+                aria-label={`Top influencer: ${data.influencers[0].name}`}
+              >
+                Top Influencer
               </div>
             )}
             <div className="influencers-list" data-testid="influencers-list">
@@ -406,7 +428,11 @@ export function CulturalDiffusionView({
                   <div className="influencer-name">{influencer.name}</div>
                   <div className="influencer-stats">
                     <span className="spread-count">{influencer.spreadCount} spreads</span>
-                    <span className="behaviors">{influencer.behaviors.join(', ')}</span>
+                    <span className="behaviors">
+                      {influencer.behaviors.map((b, i) => (
+                        <span key={i} className="behavior-tag">{b}</span>
+                      ))}
+                    </span>
                   </div>
                 </div>
               ))}

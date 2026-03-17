@@ -696,22 +696,8 @@ export class GameIntrospectionAPI {
     const limit = options?.limit || 100;
     const history: MutationHistoryEntry[] = [];
 
-    // Access the private instance to get undo/redo stacks
-    // We need to access the internal state through a type-safe getter pattern
-    const mutationServiceInstance = this.getMutationServiceInstance();
-    if (!mutationServiceInstance) {
-      // If we can't access the instance, return empty history
-      return history;
-    }
-
-    const undoStack = mutationServiceInstance.undoStack;
-    if (!undoStack) {
-      return history;
-    }
-
-    // Get commands from both undo and redo stacks
-    const undoCommands = undoStack.undoStack || [];
-    const redoCommands = undoStack.redoStack || [];
+    // Get mutation history via the public getHistory() API
+    const { undoCommands, redoCommands } = this.mutationService.getHistory();
 
     // Process undo stack (not undone)
     for (const command of undoCommands) {

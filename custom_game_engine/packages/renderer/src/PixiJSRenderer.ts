@@ -825,10 +825,11 @@ export class PixiJSRenderer implements IRenderer {
 
   private renderTerrain(world: World, bounds: VisibleBounds): void {
     // Calculate visible chunk range
-    const startChunkX = Math.floor(bounds.left / CHUNK_SIZE);
-    const endChunkX = Math.ceil(bounds.right / CHUNK_SIZE);
-    const startChunkY = Math.floor(bounds.top / CHUNK_SIZE);
-    const endChunkY = Math.ceil(bounds.bottom / CHUNK_SIZE);
+    // bounds are in pixel units; divide by tileSize to get tile units, then by CHUNK_SIZE to get chunk coords
+    const startChunkX = Math.floor(bounds.left / this._tileSize / CHUNK_SIZE);
+    const endChunkX = Math.ceil(bounds.right / this._tileSize / CHUNK_SIZE);
+    const startChunkY = Math.floor(bounds.top / this._tileSize / CHUNK_SIZE);
+    const endChunkY = Math.ceil(bounds.bottom / this._tileSize / CHUNK_SIZE);
 
     const visibleChunkKeys = new Set<string>();
 

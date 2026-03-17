@@ -93,7 +93,7 @@ const SIZES = {
   padding: 12,
   lineHeight: 18,
   headerHeight: 36,
-  beliefBarHeight: 40,
+  beliefBarHeight: 44,
   statsHeight: 140, // Increased to show believer list
   filterHeight: 28,
   powerRowHeight: 56,
@@ -125,6 +125,22 @@ const DIVINE_POWERS: DivinePower[] = [
   { id: 'create_angel', name: 'Create Angel', tier: 'supreme', beliefCost: 2000, cooldown: 72000, description: 'Create a divine servant.', targetType: 'self' },
   { id: 'divine_cataclysm', name: 'Divine Cataclysm', tier: 'world_shaping', beliefCost: 5000, cooldown: 360000, description: 'Reshape the world dramatically.', targetType: 'location' },
 ];
+
+// ============================================================================
+// Helpers
+// ============================================================================
+
+function getTierEmoji(tier: DivinePowerTier | 'all'): string {
+  switch (tier) {
+    case 'dormant': return '💤';
+    case 'minor': return '✨';
+    case 'moderate': return '🌟';
+    case 'major': return '⚡';
+    case 'supreme': return '👑';
+    case 'world_shaping': return '🌍';
+    default: return '✦';
+  }
+}
 
 // ============================================================================
 // DivinePowersPanel
@@ -339,6 +355,13 @@ export class DivinePowersPanel implements IWindowPanel {
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
 
+    // Deep mystical panel background
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
+    bgGrad.addColorStop(0, 'rgba(14, 10, 32, 0.98)');
+    bgGrad.addColorStop(1, 'rgba(7, 5, 18, 0.98)');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
+
     let y = 0;
 
     // Header
@@ -377,29 +400,59 @@ export class DivinePowersPanel implements IWindowPanel {
   }
 
   renderHeader(ctx: CanvasRenderingContext2D, width: number, y: number): number {
-    ctx.fillStyle = COLORS.headerBg;
+    // Gradient header strip
+    const headerGrad = ctx.createLinearGradient(0, y, 0, y + SIZES.headerHeight);
+    headerGrad.addColorStop(0, 'rgba(55, 30, 100, 0.95)');
+    headerGrad.addColorStop(1, 'rgba(30, 15, 60, 0.95)');
+    ctx.fillStyle = headerGrad;
     ctx.fillRect(0, y, width, SIZES.headerHeight);
 
-    ctx.fillStyle = COLORS.belief;
-    ctx.font = 'bold 14px monospace';
-    ctx.fillText('DIVINE POWERS', SIZES.padding, y + 10);
+    // Arcane rune decorations
+    ctx.fillStyle = 'rgba(180, 120, 255, 0.3)';
+    ctx.font = '14px monospace';
+    ctx.fillText('✦', SIZES.padding - 2, y + 8);
+    ctx.fillText('✦', width - SIZES.padding - 10, y + 8);
 
-    // Identity name
-    ctx.fillStyle = COLORS.textMuted;
+    // Gold title with glow
+    ctx.shadowColor = '#FFD700';
+    ctx.shadowBlur = 8;
+    ctx.fillStyle = '#FFD700';
+    ctx.font = 'bold 13px monospace';
+    ctx.fillText('DIVINE POWERS', SIZES.padding + 14, y + 10);
+    ctx.shadowBlur = 0;
+
+    // Accent separator line
+    const sepGrad = ctx.createLinearGradient(0, y + SIZES.headerHeight - 1, width, y + SIZES.headerHeight - 1);
+    sepGrad.addColorStop(0, 'transparent');
+    sepGrad.addColorStop(0.3, 'rgba(180, 120, 255, 0.6)');
+    sepGrad.addColorStop(0.7, 'rgba(180, 120, 255, 0.6)');
+    sepGrad.addColorStop(1, 'transparent');
+    ctx.strokeStyle = sepGrad;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, y + SIZES.headerHeight - 1);
+    ctx.lineTo(width, y + SIZES.headerHeight - 1);
+    ctx.stroke();
+
+    // Identity name (right-aligned, softer)
+    ctx.fillStyle = 'rgba(200, 170, 255, 0.8)';
     ctx.font = '10px monospace';
     const nameWidth = ctx.measureText(this.deityState.identity.name).width;
-    ctx.fillText(this.deityState.identity.name, width - nameWidth - SIZES.padding, y + 12);
+    ctx.fillText(this.deityState.identity.name, width - nameWidth - SIZES.padding - 12, y + 12);
 
     return y + SIZES.headerHeight;
   }
 
   private renderBeliefBar(ctx: CanvasRenderingContext2D, width: number, y: number): number {
     const barWidth = width - SIZES.padding * 2;
+    const barH = 18;
+    const barY = y + 8;
 
     // Determine current tier and next threshold
     const currentTier = this.getCurrentTier();
     const nextThreshold = this.getNextThreshold();
     const prevThreshold = BELIEF_THRESHOLDS[currentTier];
+    const tierColor = this.getTierColor(currentTier);
 
     // Progress within current tier
     let progress = 1;
@@ -407,146 +460,299 @@ export class DivinePowersPanel implements IWindowPanel {
       progress = Math.min(1, (this.deityState.belief - prevThreshold) / (nextThreshold - prevThreshold));
     }
 
-    // Background
+    // Track background — rounded
     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-    ctx.fillRect(SIZES.padding, y + 8, barWidth, 20);
+    ctx.beginPath();
+    ctx.roundRect(SIZES.padding, barY, barWidth, barH, 5);
+    ctx.fill();
 
-    // Fill
-    ctx.fillStyle = COLORS.beliefBar;
-    ctx.fillRect(SIZES.padding, y + 8, barWidth * progress, 20);
+    // Fill — gradient in tier color
+    if (progress > 0) {
+      const fillGrad = ctx.createLinearGradient(SIZES.padding, 0, SIZES.padding + barWidth * progress, 0);
+      fillGrad.addColorStop(0, tierColor + 'AA');
+      fillGrad.addColorStop(1, tierColor);
+      ctx.fillStyle = fillGrad;
+      ctx.beginPath();
+      ctx.roundRect(SIZES.padding, barY, barWidth * progress, barH, 5);
+      ctx.fill();
+    }
 
-    // Threshold markers
-    ctx.strokeStyle = COLORS.text;
+    // Animated shimmer sweep when >80% to next tier
+    if (progress > 0.8) {
+      const t = performance.now() / 600;
+      const shimmerX = SIZES.padding + (barWidth * progress) * ((t % 1));
+      const shimGrad = ctx.createLinearGradient(shimmerX - 20, 0, shimmerX + 20, 0);
+      shimGrad.addColorStop(0, 'rgba(255,255,255,0)');
+      shimGrad.addColorStop(0.5, 'rgba(255,255,255,0.35)');
+      shimGrad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = shimGrad;
+      ctx.save();
+      ctx.beginPath();
+      ctx.roundRect(SIZES.padding, barY, barWidth * progress, barH, 5);
+      ctx.clip();
+      ctx.fillRect(SIZES.padding, barY, barWidth, barH);
+      ctx.restore();
+    }
+
+    // Threshold markers (subtle ticks)
+    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
     ctx.lineWidth = 1;
     for (const [_tier, threshold] of Object.entries(BELIEF_THRESHOLDS)) {
       if (threshold > 0 && threshold < 10000) {
         const xPos = SIZES.padding + (threshold / 10000) * barWidth;
         ctx.beginPath();
-        ctx.moveTo(xPos, y + 8);
-        ctx.lineTo(xPos, y + 28);
+        ctx.moveTo(xPos, barY + 2);
+        ctx.lineTo(xPos, barY + barH - 2);
         ctx.stroke();
       }
     }
 
-    // Belief text - rounded to 1 decimal place
-    ctx.fillStyle = COLORS.text;
-    ctx.font = 'bold 11px monospace';
+    // Belief text over bar — centered
+    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+    ctx.shadowBlur = 3;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 10px monospace';
     ctx.textAlign = 'center';
     ctx.fillText(
-      `BELIEF: ${this.deityState.belief.toFixed(1)} (+${this.deityState.beliefPerHour.toFixed(1)}/hr)`,
+      `✦ ${this.deityState.belief.toFixed(1)} (+${this.deityState.beliefPerHour.toFixed(1)}/hr)`,
       width / 2,
-      y + 11
+      barY + 4
     );
+    ctx.shadowBlur = 0;
     ctx.textAlign = 'left';
 
-    // Tier indicator
-    ctx.fillStyle = this.getTierColor(currentTier);
-    ctx.font = '9px monospace';
-    ctx.fillText(currentTier.toUpperCase(), SIZES.padding, y + 32);
+    // Tier pill (left) + next threshold (right) below bar
+    const pillY = barY + barH + 4;
+
+    // Tier pill
+    ctx.fillStyle = tierColor + '33';
+    ctx.beginPath();
+    ctx.roundRect(SIZES.padding, pillY, 70, 13, 4);
+    ctx.fill();
+    ctx.fillStyle = tierColor;
+    ctx.font = 'bold 8px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${getTierEmoji(currentTier)} ${currentTier.toUpperCase().replace('_', ' ')}`, SIZES.padding + 35, pillY + 2);
+    ctx.textAlign = 'left';
 
     if (nextThreshold < Infinity) {
-      ctx.fillStyle = COLORS.textMuted;
-      ctx.fillText(`Next: ${nextThreshold}`, SIZES.padding + 80, y + 32);
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '8px monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText(`next tier: ${nextThreshold}`, width - SIZES.padding, pillY + 2);
+      ctx.textAlign = 'left';
     }
 
     return y + SIZES.beliefBarHeight;
   }
 
   private renderStats(ctx: CanvasRenderingContext2D, width: number, y: number): number {
-    ctx.fillStyle = COLORS.textMuted;
-    ctx.font = '10px monospace';
-
-    const stats = [
-      `Believers: ${this.deityState.believerCount}`,
-      `Angels: ${this.deityState.angelCount}`,
-      `Prayers: ${this.deityState.pendingPrayers}`,
+    // Stats row with gradient pill badges
+    const statItems: Array<{ label: string; value: string | number; color: string }> = [
+      { label: '🙏', value: `${this.deityState.believerCount} believers`, color: '#88CCFF' },
+      { label: '👼', value: `${this.deityState.angelCount} angels`, color: '#FFDD88' },
+      { label: '✉', value: `${this.deityState.pendingPrayers} prayers`, color: '#FF88CC' },
     ];
 
-    let x = SIZES.padding;
-    for (const stat of stats) {
-      ctx.fillText(stat, x, y + 4);
-      x += ctx.measureText(stat).width + 20;
+    let sx = SIZES.padding;
+    const pillH = 16;
+    const pillY = y + 2;
+
+    for (const stat of statItems) {
+      const text = `${stat.label} ${stat.value}`;
+      ctx.font = '9px monospace';
+      const tw = ctx.measureText(text).width;
+      const pw = tw + 14;
+
+      ctx.fillStyle = stat.color + '22';
+      ctx.beginPath();
+      ctx.roundRect(sx, pillY, pw, pillH, 4);
+      ctx.fill();
+      ctx.strokeStyle = stat.color + '55';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(sx, pillY, pw, pillH, 4);
+      ctx.stroke();
+
+      ctx.fillStyle = stat.color;
+      ctx.fillText(text, sx + 7, pillY + 3);
+      sx += pw + 6;
     }
 
-    // Show who is believing (believer names with faith levels)
-    y += 18;
+    y += pillH + 8;
+
+    // Who believes section
     if (this.deityState.believerList.length > 0) {
-      ctx.fillStyle = COLORS.belief;
-      ctx.fillText('Who believes:', SIZES.padding, y + 4);
+      ctx.fillStyle = '#FFD700';
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText('WHO BELIEVES', SIZES.padding, y + 2);
+
+      // Gradient separator
+      const sepGrad = ctx.createLinearGradient(SIZES.padding, 0, width - SIZES.padding, 0);
+      sepGrad.addColorStop(0, 'rgba(255,215,0,0.4)');
+      sepGrad.addColorStop(1, 'transparent');
+      ctx.strokeStyle = sepGrad;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(SIZES.padding + 80, y + 6);
+      ctx.lineTo(width - SIZES.padding, y + 6);
+      ctx.stroke();
 
       y += 14;
-      ctx.font = '9px monospace';
-      const maxBelieversToShow = 5;
+
+      const maxBelieversToShow = 4;
       const displayBelievers = this.deityState.believerList.slice(0, maxBelieversToShow);
+      const barTrackW = 60;
 
       for (const believer of displayBelievers) {
-        // Faith bar
         const faithPercent = Math.round(believer.faith * 100);
         const faithColor = faithPercent >= 80 ? '#FFD700' : faithPercent >= 50 ? '#87CEEB' : '#888888';
 
+        // Row background
+        ctx.fillStyle = 'rgba(255,255,255,0.03)';
+        ctx.beginPath();
+        ctx.roundRect(SIZES.padding, y, width - SIZES.padding * 2, 14, 3);
+        ctx.fill();
+
         ctx.fillStyle = faithColor;
-        ctx.fillText(`  ${believer.name} (${faithPercent}% faith)`, SIZES.padding, y + 4);
-        y += 12;
+        ctx.font = '9px monospace';
+        ctx.fillText(believer.name, SIZES.padding + 4, y + 3);
+
+        // Faith bar — right side
+        const barX = width - SIZES.padding - barTrackW;
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.beginPath();
+        ctx.roundRect(barX, y + 4, barTrackW, 6, 2);
+        ctx.fill();
+
+        const faithFill = (faithPercent / 100) * barTrackW;
+        const fbGrad = ctx.createLinearGradient(barX, 0, barX + faithFill, 0);
+        fbGrad.addColorStop(0, faithColor + '88');
+        fbGrad.addColorStop(1, faithColor);
+        ctx.fillStyle = fbGrad;
+        ctx.beginPath();
+        ctx.roundRect(barX, y + 4, faithFill, 6, 2);
+        ctx.fill();
+
+        ctx.fillStyle = faithColor;
+        ctx.font = '8px monospace';
+        ctx.textAlign = 'right';
+        ctx.fillText(`${faithPercent}%`, barX - 4, y + 3);
+        ctx.textAlign = 'left';
+
+        y += 14;
       }
 
       if (this.deityState.believerList.length > maxBelieversToShow) {
         ctx.fillStyle = COLORS.textDim;
-        ctx.fillText(`  ...and ${this.deityState.believerList.length - maxBelieversToShow} more`, SIZES.padding, y + 4);
+        ctx.font = '8px monospace';
+        ctx.fillText(`  +${this.deityState.believerList.length - maxBelieversToShow} more…`, SIZES.padding, y + 2);
         y += 12;
       }
-
-      ctx.font = '10px monospace';
     } else {
       ctx.fillStyle = COLORS.textDim;
-      ctx.fillText('No believers yet', SIZES.padding, y + 4);
+      ctx.font = '9px monospace';
+      ctx.fillText('No believers yet — spread the faith', SIZES.padding, y + 2);
       y += 14;
     }
 
     // Note about Divine Communication panel
-    y += 6;
-    ctx.fillStyle = '#4CAF50';
-    ctx.font = 'bold 9px monospace';
-    ctx.fillText('💬 For visions/whispers: Use Divine Communication panel', SIZES.padding, y + 4);
-    y += 12;
-
-    // Domains
     y += 4;
-    ctx.fillStyle = COLORS.textDim;
-    ctx.fillText('Domains:', SIZES.padding, y + 4);
+    ctx.fillStyle = 'rgba(76, 175, 80, 0.7)';
+    ctx.font = '9px monospace';
+    ctx.fillText('💬 Visions & whispers → Divine Communication panel', SIZES.padding, y + 2);
+    y += 13;
 
-    x = SIZES.padding + 60;
-    for (const [domain, strength] of Object.entries(this.deityState.domains)) {
-      ctx.fillStyle = strength > 50 ? COLORS.belief : COLORS.textMuted;
-      ctx.fillText(`${domain} ${strength}%`, x, y + 4);
-      x += ctx.measureText(`${domain} ${strength}%`).width + 12;
+    // Domains as colored pill badges
+    const domainEntries = Object.entries(this.deityState.domains);
+    if (domainEntries.length > 0) {
+      y += 4;
+      ctx.font = '8px monospace';
+      ctx.fillStyle = COLORS.textDim;
+      ctx.fillText('DOMAINS', SIZES.padding, y + 2);
+
+      let dx = SIZES.padding + 55;
+      for (const [domain, strength] of domainEntries) {
+        const domainColor = strength > 50 ? '#FFD700' : '#8888AA';
+        const dtext = domain;
+        const dtw = ctx.measureText(dtext).width;
+        const dpw = dtw + 12;
+
+        ctx.fillStyle = domainColor + '22';
+        ctx.beginPath();
+        ctx.roundRect(dx, y, dpw, 14, 4);
+        ctx.fill();
+        ctx.strokeStyle = domainColor + '55';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(dx, y, dpw, 14, 4);
+        ctx.stroke();
+
+        ctx.fillStyle = domainColor;
+        ctx.font = '8px monospace';
+        ctx.fillText(dtext, dx + 6, y + 3);
+        dx += dpw + 5;
+      }
+      y += 16;
     }
 
-    return y + SIZES.statsHeight - 20;
+    return y + 4;
   }
 
   private renderTierFilter(ctx: CanvasRenderingContext2D, width: number, y: number): number {
     const tiers: Array<{ id: DivinePowerTier | 'all'; label: string }> = [
       { id: 'all', label: 'All' },
       { id: 'minor', label: 'Minor' },
-      { id: 'moderate', label: 'Moderate' },
+      { id: 'moderate', label: 'Mod' },
       { id: 'major', label: 'Major' },
       { id: 'supreme', label: 'Supreme' },
     ];
 
     const tabWidth = (width - SIZES.padding * 2) / tiers.length;
     let x = SIZES.padding;
+    const tabH = SIZES.filterHeight - 4;
 
     for (const tier of tiers) {
       const isActive = this.filterTier === tier.id;
       const isAvailable = tier.id === 'all' || this.deityState.belief >= BELIEF_THRESHOLDS[tier.id];
+      const tierColor = tier.id === 'all' ? '#AAAACC' : this.getTierColor(tier.id);
 
-      ctx.fillStyle = isActive ? 'rgba(100, 100, 140, 0.5)' : 'rgba(40, 40, 60, 0.3)';
-      ctx.fillRect(x, y, tabWidth - 2, SIZES.filterHeight - 4);
+      // Tab background
+      if (isActive) {
+        ctx.fillStyle = tierColor + '33';
+      } else {
+        ctx.fillStyle = 'rgba(30, 25, 55, 0.5)';
+      }
+      ctx.beginPath();
+      ctx.roundRect(x, y, tabWidth - 2, tabH, 5);
+      ctx.fill();
 
-      ctx.fillStyle = !isAvailable ? COLORS.textDim : (isActive ? this.getTierColor(tier.id) : COLORS.textMuted);
+      // Active border glow
+      if (isActive) {
+        ctx.shadowColor = tierColor;
+        ctx.shadowBlur = 6;
+        ctx.strokeStyle = tierColor + 'AA';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(x, y, tabWidth - 2, tabH, 5);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      } else {
+        ctx.strokeStyle = 'rgba(80,70,110,0.4)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(x, y, tabWidth - 2, tabH, 5);
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = !isAvailable ? COLORS.textDim : (isActive ? tierColor : COLORS.textMuted);
       ctx.font = isActive ? 'bold 9px monospace' : '9px monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(tier.label, x + tabWidth / 2, y + 8);
+      ctx.fillText(
+        tier.id !== 'all' ? `${getTierEmoji(tier.id)} ${tier.label}` : tier.label,
+        x + (tabWidth - 2) / 2,
+        y + 7
+      );
       ctx.textAlign = 'left';
 
       if (isAvailable) {
@@ -554,7 +760,7 @@ export class DivinePowersPanel implements IWindowPanel {
           x,
           y,
           width: tabWidth - 2,
-          height: SIZES.filterHeight - 4,
+          height: tabH,
           action: 'filter_tier',
           data: tier.id,
         });
@@ -598,53 +804,100 @@ export class DivinePowersPanel implements IWindowPanel {
     const canAfford = this.deityState.belief >= power.beliefCost;
     const isOnCooldown = this.isPowerOnCooldown(power.id);
     const isUsable = canAfford && !isOnCooldown;
+    const tierColor = this.getTierColor(power.tier);
 
-    // Background
-    ctx.fillStyle = isSelected ? COLORS.powerSelected : COLORS.powerBg;
-    ctx.fillRect(SIZES.padding / 2, y + 2, width - SIZES.padding, SIZES.powerRowHeight - 4);
+    const rowX = SIZES.padding / 2;
+    const rowW = width - SIZES.padding;
+    const rowH = SIZES.powerRowHeight - 4;
 
-    // Border
-    ctx.strokeStyle = isSelected ? this.getTierColor(power.tier) : COLORS.border;
-    ctx.lineWidth = isSelected ? 2 : 1;
-    ctx.strokeRect(SIZES.padding / 2, y + 2, width - SIZES.padding, SIZES.powerRowHeight - 4);
+    // Card background
+    const cardGrad = ctx.createLinearGradient(rowX, y + 2, rowX + rowW, y + 2);
+    if (isSelected) {
+      cardGrad.addColorStop(0, 'rgba(70, 50, 110, 0.9)');
+      cardGrad.addColorStop(1, 'rgba(45, 30, 75, 0.9)');
+    } else {
+      cardGrad.addColorStop(0, 'rgba(30, 25, 50, 0.85)');
+      cardGrad.addColorStop(1, 'rgba(20, 15, 35, 0.85)');
+    }
+    ctx.fillStyle = cardGrad;
+    ctx.beginPath();
+    ctx.roundRect(rowX, y + 2, rowW, rowH, 5);
+    ctx.fill();
 
-    // Tier indicator
-    ctx.fillStyle = this.getTierColor(power.tier);
-    ctx.font = '9px monospace';
-    ctx.fillText(power.tier.substring(0, 3).toUpperCase(), SIZES.padding, y + 8);
+    // 3px left accent bar in tier color
+    ctx.fillStyle = tierColor;
+    ctx.beginPath();
+    ctx.roundRect(rowX, y + 2, 3, rowH, [3, 0, 0, 3]);
+    ctx.fill();
 
-    // Power name
+    // Selected border glow
+    if (isSelected) {
+      ctx.shadowColor = tierColor;
+      ctx.shadowBlur = 8;
+      ctx.strokeStyle = tierColor + '88';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(rowX, y + 2, rowW, rowH, 5);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    } else {
+      ctx.strokeStyle = 'rgba(80, 70, 110, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(rowX, y + 2, rowW, rowH, 5);
+      ctx.stroke();
+    }
+
+    // Tier emoji prefix + power name
+    const emoji = getTierEmoji(power.tier);
     ctx.fillStyle = isUsable ? COLORS.text : COLORS.textDim;
     ctx.font = 'bold 11px monospace';
-    ctx.fillText(power.name, SIZES.padding + 35, y + 8);
+    ctx.fillText(`${emoji} ${power.name}`, rowX + 10, y + 8);
 
-    // Cost
-    ctx.fillStyle = canAfford ? COLORS.belief : '#FF6666';
-    ctx.font = '10px monospace';
-    const costText = `${power.beliefCost} belief`;
-    const costWidth = ctx.measureText(costText).width;
-    ctx.fillText(costText, width - costWidth - SIZES.padding, y + 8);
+    // Cost pill badge (top-right)
+    const costText = `${power.beliefCost} ✦`;
+    ctx.font = '9px monospace';
+    const ctw = ctx.measureText(costText).width;
+    const cpw = ctw + 10;
+    const cpx = rowX + rowW - cpw - 4;
+    ctx.fillStyle = canAfford ? 'rgba(255, 215, 0, 0.15)' : 'rgba(255, 80, 80, 0.15)';
+    ctx.beginPath();
+    ctx.roundRect(cpx, y + 6, cpw, 14, 4);
+    ctx.fill();
+    ctx.fillStyle = canAfford ? '#FFD700' : '#FF6666';
+    ctx.fillText(costText, cpx + 5, y + 8);
 
     // Description
     ctx.fillStyle = COLORS.textMuted;
     ctx.font = '9px monospace';
-    ctx.fillText(power.description, SIZES.padding, y + 24);
+    ctx.fillText(power.description, rowX + 10, y + 24);
 
-    // Cooldown status
+    // Status row: target type or cooldown
     if (isOnCooldown) {
-      ctx.fillStyle = '#FF6666';
-      ctx.fillText('On Cooldown', SIZES.padding, y + 38);
+      // Cooldown pill
+      ctx.fillStyle = 'rgba(255, 100, 100, 0.12)';
+      ctx.beginPath();
+      ctx.roundRect(rowX + 10, y + 37, 72, 12, 3);
+      ctx.fill();
+      ctx.fillStyle = '#FF8888';
+      ctx.font = '8px monospace';
+      ctx.fillText('⏳ On Cooldown', rowX + 14, y + 40);
     } else {
+      ctx.fillStyle = 'rgba(120, 120, 160, 0.3)';
+      ctx.beginPath();
+      ctx.roundRect(rowX + 10, y + 37, 70, 12, 3);
+      ctx.fill();
       ctx.fillStyle = COLORS.textDim;
-      ctx.fillText(`Target: ${power.targetType}`, SIZES.padding, y + 38);
+      ctx.font = '8px monospace';
+      ctx.fillText(`→ ${power.targetType}`, rowX + 14, y + 40);
     }
 
     // Click region
     this.clickRegions.push({
-      x: SIZES.padding / 2,
+      x: rowX,
       y: y + 2,
-      width: width - SIZES.padding,
-      height: SIZES.powerRowHeight - 4,
+      width: rowW,
+      height: rowH,
       action: 'select_power',
       data: power.id,
     });
@@ -660,13 +913,22 @@ export class DivinePowersPanel implements IWindowPanel {
     const canAfford = this.deityState.belief >= power.beliefCost;
     const isOnCooldown = this.isPowerOnCooldown(power.id);
     const isUsable = canAfford && !isOnCooldown;
+    const tierColor = this.getTierColor(power.tier);
 
-    // Background
-    ctx.fillStyle = COLORS.headerBg;
+    // Dark gradient background
+    const bgGrad = ctx.createLinearGradient(0, panelY, 0, height);
+    bgGrad.addColorStop(0, 'rgba(28, 20, 55, 0.97)');
+    bgGrad.addColorStop(1, 'rgba(14, 10, 32, 0.97)');
+    ctx.fillStyle = bgGrad;
     ctx.fillRect(0, panelY, width, SIZES.detailHeight);
 
-    // Border
-    ctx.strokeStyle = this.getTierColor(power.tier);
+    // Tier-color gradient top border glow
+    const topBorderGrad = ctx.createLinearGradient(0, panelY, width, panelY);
+    topBorderGrad.addColorStop(0, 'transparent');
+    topBorderGrad.addColorStop(0.2, tierColor);
+    topBorderGrad.addColorStop(0.8, tierColor);
+    topBorderGrad.addColorStop(1, 'transparent');
+    ctx.strokeStyle = topBorderGrad;
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(0, panelY);
@@ -675,26 +937,41 @@ export class DivinePowersPanel implements IWindowPanel {
 
     let y = panelY + SIZES.padding;
 
-    // Power name
-    ctx.fillStyle = this.getTierColor(power.tier);
-    ctx.font = 'bold 14px monospace';
-    ctx.fillText(power.name, SIZES.padding, y);
+    // Power name with tier glow
+    ctx.shadowColor = tierColor;
+    ctx.shadowBlur = 6;
+    ctx.fillStyle = tierColor;
+    ctx.font = 'bold 13px monospace';
+    ctx.fillText(`${getTierEmoji(power.tier)} ${power.name}`, SIZES.padding, y);
+    ctx.shadowBlur = 0;
 
-    // Execute button
+    // INVOKE button — pulses when usable
     const btnX = width - 100 - SIZES.padding;
-    const btnY = y - 4;
-    const btnW = 100;
-    const btnH = 24;
+    const btnY = y - 2;
+    const btnW = 98;
+    const btnH = 22;
 
-    ctx.fillStyle = isUsable ? this.getTierColor(power.tier) : COLORS.textDim;
+    if (isUsable) {
+      const pulse = 0.75 + 0.25 * Math.sin(performance.now() / 400);
+      ctx.shadowColor = tierColor;
+      ctx.shadowBlur = 10 * pulse;
+      const btnGrad = ctx.createLinearGradient(btnX, btnY, btnX, btnY + btnH);
+      btnGrad.addColorStop(0, tierColor + 'CC');
+      btnGrad.addColorStop(1, tierColor + '88');
+      ctx.fillStyle = btnGrad;
+    } else {
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = 'rgba(60, 55, 80, 0.7)';
+    }
     ctx.beginPath();
-    ctx.roundRect(btnX, btnY, btnW, btnH, 4);
+    ctx.roundRect(btnX, btnY, btnW, btnH, 5);
     ctx.fill();
+    ctx.shadowBlur = 0;
 
-    ctx.fillStyle = isUsable ? COLORS.text : COLORS.textMuted;
+    ctx.fillStyle = isUsable ? '#FFFFFF' : COLORS.textDim;
     ctx.font = 'bold 10px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('INVOKE', btnX + btnW / 2, btnY + 7);
+    ctx.fillText('⚡ INVOKE', btnX + btnW / 2, btnY + 6);
     ctx.textAlign = 'left';
 
     if (isUsable) {
@@ -711,31 +988,31 @@ export class DivinePowersPanel implements IWindowPanel {
     y += 22;
 
     // Description
-    ctx.fillStyle = COLORS.text;
-    ctx.font = '11px monospace';
-    ctx.fillText(power.description, SIZES.padding, y);
-    y += 18;
-
-    // Details
-    ctx.fillStyle = COLORS.textMuted;
+    ctx.fillStyle = '#DDCCFF';
     ctx.font = '10px monospace';
+    ctx.fillText(power.description, SIZES.padding, y);
+    y += 17;
+
+    // Stats row
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = '9px monospace';
     ctx.fillText(
-      `Cost: ${power.beliefCost} belief | Cooldown: ${(power.cooldown / 20).toFixed(0)}s | Target: ${power.targetType}`,
+      `Cost: ${power.beliefCost} ✦  |  Cooldown: ${(power.cooldown / 20).toFixed(0)}s  |  Target: ${power.targetType}`,
       SIZES.padding,
       y
     );
-    y += 16;
+    y += 15;
 
     // After use preview
     if (canAfford) {
-      ctx.fillStyle = COLORS.textDim;
+      ctx.fillStyle = 'rgba(100, 220, 120, 0.7)';
       ctx.fillText(
-        `After use: ${Math.floor(this.deityState.belief - power.beliefCost)} belief remaining`,
+        `After use: ${Math.floor(this.deityState.belief - power.beliefCost)} ✦ remaining`,
         SIZES.padding,
         y
       );
     } else {
-      ctx.fillStyle = '#FF6666';
+      ctx.fillStyle = '#FF8888';
       ctx.fillText(
         `Need ${power.beliefCost - Math.floor(this.deityState.belief)} more belief`,
         SIZES.padding,

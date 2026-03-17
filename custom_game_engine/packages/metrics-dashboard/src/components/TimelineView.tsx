@@ -20,6 +20,7 @@ interface TimelineViewProps {
   showAdoption?: boolean;
   onTimeChange?: (timestamp: number) => void;
   onExport?: (format: string) => void;
+  timeRange?: { start: number; end: number };
 }
 
 const BEHAVIOR_COLORS: Record<string, string> = {
@@ -31,7 +32,14 @@ const BEHAVIOR_COLORS: Record<string, string> = {
   rest: '#9c27b0',
 };
 
-export function TimelineView({ data: propData, loading: propLoading, showAdoption = false, onTimeChange, onExport }: TimelineViewProps) {
+export function TimelineView({
+  data: propData,
+  loading: propLoading,
+  showAdoption = false,
+  onTimeChange,
+  onExport,
+  timeRange,
+}: TimelineViewProps) {
   const storeData = useMetricsStore((state) => state.timelineData);
   const storeLoading = useMetricsStore((state) => state.isLoading);
 
@@ -39,6 +47,8 @@ export function TimelineView({ data: propData, loading: propLoading, showAdoptio
   const loading = propLoading !== undefined ? propLoading : storeLoading;
 
   const [scrubberPosition, setScrubberPosition] = useState<number | null>(null);
+  const [disabledBehaviors, setDisabledBehaviors] = useState<Set<string>>(new Set());
+  const [hoveredInnovation, setHoveredInnovation] = useState<number | null>(null);
 
   if (loading) {
     return <div className="view-container">Loading timeline...</div>;
@@ -56,6 +66,11 @@ export function TimelineView({ data: propData, loading: propLoading, showAdoptio
   // Display error if behaviors is present but invalid (test expects error message)
   if (!data.behaviors || !Array.isArray(data.behaviors)) {
     return <div className="view-container">Error: Timeline data must include behaviors array</div>;
+  }
+
+  // Validate time range if provided
+  if (timeRange && timeRange.start > timeRange.end) {
+    throw new Error('TimelineView: start time must be before end time');
   }
 
   const timestamps = new Set<number>();
@@ -93,18 +108,30 @@ export function TimelineView({ data: propData, loading: propLoading, showAdoptio
     const value = parseInt(e.target.value, 10);
     setScrubberPosition(value);
     if (onTimeChange) {
-      // If value is in valid index range, look up timestamp
-      // Otherwise pass value directly (for tests that set timestamps directly)
-      if (value >= 0 && value < sortedTimestamps.length) {
-        onTimeChange(sortedTimestamps[value]!);
-      } else {
-        onTimeChange(value);
-      }
+      onTimeChange(value);
     }
   };
 
+  const handleBehaviorToggle = (behaviorName: string) => {
+    setDisabledBehaviors((prev) => {
+      const next = new Set(prev);
+      if (next.has(behaviorName)) {
+        next.delete(behaviorName);
+        return next;
+      }
+      // Don't disable if it's the last enabled behavior
+      const enabledCount = data.behaviors.length - next.size;
+      if (enabledCount <= 1) {
+        return prev;
+      }
+      next.add(behaviorName);
+      return next;
+    });
+  };
+
+  // scrubberPosition is now a timestamp value
   const currentData = scrubberPosition !== null
-    ? chartData.slice(0, scrubberPosition + 1)
+    ? chartData.filter((point) => point.timestamp <= scrubberPosition)
     : chartData;
 
   return (
@@ -112,6 +139,23 @@ export function TimelineView({ data: propData, loading: propLoading, showAdoptio
       <div className="view-header">
         <h2>Behavior Timeline</h2>
         <button onClick={handleExport} aria-label="Export timeline">Export PNG</button>
+      </div>
+      <div className="behaviors-toggles">
+        {data.behaviors.map((behavior) => {
+          const isEnabled = !disabledBehaviors.has(behavior.name);
+          return (
+            <button
+              key={behavior.name}
+              role="switch"
+              aria-checked={isEnabled}
+              aria-label={behavior.name}
+              onClick={() => handleBehaviorToggle(behavior.name)}
+              className={`behavior-toggle ${isEnabled ? 'enabled' : 'disabled'}`}
+            >
+              <span className="behavior-label">{behavior.name}</span>
+            </button>
+          );
+        })}
       </div>
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={400}>
@@ -128,7 +172,7 @@ export function TimelineView({ data: propData, loading: propLoading, showAdoptio
               labelFormatter={(value) => new Date(value as number).toLocaleString()}
             />
             <Legend />
-            {data.behaviors.map((behavior) => (
+            {data.behaviors.filter((b) => !disabledBehaviors.has(b.name)).map((behavior) => (
               <Area
                 key={behavior.name}
                 type="monotone"
@@ -139,7 +183,7 @@ export function TimelineView({ data: propData, loading: propLoading, showAdoptio
               />
             ))}
             {data.innovations && data.innovations.map((innovation, idx) => (
-              scrubberPosition === null || innovation.timestamp <= sortedTimestamps[scrubberPosition] ? (
+              scrubberPosition === null || innovation.timestamp <= scrubberPosition ? (
                 <ReferenceDot
                   key={idx}
                   x={innovation.timestamp}
@@ -155,20 +199,23 @@ export function TimelineView({ data: propData, loading: propLoading, showAdoptio
           </AreaChart>
         </ResponsiveContainer>
       </div>
-      <div className="behaviors-legend">
-        {data.behaviors.map((behavior) => (
-          <span key={behavior.name} className="behavior-label">
-            {behavior.name}
-          </span>
-        ))}
-      </div>
-      {data.innovations && data.innovations.map((_innovation, idx) => (
+      {data.innovations && data.innovations.map((innovation, idx) => (
         <div
           key={idx}
           data-testid="innovation-marker"
-          className="innovation-marker-hidden"
-          style={{ display: 'none' }}
-        />
+          className="innovation-marker-visible"
+          onMouseEnter={() => setHoveredInnovation(idx)}
+          onMouseLeave={() => setHoveredInnovation(null)}
+          style={{ cursor: 'pointer', display: 'inline-block', margin: '4px' }}
+        >
+          <span aria-hidden="true">★</span>
+          {hoveredInnovation === idx && (
+            <div className="innovation-tooltip" data-testid={`innovation-tooltip-${idx}`}>
+              <span>{innovation.agent}</span>
+              <span>{new Date(innovation.timestamp).toLocaleTimeString()}</span>
+            </div>
+          )}
+        </div>
       ))}
       {showAdoption && data.adoptionCurves && (
         <div data-testid="adoption-curve" className="adoption-curves">
@@ -177,8 +224,8 @@ export function TimelineView({ data: propData, loading: propLoading, showAdoptio
             <div key={behavior} className="adoption-curve">
               <h4>{behavior}</h4>
               <div className="curve-data">
-                {Array.isArray(curve) && curve.map((point, idx) => (
-                  <span key={idx}>
+                {Array.isArray(curve) && curve.map((point, curveIdx) => (
+                  <span key={curveIdx}>
                     {new Date(point.timestamp).toLocaleTimeString()}: {point.adopters}
                   </span>
                 ))}
@@ -193,32 +240,18 @@ export function TimelineView({ data: propData, loading: propLoading, showAdoptio
           <input
             id="timeline-scrubber"
             type="range"
-            min={0}
-            max={sortedTimestamps.length - 1}
-            value={scrubberPosition ?? sortedTimestamps.length - 1}
+            min={sortedTimestamps[0]}
+            max={sortedTimestamps[sortedTimestamps.length - 1]}
+            value={scrubberPosition ?? sortedTimestamps[sortedTimestamps.length - 1]}
             onChange={handleScrubberChange}
             className="scrubber"
             data-testid="time-scrubber"
           />
           <span>
             {scrubberPosition !== null
-              ? new Date(sortedTimestamps[scrubberPosition]!).toLocaleString()
+              ? new Date(scrubberPosition).toLocaleString()
               : 'Latest'}
           </span>
-        </div>
-      )}
-      {data.innovations && data.innovations.length > 0 && (
-        <div className="innovations-list">
-          <h3>Innovation Events</h3>
-          {data.innovations.map((innovation, idx) => (
-            <div key={idx} className="innovation-item">
-              <span className="innovation-time">
-                {new Date(innovation.timestamp).toLocaleTimeString()}
-              </span>
-              <span className="innovation-behavior">{innovation.behavior}</span>
-              <span className="innovation-agent">by {innovation.agent}</span>
-            </div>
-          ))}
         </div>
       )}
     </div>

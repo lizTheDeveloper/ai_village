@@ -294,6 +294,7 @@ export class CombatHUDPanel implements IWindowPanel {
       font-family: 'Courier New', monospace;
       box-shadow: 0 4px 18px rgba(0,0,0,0.7), 0 0 10px ${glowColor}44;
       animation: ${this.isVisible() ? 'combatHudSlideIn 220ms ease-out' : 'none'};
+      opacity: 0.9;
     `;
 
     // ── Header row: title + threat badge ───────────────────────────────────
@@ -374,6 +375,7 @@ export class CombatHUDPanel implements IWindowPanel {
         `;
 
         const typeLabel = document.createElement('div');
+        typeLabel.className = 'conflict-type';
         typeLabel.textContent = `${this.conflictTypeGlyph(conflict.type)} ${conflict.type}`;
         typeLabel.style.cssText = `
           color: ${tColor};
@@ -397,8 +399,16 @@ export class CombatHUDPanel implements IWindowPanel {
           color: #998877;
           font-size: 10px;
           line-height: 1.4;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 4px;
         `;
-        participantsRow.textContent = conflict.participants.join(' · ');
+        for (const participantId of conflict.participants) {
+          const participantEl = document.createElement('span');
+          participantEl.className = 'participant';
+          participantEl.textContent = participantId;
+          participantsRow.appendChild(participantEl);
+        }
         conflictItem.appendChild(participantsRow);
 
         // Click to focus

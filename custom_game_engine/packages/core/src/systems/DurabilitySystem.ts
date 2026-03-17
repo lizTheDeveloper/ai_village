@@ -5,6 +5,7 @@ import { itemRegistry } from '../items/ItemRegistry.js';
 import type { ToolTrait } from '../items/traits/ToolTrait.js';
 import type { EventBus } from '../events/EventBus.js';
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import { SystemEventManager } from '../events/TypedEventEmitter.js';
 
 /**
  * Usage type for tool wear tracking.
@@ -61,9 +62,15 @@ export class DurabilitySystem extends BaseSystem {
 
   /**
    * Set the event bus for emitting durability events.
+   * Used when the system is instantiated outside of the normal initialize() lifecycle
+   * (e.g., in tests or standalone usage).
    */
   setEventBus(eventBus: EventBus): void {
     this.eventBus = eventBus;
+    // Also wire up this.events so applyToolWear() can emit events
+    if (!this.events) {
+      this.events = new SystemEventManager(eventBus, this.id);
+    }
   }
 
   /**

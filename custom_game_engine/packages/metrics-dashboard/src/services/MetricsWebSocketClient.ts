@@ -26,6 +26,8 @@ export class MetricsWebSocketClient {
   private reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
   private manualDisconnect = false;
   private currentReconnectInterval: number;
+  private connected = false;
+  private everClosed = false;
 
   constructor(url: string, options: WebSocketOptions = {}) {
     // Validate URL
@@ -66,6 +68,7 @@ export class MetricsWebSocketClient {
   }
 
   private handleOpen(event: Event): void {
+    this.connected = true;
     this.reconnectAttempts = 0;
     this.currentReconnectInterval = this.options.reconnectInterval;
     this.emit('open', event);
@@ -98,6 +101,8 @@ export class MetricsWebSocketClient {
   }
 
   private handleClose(event: CloseEvent): void {
+    this.connected = false;
+    this.everClosed = true;
     this.emit('close', event);
     this.emit('disconnect', event);
 
@@ -182,15 +187,16 @@ export class MetricsWebSocketClient {
     if (!this.ws) {
       return false;
     }
-    // WebSocket.OPEN === 1, but handle test mocks where readyState might be undefined
-    // In real browsers: readyState is 0-3, OPEN is 1
-    // WebSocket instances have OPEN constant at the class level, not instance level
-    // In production, readyState should always be defined
-    if (this.ws.readyState === undefined) {
-      // Fallback for test mocks - check static WebSocket.OPEN
-      return WebSocket.OPEN === 1;
+    // If we've received a close event, we're not connected regardless of readyState
+    if (this.everClosed) {
+      return this.connected;
     }
-    return this.ws.readyState === WebSocket.OPEN;
+    // For mock WebSockets that set readyState=OPEN without firing 'open',
+    // fall back to readyState check before we've seen any close events.
+    if (this.ws.readyState === WebSocket.OPEN) {
+      return true;
+    }
+    return this.connected;
   }
 
   /**

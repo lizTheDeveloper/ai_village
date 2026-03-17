@@ -338,6 +338,19 @@ export class MutationService {
   }
 
   /**
+   * Get mutation history from undo/redo stacks
+   *
+   * @returns Object with undone and redone command arrays
+   */
+  static getHistory(): { undoCommands: readonly MutationCommand[]; redoCommands: readonly MutationCommand[] } {
+    const instance = MutationService.getInstance();
+    return {
+      undoCommands: instance.undoStack.getUndoCommands(),
+      redoCommands: instance.undoStack.getRedoCommands(),
+    };
+  }
+
+  /**
    * Subscribe to mutation events
    *
    * @param event - Event type to listen for
