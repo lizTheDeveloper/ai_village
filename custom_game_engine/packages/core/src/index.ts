@@ -120,6 +120,7 @@ export type {
   PlantPestState,
 } from './types/PlantDisease.js';
 export * from './genetics/PlantGenetics.js';
+export * from './genetics/AnimalBreedingCompatibility.js';
 
 // ============================================================================
 // LLM & Agent Intelligence
