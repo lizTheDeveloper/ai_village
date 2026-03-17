@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { World } from '../ecs/World';
 import { EventBusImpl } from '../events/EventBus';
 import { DominanceChallengeSystem } from '../systems/DominanceChallengeSystem';
@@ -176,17 +176,26 @@ describe('DominanceChallengeSystem', () => {
       // Give challenger overwhelming advantage
       challenger.getComponent('combat_stats').combatSkill = 15;
 
+      // Mock Math.random: first call for combat resolution (low = challenger wins),
+      // second call for loser fate (high = demotion, not death)
+      let callCount = 0;
+      const randomSpy = vi.spyOn(Math, 'random').mockImplementation(() => {
+        callCount++;
+        return callCount === 1 ? 0.1 : 0.9;
+      });
+
       createChallenge(challenger, alpha.id, 'combat');
 
       system.update(world, Array.from(world.entities.values()), 1);
 
+      randomSpy.mockRestore();
+
       const conflict = challenger.getComponent('conflict');
-      if (conflict.winner === challenger.id) {
-        // Challenger takes alpha's rank
-        expect(challenger.getComponent('dominance_rank').rank).toBe(1);
-        // Alpha is demoted
-        expect(alpha.getComponent('dominance_rank').rank).toBe(2);
-      }
+      expect(conflict.winner).toBe(challenger.id);
+      // Challenger takes alpha's rank
+      expect(challenger.getComponent('dominance_rank').rank).toBe(1);
+      // Alpha is demoted
+      expect(alpha.getComponent('dominance_rank').rank).toBe(2);
     });
 
     it('should apply demotion consequence on loss', () => {

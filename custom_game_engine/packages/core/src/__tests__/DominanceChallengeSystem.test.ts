@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { World } from '../ecs/World.js';
 import { DominanceChallengeSystem } from '../systems/DominanceChallengeSystem.js';
 import { createConflictComponent } from '../components/ConflictComponent.js';
@@ -147,32 +147,23 @@ describe('DominanceChallengeSystem', () => {
         method: 'combat',
       }));
 
-      // Run system multiple times until challenger wins
+      // Mock Math.random: first call for combat resolution (low = challenger wins),
+      // subsequent calls return high values (ensures demotion, not death)
+      let callCount = 0;
+      const randomSpy = vi.spyOn(Math, 'random').mockImplementation(() => {
+        callCount++;
+        return callCount === 1 ? 0.1 : 0.9;
+      });
+
       const entities = world.getAllEntities();
-      let challengerWon = false;
-      for (let i = 0; i < 20; i++) {
-        system.update(world, entities, 1000);
-        eventBus.flush();
+      system.update(world, entities, 1000);
+      eventBus.flush();
 
-        const challengerRank = world.getComponent(challenger.id, 'dominance_rank');
-        if (challengerRank && challengerRank.rank === 2) {
-          challengerWon = true;
-          break;
-        }
+      randomSpy.mockRestore();
 
-        // Reset conflict for next attempt
-        if (i < 19) {
-          challenger.updateComponent('conflict', () => createConflictComponent({
-            conflictType: 'dominance_challenge',
-            target: incumbent.id,
-            state: 'active',
-            startTime: Date.now(),
-            method: 'combat',
-          }));
-        }
-      }
+      const challengerWon = world.getComponent(challenger.id, 'dominance_rank')?.rank === 2;
 
-      // With 10 vs 1 stats, challenger should win eventually
+      // With mocked random, challenger should always win
       expect(challengerWon).toBe(true);
 
       if (challengerWon) {

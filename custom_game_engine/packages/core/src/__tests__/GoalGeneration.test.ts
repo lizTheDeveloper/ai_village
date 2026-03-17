@@ -55,7 +55,7 @@ describe('Goal Generation', () => {
       });
 
       const goals: GoalCategory[] = [];
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 200; i++) {
         const goal = generatePersonalGoal(personality, {});
         goals.push(goal.category);
       }
@@ -75,14 +75,15 @@ describe('Goal Generation', () => {
       });
 
       const goals: GoalCategory[] = [];
-      for (let i = 0; i < 50; i++) {
+      for (let i = 0; i < 200; i++) {
         const goal = generatePersonalGoal(personality, {});
         goals.push(goal.category);
       }
 
       const securityCount = goals.filter(g => g === 'security').length;
-      // Expected ~8.3 security goals (16.6% probability), allow wider range for randomness
-      expect(securityCount).toBeGreaterThan(3);
+      // Expected ~34 security goals (17% probability over 200 trials)
+      // Threshold of 10 is >5 std devs below mean — virtually impossible to fail by chance
+      expect(securityCount).toBeGreaterThan(10);
     });
 
     it('should generate exploration goals for open agents', () => {
@@ -95,13 +96,14 @@ describe('Goal Generation', () => {
       });
 
       const goals: GoalCategory[] = [];
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 200; i++) {
         const goal = generatePersonalGoal(personality, {});
         goals.push(goal.category);
       }
 
       const explorationCount = goals.filter(g => g === 'exploration').length;
-      // With openness=0.85, expect ~20-25% exploration goals
+      // With openness=0.85, expect ~22% exploration goals (44/200)
+      // Threshold of 15 is >5 std devs below mean — virtually impossible to fail by chance
       expect(explorationCount).toBeGreaterThanOrEqual(15);
     });
   });

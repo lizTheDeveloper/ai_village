@@ -215,8 +215,9 @@ describe('HuntingSystem', () => {
     });
 
     it('should handle prey escape during stalking', async () => {
-      // Very fast prey
-      prey.getComponent('animal').speed = 15;
+      // Extremely fast prey — speed must be high enough that max roll (20) + killPower (7) cannot exceed escapePower + 5
+      // Formula: roll + killPower > escapePower + 5 → need escapePower > 20 + 7 - 5 = 22
+      prey.getComponent('animal').speed = 30;
       prey.getComponent('animal').awareness = 10;
 
       hunter.addComponent('conflict', {
