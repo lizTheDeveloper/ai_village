@@ -111,6 +111,7 @@ import { ExplorationSystem } from './ExplorationSystem.js';
 import { ExplorationDiscoverySystem } from './ExplorationDiscoverySystem.js';
 import { StellarMiningSystem } from './StellarMiningSystem.js';
 import { LandmarkNamingSystem } from './LandmarkNamingSystem.js';
+import { CivilizationalLegendsSystem } from './CivilizationalLegendsSystem.js';
 import { EmotionalNavigationSystem } from '../navigation/EmotionalNavigationSystem.js';
 import { VRSystem } from '../vr/VRSystem.js';
 
@@ -933,6 +934,9 @@ export function registerAllSystems(
   // ============================================================================
   if (flags.divinity) {
     gameLoop.systemRegistry.register(new AdminAngelSystem({ llmQueue }));
+    if (llmQueue) {
+      gameLoop.systemRegistry.register(new CivilizationalLegendsSystem(llmQueue));
+    }
     gameLoop.systemRegistry.register(new MilestoneSystem());
 
     // Advanced theology

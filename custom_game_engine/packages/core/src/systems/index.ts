@@ -52,6 +52,7 @@ export * from './SteeringSystem.js';
 export * from './AgeTrackingSystem.js';
 export * from './ExplorationSystem.js';
 export * from './LandmarkNamingSystem.js';
+export * from './CivilizationalLegendsSystem.js';
 export * from './VerificationSystem.js';
 export * from './SocialGradientSystem.js';
 export * from './BeliefFormationSystem.js';

@@ -96,6 +96,14 @@ export interface MiscEvents {
     newLevel: number;
   };
 
+  'civilizational_legend:born': {
+    triggerType: 'elder_death' | 'population_50' | 'master_skill';
+    agentName: string;
+    legendText: string;
+    eldestAgentId?: string;
+    tick: number;
+  };
+
   // === Trauma & Stress Events ===
   'trauma:experienced': {
     agentId: EntityId;
