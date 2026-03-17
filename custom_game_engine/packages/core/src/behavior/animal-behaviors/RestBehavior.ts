@@ -113,6 +113,7 @@ export class RestBehavior extends BaseAnimalBehavior {
       energy: Math.min(100, current.energy + recoveryRate * 0.05), // 0.05 = deltaTime at 20 TPS
       stress: Math.max(0, current.stress - 2 * 0.05), // Reduce stress while resting
       state: 'sleeping' as const,
+      isDomesticated: current.isDomesticated,
     }));
 
     // Emit resting event

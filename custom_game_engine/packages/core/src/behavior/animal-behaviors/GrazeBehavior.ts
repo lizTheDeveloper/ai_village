@@ -171,6 +171,7 @@ export class GrazeBehavior extends BaseAnimalBehavior {
       ...current,
       hunger: Math.max(0, current.hunger - this.eatRate * 0.05), // 0.05 = deltaTime at 20 TPS
       state: 'eating' as const,
+      isDomesticated: current.isDomesticated,
     }));
 
     // Consume plant resources (if it has at least 1 whole fruit)

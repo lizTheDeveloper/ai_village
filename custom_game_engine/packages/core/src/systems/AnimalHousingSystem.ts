@@ -125,6 +125,7 @@ export class AnimalHousingSystem extends BaseSystem {
         impl.updateComponent<AnimalComponent>(CT.Animal, (current) => ({
           ...current,
           housingBuildingId: undefined,
+          isDomesticated: current.isDomesticated,
         }));
         continue;
       }
@@ -137,6 +138,7 @@ export class AnimalHousingSystem extends BaseSystem {
         impl.updateComponent<AnimalComponent>(CT.Animal, (current) => ({
           ...current,
           housingBuildingId: undefined,
+          isDomesticated: current.isDomesticated,
         }));
         continue;
       }
@@ -150,6 +152,7 @@ export class AnimalHousingSystem extends BaseSystem {
         impl.updateComponent<AnimalComponent>(CT.Animal, (current) => ({
           ...current,
           stress: Math.min(100, current.stress + stressPenalty * STRESS_PENALTY_MULTIPLIER), // Small increase per tick
+          isDomesticated: current.isDomesticated,
         }));
       }
 

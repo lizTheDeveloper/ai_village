@@ -112,6 +112,7 @@ export class AnimalBrainSystem extends BaseSystem {
       entity.updateComponent('animal', (current: AnimalComponent) => ({
         ...current,
         state: newState,
+        isDomesticated: current.isDomesticated,
       }));
 
       // Emit state change event
@@ -179,6 +180,7 @@ export class AnimalBrainSystem extends BaseSystem {
       entity.updateComponent('animal', (current: AnimalComponent) => ({
         ...current,
         state: result.newState!,
+        isDomesticated: current.isDomesticated,
       }));
 
       world.eventBus.emit({
@@ -198,6 +200,7 @@ export class AnimalBrainSystem extends BaseSystem {
       entity.updateComponent('animal', (current: AnimalComponent) => ({
         ...current,
         state: result.newState!,
+        isDomesticated: current.isDomesticated,
       }));
     }
   }

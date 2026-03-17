@@ -71,6 +71,7 @@ export class FleeBehavior extends BaseAnimalBehavior {
       // Actively reduce stress when safe (faster recovery than passive decay)
       entity.updateComponent('animal', (current: AnimalComponent) => ({
         ...current,
+        isDomesticated: current.isDomesticated,
         stress: Math.max(0, current.stress - 10),
         state: 'idle' as const,
       }));
@@ -98,6 +99,7 @@ export class FleeBehavior extends BaseAnimalBehavior {
       // Reduce stress gradually
       entity.updateComponent('animal', (current: AnimalComponent) => ({
         ...current,
+        isDomesticated: current.isDomesticated,
         stress: Math.max(0, current.stress - 5),
         state: 'idle' as const,
       }));
@@ -117,6 +119,7 @@ export class FleeBehavior extends BaseAnimalBehavior {
     // Increase stress while fleeing
     entity.updateComponent('animal', (current: AnimalComponent) => ({
       ...current,
+      isDomesticated: current.isDomesticated,
       stress: Math.min(100, current.stress + 2),
       state: 'fleeing' as const,
     }));

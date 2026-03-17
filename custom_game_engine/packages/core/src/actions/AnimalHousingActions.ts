@@ -86,6 +86,7 @@ export function assignAnimalToHousing(
   animalImpl.updateComponent<AnimalComponent>(ComponentType.Animal, (current) => ({
     ...current,
     housingBuildingId: housingEntityId,
+    isDomesticated: !current.wild,
   }));
 
   // Add to occupants list
@@ -156,6 +157,7 @@ export function removeAnimalFromHousing(
   animalImpl.updateComponent<AnimalComponent>(ComponentType.Animal, (current) => ({
     ...current,
     housingBuildingId: undefined,
+    isDomesticated: !current.wild,
   }));
 
   // Emit event
