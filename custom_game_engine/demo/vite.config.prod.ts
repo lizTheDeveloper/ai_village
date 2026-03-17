@@ -70,12 +70,11 @@ export default defineConfig({
     emptyOutDir: true,
     target: ['chrome92', 'firefox79', 'safari15'],
     rollupOptions: {
-      // Exclude modules not in package.json — optional features (PixiJS renderer,
-      // d3 timeline, chart.js hierarchy viz, dexie IndexedDB) that aren't required
-      // for the core game. Also exclude Node.js builtins handled by browser stubs.
+      // Only externalize Node.js-native modules that can't run in the browser.
+      // All browser packages (pixi.js, d3, chart.js, dexie) MUST be bundled —
+      // there is no import map in game.html to resolve bare specifiers.
       external: (id: string) => {
-        // Externalize optional features not installed in Docker build
-        const externals = ['sharp', 'pixi.js', 'd3', 'chart.js', 'dexie'];
+        const externals = ['sharp'];
         return externals.some(pkg => id === pkg || id.startsWith(pkg + '/'));
       },
       input: {

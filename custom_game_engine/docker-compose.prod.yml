@@ -2,7 +2,7 @@ services:
   mvee:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prebuilt
     container_name: mvee-game
     restart: unless-stopped
     healthcheck:
