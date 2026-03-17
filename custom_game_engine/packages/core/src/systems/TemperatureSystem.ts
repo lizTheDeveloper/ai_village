@@ -18,6 +18,34 @@ import {
   HEALTH_CRITICAL,
 } from '../constants/index.js';
 
+/**
+ * Seasonal temperature amplitude by biome climate character (°C peak deviation from annual mean).
+ *
+ * Scientific basis: IPCC AR6 (2021) Table 11.1 — observed seasonal temperature ranges by
+ * climate zone. Equatorial biomes have low variation (consistent insolation angle);
+ * polar biomes have extreme swings (Milanković 1941 axial tilt effect).
+ */
+const BIOME_SEASONAL_AMPLITUDE: Record<string, number> = {
+  // Equatorial: low seasonal variation
+  jungle: 3,
+  wetland: 4,
+  // Subtropical: moderate variation
+  desert: 8,
+  scrubland: 8,
+  savanna: 6,
+  // Temperate: strong four-season cycle
+  plains: 12,
+  forest: 12,
+  woodland: 11,
+  foothills: 14,
+  mountains: 16,
+  // Polar/boreal: extreme seasonal swings
+  taiga: 20,
+  tundra: 22,
+  glacier: 25,
+};
+const DEFAULT_SEASONAL_AMPLITUDE = 12; // Temperate default
+
 /** Wall material insulation values (matching WALL_MATERIAL_PROPERTIES in Tile.ts) */
 const WALL_INSULATION: Record<string, number> = {
   wood: 50,
@@ -168,11 +196,17 @@ export class TemperatureSystem extends BaseSystem {
   }
 
   /**
-   * Calculate world ambient temperature based on time and season
+   * Calculate world ambient temperature based on time of day and season.
+   *
+   * Superimposes two cycles (Milanković 1941 + standard diurnal model):
+   *   1. Daily cycle: sine wave, peak at noon, trough at midnight
+   *   2. Seasonal cycle: cosine on day-of-year, peak at end of summer (day 180),
+   *      trough at end of winter (day 360). Amplitude varies by biome.
    */
   private calculateWorldTemperature(world: World): number {
     // Use cached time entity ID (performance optimization)
     let timeOfDay = 12; // Default noon if no time entity
+    let day = 1; // Default day 1 if no time entity
 
     if (!this.timeEntityId) {
       // Find and cache time entity
@@ -188,20 +222,42 @@ export class TemperatureSystem extends BaseSystem {
         const timeComp = timeEntity.getComponent<TimeComponent>(CT.Time);
         if (timeComp) {
           timeOfDay = timeComp.timeOfDay;
+          day = timeComp.day;
         }
       } else {
         this.timeEntityId = null; // Entity was deleted, reset cache
       }
     }
 
-    // Convert time of day (0-24) to radians for sine wave
-    // 0 hours = midnight (low), 12 hours = noon (peak)
-    const timeRadians = ((timeOfDay - 6) / 24) * Math.PI * 2; // Shift by 6 hours so peak is at noon
-
-    // Daily variation using sine wave (peak at noon, low at midnight)
+    // Daily cycle: sine wave, peak at noon (Shift by 6h so sin(0) = midnight trough)
+    const timeRadians = ((timeOfDay - 6) / 24) * Math.PI * 2;
     const dailyVariation = this.DAILY_VARIATION * Math.sin(timeRadians);
 
-    return this.BASE_TEMP + dailyVariation;
+    // Seasonal cycle: cosine on day-of-year (smooth, no stepped seasons)
+    // Formula: -amplitude * cos(2π * dayOfYear / 360)
+    //   day 1  → cos(0) = 1   → variation = -amplitude (spring start, still cold)
+    //   day 180 → cos(π) = -1 → variation = +amplitude (end of summer, peak warmth)
+    //   day 360 → cos(2π) = 1 → variation = -amplitude (end of winter, coldest)
+    // Budyko (1969) albedo feedback is handled via WeatherSystem tempModifier for snow.
+    const dayOfYear = ((day - 1) % 360) + 1;
+    const amplitude = this.getSeasonalAmplitude(world);
+    const seasonalVariation = -amplitude * Math.cos((2 * Math.PI * dayOfYear) / 360);
+
+    return this.BASE_TEMP + dailyVariation + seasonalVariation;
+  }
+
+  /**
+   * Get seasonal temperature amplitude for the current world's biome.
+   * Samples the world-origin tile; falls back to temperate default.
+   */
+  private getSeasonalAmplitude(world: World): number {
+    if (typeof world.getTileAt === 'function') {
+      const tile = world.getTileAt(0, 0);
+      if (tile?.biome) {
+        return BIOME_SEASONAL_AMPLITUDE[tile.biome] ?? DEFAULT_SEASONAL_AMPLITUDE;
+      }
+    }
+    return DEFAULT_SEASONAL_AMPLITUDE;
   }
 
   /**

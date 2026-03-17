@@ -97,6 +97,29 @@ export class SoilSystem extends BaseSystem {
     world.eventBus.on('world:time:day', (event) => {
       this.processDailyMoistureDecay(world);
     });
+
+    // Plant growth consumes nutrients from soil
+    world.eventBus.on('plant:nutrientConsumption', (event) => {
+      const { x, y, consumed } = event.data;
+      const tile = this.getTileAt(world, x, y);
+      if (!tile?.nutrients) return;
+      // Each nutrient takes equal share of total consumed
+      const perNutrient = consumed / 3;
+      tile.nutrients.nitrogen = Math.max(0, tile.nutrients.nitrogen - perNutrient);
+      tile.nutrients.phosphorus = Math.max(0, tile.nutrients.phosphorus - perNutrient);
+      tile.nutrients.potassium = Math.max(0, tile.nutrients.potassium - perNutrient);
+    });
+
+    // Decomposing plants return nutrients to soil
+    world.eventBus.on('plant:nutrientReturn', (event) => {
+      const { x, y, returned } = event.data;
+      const tile = this.getTileAt(world, x, y);
+      if (!tile?.nutrients) return;
+      const perNutrient = returned / 3;
+      tile.nutrients.nitrogen = Math.min(100, tile.nutrients.nitrogen + perNutrient);
+      tile.nutrients.phosphorus = Math.min(100, tile.nutrients.phosphorus + perNutrient);
+      tile.nutrients.potassium = Math.min(100, tile.nutrients.potassium + perNutrient);
+    });
   }
 
   protected onUpdate(ctx: SystemContext): void {
@@ -136,6 +159,28 @@ export class SoilSystem extends BaseSystem {
       this.chunkManagerCacheTick = world.tick;
     }
     return this.cachedChunkManager;
+  }
+
+  /**
+   * Get the tile at a given world position by looking it up via chunk coordinates.
+   * Returns null if the chunk is not loaded or the tile does not exist —
+   * this is expected for tiles in unloaded chunks (not an error condition).
+   */
+  private getTileAt(world: World, x: number, y: number): Tile | null {
+    const chunkManager = this.getCachedChunkManager(world);
+    if (!chunkManager) return null;
+    if (!('getChunk' in chunkManager) || typeof chunkManager.getChunk !== 'function') return null;
+    const CHUNK_SIZE = 32;
+    const chunkX = Math.floor(x / CHUNK_SIZE);
+    const chunkY = Math.floor(y / CHUNK_SIZE);
+    const chunk = (chunkManager.getChunk as (x: number, y: number) => { tiles?: Tile[][] } | undefined)(chunkX, chunkY);
+    if (!chunk?.tiles) return null;
+    const localX = ((x % CHUNK_SIZE) + CHUNK_SIZE) % CHUNK_SIZE;
+    const localY = ((y % CHUNK_SIZE) + CHUNK_SIZE) % CHUNK_SIZE;
+    const row = chunk.tiles[localY];
+    if (!row) return null;
+    const tile = row[localX];
+    return tile ?? null;
   }
 
   /**

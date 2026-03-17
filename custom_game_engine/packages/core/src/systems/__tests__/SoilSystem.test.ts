@@ -498,6 +498,86 @@ describe('SoilSystem', () => {
     });
   });
 
+  describe('Nutrient Consumption from Plant Events', () => {
+    it('should decrease N/P/K equally when plant:nutrientConsumption is emitted', async () => {
+      const world = new World(eventBus);
+      const tile = {
+        terrain: 'dirt',
+        moisture: 50,
+        fertility: 70,
+        biome: 'plains' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 30, phosphorus: 30, potassium: 30 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false,
+      };
+
+      // Mock getChunkManager to return a chunkManager with a getChunk function
+      const mockChunkManager = {
+        getChunk: vi.fn().mockReturnValue({ tiles: [[tile]] }),
+        hasChunk: vi.fn().mockReturnValue(true),
+      };
+      vi.spyOn(world, 'getChunkManager').mockReturnValue(mockChunkManager);
+
+      await soilSystem.initialize(world, eventBus);
+
+      world.eventBus.emit({
+        type: 'plant:nutrientConsumption',
+        source: 'test',
+        data: { x: 0, y: 0, consumed: 3 },
+      });
+      world.eventBus.flush();
+
+      // consumed / 3 = 1 per nutrient
+      expect(tile.nutrients.nitrogen).toBe(29);
+      expect(tile.nutrients.phosphorus).toBe(29);
+      expect(tile.nutrients.potassium).toBe(29);
+    });
+
+    it('should increase N/P/K equally when plant:nutrientReturn is emitted', async () => {
+      const world = new World(eventBus);
+      const tile = {
+        terrain: 'dirt',
+        moisture: 50,
+        fertility: 70,
+        biome: 'plains' as const,
+        tilled: true,
+        plantability: 3,
+        nutrients: { nitrogen: 30, phosphorus: 30, potassium: 30 },
+        fertilized: false,
+        fertilizerDuration: 0,
+        lastWatered: 0,
+        lastTilled: 0,
+        composted: false,
+      };
+
+      // Mock getChunkManager to return a chunkManager with a getChunk function
+      const mockChunkManager = {
+        getChunk: vi.fn().mockReturnValue({ tiles: [[tile]] }),
+        hasChunk: vi.fn().mockReturnValue(true),
+      };
+      vi.spyOn(world, 'getChunkManager').mockReturnValue(mockChunkManager);
+
+      await soilSystem.initialize(world, eventBus);
+
+      world.eventBus.emit({
+        type: 'plant:nutrientReturn',
+        source: 'test',
+        data: { x: 0, y: 0, returned: 3 },
+      });
+      world.eventBus.flush();
+
+      // returned / 3 = 1 per nutrient
+      expect(tile.nutrients.nitrogen).toBe(31);
+      expect(tile.nutrients.phosphorus).toBe(31);
+      expect(tile.nutrients.potassium).toBe(31);
+    });
+  });
+
   describe('Error Handling - No Fallbacks', () => {
     it('should throw when accessing tile without soil data', () => {
       const incompleteTile = {
