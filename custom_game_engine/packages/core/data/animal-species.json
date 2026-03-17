@@ -377,7 +377,7 @@
       "intelligence": 0.5,
       "minComfortTemp": 5,
       "maxComfortTemp": 38,
-      "spawnBiomes": ["wetland", "river", "ocean"],
+      "spawnBiomes": ["wetland", "river"],
       "spawnDensity": 0.08,
       "_comment": "Wading ambush predator. Stands motionless at water edge (hiding spot). Flies to safety when threatened (traversal: aerial escape)."
     },
@@ -615,7 +615,7 @@
       "thirstRate": 0.03,
       "energyRate": 0.01,
       "tameDifficulty": 40,
-      "preferredFood": ["insects", "worm", "berry"],
+      "preferredFood": ["insects", "worm", "larvae"],
       "intelligence": 0.3,
       "minComfortTemp": 18,
       "maxComfortTemp": 40,
