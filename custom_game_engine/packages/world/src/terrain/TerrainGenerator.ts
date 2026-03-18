@@ -42,6 +42,7 @@ export class TerrainGenerator {
   private elevationNoise: PerlinNoise;
   private moistureNoise: PerlinNoise;
   private temperatureNoise: PerlinNoise;
+  private geologicalNoise: PerlinNoise;
   private seed: string;
   /** Public so BackgroundChunkGenerator can access for entity spawning */
   public animalSpawner: WildAnimalSpawningSystem;
@@ -84,6 +85,7 @@ export class TerrainGenerator {
     this.elevationNoise = new PerlinNoise(seedHash);
     this.moistureNoise = new PerlinNoise(seedHash + 1000);
     this.temperatureNoise = new PerlinNoise(seedHash + 2000);
+    this.geologicalNoise = new PerlinNoise(seedHash + 3000);
     this.animalSpawner = new WildAnimalSpawningSystem();
     this.godCraftedSpawner = godCraftedSpawner;
 
@@ -266,7 +268,7 @@ export class TerrainGenerator {
       case 'glacier':
         return 'ice';
       case 'frozen_ocean':
-        return 'water'; // Frozen water surface
+        return 'ice'; // Ice-covered ocean surface (visually distinct from open water)
       case 'ice_caves':
         return 'ice';
       case 'permafrost':
@@ -359,6 +361,14 @@ export class TerrainGenerator {
         return 'sand'; // Dusty regolith
       case 'hycean_depths':
         return 'water';
+
+      // -----------------------------------------------------------------------
+      // Cold Standard Biomes - override to frozen terrain types
+      // -----------------------------------------------------------------------
+      case 'tundra':
+        return 'snow'; // Tundra is frozen arctic terrain, not green grass
+      case 'taiga':
+        return originalTerrain === 'grass' ? 'snow' : originalTerrain; // Snow under trees in cold forest
 
       // -----------------------------------------------------------------------
       // Standard Biomes - keep original terrain
@@ -1366,6 +1376,14 @@ export class TerrainGenerator {
       (rawTemperature * this.tempScale) + this.tempOffset
     ));
 
+    // Geological noise - creates rare crystal/volcanic zones at biome scale
+    const geologicalNoise = this.geologicalNoise.octaveNoise(
+      worldX * biomeScale,
+      worldY * biomeScale,
+      2,
+      0.6
+    );
+
     // === FOREST DENSITY GRADIENTS ===
     // Creates realistic forest structure: dense old-growth, young forest, sparse woodland, clearings.
     //
@@ -1881,7 +1899,8 @@ export class TerrainGenerator {
     const { terrain, biome: rawBiome, fluid, oceanZone } = this.determineTerrainAndBiome(
       biomeElevation,
       moisture,
-      temperature
+      temperature,
+      geologicalNoise
     );
 
     // Filter biome through allowed list if planet config specifies restrictions
@@ -2174,7 +2193,8 @@ export class TerrainGenerator {
   private determineTerrainAndBiome(
     elevation: number,
     moisture: number,
-    temperature: number
+    temperature: number,
+    geologicalNoise: number = 0
   ): { terrain: TerrainType; biome: BiomeType; fluid?: FluidLayer; oceanZone?: OceanBiomeZone } {
 
     // PRIORITY 1: Water (hard boundary at WATER_LEVEL)
@@ -2224,6 +2244,58 @@ export class TerrainGenerator {
       // Foothills terrain is a blend
       const terrain = this.determineFoothillsTerrain(elevation, moisture);
       return { terrain, biome: 'foothills' };
+    }
+
+    // PRIORITY 4.5: Geological anomalies — volcanic and crystal biomes
+    // These override normal temperature/moisture biomes in specific geological conditions.
+
+    // Volcanic zones: extreme heat (temperature > 0.55) at non-water elevations
+    // Sub-biome selection based on elevation and moisture profile
+    if (temperature > 0.55 && elevation > 0.05 && elevation <= this.STONE_LEVEL) {
+      if (elevation > 0.28) {
+        // High volcanic elevation — old calderas near mountain base
+        return { terrain: 'basalt', biome: 'caldera' };
+      }
+      if (moisture < -0.3 && temperature > 0.65) {
+        // Extremely hot and dry — sulfur-bearing flats
+        return { terrain: 'sulfur', biome: 'sulfur_flats' };
+      }
+      if (temperature > 0.65) {
+        // Core volcanic zone — active lava fields
+        return { terrain: 'lava', biome: 'lava_field' };
+      }
+      if (moisture < -0.1) {
+        // Cooler volcanic edge with obsidian deposits
+        return { terrain: 'obsidian', biome: 'obsidian_waste' };
+      }
+      // Default volcanic fringe — ash-covered plains
+      return { terrain: 'ash', biome: 'ash_plain' };
+    }
+
+    // Crystal zones: geological anomaly noise > 0.65, moderate temp/elevation
+    // These are rare pockets of crystallized minerals in otherwise normal terrain
+    if (
+      geologicalNoise > 0.65 &&
+      elevation > 0.05 &&
+      elevation < 0.35 &&
+      temperature > -0.15 &&
+      temperature < 0.35
+    ) {
+      if (moisture > 0.15) {
+        // Crystal forest — minerals have grown through existing vegetation
+        return { terrain: 'prismatic', biome: 'prismatic_forest' };
+      }
+      if (moisture > -0.2) {
+        // Crystal plains — open crystalline fields
+        return { terrain: 'crystal', biome: 'crystal_plains' };
+      }
+      // Quartz desert — dry, mineral-rich crystal wasteland
+      return { terrain: 'crystal', biome: 'quartz_desert' };
+    }
+
+    // Geode caves: very high geological noise near foothills
+    if (geologicalNoise > 0.80 && elevation > 0.2 && elevation <= this.STONE_LEVEL) {
+      return { terrain: 'geode', biome: 'geode_caves' };
     }
 
     // PRIORITY 5: Temperature/moisture-based biomes (forests, deserts, plains)
