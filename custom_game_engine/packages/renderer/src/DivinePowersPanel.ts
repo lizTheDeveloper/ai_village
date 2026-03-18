@@ -159,6 +159,10 @@ export class DivinePowersPanel implements IWindowPanel {
   private world?: World;
   private playerDeityId?: string;
 
+  // Throttle world refresh to avoid per-frame ECS queries (perf fix MUL-1906)
+  private lastRefreshTime = 0;
+  private static readonly REFRESH_INTERVAL_MS = 1000;
+
   // Parameter modal for divine powers
   private parameterModal: DivineParameterModal = new DivineParameterModal();
 
@@ -345,9 +349,13 @@ export class DivinePowersPanel implements IWindowPanel {
   // ========== Rendering ==========
 
   render(ctx: CanvasRenderingContext2D, _x: number, _y: number, width: number, height: number, world?: any): void {
-    // Refresh state from world if available
+    // Throttle world refresh to avoid per-frame ECS queries (perf fix MUL-1906)
     if (world) {
-      this.refreshFromWorld(world);
+      const now = performance.now();
+      if (now - this.lastRefreshTime >= DivinePowersPanel.REFRESH_INTERVAL_MS) {
+        this.lastRefreshTime = now;
+        this.refreshFromWorld(world);
+      }
     }
 
     this.clickRegions = [];

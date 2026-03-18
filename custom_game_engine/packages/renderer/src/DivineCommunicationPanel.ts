@@ -53,6 +53,10 @@ export class DivineCommunicationPanel implements IWindowPanel {
   private world?: World;
   private eventBus?: EventBus;
 
+  // Throttle world refresh to avoid per-frame ECS queries (perf fix MUL-1906)
+  private lastRefreshTime = 0;
+  private static readonly REFRESH_INTERVAL_MS = 1000;
+
   // IWindowPanel required methods
   getId(): string {
     return 'divine-communication';
@@ -170,9 +174,13 @@ export class DivineCommunicationPanel implements IWindowPanel {
   }
 
   render(ctx: CanvasRenderingContext2D, _x: number, _y: number, width: number, height: number, world?: any): void {
-    // Update if world provided
+    // Throttle world refresh to avoid per-frame ECS queries (perf fix MUL-1906)
     if (world && this.eventBus) {
-      this.onUpdate(world, this.eventBus);
+      const now = performance.now();
+      if (now - this.lastRefreshTime >= DivineCommunicationPanel.REFRESH_INTERVAL_MS) {
+        this.lastRefreshTime = now;
+        this.onUpdate(world, this.eventBus);
+      }
     }
 
     if (!this.deity) {
