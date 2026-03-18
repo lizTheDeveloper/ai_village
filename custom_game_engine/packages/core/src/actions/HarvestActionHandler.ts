@@ -7,7 +7,7 @@ import type { InventoryComponent } from '../components/InventoryComponent.js';
 import { addToInventory, addToInventoryWithQuality, createSeedItemId } from '../components/InventoryComponent.js';
 import type { SkillsComponent } from '../components/SkillsComponent.js';
 import { getEfficiencyBonus } from '../components/SkillsComponent.js';
-import { calculateSeedYield } from '../genetics/PlantGenetics.js';
+import { calculateSeedYield, applyGenetics } from '../genetics/PlantGenetics.js';
 import { calculateHarvestQuality } from '../items/ItemQuality.js';
 import type { GameEvent } from '../events/GameEvent.js';
 import type { GameEventMap } from '../events/EventMap.js';
@@ -263,15 +263,23 @@ export class HarvestActionHandler implements ActionHandler {
     // Convert skill level (0-5) to skill percentage (0-100)
     const farmingSkill = (farmingLevel / SKILL_LEVEL_HARVEST_THRESHOLD) * 100;
 
+    // Calculate yield quality multiplier from genetics and care
+    // genetics.yieldAmount: genetic production multiplier (0.5-2.0, defaults 1.0)
+    // careQuality: 0-100, how well agent has tended this plant (defaults 100)
+    // environmentMatch: 0-100, how well plant matches its biome (defaults 75)
+    const yieldMultiplier = (plant.genetics ? applyGenetics(plant, 'yield') : 1.0)
+      * (plant.careQuality / 100)
+      * (plant.environmentMatch / 100);
+
     // Calculate fruit yield (use fruitCount if available, otherwise base on health)
     // REQUIREMENT: Must yield at least 1 whole fruit - no fractional harvests
     let fruitYield: number;
     if (plant.fruitCount > 0) {
-      // Use existing fruit count (always a whole number)
-      fruitYield = plant.fruitCount;
+      // Use existing fruit count scaled by yield multiplier
+      fruitYield = Math.max(1, Math.round(plant.fruitCount * yieldMultiplier));
     } else {
-      // Calculate based on health: 0-3 fruit, but must be at least 1 to harvest
-      fruitYield = Math.floor((plant.health / 100) * BASE_FRUIT_YIELD);
+      // Calculate based on health and yield multiplier
+      fruitYield = Math.floor((plant.health / 100) * BASE_FRUIT_YIELD * yieldMultiplier);
     }
     // Ensure we always get at least 1 fruit from a successful harvest (if plant has any potential)
     if (fruitYield === 0 && plant.health > 0) {

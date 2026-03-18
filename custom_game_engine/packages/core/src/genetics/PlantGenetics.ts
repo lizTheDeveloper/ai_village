@@ -282,8 +282,9 @@ export function calculateSeedYield(
   const healthMod = plant.health / 100;
   const stageMod = plant.stage === 'seeding' ? 1.5 : 1.0;
   const skillMod = 0.5 + (agentSkill / 100);
+  const geneticYieldMod = plant.genetics ? applyGenetics(plant, 'yield') : 1.0;
 
-  return Math.floor(baseSeedsPerPlant * healthMod * stageMod * skillMod);
+  return Math.floor(baseSeedsPerPlant * healthMod * stageMod * skillMod * geneticYieldMod);
 }
 
 /**

@@ -82,6 +82,9 @@ export class PlantSystem extends BaseSystem {
   // Cache time component per frame to avoid repeated queries
   private cachedTimeComponent: { season?: string; lightLevel?: number } | undefined;
 
+  // Track recent watering events to update careQuality during update()
+  private recentlyWatered: Map<string, number> = new Map();
+
   // Event listeners storage
   private weatherRainIntensity: string | null = null;
   private weatherFrostTemperature: number | null = null;
@@ -166,6 +169,13 @@ export class PlantSystem extends BaseSystem {
       const nutrientLevel = e.data.nutrientLevel;
       const key = `${x},${y}`;
       this.soilNutrientChanges.set(key, nutrientLevel);
+    });
+
+    this.events.subscribe('soil:watered', (event: unknown) => {
+      const e = event as { data: { x: number; y: number; amount: number } };
+      const key = `${Math.floor(e.data.x)},${Math.floor(e.data.y)}`;
+      // Track watering events to update careQuality during update()
+      this.recentlyWatered.set(key, (this.recentlyWatered.get(key) ?? 0) + 1);
     });
 
     // Time events
@@ -731,6 +741,31 @@ export class PlantSystem extends BaseSystem {
         consumed: hourlyGrowth * PLANT_CONSTANTS.NUTRIENT_CONSUMPTION_MULTIPLIER,
         position: plant.position
       });
+
+    // Update careQuality based on watering (tending improves care, time decreases it)
+    const wateringKey = `${Math.floor(plant.position.x)},${Math.floor(plant.position.y)}`;
+    if (this.recentlyWatered.has(wateringKey)) {
+      // Watering increases careQuality by 5 per watering event (capped at 100)
+      plant.careQuality = Math.min(100, plant.careQuality + 5 * this.recentlyWatered.get(wateringKey)!);
+      this.recentlyWatered.delete(wateringKey); // Process once
+    } else {
+      // Slowly decay careQuality when not tended (2 points per day equivalent)
+      const decayRate = hoursElapsed * (2 / 24);
+      plant.careQuality = Math.max(0, plant.careQuality - decayRate);
+    }
+
+    // Calculate environmentMatch based on species biome preferences
+    const worldWithTiles = world as { getTileAt?: (x: number, y: number) => { biome?: string } | null };
+    const tile = typeof worldWithTiles.getTileAt === 'function'
+      ? worldWithTiles.getTileAt(plant.position.x, plant.position.y)
+      : null;
+    if (tile && tile.biome) {
+      const biomeMatch = species.biomes.includes(tile.biome);
+      const targetMatch = biomeMatch ? 90 : 50; // 90% match in native biome, 50% elsewhere
+      // Smoothly approach target match (gradual acclimation)
+      const matchDelta = (targetMatch - plant.environmentMatch) * 0.01 * hoursElapsed;
+      plant.environmentMatch = Math.max(10, Math.min(100, plant.environmentMatch + matchDelta));
+    }
 
     // Stage-specific updates
     this.handleStageSpecificUpdates(plant, species, world, entityId);
