@@ -138,6 +138,9 @@ export class UniverseGalleryScreen {
   private getFilteredUniverses(): ServerUniverseInfo[] {
     let filtered = this.universes;
 
+    // Hide deleted universes by default
+    filtered = filtered.filter(u => !u.name.startsWith('[DELETED]'));
+
     if (this.filterPublicOnly) {
       filtered = filtered.filter(u => u.isPublic);
     }
@@ -526,13 +529,16 @@ export class UniverseGalleryScreen {
       reality_is_magic: '#ff00ff',
     };
 
-    magicInfo.innerHTML = `
-      <div style="font-size: 12px; color: #888; margin-bottom: 4px;">Magic System</div>
-      <div style="font-size: 14px; color: ${intensityColors[universe.magicIntensity] || '#aaa'};">
-        ${universe.magicPreset} (${universe.magicIntensity})
-      </div>
-    `;
-    card.appendChild(magicInfo);
+    const hasKnownMagic = universe.magicPreset !== 'Unknown';
+    if (hasKnownMagic) {
+      magicInfo.innerHTML = `
+        <div style="font-size: 12px; color: #888; margin-bottom: 4px;">Magic System</div>
+        <div style="font-size: 14px; color: ${intensityColors[universe.magicIntensity] || '#aaa'};">
+          ${universe.magicPreset} (${universe.magicIntensity})
+        </div>
+      `;
+      card.appendChild(magicInfo);
+    }
 
     // Cosmic deities
     if (universe.cosmicDeities.length > 0) {

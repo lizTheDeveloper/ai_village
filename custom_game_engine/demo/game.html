@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌌</text></svg>">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -40,13 +41,25 @@
       margin-bottom: 0.5rem;
     }
 
+    @keyframes status-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
     .status {
       font-size: 0.875rem;
       color: #888;
+      animation: status-pulse 1.8s ease-in-out infinite;
     }
 
     .status.running {
       color: #4ade80;
+      animation: none;
+    }
+
+    .status.ready {
+      color: #60a5fa;
+      animation: none;
     }
 
     main {

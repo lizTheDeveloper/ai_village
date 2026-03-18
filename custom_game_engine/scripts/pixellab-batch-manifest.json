@@ -141,6 +141,36 @@
         "deer"
       ],
       "pending": []
+    },
+    "folklore": {
+      "description": "Folklore species batch — Sprint 9 Theme C/E (MUL-1995, MUL-1997, MUL-2010)",
+      "completed": [],
+      "pending": [
+        {
+          "id": "peuchen_vel",
+          "desc": "Mapuche folklore spirit, spinning iridescent disc form, blue-white glowing edges, fine hair-like filaments fringe, compact low silhouette, top-down view, pixel art"
+        },
+        {
+          "id": "mboi_tuivel",
+          "desc": "Guarani water guardian, thick teal-green serpentine body, oversized scarlet-and-yellow parrot head, curved beak, large round orange eyes, top-down view, pixel art"
+        },
+        {
+          "id": "bouda_kin",
+          "desc": "Berber shapeshifter humanoid form, tall lean figure, dark brown skin, loose ochre and rust woven robes, golden-brown eyes slightly wide-set, top-down view, pixel art"
+        },
+        {
+          "id": "anzar_vel",
+          "desc": "Kabyle rain deity, translucent humanoid spirit, blue-grey iridescent skin, floating silver hair, solid pale blue eyes no pupils, gentle mist at feet, top-down view, pixel art"
+        },
+        {
+          "id": "yelbegen_rin",
+          "desc": "Altai Turkic three-headed giant, heavy-set grey stone-like skin, rough furs, three heads on thick necks in different states (asleep/alert/eating), massive bone club, top-down view, pixel art"
+        },
+        {
+          "id": "lus_vel",
+          "desc": "Mongolian water serpent spirit, enormous coiled body, deep blue-green scales refracting light, wide flat head, long water-weed tendrils around jaw, silver-white glowing eyes, top-down view, pixel art"
+        }
+      ]
     }
   },
   "building_tiles": {
