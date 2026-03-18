@@ -74,7 +74,6 @@ export class TerrainRenderer {
   private tileSize: number;
   private showTemperatureOverlay: boolean = false;
   private hasLoggedTilledTile = false; // Debug flag to log first tilled tile rendering
-  private hasLoggedWallRender = false; // Debug flag to log first wall rendering
 
   // Chunk cache (key = "chunkX,chunkY")
   private chunkCache = new Map<string, CachedChunk>();
@@ -281,7 +280,7 @@ export class TerrainRenderer {
           // Add EXTRA THICK horizontal furrows (visible even at low zoom)
           // Use nearly black furrows with increased thickness
           ctx.strokeStyle = 'rgba(15, 8, 3, 1.0)'; // Even darker furrows
-          ctx.lineWidth = Math.max(4, this.tileSize * 3); // THICKER lines (constant since zoom=1 in cache)
+          ctx.lineWidth = 2; // THICKER lines (constant since zoom=1 in cache)
           const furrowCount = 7; // Even more furrows for unmistakable pattern
           const furrowSpacing = tilePixelSize / (furrowCount + 1);
 
@@ -295,7 +294,7 @@ export class TerrainRenderer {
 
           // Add vertical lines for grid pattern (makes it unmistakable)
           ctx.strokeStyle = 'rgba(15, 8, 3, 0.9)'; // Match furrow color
-          ctx.lineWidth = Math.max(3, this.tileSize * 1.5); // Thicker vertical lines
+          ctx.lineWidth = 1; // Thicker vertical lines
           const verticalCount = 5; // More vertical lines for denser grid
           const verticalSpacing = tilePixelSize / (verticalCount + 1);
 
@@ -310,12 +309,12 @@ export class TerrainRenderer {
           // Add DOUBLE BORDER for maximum visibility
           // Inner border: BRIGHTER orange for extreme visibility
           ctx.strokeStyle = 'rgba(255, 140, 60, 1.0)'; // BRIGHTER orange (increased from 200,120,60)
-          ctx.lineWidth = Math.max(4, this.tileSize * 1.5); // THICKER inner border (was 3)
+          ctx.lineWidth = 2; // THICKER inner border (was 3)
           ctx.strokeRect(screenX + 1, screenY + 1, tilePixelSize - 2, tilePixelSize - 2);
 
           // Outer border: darker for contrast
           ctx.strokeStyle = 'rgba(90, 50, 20, 1.0)'; // Even darker outer border for more contrast
-          ctx.lineWidth = Math.max(3, this.tileSize); // Thicker outer border (was 2)
+          ctx.lineWidth = 1; // Thicker outer border (was 2)
           ctx.strokeRect(screenX, screenY, tilePixelSize, tilePixelSize);
         }
 
@@ -329,7 +328,7 @@ export class TerrainRenderer {
         // Draw fertilized indicator (golden glow)
         if (tile.fertilized) {
           ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)'; // Gold
-          ctx.lineWidth = Math.max(1, this.tileSize);
+          ctx.lineWidth = 1;
           ctx.strokeRect(screenX, screenY, tilePixelSize, tilePixelSize);
         }
 
@@ -357,13 +356,13 @@ export class TerrainRenderer {
 
           // Add border for wall definition
           ctx.strokeStyle = `rgba(40, 40, 40, ${alpha * 0.8})`;
-          ctx.lineWidth = Math.max(1, this.tileSize * 0.5);
+          ctx.lineWidth = 1;
           ctx.strokeRect(screenX + 1, screenY + 1, tilePixelSize - 2, tilePixelSize - 2);
 
           // Show construction progress if incomplete
           if (progress < 100) {
             ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.font = `${Math.max(8, this.tileSize * 6)}px sans-serif`;
+            ctx.font = `${Math.max(8, Math.floor(tilePixelSize * 0.6))}px sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(`${Math.round(progress)}%`, screenX + tilePixelSize / 2, screenY + tilePixelSize / 2);
@@ -384,7 +383,7 @@ export class TerrainRenderer {
           if (door.state === 'open') {
             // Open door: render as thin outline (passable)
             ctx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
-            ctx.lineWidth = Math.max(2, this.tileSize);
+            ctx.lineWidth = 2;
             ctx.strokeRect(screenX + 2, screenY + 2, tilePixelSize - 4, tilePixelSize - 4);
             // Add dashed pattern to indicate open
             ctx.setLineDash([3, 3]);
@@ -397,19 +396,19 @@ export class TerrainRenderer {
 
             // Door frame (lighter)
             ctx.strokeStyle = `rgba(160, 120, 80, ${alpha})`;
-            ctx.lineWidth = Math.max(1, this.tileSize * 0.3);
+            ctx.lineWidth = 1;
             ctx.strokeRect(screenX + 1, screenY + 1, tilePixelSize - 2, tilePixelSize - 2);
 
             // Door handle (small circle on right side)
             ctx.fillStyle = door.state === 'locked' ? 'rgba(200, 200, 80, 0.9)' : 'rgba(180, 140, 100, 0.9)';
             ctx.beginPath();
-            ctx.arc(screenX + tilePixelSize * 0.75, screenY + tilePixelSize * 0.5, Math.max(2, this.tileSize), 0, Math.PI * 2);
+            ctx.arc(screenX + tilePixelSize * 0.75, screenY + tilePixelSize * 0.5, Math.max(2, tilePixelSize * 0.1), 0, Math.PI * 2);
             ctx.fill();
 
             // Lock indicator for locked doors
             if (door.state === 'locked') {
               ctx.strokeStyle = 'rgba(200, 200, 80, 0.9)';
-              ctx.lineWidth = Math.max(1, this.tileSize * 0.5);
+              ctx.lineWidth = 1;
               ctx.strokeRect(screenX + tilePixelSize * 0.7, screenY + tilePixelSize * 0.35, tilePixelSize * 0.1, tilePixelSize * 0.15);
             }
           }
@@ -427,7 +426,7 @@ export class TerrainRenderer {
 
           // Window frame (dark border)
           ctx.strokeStyle = `rgba(60, 40, 30, ${alpha + 0.2})`;
-          ctx.lineWidth = Math.max(2, this.tileSize * 0.7);
+          ctx.lineWidth = 2;
           ctx.strokeRect(screenX + 2, screenY + 2, tilePixelSize - 4, tilePixelSize - 4);
 
           // Cross pattern for window panes
@@ -460,7 +459,7 @@ export class TerrainRenderer {
 
           // Add diagonal line pattern to indicate roof texture
           ctx.strokeStyle = `rgba(0, 0, 0, ${alpha * 0.3})`;
-          ctx.lineWidth = Math.max(1, this.tileSize * 0.3);
+          ctx.lineWidth = 1;
 
           // Draw diagonal lines for roof texture
           const step = Math.max(3, tilePixelSize / 4);
@@ -474,7 +473,7 @@ export class TerrainRenderer {
           // Show construction progress if incomplete
           if (progress < 100) {
             ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.font = `${Math.max(8, this.tileSize * 6)}px sans-serif`;
+            ctx.font = `${Math.max(8, Math.floor(tilePixelSize * 0.6))}px sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(`${Math.round(progress)}%`, screenX + tilePixelSize / 2, screenY + tilePixelSize / 2);
@@ -507,7 +506,7 @@ export class TerrainRenderer {
           }
 
           ctx.fillStyle = tempColor;
-          ctx.font = `bold ${Math.max(8, this.tileSize * 8)}px monospace`;
+          ctx.font = `bold ${Math.max(8, this.tileSize * 0.8)}px monospace`;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText(
