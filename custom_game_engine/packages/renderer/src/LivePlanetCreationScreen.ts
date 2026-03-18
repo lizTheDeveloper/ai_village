@@ -749,24 +749,38 @@ export class LivePlanetCreationScreen {
   /**
    * Poll the metrics server to check if a sprite has been generated.
    * Updates the species with the sprite URL when complete.
+   * Uses exponential backoff with a max retry cap to avoid infinite 404 loops.
    */
   private async pollSpriteStatus(species: GeneratedSpecies): Promise<void> {
     const METRICS_API = LLM_PROXY_URL;
     const folderId = species.folderId;
     if (!folderId) return;
 
+    const MAX_RETRIES = 10;
+    const BASE_DELAY_MS = 3000;
+    let attempt = 0;
+
     const poll = async (): Promise<void> => {
+      if (attempt >= MAX_RETRIES) {
+        console.warn(`[LivePlanetCreation] Sprite polling for ${species.name} exceeded ${MAX_RETRIES} attempts, giving up`);
+        species.spriteStatus = 'failed';
+        this.render();
+        return;
+      }
+
+      attempt++;
+
       try {
         const response = await fetch(`${METRICS_API}/api/sprites/generate/status/${folderId}`);
         if (!response.ok) {
-          // Keep polling if not found yet
-          setTimeout(poll, 3000);
+          // Not found yet — backoff and retry
+          const delay = BASE_DELAY_MS * Math.pow(1.5, attempt - 1);
+          setTimeout(poll, delay);
           return;
         }
 
         const status = await response.json();
         if (status.status === 'complete') {
-          // Sprite is ready - set the URL
           species.spriteUrl = `${METRICS_API}/api/sprites/${folderId}/south.png`;
           species.spriteStatus = 'ready';
           species.otherDirectionsQueued = true;
@@ -776,13 +790,15 @@ export class LivePlanetCreationScreen {
           species.spriteStatus = 'failed';
           this.render();
         } else {
-          // Still generating - poll again in 3 seconds
+          // Still generating — backoff and retry
           species.spriteStatus = 'generating';
-          setTimeout(poll, 3000);
+          const delay = BASE_DELAY_MS * Math.pow(1.5, attempt - 1);
+          setTimeout(poll, delay);
         }
       } catch (error) {
-        // Network error - retry after delay
-        setTimeout(poll, 5000);
+        // Network error — backoff and retry
+        const delay = BASE_DELAY_MS * Math.pow(1.5, attempt - 1);
+        setTimeout(poll, delay);
       }
     };
 
