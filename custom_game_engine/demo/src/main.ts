@@ -96,6 +96,7 @@ import {
   PlantDiscoverySystem as BotanyPlantDiscoverySystem,
   PlantDiseaseSystem as BotanyPlantDiseaseSystem,
   WildPlantPopulationSystem as BotanyWildPlantPopulationSystem,
+  PlantCrossPollinationSystem as BotanyPlantCrossPollinationSystem,
 } from '@ai-village/botany';
 import {
   Renderer,
@@ -410,6 +411,7 @@ async function registerAllSystems(
     PlantDiscoverySystem: BotanyPlantDiscoverySystem,
     PlantDiseaseSystem: BotanyPlantDiseaseSystem,
     WildPlantPopulationSystem: BotanyWildPlantPopulationSystem,
+    PlantCrossPollinationSystem: BotanyPlantCrossPollinationSystem,
   };
   // Select feature flags based on VITE_MVEE_SPRINT env var (defaults to all systems)
   const sprintNumber = parseInt(import.meta.env.VITE_MVEE_SPRINT || '0', 10);
@@ -3908,12 +3910,16 @@ async function main() {
     });
   }
 
+  // Mutable ref so the settings handler (registered before renderer creation) can destroy it.
+  let activeRenderer: import('@ai-village/renderer').IRenderer | null = null;
+
   // Register settings change handler NOW (after storage is initialized)
   settingsPanel.setOnSettingsChange(async () => {
     // Guard: Only reload if gameLoop is fully initialized
     // This prevents reload loops during HMR or initialization
     if (!gameLoop || !gameLoop.world) {
       console.warn('[Demo] Settings changed but gameLoop not ready - skipping save');
+      activeRenderer?.destroy();
       window.location.reload();
       return;
     }
@@ -3929,6 +3935,7 @@ async function main() {
       console.error('[Demo] Failed to save before reload:', error);
       // Continue with reload even if save fails
     }
+    activeRenderer?.destroy();
     window.location.reload();
   });
 
@@ -3986,7 +3993,15 @@ async function main() {
   // Uses factory to automatically select WebGPU/WebGL/Canvas2D based on browser support
   // Override via localStorage.setItem('renderer', 'webgpu'|'webgl'|'canvas2d') or ?renderer= URL param
   const renderer = await createRenderer(canvas, chunkManager, terrainGenerator);
+  activeRenderer = renderer;
   console.log(`[Main] Renderer created with backend: ${renderer.getStats().backend}`);
+
+  // Destroy renderer on page unload to release WebGL context before the browser re-uses the slot.
+  // This is belt-and-suspenders alongside PixiJSRenderer's own beforeunload handler.
+  window.addEventListener('beforeunload', () => {
+    activeRenderer?.destroy();
+    activeRenderer = null;
+  }, { once: true });
 
   // Initialize combat UI renderers (optional on IRenderer)
   if (renderer.initCombatUI) {
