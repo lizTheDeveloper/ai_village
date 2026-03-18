@@ -48,6 +48,10 @@ import { DeitySerializer } from './DeitySerializer.js';
 import { DivineAbilitySerializer } from './DivineAbilitySerializer.js';
 import { NeedsSerializer } from './NeedsSerializer.js';
 import { PlantKnowledgeSerializer } from './PlantKnowledgeSerializer.js';
+import { SeedSerializer } from './SeedSerializer.js';
+
+// Discovery naming serializer (handles Map fields for player-named world firsts)
+import { DiscoveryNamingSerializer } from './DiscoveryNamingSerializer.js';
 
 /**
  * Register all component serializers.
@@ -103,6 +107,12 @@ export function registerAllSerializers(): void {
   // Register plant knowledge serializer (handles Map<string, PlantKnowledgeEntry> and Set<string>)
   componentSerializerRegistry.register('plant_knowledge', new PlantKnowledgeSerializer());
 
+  // Register seed serializer (handles genetics and metadata properly)
+  componentSerializerRegistry.register('seed', new SeedSerializer());
+
+  // Register discovery naming serializer (handles Map fields for player-named world firsts)
+  componentSerializerRegistry.register('discovery_naming', new DiscoveryNamingSerializer());
+
   // Register generic serializers for all other components
   // These can be replaced with specific serializers later
   const genericComponents = [
@@ -123,7 +133,7 @@ export function registerAllSerializers(): void {
     'weather',
     'time',
     'soil',
-    'seed',
+    // 'seed' - now has specific serializer (handles genetics and metadata properly)
     'steering',
     'velocity',
     'vision',
@@ -368,6 +378,7 @@ export function registerAllSerializers(): void {
 
     // --- Player / progression ---
     'milestone',
+    // Note: 'discovery_naming' uses DiscoveryNamingSerializer (handles Map fields)
     'generated_content',
     'god_crafted_artifact',
     'discovery_marker',
@@ -460,3 +471,5 @@ export { DeitySerializer } from './DeitySerializer.js';
 export { DivineAbilitySerializer } from './DivineAbilitySerializer.js';
 export { NeedsSerializer } from './NeedsSerializer.js';
 export { PlantKnowledgeSerializer } from './PlantKnowledgeSerializer.js';
+export { SeedSerializer } from './SeedSerializer.js';
+export { DiscoveryNamingSerializer } from './DiscoveryNamingSerializer.js';
