@@ -798,8 +798,11 @@ export class AdminAngelSystem extends BaseSystem {
 
     // Check if we're in browser environment - use proxy
     const isBrowser = typeof window !== 'undefined';
+    const apiBasePath = isBrowser
+      ? (typeof import.meta !== 'undefined' && (import.meta as any).env?.BASE_URL || '/').replace(/\/$/, '')
+      : '';
     const url = isBrowser
-      ? `/api/llm/chat`  // Vite dev server proxy route (not available in production builds)
+      ? `${apiBasePath}/api/llm/chat`  // Proxy route — base-path-aware for production
       : `${baseUrl}/chat/completions`;
 
     const headers: Record<string, string> = {

@@ -47,7 +47,8 @@ function getLLMApiKey(baseUrl: string): string {
 }
 
 // LLM availability check proxy — avoids CORS from browser
-app.get('/api/llm/check-availability', async (req, res) => {
+// Mounted under BASE_PATH so Traefik's PathPrefix('/mvee') routing reaches it
+app.get(`${BASE_PATH}/api/llm/check-availability`, async (req, res) => {
   const baseUrl = req.query.baseUrl as string;
   if (!baseUrl) {
     res.status(400).json({ available: false, error: 'Missing baseUrl parameter' });
@@ -75,7 +76,7 @@ app.get('/api/llm/check-availability', async (req, res) => {
 });
 
 // LLM chat proxy — forwards chat completions requests to provider
-app.post('/api/llm/chat', async (req, res) => {
+app.post(`${BASE_PATH}/api/llm/chat`, async (req, res) => {
   try {
     const requestData = req.body;
     const baseUrl: string = requestData.baseUrl || 'https://api.groq.com/openai/v1';
@@ -116,8 +117,8 @@ app.post('/api/llm/chat', async (req, res) => {
   }
 });
 
-// Health check (both at root and under base path)
-app.get('/api/health', (_req, res) => {
+// Health check under base path for Traefik routing
+app.get(`${BASE_PATH}/api/health`, (_req, res) => {
   res.json({ status: 'ok', timestamp: Date.now(), env: 'production' });
 });
 

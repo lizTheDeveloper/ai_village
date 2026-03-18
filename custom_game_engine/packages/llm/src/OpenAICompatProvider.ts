@@ -1028,8 +1028,11 @@ Be brief and natural.`
     try {
       // In browser environment, route through Vite proxy to avoid CORS
       const isBrowser = typeof window !== 'undefined';
+      const baseUrl = isBrowser
+        ? (typeof import.meta !== 'undefined' && (import.meta as any).env?.BASE_URL || '/').replace(/\/$/, '')
+        : '';
       const checkUrl = isBrowser
-        ? `/api/llm/check-availability?baseUrl=${encodeURIComponent(this.baseUrl)}`
+        ? `${baseUrl}/api/llm/check-availability?baseUrl=${encodeURIComponent(this.baseUrl)}`
         : `${this.baseUrl}/models`;
 
       const headers: Record<string, string> = {};
