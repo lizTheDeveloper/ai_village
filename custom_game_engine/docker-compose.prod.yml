@@ -11,6 +11,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 15s
+    env_file:
+      - .env
     environment:
       - PORT=3000
       - NODE_ENV=production
