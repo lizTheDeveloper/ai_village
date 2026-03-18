@@ -5477,11 +5477,64 @@ async function main() {
   });
 }
 
-// Start when DOM is ready
+// Wait for Matrix authentication before starting the game engine.
+// This prevents wasting CPU/GPU on unauthenticated visitors and avoids
+// IndexedDB save/load conflicts before auth is confirmed.
+function waitForAuth(): Promise<void> {
+  return new Promise((resolve) => {
+    const matrixAuth = (window as any).matrixAuth;
+    if (matrixAuth && matrixAuth.isLoggedIn()) {
+      resolve();
+      return;
+    }
+
+    const onReady = (e: Event) => {
+      if ((e as CustomEvent).detail && (e as CustomEvent).detail.loggedIn) {
+        cleanup();
+        resolve();
+      }
+    };
+
+    const onLogin = () => {
+      cleanup();
+      resolve();
+    };
+
+    let fallbackTimer: ReturnType<typeof setTimeout> | null = null;
+
+    function cleanup() {
+      window.removeEventListener('matrixAuthReady', onReady);
+      window.removeEventListener('matrixAuthLogin', onLogin);
+      if (fallbackTimer !== null) clearTimeout(fallbackTimer);
+    }
+
+    window.addEventListener('matrixAuthReady', onReady);
+    window.addEventListener('matrixAuthLogin', onLogin);
+
+    // Fallback: if auth scripts didn't load (local dev, scripts blocked),
+    // proceed after 5s so the game isn't permanently stuck
+    fallbackTimer = setTimeout(() => {
+      const auth = (window as any).matrixAuth;
+      if (!auth) {
+        console.warn('[Auth] matrix-auth.js not loaded — proceeding without authentication');
+        cleanup();
+        resolve();
+      }
+      // If matrixAuth exists but user not logged in, keep waiting —
+      // play-gate.js handles the login UI
+    }, 5000);
+  });
+}
+
+// Start when DOM is ready, but only after authentication
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    main().catch(err => console.error('[Demo] FATAL ERROR in main():', err));
+    waitForAuth()
+      .then(() => main())
+      .catch(err => console.error('[Demo] FATAL ERROR in main():', err));
   });
 } else {
-  main().catch(err => console.error('[Demo] FATAL ERROR in main():', err));
+  waitForAuth()
+    .then(() => main())
+    .catch(err => console.error('[Demo] FATAL ERROR in main():', err));
 }
