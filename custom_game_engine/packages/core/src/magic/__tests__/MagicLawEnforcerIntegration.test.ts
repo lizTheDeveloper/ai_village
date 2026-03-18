@@ -1,12 +1,10 @@
 /**
  * Integration tests for MagicLawEnforcer with real cost calculators
- * Gap: MagicLawEnforcer currently uses placeholder cost logic
- * Need: Integration with costCalculatorRegistry
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { MagicLawEnforcer } from '../MagicLawEnforcer.js';
-import { ACADEMIC_PARADIGM } from '../CoreParadigms.js';
+import { ACADEMIC_PARADIGM, getCoreParadigm } from '../CoreParadigms.js';
 import { costCalculatorRegistry } from '../costs/CostCalculatorRegistry.js';
 import type { ComposedSpell } from '../../components/MagicComponent.js';
 import type { MagicComponent } from '../../components/MagicComponent.js';
@@ -70,18 +68,16 @@ describe('MagicLawEnforcer - Cost Calculator Integration', () => {
     expect(manaCost).toBeDefined();
   });
 
-  // TODO: needs proper system initialization - insufficient mana rejection not working
-  it.skip('should reject spell if caster cannot afford costs', () => {
+  it('should reject spell if caster cannot afford costs', () => {
     mockCaster.resourcePools.mana.current = 20; // Insufficient
 
     const result = enforcer.validateSpell(testSpell, mockCaster, mockContext);
 
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain(expect.stringContaining('Insufficient mana'));
+    expect(result.errors).toEqual(expect.arrayContaining([expect.stringContaining('Insufficient mana')]));
   });
 
-  // TODO: needs proper system initialization - blood/names/pact/divine paradigm cost calculators not registered
-  it.skip('should warn about terminal effects', () => {
+  it('should warn about terminal effects', () => {
     // Set up for terminal scenario
     mockCaster.activeParadigms = ['blood'];
     mockCaster.resourcePools = {
@@ -164,8 +160,7 @@ describe('MagicLawEnforcer - Cost Calculator Integration', () => {
   });
 });
 
-// TODO: needs proper system initialization - cross-paradigm validation not implemented
-describe.skip('MagicLawEnforcer - Cross-Paradigm Validation', () => {
+describe('MagicLawEnforcer - Cross-Paradigm Validation', () => {
   it('should validate multi-paradigm casters', () => {
     const mockCaster: MagicComponent = {
       knownParadigmIds: ['academic', 'names'],
