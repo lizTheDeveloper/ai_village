@@ -146,6 +146,7 @@ export * from './data/index.js';
 // Import from: import { MetricsCollector, MetricsAnalysis, ... } from '@ai-village/metrics';
 // LiveEntityAPI still lives in core for now
 export { LiveEntityAPI, type QueryRequest, type QueryResponse } from './metrics/index.js';
+export { MetricsStreamClient, type MetricsStreamConfig } from './metrics/index.js';
 
 // ============================================================================
 // Crafting & Recipes

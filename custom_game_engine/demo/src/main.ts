@@ -3126,6 +3126,22 @@ async function main() {
   // Track intervals for cleanup to prevent memory leaks
   const intervalIds: ReturnType<typeof setInterval>[] = [];
 
+  // Early metrics connection so admin dashboard sees "Game Connected" during universe browser
+  // The full MetricsCollectionSystem will create its own connection later in registerAllSystems()
+  let earlyMetricsClient: import('@ai-village/core').MetricsStreamClient | null = null;
+  if (METRICS_WS_URL) {
+    try {
+      const { MetricsStreamClient } = await import('@ai-village/core');
+      earlyMetricsClient = new MetricsStreamClient({
+        serverUrl: METRICS_WS_URL,
+        gameSessionId: `game_${Date.now()}`,
+      });
+      earlyMetricsClient.connect();
+    } catch {
+      // Non-critical — admin dashboard just won't see early connection
+    }
+  }
+
   // Check if SharedWorker mode is enabled
   const useSharedWorker = import.meta.env.VITE_USE_SHARED_WORKER === 'true';
 
@@ -3917,6 +3933,11 @@ async function main() {
       chunkManager,
       terrainGenerator
     );
+    // Disconnect early metrics client — MetricsCollectionSystem now owns the connection
+    if (earlyMetricsClient) {
+      earlyMetricsClient.disconnect();
+      earlyMetricsClient = null;
+    }
   } else {
     // In SharedWorker mode, create minimal result for compatibility
     console.log('[Main] Skipping system registration (SharedWorker handles this)');
