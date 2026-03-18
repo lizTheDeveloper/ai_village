@@ -7,6 +7,7 @@ import type {
   PlantComponent,
   PlantSpecies,
   EventBus,
+  BiomeType,
 } from '@ai-village/core';
 import {
   BaseSystem,
@@ -51,8 +52,8 @@ export class WildPlantPopulationSystem extends BaseSystem {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
   public readonly dependsOn = [] as const;
 
-  /** Throttle to every 10 seconds (200 ticks at 20 TPS) */
-  protected readonly throttleInterval = 200;
+  /** Throttle to every 24 seconds (480 ticks at 20 TPS) */
+  protected readonly throttleInterval = 480;
 
   private speciesLookup: ((id: string) => PlantSpecies) | null = null;
   private config: PopulationConfig;
@@ -68,10 +69,6 @@ export class WildPlantPopulationSystem extends BaseSystem {
 
   /** Wild plant species registry */
   private wildPlantSpecies: PlantSpecies[] = [];
-
-  /** Time tracking */
-  private accumulatedTime: number = 0;
-  private readonly UPDATE_INTERVAL = 24; // Update once per game day
 
   /** Per-tick counter for unique seed IDs — reset each update pass */
   private seedIdCounter: number = 0;
@@ -260,19 +257,9 @@ export class WildPlantPopulationSystem extends BaseSystem {
 
   protected onUpdate(ctx: SystemContext): void {
     const world = ctx.world;
-    const deltaTime = ctx.deltaTime;
 
     // Store world reference for event handlers
     this.lastWorld = world;
-
-    // Accumulate time (assuming game runs at ~60fps with deltaTime in seconds)
-    this.accumulatedTime += deltaTime;
-
-    // Only update once per game day
-    if (this.accumulatedTime < this.UPDATE_INTERVAL) {
-      return;
-    }
-    this.accumulatedTime = 0;
 
     // Update agent positions in scheduler for proximity-based filtering
     world.simulationScheduler.updateAgentPositions(world);
@@ -461,23 +448,15 @@ export class WildPlantPopulationSystem extends BaseSystem {
   }
 
   /**
-   * Get biome at position from world terrain system
+   * Get biome at position from world terrain system.
+   * Returns null if tile or biome data is missing — callers must handle this.
    */
   private getBiomeAtPosition(
     position: { x: number; y: number },
     world: World
-  ): string | null {
-    // Query tile for biome data
-    const worldWithTiles = world as { getTileAt?: (x: number, y: number) => any };
-    if (typeof worldWithTiles.getTileAt === 'function') {
-      const tile = worldWithTiles.getTileAt(position.x, position.y);
-      if (tile && tile.biome) {
-        return tile.biome;
-      }
-    }
-
-    // Fallback to default biome if tile access not available or biome not set
-    return 'plains';
+  ): BiomeType | null {
+    const tile = world.getTileAt?.(position.x, position.y);
+    return tile?.biome ?? null;
   }
 
   /**
