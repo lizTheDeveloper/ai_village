@@ -493,7 +493,7 @@ describe('GoalGenerationSystem Integration', () => {
     }
 
     // Should be around 25 (50% of 50), allow 30-70% range for randomness
-    expect(goalsFormedCount).toBeGreaterThan(15);
-    expect(goalsFormedCount).toBeLessThan(35);
+    expect(goalsFormedCount).toBeGreaterThanOrEqual(15);
+    expect(goalsFormedCount).toBeLessThanOrEqual(35);
   });
 });

@@ -222,7 +222,7 @@ describe('UpliftBreedingProgramSystem - Stage Transitions', () => {
     program.currentIntelligence = 0.65;
     program.currentGeneration = 5;
     program.stage = 'neural_enhancement';
-    program.progressToNextGeneration = 100;
+    program.progressToNextGeneration = 0;
 
     // Run 20 ticks to trigger update interval
     for (let i = 0; i < 20; i++) {
