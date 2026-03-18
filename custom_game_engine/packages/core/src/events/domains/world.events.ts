@@ -141,6 +141,24 @@ export interface WorldEvents {
     newName: string;
   };
 
+  // === Biome Events ===
+  'biome:season_conditions_changed': {
+    biome: string;
+    season: string;
+    foodMultiplier: number;       // 0.1-2.0
+    waterMultiplier: number;      // 0.1-2.0
+    temperatureOffset: number;    // °C offset
+    animalActivityModifier: number; // 0.1-2.0
+  };
+  'biome:weather_event': {
+    biome: string;
+    eventType: string;
+    severity: number;  // 0-1
+    duration: number;  // seconds
+    movementModifier: number;  // 0-1 multiplier
+    temperatureOffset: number;
+  };
+
   // EXOTIC PLOT EVENTS - for Fates Council
   /** When time manipulation creates a paradox */
   'time:paradox_detected': {

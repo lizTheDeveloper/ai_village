@@ -75,6 +75,18 @@ export interface AnimalEvents {
     itemId: string;
     amount: number;
   };
+  'animal:migration_started': {
+    animalId: EntityId;
+    speciesId: string;
+    fromBiome: string;
+    toBiome: string;
+    season: string;
+  };
+  'animal:migration_completed': {
+    animalId: EntityId;
+    speciesId: string;
+    biome: string;
+  };
 }
 export type AnimalEventType = keyof AnimalEvents;
 export type AnimalEventData = AnimalEvents[AnimalEventType];

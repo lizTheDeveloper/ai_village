@@ -160,6 +160,7 @@ export enum ComponentType {
   Bioluminescent = 'bioluminescent',
   AnimalGroup = 'animal_group',
   WorkingAnimal = 'working_animal',
+  AnimalMigration = 'animal_migration',
 
   // Body Parts, Species & Genetics
   Body = 'body',
@@ -321,4 +322,7 @@ export enum ComponentType {
   GeneratedContent = 'generated_content',     // LLM-generated content (riddles, spells, recipes, etc.)
   GodCraftedArtifact = 'god_crafted_artifact', // Metadata for god-crafted discoveries
   DiscoveryMarker = 'discovery_marker',       // Marks discovered content locations
+
+  // Player Discovery Naming (Drive 4: Ownership)
+  DiscoveryNaming = 'discovery_naming',       // Player-named world firsts (milestone events)
 }
