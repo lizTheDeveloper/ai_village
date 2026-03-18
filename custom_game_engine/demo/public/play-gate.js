@@ -120,6 +120,25 @@
       btn.addEventListener('click', function () {
         if (window.matrixAuth && typeof window.matrixAuth.showLoginModal === 'function') {
           window.matrixAuth.showLoginModal();
+          // Hide gate so auth modal receives pointer events
+          gate.style.pointerEvents = 'none';
+          gate.style.opacity = '0';
+          // Restore gate if auth modal is closed without logging in
+          var overlay = document.getElementById('mx-auth-overlay');
+          if (overlay) {
+            var observer = new MutationObserver(function (mutations) {
+              for (var i = 0; i < mutations.length; i++) {
+                if (mutations[i].attributeName === 'class' && !overlay.classList.contains('open')) {
+                  observer.disconnect();
+                  if (!window.matrixAuth || !window.matrixAuth.isLoggedIn || !window.matrixAuth.isLoggedIn()) {
+                    gate.style.pointerEvents = '';
+                    gate.style.opacity = '';
+                  }
+                }
+              }
+            });
+            observer.observe(overlay, { attributes: true });
+          }
         }
       });
     }
