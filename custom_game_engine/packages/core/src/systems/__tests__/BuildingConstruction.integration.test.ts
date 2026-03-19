@@ -168,7 +168,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     expect(updatedResource.amount).toBeLessThanOrEqual(updatedResource.maxAmount);
   });
 
-  it('should resources not regenerate beyond max amount', () => {
+  it('should resources not regenerate beyond max amount', async () => {
     const resource = harness.world.createEntity('resource');
     resource.addComponent({
       type: ComponentType.Position,
@@ -187,9 +187,11 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
 
     // Setup StateMutatorSystem
     const stateMutator = new StateMutatorSystem();
+    await stateMutator.initialize(harness.world, harness.eventBus);
     harness.registerSystem('StateMutatorSystem', stateMutator);
 
     const resourceSystem = new ResourceGatheringSystem();
+    await resourceSystem.initialize(harness.world, harness.eventBus);
     harness.registerSystem('ResourceGatheringSystem', resourceSystem);
 
     const entities = harness.world.query().with(ComponentType.Resource).executeEntities();

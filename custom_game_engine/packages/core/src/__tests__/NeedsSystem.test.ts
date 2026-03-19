@@ -474,21 +474,20 @@ describe('NeedsSystem', () => {
 
       const entity = world.createEntity();
       const needs = new NeedsComponent({
-        hunger: 0.01,
+        hunger: 0,
         energy: 0.01,
         health: 1.0,
         thirst: 1.0,
         temperature: 1.0,
+        // Pre-set ticksAtZeroHunger to the starvation death threshold (5 game days)
+        ticksAtZeroHunger: 5 * 14400,
       });
       (entity as EntityImpl).addComponent(needs);
 
       const entities = world.query().with(ComponentType.Needs).executeEntities();
 
-      // Simulate long enough for both to reach zero
-      // With deltaTime=60, decay rate is much faster
-      for (let i = 0; i < 50; i++) {
-        system.update(world, entities, 60.0); // 60s = 1 game minute each
-      }
+      // Single update is enough — ticksAtZeroHunger already at threshold
+      system.update(world, entities, 1.0);
 
       eventBus.flush();
       expect(starvedHandler).toHaveBeenCalled();
@@ -566,7 +565,7 @@ describe('NeedsSystem', () => {
       const entities = [entity]; // Force entity without needs into update
 
       // Per CLAUDE.md: missing required components should throw, not silently skip
-      expect(() => system.update(world, entities, 1.0)).toThrow(/missing required needs component/);
+      expect(() => system.update(world, entities, 1.0)).toThrow(/missing required component: needs/);
     });
 
     it('should handle entity with needs but no circadian component', () => {

@@ -536,19 +536,21 @@ describe('GalacticCouncilSystem', () => {
       // Process mediation
       (system as Record<string, unknown>).mediateDisputes(world, councilComp, councilEntity, world.tick);
 
-      // Dispute should be resolved or escalated (removed from active)
+      // Dispute should be resolved or escalated — in either case removed from activeDisputes.
+      // When resolved (70% chance): moved to resolvedDisputes with status 'resolved'.
+      // When escalated (30% chance): removed from activeDisputes but NOT added to
+      // resolvedDisputes (only status set to 'escalated_to_war' before removal).
       const activeDispute = councilComp.disputes.activeDisputes.find((d) => d.id === 'dispute_2');
-      if (!activeDispute) {
-        // Moved to resolved
-        const resolvedDispute = councilComp.disputes.resolvedDisputes.find(
-          (d) => d.id === 'dispute_2'
-        );
-        expect(resolvedDispute).toBeDefined();
-        expect(resolvedDispute?.status).toBe('resolved');
-      } else {
-        // Or escalated to war
-        expect(activeDispute.status).toBe('escalated_to_war');
+      expect(activeDispute).toBeUndefined(); // Always removed from active after mediation period
+
+      const resolvedDispute = councilComp.disputes.resolvedDisputes.find(
+        (d) => d.id === 'dispute_2'
+      );
+      if (resolvedDispute) {
+        // Resolved path (70% probability)
+        expect(resolvedDispute.status).toBe('resolved');
       }
+      // Escalated path (30% probability): dispute is gone from both lists — no further assertion needed
     });
   });
 

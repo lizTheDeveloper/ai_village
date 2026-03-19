@@ -171,7 +171,7 @@ describe('Complete Game Day Cycle Integration', () => {
     expect(finalNeeds.energy).toBeLessThanOrEqual(initialEnergy);
   });
 
-  it.skip('should weather change during day', () => {
+  it.skip('should weather change during day', async () => {
     // SKIP: Test requires weather entity to be created, which isn't done in setupTestWorld
     // Also doesn't test anything meaningful (expect(true).toBe(true))
     const weatherSystem = new WeatherSystem(harness.eventBus);
@@ -327,7 +327,7 @@ describe('Complete Game Day Cycle Integration', () => {
     expect(needs.health).toBeGreaterThan(0);
   });
 
-  it.skip('should full day cycle emit all expected events', () => {
+  it.skip('should full day cycle emit all expected events', async () => {
     // SKIP: TimeSystem doesn't emit world:time:hour events (not implemented)
     // Create StateMutatorSystem (required for applying deltas)
     const stateMutator = new StateMutatorSystem();

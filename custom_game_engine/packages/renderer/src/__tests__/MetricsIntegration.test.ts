@@ -99,6 +99,7 @@ describe('Metrics Server Integration', () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(validPayload),
+            signal: AbortSignal.timeout(2000),
           });
 
           if (response.ok) {
@@ -156,6 +157,7 @@ describe('Metrics Server Integration', () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(validPayload),
+            signal: AbortSignal.timeout(2000),
           });
 
           if (response.ok) {
@@ -234,6 +236,7 @@ describe('Metrics Server Integration', () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(validPayload),
+            signal: AbortSignal.timeout(2000),
           });
 
           if (response.ok) {
@@ -285,6 +288,7 @@ describe('Metrics Server Integration', () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(validPayload),
+            signal: AbortSignal.timeout(2000),
           });
 
           if (response.ok) {
@@ -327,7 +331,9 @@ describe('Metrics Server Integration', () => {
     describe('GET /api/game/entities', () => {
       it('should return array of agent IDs', async () => {
         try {
-          const response = await fetch(`${SERVER_URL}/api/game/entities`);
+          const response = await fetch(`${SERVER_URL}/api/game/entities`, {
+            signal: AbortSignal.timeout(2000),
+          });
 
           if (response.ok) {
             const data = await response.json();
@@ -376,7 +382,8 @@ describe('Metrics Server Integration', () => {
       it('should return 404 for non-existent entity', async () => {
         try {
           const response = await fetch(
-            `${SERVER_URL}/api/game/entity?id=nonexistent_agent`
+            `${SERVER_URL}/api/game/entity?id=nonexistent_agent`,
+            { signal: AbortSignal.timeout(2000) }
           );
 
           if (!response.ok) {
@@ -394,7 +401,9 @@ describe('Metrics Server Integration', () => {
     describe('GET /api/game/magic', () => {
       it('should return magic system state', async () => {
         try {
-          const response = await fetch(`${SERVER_URL}/api/game/magic`);
+          const response = await fetch(`${SERVER_URL}/api/game/magic`, {
+            signal: AbortSignal.timeout(2000),
+          });
 
           if (response.ok) {
             const data = await response.json();
@@ -410,7 +419,9 @@ describe('Metrics Server Integration', () => {
     describe('GET /api/game/divinity', () => {
       it('should return divinity system state', async () => {
         try {
-          const response = await fetch(`${SERVER_URL}/api/game/divinity`);
+          const response = await fetch(`${SERVER_URL}/api/game/divinity`, {
+            signal: AbortSignal.timeout(2000),
+          });
 
           if (response.ok) {
             const data = await response.json();
@@ -426,7 +437,9 @@ describe('Metrics Server Integration', () => {
     describe('GET /api/game/universe', () => {
       it('should return universe configuration', async () => {
         try {
-          const response = await fetch(`${SERVER_URL}/api/game/universe`);
+          const response = await fetch(`${SERVER_URL}/api/game/universe`, {
+            signal: AbortSignal.timeout(2000),
+          });
 
           if (response.ok) {
             const data = await response.json();
@@ -571,7 +584,7 @@ describe('Metrics Server Integration', () => {
   describe('Rate Limiting', () => {
     it('should handle rapid requests without crashing', async () => {
       const requests = Array.from({ length: 10 }, (_, i) =>
-        fetch(`${SERVER_URL}/api/game/entities`)
+        fetch(`${SERVER_URL}/api/game/entities`, { signal: AbortSignal.timeout(2000) })
       );
 
       try {
@@ -590,7 +603,9 @@ describe('Metrics Server Integration', () => {
   describe('Content Negotiation', () => {
     it('should return JSON by default', async () => {
       try {
-        const response = await fetch(`${SERVER_URL}/api/game/entities`);
+        const response = await fetch(`${SERVER_URL}/api/game/entities`, {
+          signal: AbortSignal.timeout(2000),
+        });
 
         if (response.ok) {
           const contentType = response.headers.get('content-type');
@@ -609,6 +624,7 @@ describe('Metrics Server Integration', () => {
           headers: {
             Origin: 'http://localhost:3000',
           },
+          signal: AbortSignal.timeout(2000),
         });
 
         // Check for CORS headers

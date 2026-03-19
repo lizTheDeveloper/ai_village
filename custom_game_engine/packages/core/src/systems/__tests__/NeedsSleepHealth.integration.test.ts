@@ -45,7 +45,6 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
 
     // Use AutonomicSystem to check sleep trigger
     const autonomic = new AutonomicSystem();
-    await autonomic.initialize(harness.world, harness.eventBus);
 
     // Check autonomic override - low energy should trigger seek_sleep
     const result = autonomic.check(agent, harness.world);

@@ -19,7 +19,7 @@ import type { EntityImpl } from '../ecs/Entity.js';
 import type { LLMDecisionQueue } from '../types/LLMTypes.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
-import type { MemoryComponent } from '../components/MemoryComponent.js';
+import type { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 
@@ -220,24 +220,30 @@ Respond with ONLY the legend text, no title or preamble.`;
         continue;
       }
 
-      // Find eldest surviving agent to carry this memory
+      // Find eldest surviving agent (gets elevated importance)
       const eldestAgentId = this.findEldestLivingAgent(world);
 
-      if (eldestAgentId) {
-        const entity = world.getEntity(eldestAgentId) as EntityImpl | undefined;
-        if (entity) {
-          const memory = entity.getComponent<MemoryComponent>(CT.Memory);
-          if (memory) {
-            memory.addMemory({
-              id: `legend_${pending.triggerType}_${tick}`,
-              type: 'episodic',
-              content: legendText,
-              importance: 95,
-              timestamp: tick,
-              location: { x: 0, y: 0 },
-            });
-          }
-        }
+      // Store memory in all living agents' EpisodicMemoryComponent
+      const agentEntities = world.query().with(CT.Agent).with(CT.Needs).executeEntities();
+      for (const entity of agentEntities) {
+        const impl = entity as EntityImpl;
+        const needs = impl.getComponent<NeedsComponent>(CT.Needs);
+        if (!needs || needs.health <= 0) continue;
+
+        const episodicMemory = impl.getComponent<EpisodicMemoryComponent>(CT.EpisodicMemory);
+        if (!episodicMemory) continue;
+
+        const isEldest = entity.id === eldestAgentId;
+        episodicMemory.formMemory({
+          eventType: `civilizational_legend:${pending.triggerType}`,
+          summary: legendText,
+          timestamp: tick,
+          importance: isEldest ? 0.95 : 0.75,
+          emotionalIntensity: isEldest ? 0.9 : 0.6,
+          emotionalValence: 0.8,
+          surprise: 0.7,
+          socialSignificance: 1.0,
+        });
       }
 
       // Emit the legend born event

@@ -15,7 +15,7 @@ import { World } from '../../ecs/World.js';
 
 import { AgentBrainSystem, createAgentBrainSystem } from '../AgentBrainSystem.js';
 import { BehaviorRegistry } from '../../behavior/BehaviorRegistry.js';
-import { EventBusImpl } from '../events/EventBus.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 
 // Helper to create a mock agent component
 function createMockAgent(overrides: Partial<AgentComponent> = {}): AgentComponent {
@@ -37,6 +37,11 @@ function createMockAgent(overrides: Partial<AgentComponent> = {}): AgentComponen
 function createMockWorld(tick: number = 100): World {
   return {
     tick,
+    gameTime: {
+      day: 1,
+      hour: 12,
+      season: 'spring',
+    },
     eventBus: {
       emit: vi.fn(),
       subscribe: vi.fn(),
