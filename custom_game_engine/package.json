@@ -12,6 +12,7 @@
     "build:prod": "cd demo && npx vite build --config vite.config.prod.ts",
     "dev": "tsc --build --watch",
     "test": "npm run validate-data && vitest run",
+    "test:perf": "vitest run --config vitest.config.perf.ts",
     "test:watch": "vitest",
     "test:coverage": "npm run validate-data && vitest run --coverage",
     "test:all": "npm run test --workspaces",
