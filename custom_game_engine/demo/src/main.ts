@@ -5459,9 +5459,17 @@ async function main() {
   }
 
   // Show onboarding hints for first-time players (after cinematic, before gameplay)
-  if (!OnboardingOverlay.wasCompleted()) {
+  const isNewPlayer = !OnboardingOverlay.wasCompleted();
+  if (isNewPlayer) {
     const onboarding = new OnboardingOverlay();
     onboarding.show();
+  }
+
+  // Auto-open Divine Chat for new players so they discover the Angel
+  if (isNewPlayer) {
+    setTimeout(() => {
+      windowManager.showWindow('divine-chat');
+    }, 5000); // 5 second delay after genesis
   }
 
   // In-game support prompt (shows after 10 minutes of active play)

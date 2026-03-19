@@ -24,6 +24,12 @@ const HINTS: OnboardingHint[] = [
     arrow: 'up',
   },
   {
+    id: 'divine-chat',
+    text: 'Press G to open Divine Chat — your Angel is watching the village with you. Ask them anything about what\'s happening!',
+    position: { top: '50%', left: '50%' },
+    arrow: 'none',
+  },
+  {
     id: 'click-agent',
     text: 'Click on an agent in the world to see their thoughts, needs, and skills.',
     position: { top: '50%', left: '50%' },

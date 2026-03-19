@@ -4099,19 +4099,7 @@ export function spawnAdminAngel(
   // Send greeting only if this is a new player (no chat history exists)
   const isReturningPlayer = hasPlayerBeenGreeted();
   if (!isReturningPlayer) {
-    setTimeout(() => {
-      world.eventBus.emit({
-        type: 'chat:send_message',
-        data: {
-          roomId: 'divine_chat',
-          senderId: entity.id,
-          senderName: name,
-          message: 'hey',
-          type: 'message',
-        },
-        source: entity.id,
-      });
-
+    const sendGreeting = (message: string, delay: number): void => {
       setTimeout(() => {
         world.eventBus.emit({
           type: 'chat:send_message',
@@ -4119,13 +4107,17 @@ export function spawnAdminAngel(
             roomId: 'divine_chat',
             senderId: entity.id,
             senderName: name,
-            message: 'welcome to the game. its kinda complicated but ill help u figure it out',
+            message,
             type: 'message',
           },
           source: entity.id,
         });
-      }, 1000);
-    }, 500);
+      }, delay);
+    };
+
+    sendGreeting('hey, welcome', 500);
+    sendGreeting('so ur basically a god watching over this lil village. the people down there are living their lives and u can help guide them', 2000);
+    sendGreeting('u can talk to me anytime btw — just type here. i see everything thats happening and can explain stuff or help u figure things out', 4000);
   }
 
   return entity.id;
