@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc --build > /dev/null 2>&1 || tsc --build",
     "build:stable": "npx tsx scripts/create-stable-build.ts",
     "build:prod": "cd demo && npx vite build --config vite.config.prod.ts",
     "dev": "tsc --build --watch",
