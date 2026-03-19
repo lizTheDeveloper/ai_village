@@ -1,0 +1,209 @@
+name: Deploy MVEE
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'custom_game_engine/**'
+  workflow_dispatch:
+    inputs:
+      paperclip_issue:
+        description: 'Paperclip issue ID (e.g. MUL-1847)'
+        required: false
+        type: string
+
+concurrency:
+  group: hetzner-mvee
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: custom_game_engine
+
+jobs:
+  ci:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: custom_game_engine/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run build
+
+      - name: Run tests
+        run: npm test
+
+      - name: Production build
+        run: npm run build:prod
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mvee-dist
+          path: |
+            custom_game_engine/demo/dist/
+            custom_game_engine/demo/server/
+            custom_game_engine/package.json
+            custom_game_engine/package-lock.json
+            custom_game_engine/Dockerfile.prebuilt
+            custom_game_engine/docker-compose.prod.yml
+          retention-days: 7
+
+  deploy:
+    name: Deploy to Hetzner
+    needs: ci
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: mvee-dist
+          path: artifacts
+
+      - name: Deploy to Hetzner
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 37.27.36.108
+          username: root
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            # Backup current dist for rollback
+            if [ -d /opt/mvee/demo/dist ]; then
+              rm -rf /opt/mvee/demo/dist.backup
+              cp -a /opt/mvee/demo/dist /opt/mvee/demo/dist.backup
+            fi
+
+      - name: Sync build artifacts
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 37.27.36.108
+          username: root
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          source: "artifacts/custom_game_engine/demo/dist/*,artifacts/custom_game_engine/demo/server/*,artifacts/custom_game_engine/Dockerfile.prebuilt,artifacts/custom_game_engine/docker-compose.prod.yml,artifacts/custom_game_engine/package.json,artifacts/custom_game_engine/package-lock.json"
+          target: /opt/mvee/
+          strip_components: 2
+
+      - name: Rebuild and restart container
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 37.27.36.108
+          username: root
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            cd /opt/mvee
+            docker compose -f docker-compose.prod.yml build
+            docker compose -f docker-compose.prod.yml up -d
+
+  verify:
+    name: Verify Production
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for container startup
+        run: sleep 15
+
+      - name: Verify MVEE returns HTTP 200
+        id: mvee_check
+        run: |
+          URL="https://play.multiversestudios.xyz/mvee/"
+          STATUS=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 -L "$URL")
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+          echo "MVEE at $URL → HTTP $STATUS"
+          if [ "$STATUS" -ne 200 ]; then
+            echo "::error::MVEE returned HTTP $STATUS"
+            exit 1
+          fi
+
+      - name: Check for script tags
+        run: |
+          BODY=$(curl -s --max-time 30 -L "https://play.multiversestudios.xyz/mvee/")
+          if echo "$BODY" | grep -q '<script'; then
+            echo "Script tags found — bundle loaded"
+          else
+            echo "::warning::No script tags found in response"
+          fi
+
+  rollback:
+    name: Rollback on Failure
+    needs: verify
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore previous dist
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 37.27.36.108
+          username: root
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            if [ -d /opt/mvee/demo/dist.backup ]; then
+              echo "Rolling back to previous dist..."
+              rm -rf /opt/mvee/demo/dist
+              mv /opt/mvee/demo/dist.backup /opt/mvee/demo/dist
+              cd /opt/mvee
+              docker compose -f docker-compose.prod.yml build
+              docker compose -f docker-compose.prod.yml up -d
+              echo "Rollback complete."
+            else
+              echo "No backup found — cannot rollback"
+              exit 1
+            fi
+
+  notify:
+    name: Notify Paperclip
+    needs: [deploy, verify]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Post deploy result to Paperclip
+        if: inputs.paperclip_issue != ''
+        env:
+          PAPERCLIP_API_URL: ${{ secrets.PAPERCLIP_API_URL }}
+          PAPERCLIP_API_KEY: ${{ secrets.PAPERCLIP_CI_TOKEN }}
+          PAPERCLIP_COMPANY_ID: ${{ secrets.PAPERCLIP_COMPANY_ID }}
+        run: |
+          ISSUE_ID="${{ inputs.paperclip_issue }}"
+
+          if [ -z "$PAPERCLIP_API_URL" ] || [ -z "$PAPERCLIP_API_KEY" ]; then
+            echo "Paperclip not configured — skipping"
+            exit 0
+          fi
+
+          ISSUE_DATA=$(curl -s -H "Authorization: Bearer $PAPERCLIP_API_KEY" \
+            "$PAPERCLIP_API_URL/api/companies/$PAPERCLIP_COMPANY_ID/issues?search=$ISSUE_ID" 2>/dev/null || true)
+          ISSUE_UUID=$(echo "$ISSUE_DATA" | python3 -c "
+          import sys, json
+          data = json.loads(sys.stdin.read())
+          for d in data:
+              if d.get('identifier') == '$ISSUE_ID':
+                  print(d['id'])
+                  break
+          " 2>/dev/null || true)
+
+          if [ -z "$ISSUE_UUID" ]; then
+            echo "Could not resolve $ISSUE_ID"
+            exit 0
+          fi
+
+          if [ "${{ needs.verify.result }}" = "success" ]; then
+            BODY="## MVEE Auto-Deploy Succeeded\n\nDeployed to play.multiversestudios.xyz/mvee/\nWorkflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          else
+            BODY="## MVEE Auto-Deploy FAILED\n\nRollback attempted.\nWorkflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          fi
+
+          curl -s -X POST \
+            -H "Authorization: Bearer $PAPERCLIP_API_KEY" \
+            -H "Content-Type: application/json" \
+            "$PAPERCLIP_API_URL/api/issues/$ISSUE_UUID/comments" \
+            -d "{\"body\": \"$BODY\"}" || echo "Failed to post comment"
