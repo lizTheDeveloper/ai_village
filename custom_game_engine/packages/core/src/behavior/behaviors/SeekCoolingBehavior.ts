@@ -34,6 +34,7 @@ interface CoolingSource {
   position: { x: number; y: number };
   distance: number;
   entity?: Entity;
+  entityId?: string;
   waterDepth?: number;
 }
 
@@ -85,8 +86,14 @@ export class SeekCoolingBehavior extends BaseBehavior {
         cachedCoolingSource: coolingSource,
       });
     } else {
-      // Use cached source
-      coolingSource = cachedSource;
+      // Use cached source — validate entity reference is still valid
+      if (cachedSource.entity && typeof (cachedSource.entity as EntityImpl).getComponent !== 'function') {
+        // Cached entity is stale — invalidate and re-search next tick
+        this.updateState(entity, { lastSearchTick: 0, cachedCoolingSource: null });
+        coolingSource = null;
+      } else {
+        coolingSource = cachedSource;
+      }
     }
 
     if (!coolingSource) {
@@ -365,6 +372,9 @@ export class SeekCoolingBehavior extends BaseBehavior {
     if (source.type === 'shade' && source.entity) {
       const entityImpl = source.entity as EntityImpl;
 
+      // Guard: validate cached entity reference is still valid
+      if (typeof entityImpl.getComponent !== 'function') return false;
+
       // Check if it's a building with shade
       const buildingComp = entityImpl.getComponent(ComponentType.Building);
       if (buildingComp) {
@@ -386,6 +396,10 @@ export class SeekCoolingBehavior extends BaseBehavior {
 
     if (source.type === 'interior' && source.entity) {
       const buildingImpl = source.entity as EntityImpl;
+
+      // Guard: validate cached entity reference is still valid
+      if (typeof buildingImpl.getComponent !== 'function') return false;
+
       const buildingComp = buildingImpl.getComponent(ComponentType.Building);
       return !!(buildingComp && source.distance <= buildingComp.interiorRadius);
     }
@@ -634,12 +648,30 @@ export function seekCoolingBehaviorWithContext(ctx: BehaviorContext): ContextBeh
   let coolingSource: CoolingSource | null;
   if (ctx.tick - lastSearchTick >= SEEK_COOLING_SEARCH_INTERVAL || !cachedSource) {
     coolingSource = findBestCoolingSourceWithContext(ctx);
+    // Cache with entityId instead of entity reference to survive serialization
     ctx.updateState({
       lastSearchTick: ctx.tick,
-      cachedCoolingSource: coolingSource,
+      cachedCoolingSource: coolingSource ? {
+        type: coolingSource.type,
+        position: coolingSource.position,
+        distance: coolingSource.distance,
+        entityId: coolingSource.entity?.id,
+        waterDepth: coolingSource.waterDepth,
+      } : null,
     });
   } else {
-    coolingSource = cachedSource;
+    // Re-resolve entity from world using cached entityId
+    coolingSource = { ...cachedSource };
+    if (cachedSource.entityId) {
+      const resolved = ctx.getEntity(cachedSource.entityId);
+      if (resolved) {
+        coolingSource.entity = resolved;
+      } else {
+        // Entity no longer exists — invalidate cache, re-search next tick
+        ctx.updateState({ lastSearchTick: 0, cachedCoolingSource: null });
+        coolingSource = null;
+      }
+    }
   }
 
   if (!coolingSource) {
@@ -770,6 +802,7 @@ function findShadeSourcesWithContext(ctx: BehaviorContext): CoolingSource[] {
         position,
         distance,
         entity: building,
+        entityId: building.id,
       });
     }
 
@@ -780,6 +813,7 @@ function findShadeSourcesWithContext(ctx: BehaviorContext): CoolingSource[] {
         position,
         distance,
         entity: building,
+        entityId: building.id,
       });
     }
   }
@@ -804,6 +838,7 @@ function findShadeSourcesWithContext(ctx: BehaviorContext): CoolingSource[] {
         position,
         distance,
         entity: plant,
+        entityId: plant.id,
       });
     }
   }
@@ -818,6 +853,9 @@ function isInCoolingRangeWithContext(ctx: BehaviorContext, source: CoolingSource
 
   if (source.type === 'shade' && source.entity) {
     const entityImpl = source.entity as EntityImpl;
+
+    // Guard: validate entity reference is still a proper Entity with methods
+    if (typeof entityImpl.getComponent !== 'function') return false;
 
     const buildingComp = entityImpl.getComponent<BuildingComponent>(CT.Building);
     if (buildingComp) {
@@ -838,6 +876,10 @@ function isInCoolingRangeWithContext(ctx: BehaviorContext, source: CoolingSource
 
   if (source.type === 'interior' && source.entity) {
     const buildingImpl = source.entity as EntityImpl;
+
+    // Guard: validate entity reference is still a proper Entity with methods
+    if (typeof buildingImpl.getComponent !== 'function') return false;
+
     const buildingComp = buildingImpl.getComponent<BuildingComponent>(CT.Building);
     return !!(buildingComp && source.distance <= buildingComp.interiorRadius);
   }
