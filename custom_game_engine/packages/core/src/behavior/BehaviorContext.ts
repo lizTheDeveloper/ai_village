@@ -389,18 +389,23 @@ export class BehaviorContextImpl implements BehaviorContext {
     componentTypes: string[],
     options?: SpatialQueryOptions
   ): EntityWithDistance[] {
+    let results: EntityWithDistance[];
     if (this.spatialQuery) {
-      return this.spatialQuery.getEntitiesInRadius(
+      results = this.spatialQuery.getEntitiesInRadius(
         this.position.x,
         this.position.y,
         radius,
         componentTypes,
         options
       );
+    } else {
+      // Fallback to global query
+      results = this.globalQueryEntitiesInRadius(radius, componentTypes, options);
     }
 
-    // Fallback to global query
-    return this.globalQueryEntitiesInRadius(radius, componentTypes, options);
+    // Guard: filter out entities that lack getComponent (zombie/stale references)
+    // This prevents TypeError crashes in behavior handlers
+    return results.filter(r => typeof (r.entity as EntityImpl).getComponent === 'function');
   }
 
   getNearestEntity(
@@ -670,7 +675,12 @@ export class BehaviorContextImpl implements BehaviorContext {
   // ============================================================================
 
   getEntity(id: string): Entity | undefined {
-    return this.world.getEntity(id);
+    const entity = this.world.getEntity(id);
+    // Guard: verify entity has expected methods (not a zombie/stale reference)
+    if (entity && typeof (entity as EntityImpl).getComponent !== 'function') {
+      return undefined;
+    }
+    return entity;
   }
 }
 

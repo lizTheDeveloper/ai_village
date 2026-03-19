@@ -355,48 +355,65 @@ export class AgentBrainSystem extends BaseSystem {
 
       thinkingAgents++;
 
-      // Update last think time
-      this.updateThinkTime(impl, ctx.tick);
+      try {
+        // Update last think time
+        this.updateThinkTime(impl, ctx.tick);
 
-      // Re-fetch agent component after updating think time
-      agent = impl.getComponent<AgentComponent>(CT.Agent)!;
+        // Re-fetch agent component after updating think time
+        agent = impl.getComponent<AgentComponent>(CT.Agent)!;
 
-      // Phase 1: Perception
-      const p1 = performance.now();
-      this.perception.processAll(impl, ctx.world);
-      perceptionTime += performance.now() - p1;
+        // Phase 1: Perception
+        const p1 = performance.now();
+        this.perception.processAll(impl, ctx.world);
+        perceptionTime += performance.now() - p1;
 
-      // Phase 2: Decision
-      const p2 = performance.now();
-      const decisionResult = this.processDecision(impl, ctx.world, agent);
-      decisionTime += performance.now() - p2;
+        // Phase 2: Decision
+        const p2 = performance.now();
+        const decisionResult = this.processDecision(impl, ctx.world, agent);
+        decisionTime += performance.now() - p2;
 
-      // Phase 3: Execution
-      if (decisionResult.execute) {
-        const p3 = performance.now();
-        const behaviorResult = this.behaviors.execute(decisionResult.behavior, impl, ctx.world);
-        executionTime += performance.now() - p3;
+        // Phase 3: Execution
+        if (decisionResult.execute) {
+          const p3 = performance.now();
+          const behaviorResult = this.behaviors.execute(decisionResult.behavior, impl, ctx.world);
+          executionTime += performance.now() - p3;
 
-        // Phase 4: Handle behavior completion and transitions
-        if (behaviorResult.complete) {
-          // Emit completion event
-          ctx.world.eventBus.emit({
-            type: 'behavior:completed',
-            source: impl.id,
-            data: {
-              behavior: agent.behavior,
-              reason: behaviorResult.reason,
-              nextBehavior: behaviorResult.nextBehavior,
-            },
-          });
+          // Phase 4: Handle behavior completion and transitions
+          if (behaviorResult.complete) {
+            // Emit completion event
+            ctx.world.eventBus.emit({
+              type: 'behavior:completed',
+              source: impl.id,
+              data: {
+                behavior: agent.behavior,
+                reason: behaviorResult.reason,
+                nextBehavior: behaviorResult.nextBehavior,
+              },
+            });
 
-          // Transition to next behavior or idle
-          const nextBehavior = behaviorResult.nextBehavior || 'idle';
+            // Transition to next behavior or idle
+            const nextBehavior = behaviorResult.nextBehavior || 'idle';
+            impl.updateComponent<AgentComponent>(CT.Agent, (current) => ({
+              ...current,
+              behavior: nextBehavior,
+              behaviorState: behaviorResult.nextState || {},
+            }));
+          }
+        }
+      } catch (error) {
+        // Isolate per-agent errors: one agent's crash must not abort all other agents.
+        // Reset the crashing agent to idle to prevent repeated failures.
+        const agentName = impl.id;
+        const behavior = agent?.behavior ?? 'unknown';
+        console.error(`[AgentBrainSystem] Error processing agent '${agentName}' (behavior=${behavior}): ${error}`);
+        try {
           impl.updateComponent<AgentComponent>(CT.Agent, (current) => ({
             ...current,
-            behavior: nextBehavior,
-            behaviorState: behaviorResult.nextState || {},
+            behavior: 'idle',
+            behaviorState: {},
           }));
+        } catch {
+          // Entity may be in a bad state — skip recovery
         }
       }
     }
