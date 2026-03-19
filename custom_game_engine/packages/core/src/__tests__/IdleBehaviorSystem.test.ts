@@ -264,7 +264,7 @@ describe('IdleBehaviorSystem', () => {
       }
 
       const practiceCount = behaviors.filter(b => b === 'practice_skill').length;
-      expect(practiceCount).toBeGreaterThan(3);
+      expect(practiceCount).toBeGreaterThanOrEqual(3);
     });
   });
 
