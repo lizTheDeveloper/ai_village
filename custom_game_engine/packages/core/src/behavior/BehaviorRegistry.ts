@@ -191,16 +191,26 @@ export class BehaviorRegistry {
         }
       } catch (error) {
         // Enrich TypeError with behavior context for production diagnostics
-        if (error instanceof TypeError) {
+        if (error instanceof TypeError && error.message.includes('getComponent')) {
           let stateStr: string;
           try {
             stateStr = JSON.stringify(entity.getComponent<AgentComponent>('agent')?.behaviorState ?? {});
           } catch {
             stateStr = '[unserializable]';
           }
+          // Extract the object that failed getComponent from the error
+          // Parse "t.getComponent is not a function" → inspect what 't' actually was
           const enriched = new TypeError(
             `[BehaviorRegistry] ${error.message} in behavior '${name}' ` +
-            `(entity=${entity.id}, tick=${world.tick}, state=${stateStr})`,
+            `(entity=${entity.id}, tick=${world.tick}, state=${stateStr}). ` +
+            `Stack: ${error.stack?.split('\n').slice(0, 5).join(' | ')}`,
+          );
+          enriched.stack = error.stack;
+          throw enriched;
+        }
+        if (error instanceof TypeError) {
+          const enriched = new TypeError(
+            `[BehaviorRegistry] ${error.message} in behavior '${name}' (entity=${entity.id}, tick=${world.tick})`,
           );
           enriched.stack = error.stack;
           throw enriched;
