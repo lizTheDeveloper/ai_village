@@ -73,7 +73,7 @@ export const DOMAIN_PREFIXES: Record<DomainName, readonly string[]> = {
   plant: ['plant:', 'seed:', 'soil:', 'wild_plant:', 'harvest:'],
   building: ['building:', 'construction:', 'door:', 'housing:'],
   combat: ['combat:', 'conflict:', 'guard:', 'hunt:', 'predator:', 'invasion:', 'injury:'],
-  social: ['conversation:', 'relationship:', 'courtship:', 'parenting:', 'friendship:', 'trust:', 'dominance:'],
+  social: ['conversation:', 'relationship:', 'courtship:', 'parenting:', 'friendship:', 'trust:', 'dominance:', 'mourn_together:'],
   economy: ['trade:', 'trade_agreement:', 'market:', 'crafting:', 'cooking:', 'item:', 'items:', 'inventory:', 'storage:', 'resource:', 'gathering:'],
   magic: ['magic:', 'divine:', 'divine_power:', 'divinity:', 'prayer:', 'soul:', 'angel:', 'deity:', 'possession:', 'sacred_site:', 'godcrafted:', 'vision:', 'group_vision:', 'group_prayer:', 'wisdom:'],
   media: ['tv:', 'radio:', 'publishing:', 'library:', 'bookstore:', 'journal:', 'paper:'],

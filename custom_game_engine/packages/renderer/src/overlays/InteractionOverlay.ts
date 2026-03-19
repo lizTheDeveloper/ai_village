@@ -67,13 +67,13 @@ export class InteractionOverlay {
     world: World,
     camera: Camera,
     tileSize: number,
-    selectedEntity?: Entity | { id: string }
+    selectedEntity?: Entity | { id: string },
+    cachedAgents?: readonly Entity[],
+    cachedBuildings?: readonly Entity[]
   ): void {
-    // Get all agents
-    const agents = world.query().with('agent', 'position').executeEntities();
-
-    // Get all buildings
-    const buildings = world.query().with('building', 'position').executeEntities();
+    // Use pre-cached queries when available (avoids expensive world.query() every render frame)
+    const agents = cachedAgents ?? world.query().with('agent', 'position').executeEntities();
+    const buildings = cachedBuildings ?? world.query().with('building', 'position').executeEntities();
 
     const interactionRadius = 2.0; // tiles
     const interactionRadiusSquared = interactionRadius * interactionRadius; // Pre-compute squared threshold

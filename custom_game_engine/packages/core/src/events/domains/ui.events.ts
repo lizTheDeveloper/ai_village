@@ -162,6 +162,22 @@ export interface UIEvents {
     roomId: string;
     entityId: EntityId;
   };
+
+  /** Discovery naming prompt — player should name a world first */
+  'discovery:naming_prompt': {
+    category: string;
+    description: string;
+    eventDay: number;
+    entityIds: string[];
+  };
+
+  /** Discovery named by player */
+  'discovery:named': {
+    category: string;
+    name: string;
+    description: string;
+    eventDay: number;
+  };
 }
 
 export type UIEventType = keyof UIEvents;

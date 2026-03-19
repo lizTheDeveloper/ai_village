@@ -41,7 +41,7 @@ import { Renderer3D } from './Renderer3D.js';
 import { TerrainRenderer } from './terrain/index.js';
 import { SideViewTerrainRenderer } from './terrain/index.js';
 import { AgentRenderer, AnimalRenderer, BuildingRenderer } from './entities/index.js';
-import { DebugOverlay, InteractionOverlay } from './overlays/index.js';
+import { DebugOverlay, InteractionOverlay, AetherMantaOverlay } from './overlays/index.js';
 import { EntityPicker } from './EntityPicker.js';
 import { PixelLabEntityRenderer } from './sprites/PixelLabEntityRenderer.js';
 import { DimensionalControls } from './DimensionalControls.js';
@@ -70,6 +70,7 @@ export class Renderer {
   private buildingRenderer!: BuildingRenderer;
   private debugOverlay!: DebugOverlay;
   private interactionOverlay!: InteractionOverlay;
+  private aetherMantaOverlay!: AetherMantaOverlay;
   private entityPicker!: EntityPicker;
   private pixelLabEntityRenderer!: PixelLabEntityRenderer;
   private dimensionalControls!: DimensionalControls;
@@ -160,6 +161,7 @@ export class Renderer {
     this.buildingRenderer = new BuildingRenderer(this.ctx);
     this.debugOverlay = new DebugOverlay(this.ctx, this.chunkManager, this.terrainGenerator);
     this.interactionOverlay = new InteractionOverlay(this.ctx);
+    this.aetherMantaOverlay = new AetherMantaOverlay(this.ctx);
     this.entityPicker = new EntityPicker(this.tileSize);
     this.pixelLabEntityRenderer = new PixelLabEntityRenderer(this.ctx);
     this.dimensionalControls = new DimensionalControls();
@@ -228,6 +230,19 @@ export class Renderer {
 
   getCamera(): Camera {
     return this.camera;
+  }
+
+  /**
+   * Trigger an aether_manta eclipse pass — the creature's shadow sweeps across
+   * the visible terrain for ~40 seconds. Safe to call multiple times (restarts).
+   */
+  triggerAetherMantaEclipse(): void {
+    this.aetherMantaOverlay.trigger();
+  }
+
+  /** Whether an aether_manta eclipse is currently in progress. */
+  get isAetherMantaEclipseActive(): boolean {
+    return this.aetherMantaOverlay.isActive;
   }
 
   /**
@@ -851,6 +866,12 @@ export class Renderer {
 
     // Draw city boundaries
     this.debugOverlay.drawCityBoundaries(world, this.camera, this.tileSize);
+
+    // Draw aether_manta sky-shadow overlay (eclipse effect across terrain)
+    // Rendered after all entities so the shadow falls on everything below
+    const cssWidth = this.canvas.width / (window.devicePixelRatio || 1);
+    const cssHeight = this.canvas.height / (window.devicePixelRatio || 1);
+    this.aetherMantaOverlay.render(cssWidth, cssHeight);
 
     // Draw floating text (resource gathering feedback, etc.)
     this.getFloatingTextRenderer().render(this.ctx, this.camera, Date.now());

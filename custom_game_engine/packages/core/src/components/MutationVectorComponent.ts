@@ -65,6 +65,9 @@ export interface MutationField {
 
   /** Amount applied so far (tracked internally) */
   appliedAmount?: number;
+
+  /** Cached path parts (computed once, reused) */
+  _cachedParts?: string[];
 }
 
 /**

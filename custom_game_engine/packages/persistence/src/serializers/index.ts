@@ -52,6 +52,7 @@ import { SeedSerializer } from './SeedSerializer.js';
 
 // Discovery naming serializer (handles Map fields for player-named world firsts)
 import { DiscoveryNamingSerializer } from './DiscoveryNamingSerializer.js';
+import { WildSeedBankSerializer } from './WildSeedBankSerializer.js';
 
 /**
  * Register all component serializers.
@@ -112,6 +113,9 @@ export function registerAllSerializers(): void {
 
   // Register discovery naming serializer (handles Map fields for player-named world firsts)
   componentSerializerRegistry.register('discovery_naming', new DiscoveryNamingSerializer());
+
+  // Register wild seed bank serializer (handles Map<string, WildSeedBankEntry[]> for plant ecology persistence)
+  componentSerializerRegistry.register('wild_seed_bank', new WildSeedBankSerializer());
 
   // Register generic serializers for all other components
   // These can be replaced with specific serializers later
@@ -473,3 +477,4 @@ export { NeedsSerializer } from './NeedsSerializer.js';
 export { PlantKnowledgeSerializer } from './PlantKnowledgeSerializer.js';
 export { SeedSerializer } from './SeedSerializer.js';
 export { DiscoveryNamingSerializer } from './DiscoveryNamingSerializer.js';
+export { WildSeedBankSerializer } from './WildSeedBankSerializer.js';

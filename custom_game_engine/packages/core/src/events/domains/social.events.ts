@@ -249,6 +249,32 @@ export interface SocialEvents {
     conversationId?: string;
     depth: number;
   };
+
+  // === Mourning Events ===
+
+  /** An agent calls out in grief, seeking others to mourn with */
+  'mourn_together:call': {
+    initiatorId: EntityId;
+    location: { x: number; y: number };
+    message: string;
+    tick: number;
+  };
+
+  /** An agent joins a mourning gathering */
+  'mourn_together:joined': {
+    participantId: EntityId;
+    initiatorId: EntityId;
+    tick: number;
+  };
+
+  /** Mourning gathering completed */
+  'mourn_together:complete': {
+    initiatorId: EntityId;
+    participants: EntityId[];
+    tick: number;
+    duration: number;
+    griefReduced: number;
+  };
 }
 export type SocialEventType = keyof SocialEvents;
 export type SocialEventData = SocialEvents[SocialEventType];

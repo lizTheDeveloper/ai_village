@@ -92,6 +92,36 @@ export class AgentRenderer {
   }
 
   /**
+   * Draw thinking indicator (animated dots) above agents waiting on LLM decisions.
+   * Looks like a chat typing indicator — subtle, curious-feeling, not a loading spinner.
+   */
+  drawThinkingIndicator(screenX: number, screenY: number): void {
+    if (this.camera.zoom < 0.5) return;
+
+    const centerX = screenX + (this.tileSize * this.camera.zoom) / 2;
+    // Position above reflection indicator (which is at -60)
+    const baseY = screenY - 80 * this.camera.zoom;
+
+    const time = Date.now() / 1000;
+    const dotSpacing = 6 * this.camera.zoom;
+    const dotRadius = 2.5 * this.camera.zoom;
+
+    this.ctx.save();
+    for (let i = 0; i < 3; i++) {
+      // Each dot offset by 0.4s — creates a left-to-right wave
+      const phase = (time * 2.5 + i * 0.4) % (Math.PI * 2);
+      const alpha = Math.sin(phase) * 0.35 + 0.65; // oscillate 0.3 → 1.0
+      const yOffset = Math.sin(phase) * 2.5 * this.camera.zoom;
+
+      this.ctx.beginPath();
+      this.ctx.arc(centerX + (i - 1) * dotSpacing, baseY + yOffset, dotRadius, 0, Math.PI * 2);
+      this.ctx.fillStyle = `rgba(120, 200, 255, ${alpha})`;
+      this.ctx.fill();
+    }
+    this.ctx.restore();
+  }
+
+  /**
    * Draw agent behavior label above the agent.
    * Shows what the agent is currently doing.
    */

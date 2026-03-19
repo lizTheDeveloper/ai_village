@@ -97,6 +97,8 @@ export { JournalComponent } from './JournalComponent.js';
 export * from './SpatialMemoryComponent.js';
 export { SpatialMemoryComponent } from './SpatialMemoryComponent.js';
 export * from './NamedLandmarksComponent.js';
+export * from './DiscoveryNamingComponent.js';
+export * from './WildSeedBankComponent.js';
 export * from './TrustNetworkComponent.js';
 export { TrustNetworkComponent } from './TrustNetworkComponent.js';
 export * from './BeliefComponent.js';

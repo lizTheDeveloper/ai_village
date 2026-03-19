@@ -18,7 +18,7 @@ export interface SpeciesTrait {
   id: string;
   name: string;
   description: string;
-  category: 'physical' | 'sensory' | 'magical' | 'spiritual' | 'social';
+  category: 'physical' | 'sensory' | 'magical' | 'spiritual' | 'social' | 'metabolic';
 
   // Gameplay effects
   needsModifier?: Record<string, number>;     // e.g., { hunger: 0.5 }

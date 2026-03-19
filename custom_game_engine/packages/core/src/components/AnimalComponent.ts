@@ -258,6 +258,11 @@ export class AnimalComponent implements Component {
   public personality?: AnimalPersonality;
   public groupId?: string;
 
+  /** Convenience getter: inverse of `wild`. Domesticated animals have wild=false. */
+  get isDomesticated(): boolean {
+    return !this.wild;
+  }
+
   constructor(data: AnimalComponentData) {
     // Validate all required fields - NO FALLBACKS
     if (data.id === undefined || data.id === null) {

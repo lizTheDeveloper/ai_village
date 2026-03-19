@@ -1229,6 +1229,26 @@ export interface GovernanceEvents {
     tick: number;
   };
 
+  // === Village Council Meeting Events ===
+  'governance:council_meeting_proposal_requested': {
+    villageId: EntityId;
+    villageName: string;
+    population: number;
+    recentDeaths: number;
+    existingLaws: Array<{ name: string; description: string }>;
+    resourcePriority: string;
+    elderTraits: string[];
+    tick: number;
+  };
+
+  'governance:council_proposal_resolved': {
+    villageId: EntityId;
+    proposal: {
+      type: string;
+      description: string;
+    };
+  };
+
   // === Village/Caravan Events ===
   'village:news_received': {
     villageId: EntityId;
