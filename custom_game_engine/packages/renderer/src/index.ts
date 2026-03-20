@@ -90,6 +90,8 @@ export * from './PendingApprovalsPanel.js';
 export * from './DevPanel.js';
 export * from './FarmManagementPanel.js';
 export * from './SoulCeremonyModal.js';
+export * from './PatronPortraitWidget.js';
+export * from './PatronToastRenderer.js';
 export * from './NotificationModal.js';
 export * from './NotificationHelpers.js';
 export * from './DiscoveryNamingModal.js';

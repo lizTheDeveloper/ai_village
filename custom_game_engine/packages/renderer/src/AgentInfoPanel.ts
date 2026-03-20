@@ -87,6 +87,11 @@ export class AgentInfoPanel implements IWindowPanel {
   // Camera navigation callback
   private onNavigateToCallback: ((x: number, y: number) => void) | null = null;
 
+  // Patron binding callbacks (Drive 4)
+  private patronBindCallback: ((agentId: string) => void) | null = null;
+  private patronUnbindCallback: (() => void) | null = null;
+  private patronGetCurrentId: (() => string | null) | null = null;
+
   getId(): string {
     return 'agent-info';
   }
@@ -205,6 +210,23 @@ export class AgentInfoPanel implements IWindowPanel {
   setOnNavigateTo(callback: (x: number, y: number) => void): void {
     this.onNavigateToCallback = callback;
     this.infoSection.setOnNavigateToTarget(callback);
+  }
+
+  /**
+   * Set callbacks for patron binding (Drive 4).
+   * @param onBind - Called with agentId when user binds a patron
+   * @param onUnbind - Called when user unbinds current patron
+   * @param getCurrentPatronId - Returns the current patron agent ID or null
+   */
+  setPatronBindingCallbacks(
+    onBind: (agentId: string) => void,
+    onUnbind: () => void,
+    getCurrentPatronId: () => string | null
+  ): void {
+    this.patronBindCallback = onBind;
+    this.patronUnbindCallback = onUnbind;
+    this.patronGetCurrentId = getCurrentPatronId;
+    this.infoSection.setPatronBindingCallbacks(onBind, onUnbind, getCurrentPatronId);
   }
 
   /**

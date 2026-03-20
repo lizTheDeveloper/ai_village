@@ -74,6 +74,10 @@ export class InfoSection {
   private clickRegions: ClickRegion[] = [];
   private currentEntityId: string | null = null;
   private devMode = true; // Show dev controls
+  private patronBindCallback: ((agentId: string) => void) | null = null;
+  private patronUnbindCallback: (() => void) | null = null;
+  private patronGetCurrentId: (() => string | null) | null = null;
+  private patronButtonBounds: { x: number; y: number; width: number; height: number } | null = null;
 
   getScrollOffset(): number {
     return this.scrollOffset;
@@ -106,6 +110,19 @@ export class InfoSection {
   }
 
   /**
+   * Set callbacks for patron binding (Drive 4).
+   */
+  setPatronBindingCallbacks(
+    onBind: (agentId: string) => void,
+    onUnbind: () => void,
+    getCurrentPatronId: () => string | null
+  ): void {
+    this.patronBindCallback = onBind;
+    this.patronUnbindCallback = onUnbind;
+    this.patronGetCurrentId = getCurrentPatronId;
+  }
+
+  /**
    * Handle click on navigation target or dev controls.
    */
   handleClick(clickX: number, clickY: number): boolean {
@@ -134,6 +151,27 @@ export class InfoSection {
         return true;
       }
     }
+
+    // Check patron bind/unbind button
+    if (this.patronButtonBounds && this.currentEntityId) {
+      const pb = this.patronButtonBounds;
+      if (
+        clickX >= pb.x &&
+        clickX <= pb.x + pb.width &&
+        clickY >= pb.y &&
+        clickY <= pb.y + pb.height
+      ) {
+        const currentPatronId = this.patronGetCurrentId ? this.patronGetCurrentId() : null;
+        const isCurrentPatron = currentPatronId === this.currentEntityId;
+        if (isCurrentPatron && this.patronUnbindCallback) {
+          this.patronUnbindCallback();
+        } else if (!isCurrentPatron && this.patronBindCallback) {
+          this.patronBindCallback(this.currentEntityId);
+        }
+        return true;
+      }
+    }
+
     return false;
   }
 
@@ -600,6 +638,52 @@ export class InfoSection {
     const actionQueue = entity.components.get('action_queue') as Component | undefined;
     if (actionQueue && isActionQueue(actionQueue) && !actionQueue.isEmpty()) {
       currentY = this.renderActionQueue(ctx, x, currentY, actionQueue, padding, lineHeight);
+    }
+
+    // Patron bind/unbind button (Drive 4)
+    if (this.patronBindCallback || this.patronUnbindCallback) {
+      currentY += 5;
+      renderSeparator(ctx, x, currentY, this.panelWidth, padding);
+      currentY += 10;
+
+      const currentPatronId = this.patronGetCurrentId ? this.patronGetCurrentId() : null;
+      const isCurrentPatron = currentPatronId === entity?.id;
+
+      const btnLabel = isCurrentPatron ? 'Unbind Patron' : 'Bind as Patron';
+      const btnWidth = 140;
+      const btnHeight = 22;
+      const btnX = x + padding;
+      const btnY = currentY - 2;
+
+      // Button background
+      ctx.fillStyle = isCurrentPatron ? 'rgba(180, 60, 220, 0.8)' : 'rgba(130, 80, 220, 0.8)';
+      ctx.fillRect(btnX, btnY, btnWidth, btnHeight);
+
+      // Button border
+      ctx.strokeStyle = isCurrentPatron ? 'rgba(220, 120, 255, 0.9)' : 'rgba(180, 130, 255, 0.9)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(btnX, btnY, btnWidth, btnHeight);
+
+      // Button text
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 11px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(btnLabel, btnX + btnWidth / 2, btnY + btnHeight - 6);
+      ctx.textAlign = 'left';
+
+      // Status label beside button
+      if (isCurrentPatron) {
+        ctx.fillStyle = '#CC88FF';
+        ctx.font = '11px monospace';
+        ctx.fillText('(current patron)', btnX + btnWidth + 8, btnY + btnHeight - 6);
+      }
+
+      // Store bounds for click detection
+      this.patronButtonBounds = { x: btnX, y: btnY, width: btnWidth, height: btnHeight };
+
+      currentY += btnHeight + 8;
+    } else {
+      this.patronButtonBounds = null;
     }
 
     // Restore canvas state

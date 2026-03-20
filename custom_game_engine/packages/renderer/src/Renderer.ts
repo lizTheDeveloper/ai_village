@@ -45,6 +45,8 @@ import { DebugOverlay, InteractionOverlay, AetherMantaOverlay } from './overlays
 import { EntityPicker } from './EntityPicker.js';
 import { PixelLabEntityRenderer } from './sprites/PixelLabEntityRenderer.js';
 import { DimensionalControls } from './DimensionalControls.js';
+import { PatronPortraitWidget } from './PatronPortraitWidget.js';
+import { PatronToastRenderer } from './PatronToastRenderer.js';
 
 /**
  * 2D renderer using Canvas.
@@ -78,6 +80,10 @@ export class Renderer {
   // Combat UI renderers (initialized via initCombatUI)
   private healthBarRenderer: HealthBarRenderer | null = null;
   private threatIndicatorRenderer: ThreatIndicatorRenderer | null = null;
+
+  // Patron Binding UI (Drive 4)
+  public patronWidget!: PatronPortraitWidget;
+  public patronToast!: PatronToastRenderer;
 
   private tileSize = 16; // Pixels per tile at zoom=1
   private hasLoggedTilledTile = false; // Debug flag to log first tilled tile rendering
@@ -165,6 +171,8 @@ export class Renderer {
     this.entityPicker = new EntityPicker(this.tileSize);
     this.pixelLabEntityRenderer = new PixelLabEntityRenderer(this.ctx);
     this.dimensionalControls = new DimensionalControls();
+    this.patronWidget = new PatronPortraitWidget(this.ctx);
+    this.patronToast = new PatronToastRenderer(this.ctx);
 
     // Lazy renderers: floatingTextRenderer, speechBubbleRenderer, particleRenderer,
     // bedOwnershipRenderer, animalRenderer initialized on first use via getters
@@ -915,6 +923,10 @@ export class Renderer {
 
     // Draw debug info
     this.debugOverlay.drawDebugInfo(world, this.camera);
+
+    // Render patron binding UI (Drive 4) — after all world rendering, before UI panels
+    this.patronWidget.render(cssWidth, cssHeight);
+    this.patronToast.render(cssWidth);
   }
 
   /**
