@@ -236,3 +236,9 @@ export * from './PersonalityVariationsLibrary';
 
 export * from './SpellSandboxPromptBuilder';
 export * from './SpellSandboxService';
+
+// Opus Generator (Eternal Return — cycle synthesis pipeline)
+// ============================================================================
+
+export * from './OpusPromptBuilder';
+export * from './OpusGeneratorService';
