@@ -387,6 +387,9 @@ import { QueryCacheMonitorSystem } from './QueryCacheMonitorSystem.js';
 // Event Coalescing Monitoring
 import { EventCoalescingMonitorSystem } from './EventCoalescingMonitorSystem.js';
 
+// Lore — Audio
+import { SongSystem } from '../lore/SongSystem.js';
+
 // Animal Brain (from behavior module)
 import { AnimalBrainSystem } from '../behavior/animal-behaviors/AnimalBrainSystem.js';
 
@@ -1142,6 +1145,11 @@ export function registerAllSystems(
 
   // EventCoalescingMonitorSystem (priority 998) - Logs event coalescing statistics every 5 minutes
   gameLoop.systemRegistry.register(new EventCoalescingMonitorSystem());
+
+  // ============================================================================
+  // LORE — AUDIO (browser-only, self-guards against non-browser contexts)
+  // ============================================================================
+  gameLoop.systemRegistry.register(new SongSystem());
 
   // ============================================================================
   // AUTO-SAVE (Optional)
