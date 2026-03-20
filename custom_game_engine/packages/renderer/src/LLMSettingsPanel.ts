@@ -502,7 +502,9 @@ export class LLMSettingsPanel implements IWindowPanel {
     `;
     saveBtn.onclick = () => {
       this.saveSettings();
-      if (this.onSettingsChange) {
+      if (!this.onSettingsChange) {
+        console.error('[LLMSettingsPanel] Save callback not wired — settings saved to localStorage but game will not react until reload');
+      } else {
         this.onSettingsChange(this.settings);
       }
       this.hide();

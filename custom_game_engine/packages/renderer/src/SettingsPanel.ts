@@ -586,7 +586,9 @@ export class SettingsPanel implements IWindowPanel {
 
       this.saveSettings();
       this.isFirstRun = false;
-      if (this.onSettingsChange) {
+      if (!this.onSettingsChange) {
+        console.error('[SettingsPanel] Save callback not wired — settings saved to localStorage but game will not react until reload');
+      } else {
         this.onSettingsChange(this.settings);
       }
       this.hide();
