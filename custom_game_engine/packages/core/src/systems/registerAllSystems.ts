@@ -389,6 +389,8 @@ import { EventCoalescingMonitorSystem } from './EventCoalescingMonitorSystem.js'
 
 // Lore — Audio
 import { SongSystem } from '../lore/SongSystem.js';
+import { ChorusStateSystem } from './ChorusStateSystem.js';
+import { SpellWorldEffectSystem } from './SpellWorldEffectSystem.js';
 
 // Animal Brain (from behavior module)
 import { AnimalBrainSystem } from '../behavior/animal-behaviors/AnimalBrainSystem.js';
@@ -1150,6 +1152,16 @@ export function registerAllSystems(
   // LORE — AUDIO (browser-only, self-guards against non-browser contexts)
   // ============================================================================
   gameLoop.systemRegistry.register(new SongSystem());
+
+  // ============================================================================
+  // CHORUS STATE (cross-game Folkfork collective intelligence — priority 45)
+  // ============================================================================
+  gameLoop.systemRegistry.register(new ChorusStateSystem());
+
+  // ============================================================================
+  // SPELL WORLD EFFECTS (Drive 3 — Spell Sandbox world mutations, priority 160)
+  // ============================================================================
+  gameLoop.systemRegistry.register(new SpellWorldEffectSystem());
 
   // ============================================================================
   // AUTO-SAVE (Optional)

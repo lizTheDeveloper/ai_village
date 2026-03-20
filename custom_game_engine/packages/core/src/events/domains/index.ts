@@ -9,6 +9,7 @@ export * from './agent.events.js';
 export * from './animal.events.js';
 export * from './avatar.events.js';
 export * from './building.events.js';
+export * from './chorus.events.js';
 export * from './cognitive.events.js';
 export * from './combat.events.js';
 export * from './companion.events.js';

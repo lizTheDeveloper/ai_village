@@ -333,4 +333,7 @@ export enum ComponentType {
 
   // Civilization Chronicle (Drive 2: Accomplishment)
   CivilizationChronicle = 'civilization_chronicle',
+
+  // Chorus State (cross-game Folkfork collective intelligence)
+  ChorusState = 'chorus_state',
 }

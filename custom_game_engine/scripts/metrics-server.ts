@@ -5282,6 +5282,67 @@ Available agents:
     return;
   }
 
+  if (pathname === '/api/chorus/state-changed') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    if (req.method === 'OPTIONS') {
+      res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Chorus-Signature');
+      res.statusCode = 204;
+      res.end();
+      return;
+    }
+
+    if (req.method !== 'POST') {
+      res.statusCode = 405;
+      res.end(JSON.stringify({ error: 'Method not allowed' }));
+      return;
+    }
+
+    const rawChunks: Buffer[] = [];
+    req.on('data', (chunk: Buffer) => { rawChunks.push(chunk); });
+    req.on('end', async () => {
+      try {
+        const rawBody = Buffer.concat(rawChunks);
+
+        // Verify HMAC-SHA256 signature
+        const signature = req.headers['x-chorus-signature'] as string | undefined;
+        const secret = process.env.CHORUS_WEBHOOK_SECRET ?? 'mvee-chorus-dev-secret';
+        const { createHmac, timingSafeEqual } = await import('crypto');
+        const expectedHmac = createHmac('sha256', secret).update(rawBody).digest('hex');
+        const expectedSig = `sha256=${expectedHmac}`;
+        const sigBuffer = Buffer.from(signature ?? '', 'utf8');
+        const expectedBuffer = Buffer.from(expectedSig, 'utf8');
+        const sigValid = sigBuffer.length === expectedBuffer.length &&
+          timingSafeEqual(sigBuffer, expectedBuffer);
+        if (!sigValid) {
+          res.statusCode = 401;
+          res.end(JSON.stringify({ error: 'Invalid signature' }));
+          return;
+        }
+
+        const payload = JSON.parse(rawBody.toString('utf8'));
+        const gameClient = getActiveGameClient();
+        if (gameClient) {
+          await sendActionToGame(gameClient, 'chorus-state-changed', {
+            e_f: payload.e_f,
+            band: payload.band,
+            nelFragments: payload.nelFragments || [],
+            creaturePatterns: payload.creaturePatterns || [],
+          });
+          res.end(JSON.stringify({ success: true }));
+        } else {
+          res.end(JSON.stringify({ success: true, forwarded: false }));
+        }
+      } catch (err) {
+        res.statusCode = 400;
+        res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Bad request' }));
+      }
+    });
+    return;
+  }
+
   if (pathname === '/api/game/status') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');

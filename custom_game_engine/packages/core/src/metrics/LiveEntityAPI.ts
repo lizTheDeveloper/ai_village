@@ -19,6 +19,7 @@ import { createTagsComponent } from '../components/TagsComponent.js';
 import { createIdentityComponent } from '../components/IdentityComponent.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
+import { updateChorusState, getChorusState } from '../systems/ChorusStateSystem.js';
 
 /**
  * Interface for the prompt builder (from @ai-village/llm)
@@ -204,6 +205,8 @@ export class LiveEntityAPI {
         return await this.handleSpawnCity(action);
       case 'list-city-templates':
         return this.handleListCityTemplates(action);
+      case 'chorus-state-changed':
+        return this.handleChorusStateChanged(action);
       default:
         return {
           requestId: action.requestId,
@@ -423,6 +426,34 @@ export class LiveEntityAPI {
       requestId: action.requestId,
       success: true,
       data: { templates },
+    };
+  }
+
+  /**
+   * Handle chorus-state-changed action
+   */
+  private handleChorusStateChanged(action: ActionRequest): ActionResponse {
+    const { e_f, nelFragments, creaturePatterns } = action.params as {
+      e_f: number;
+      nelFragments?: string[];
+      creaturePatterns?: Array<{ species: string; behavior: string }>;
+    };
+
+    if (typeof e_f !== 'number' || e_f < 0 || e_f > 1) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Invalid e_f value: must be number between 0 and 1',
+      };
+    }
+
+    // Import and call updateChorusState
+    updateChorusState(e_f, nelFragments, creaturePatterns);
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { e_f, band: getChorusState().band },
     };
   }
 
