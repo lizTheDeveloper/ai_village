@@ -41,7 +41,7 @@ import { Renderer3D } from './Renderer3D.js';
 import { TerrainRenderer } from './terrain/index.js';
 import { SideViewTerrainRenderer } from './terrain/index.js';
 import { AgentRenderer, AnimalRenderer, BuildingRenderer } from './entities/index.js';
-import { DebugOverlay, InteractionOverlay, AetherMantaOverlay } from './overlays/index.js';
+import { DebugOverlay, InteractionOverlay, AetherMantaOverlay, EternalReturnGlyphOverlay } from './overlays/index.js';
 import { EntityPicker } from './EntityPicker.js';
 import { PixelLabEntityRenderer } from './sprites/PixelLabEntityRenderer.js';
 import { DimensionalControls } from './DimensionalControls.js';
@@ -73,6 +73,7 @@ export class Renderer {
   private debugOverlay!: DebugOverlay;
   private interactionOverlay!: InteractionOverlay;
   private aetherMantaOverlay!: AetherMantaOverlay;
+  private eternalReturnGlyph!: EternalReturnGlyphOverlay;
   private entityPicker!: EntityPicker;
   private pixelLabEntityRenderer!: PixelLabEntityRenderer;
   private dimensionalControls!: DimensionalControls;
@@ -168,6 +169,7 @@ export class Renderer {
     this.debugOverlay = new DebugOverlay(this.ctx, this.chunkManager, this.terrainGenerator);
     this.interactionOverlay = new InteractionOverlay(this.ctx);
     this.aetherMantaOverlay = new AetherMantaOverlay(this.ctx);
+    this.eternalReturnGlyph = new EternalReturnGlyphOverlay(this.ctx);
     this.entityPicker = new EntityPicker(this.tileSize);
     this.pixelLabEntityRenderer = new PixelLabEntityRenderer(this.ctx);
     this.dimensionalControls = new DimensionalControls();
@@ -251,6 +253,11 @@ export class Renderer {
   /** Whether an aether_manta eclipse is currently in progress. */
   get isAetherMantaEclipseActive(): boolean {
     return this.aetherMantaOverlay.isActive;
+  }
+
+  /** Eternal Return glyph overlay (MUL-2543). */
+  get eternalReturnGlyphOverlay(): EternalReturnGlyphOverlay {
+    return this.eternalReturnGlyph;
   }
 
   /**
@@ -927,6 +934,7 @@ export class Renderer {
     // Render patron binding UI (Drive 4) — after all world rendering, before UI panels
     this.patronWidget.render(cssWidth, cssHeight);
     this.patronToast.render(cssWidth);
+    this.eternalReturnGlyph.render(cssWidth, cssHeight);
   }
 
   /**

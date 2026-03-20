@@ -5495,6 +5495,51 @@ async function main() {
     });
   });
 
+  // === Eternal Return: Glyph trigger (MUL-2543) ===
+  // When the first settlement is founded, call Folkfork glyph API and display the glyph.
+  const glyphOverlay = 'eternalReturnGlyphOverlay' in renderer
+    ? (renderer as any).eternalReturnGlyphOverlay
+    : null;
+
+  if (glyphOverlay) {
+    let glyphTriggered = false;
+    gameLoop.world.eventBus.subscribe('milestone:achieved' as any, (event: any) => {
+      const data = event.data as { milestoneId?: string } | undefined;
+      if (data?.milestoneId !== 'first_building_completed') return;
+      if (glyphTriggered) return;
+      glyphTriggered = true;
+
+      const FOLKFORK_API_URL = (import.meta.env.VITE_FOLKFORK_API_URL as string | undefined)
+        ?? 'http://localhost:3030/api';
+      const pid = localStorage.getItem('ai-village-player-id') ?? 'local-player';
+
+      fetch(`${FOLKFORK_API_URL}/glyph/${encodeURIComponent(pid)}/mvee`, { method: 'POST' })
+        .then((res) => {
+          if (!res.ok) throw new Error(`Folkfork API ${res.status}`);
+          return res.json();
+        })
+        .then((body: { encounterCount?: number; cycleUrl?: string }) => {
+          const encounterCount = body.encounterCount ?? 1;
+          const cycleUrl = body.cycleUrl ?? '';
+          glyphOverlay.trigger(encounterCount, cycleUrl);
+        })
+        .catch((err: unknown) => {
+          console.warn('[EternalReturn] Folkfork glyph API call failed:', err);
+          // Graceful degradation: show glyph as first encounter (cosmetic only)
+          glyphOverlay.trigger(1, '');
+        });
+    });
+
+    // Wire click handler for the glyph overlay
+    canvas.addEventListener('click', (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const clickX = (e.clientX - rect.left) / dpr;
+      const clickY = (e.clientY - rect.top) / dpr;
+      glyphOverlay.handleClick(clickX, clickY);
+    });
+  }
+
   // Game loop already started before soul creation
 
   // Start render loop immediately - don't block on soul creation
