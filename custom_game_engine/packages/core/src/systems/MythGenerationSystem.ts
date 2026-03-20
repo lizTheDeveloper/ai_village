@@ -15,6 +15,7 @@ import { DeityComponent } from '../components/DeityComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
+import type { NarrativeSedimentSystem } from './NarrativeSedimentSystem.js';
 
 /**
  * Myth event types that can trigger myth generation
@@ -233,7 +234,7 @@ export class MythGenerationSystem extends BaseSystem {
 
     // Process pending myths (queue LLM requests)
     for (const pending of this.pendingMyths) {
-      this._processPendingMyth(pending, entities, currentTick);
+      this._processPendingMyth(pending, entities, currentTick, world);
     }
 
     // Clear processed myths
@@ -718,11 +719,19 @@ export class MythGenerationSystem extends BaseSystem {
   private _processPendingMyth(
     pending: PendingMyth,
     entities: ReadonlyArray<Entity>,
-    currentTick: number
+    currentTick: number,
+    world: World
   ): void {
     // Build prompt based on event type
-    const prompt = this._buildMythPromptForEventType(pending, entities);
+    let prompt = this._buildMythPromptForEventType(pending, entities);
     if (!prompt) return;
+
+    // Inject narrative weathering from NEL reader sediment (The Shared Retelling)
+    const weathering = this._getNarrativeWeathering(world);
+    if (weathering) {
+      prompt += `\nThe mythological tradition of this world carries a particular tone: ${weathering}.\n`;
+      prompt += `Let this emotional texture influence the style and mood of the myth.\n`;
+    }
 
     // Generate unique ID for this myth request
     const llmRequestId = `myth_${pending.eventType}_${currentTick}_${Math.random().toString(36).substr(2, 9)}`;
@@ -1424,6 +1433,24 @@ export class MythGenerationSystem extends BaseSystem {
           protagonistIds: agent.id ? [agent.id] : undefined,
           timestamp: currentTick,
         });
+
+        // Cross-game lore export event (see cross-game-lore-bridge-spec-v1.md)
+        this.events.emitGeneric('lore:myth_created', {
+          mythId: myth.id,
+          sourceGame: 'mvee',
+          title: mythStory.title,
+          summary: mythStory.story.slice(0, 200),
+          fullText: mythStory.story,
+          category,
+          deityDomains: [deityComp.identity.domain, ...(deityComp.identity.secondaryDomains || [])].filter(Boolean),
+          deityPersonality: deityComp.identity.perceivedPersonality,
+          deityName: deityComp.identity.primaryName,
+          believerCount: deityComp.believers?.size || 0,
+          tellingCount: 1,
+          status: 'oral',
+          canonicityScore: 0,
+          timestamp: currentTick,
+        });
       }
 
       completedRequests.push(llmRequestId);
@@ -1438,6 +1465,16 @@ export class MythGenerationSystem extends BaseSystem {
   /**
    * Build LLM prompt for myth generation
    */
+  /**
+   * Get the narrative weathering description from NEL reader sediment.
+   * Returns empty string if no sediment system is registered or no data exists.
+   */
+  private _getNarrativeWeathering(world: World): string {
+    const sedimentSystem = world.getSystem('narrative_sediment') as NarrativeSedimentSystem | undefined;
+    if (!sedimentSystem?.hasSediment()) return '';
+    return sedimentSystem.getWeatheringDescription();
+  }
+
   private _buildMythGenerationPrompt(
     deityComp: DeityComponent,
     agent: Entity,
@@ -1668,6 +1705,19 @@ export class MythGenerationSystem extends BaseSystem {
       heroName,
       achievement,
       difficulty,
+      witnessCount: nearbyAgents.length,
+      timestamp: currentTick,
+    });
+
+    // Cross-game lore export for legends (high-canonicity myths)
+    this.events.emitGeneric('lore:myth_canonized', {
+      mythId: myth.id,
+      sourceGame: 'mvee',
+      title: myth.title,
+      heroName,
+      achievement,
+      difficulty,
+      canonicityScore: difficulty === 'mythic' ? 1.0 : difficulty === 'legendary' ? 0.9 : difficulty === 'heroic' ? 0.7 : 0.5,
       witnessCount: nearbyAgents.length,
       timestamp: currentTick,
     });

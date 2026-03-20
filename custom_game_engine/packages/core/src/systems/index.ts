@@ -64,6 +64,10 @@ export * from './PrayerSystem.js';
 export * from './PrayerAnsweringSystem.js';
 export * from './MythGenerationSystem.js';
 export * from './SpatialMemoryQuerySystem.js';
+// Narrative Sediment (NEL cross-game reading pattern integration for The Shared Retelling)
+export * from './NarrativeSedimentSystem.js';
+export { NarrativeSedimentSystem } from './NarrativeSedimentSystem.js';
+export type { NarrativeTheme, ThemeDimension, SedimentDeposit } from './NarrativeSedimentSystem.js';
 // Lore Export Collector (Cross-game wiki data pipeline for Leaky Game ARG)
 export * from './LoreExportCollector.js';
 export { LoreExportCollector } from './LoreExportCollector.js';

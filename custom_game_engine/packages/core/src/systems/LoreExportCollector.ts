@@ -37,7 +37,8 @@ export type WikiLoreCategory =
   | 'syncretism'
   | 'holy_text'
   | 'belief'
-  | 'ritual';
+  | 'ritual'
+  | 'narrative_sediment';
 
 export interface LoreExportSnapshot {
   timestamp: number;
@@ -69,6 +70,7 @@ export class LoreExportCollector extends BaseSystem {
     this.events.onGeneric('lore:holy_text_written', (data) => this.queueEvent('holy_text_written', data));
     this.events.onGeneric('lore:belief_emerged', (data) => this.queueEvent('belief_emerged', data));
     this.events.onGeneric('lore:ritual_performed', (data) => this.queueEvent('ritual_performed', data));
+    this.events.onGeneric('lore:narrative_sediment_received', (data) => this.queueEvent('narrative_sediment_received', data));
   }
 
   private queueEvent(type: string, data: unknown): void {
@@ -265,6 +267,37 @@ export class LoreExportCollector extends BaseSystem {
           relatedEntries: [],
         });
         break;
+
+      case 'narrative_sediment_received': {
+        const themes = data.themes as Record<string, number>;
+        const themeKeys = Object.keys(themes);
+        const dominantTheme = themeKeys.reduce(
+          (best, key) => {
+            const dist = Math.abs((themes[key] ?? 0.5) - 0.5);
+            return dist > best.dist ? { key, dist } : best;
+          },
+          { key: 'balanced', dist: 0 }
+        );
+        this.upsertEntry({
+          id: 'sediment-nel-aggregate',
+          sourceGame: data.sourceGame as string,
+          category: 'narrative_sediment',
+          title: 'The Weathering — Collective Reader Imprint',
+          summary: `NEL narrative sediment from ${data.totalSessionCount} reader sessions. Dominant theme: ${dominantTheme.key}. ${data.depositCount} active deposits shaping MVEE mythology.`,
+          details: {
+            themes: data.themes,
+            depositCount: data.depositCount,
+            totalSessionCount: data.totalSessionCount,
+            mythCategoryBoosts: data.mythCategoryBoosts,
+            targetGame: data.targetGame,
+          },
+          canonicityScore: 0.9, // Collective reader voice is highly canonical
+          createdAtTick: data.timestamp as number,
+          updatedAtTick: data.timestamp as number,
+          relatedEntries: [],
+        });
+        break;
+      }
     }
   }
 
@@ -289,7 +322,7 @@ export class LoreExportCollector extends BaseSystem {
   getSnapshot(currentTick: number): LoreExportSnapshot {
     const entries = Array.from(this.entries.values());
     const categoryCounts = {} as Record<WikiLoreCategory, number>;
-    for (const cat of ['myth', 'schism', 'syncretism', 'holy_text', 'belief', 'ritual'] as WikiLoreCategory[]) {
+    for (const cat of ['myth', 'schism', 'syncretism', 'holy_text', 'belief', 'ritual', 'narrative_sediment'] as WikiLoreCategory[]) {
       categoryCounts[cat] = 0;
     }
     for (const entry of entries) {
