@@ -391,6 +391,7 @@ import { EventCoalescingMonitorSystem } from './EventCoalescingMonitorSystem.js'
 import { SongSystem } from '../lore/SongSystem.js';
 import { ChorusStateSystem } from './ChorusStateSystem.js';
 import { SpellWorldEffectSystem } from './SpellWorldEffectSystem.js';
+import { AchievementService } from './AchievementService.js';
 
 // Animal Brain (from behavior module)
 import { AnimalBrainSystem } from '../behavior/animal-behaviors/AnimalBrainSystem.js';
@@ -1147,6 +1148,11 @@ export function registerAllSystems(
 
   // EventCoalescingMonitorSystem (priority 998) - Logs event coalescing statistics every 5 minutes
   gameLoop.systemRegistry.register(new EventCoalescingMonitorSystem());
+
+  // ============================================================================
+  // ACHIEVEMENT TRACKING (priority 910 — Folkfork cross-game achievements)
+  // ============================================================================
+  gameLoop.systemRegistry.register(new AchievementService());
 
   // ============================================================================
   // LORE — AUDIO (browser-only, self-guards against non-browser contexts)

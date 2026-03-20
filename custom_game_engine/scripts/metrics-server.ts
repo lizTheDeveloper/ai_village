@@ -5343,6 +5343,66 @@ Available agents:
     return;
   }
 
+  // Achievement unlock proxy — forwards to Folkfork Portal (MUL-2596)
+  if (pathname === '/api/achievements/unlock') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    if (req.method === 'OPTIONS') {
+      res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+      res.statusCode = 204;
+      res.end();
+      return;
+    }
+
+    if (req.method !== 'POST') {
+      res.statusCode = 405;
+      res.end(JSON.stringify({ error: 'Method not allowed' }));
+      return;
+    }
+
+    const portalUrl = process.env.FOLKFORK_PORTAL_URL ?? 'https://folkfork.multiversestudios.xyz';
+    const studioKey = process.env.FOLKFORK_STUDIO_API_KEY;
+    if (!studioKey) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({ error: 'FOLKFORK_STUDIO_API_KEY not configured' }));
+      return;
+    }
+
+    const rawChunks: Buffer[] = [];
+    req.on('data', (chunk: Buffer) => { rawChunks.push(chunk); });
+    req.on('end', async () => {
+      try {
+        const rawBody = Buffer.concat(rawChunks);
+        const payload = JSON.parse(rawBody.toString('utf8'));
+
+        const response = await fetch(`${portalUrl}/api/achievements/unlock`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${studioKey}`,
+          },
+          body: JSON.stringify({
+            achievementId: payload.achievementId,
+            playerId: payload.playerId,
+            gameOrigin: 'mvee',
+            unlockedAt: new Date().toISOString(),
+            metadata: payload.metadata,
+          }),
+        });
+
+        const result = await response.json();
+        res.statusCode = response.status;
+        res.end(JSON.stringify(result));
+      } catch (err) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Proxy request failed' }));
+      }
+    });
+    return;
+  }
+
   if (pathname === '/api/game/status') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
