@@ -6,6 +6,14 @@ Format: [Semantic Versioning](https://semver.org/). Newest first.
 
 ---
 
+## v0.1.7 — 2026-03-21
+
+### Fixes
+- **Critical:** `gameLoop` was not passed to `setupWindowManager`, causing a `ReferenceError: gameLoop is not defined` crash on every save load — game was 100% unplayable (MUL-2899)
+- Removed `as unknown as` type assertion escape hatches in `PrayerSystem`, `AchievementService`, and `ThreatResponseSystem` — replaced with proper type guards
+
+---
+
 ## v0.1.6 — 2026-03-21
 
 ### Fixes
