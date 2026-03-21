@@ -1,0 +1,94 @@
+# MVEE — Changelog
+
+All notable changes to Multiverse: The End of Eternity will be documented in this file.
+
+Format: [Semantic Versioning](https://semver.org/). Newest first.
+
+---
+
+## v0.1.0 — 2026-03-17
+
+### What's New
+- **Custom TypeScript ECS engine** — 200+ systems running at 20 TPS, built ground-up for this game
+- **AI-powered village simulation** — agents with memory, skills, personality, and social relationships driven by LLMs
+- **25 magic paradigms** — full magic system with spellbook UI, diverse schools of arcane practice
+- **Procedural world generation** — biomes, dynamic weather, biome-aware seasons, and nutrient cycling
+- **16+ species** across diverse biome environments including 11 new species added this sprint
+- **40+ renderer panels** — rich UI covering agents, economy, relationships, memory, tech tree, spellbook, combat, and more
+- **Genesis Vision cinematic** — first-session creation myth onboarding experience (Octalysis Drive 1: Epic Meaning)
+- **Player avatar system** — players can inhabit and control a character in the simulation
+- **Genetics system** — trait inheritance, mutation, and emergent species variation
+- **Save/load with snapshot support** — persistent world state with time-travel-ready architecture
+- **CI build gate** — automated TypeScript build verification and test regression detection
+
+### Fixes
+- Rendering artifacts: vertical line bands and interior black void in Ancient Ark eliminated
+- Production bundle TDZ errors resolved — game now loads reliably on all browsers
+- Sprite assets now correctly copied into dist/ during Vite production build
+- Map/Set serialization fixed — silent data loss on save/load no longer occurs
+- ExplorationSystem crash on negative coordinates fixed
+- AdminAngelSystem no longer blocks the game loop with LLM timeout calls
+- Test suite stabilized from 165 failing files → 13 failing files
+
+### Known Issues
+- Human playtesting in progress — launching to public after playtest sign-off
+- LLM cognition pipeline blocked pending infrastructure resolution
+
+## v0.1.1 — 2026-03-18
+
+### Fixes
+- **Critical:** Agent-brain TypeError (`t.getComponent is not a function`) crashing on every tick — agents can now process decisions normally (MUL-1847)
+- UI heading mis-aligned on narrow viewports (< 600px) — layout correct at all screen sizes (MUL-1903)
+- TypeError thrown when clicking the "direct" button — interaction now works as expected (MUL-1905)
+- CivilizationalLegendsSystem had zero event subscribers — legendary events now fire and propagate correctly (MUL-1860)
+- Admin dashboard showing "No Game Connected" after game load — dashboard now connects reliably (MUL-1902)
+
+### Known Issues
+- LLM cognition pipeline blocked pending infrastructure resolution
+- Automated playwright tests cannot read TPS/FPS from canvas overlay (MUL-1768)
+
+## v0.1.3 — 2026-03-20
+
+### What's New
+- **PatronBindingSystem** — patron souls can bind to agents via Drive 4 mechanics, with full UI (patron widget + toast notifications)
+- **The Chorus expanded** — environmental hooks integrate world events into The Chorus; Spell Sandbox spells now affect the live world
+- **Folkfork achievement integration** — server proxy + AchievementService tracking civilizational milestones
+- **CivilizationChronicleService** — persistent milestone storage for civilizational history; agent and social milestones visible in the Chronicle panel, clickable for details
+- **NarrativeSedimentSystem** — cross-game reading patterns integrate into the world simulation
+- **Leaky Game ARG Phase 2** — lore export pipeline complete
+- **D_cc metric service** — real-time D_cc (collective consciousness density) metric push for The Chorus
+
+### Performance
+- GameLoop all-entities query now cached, eliminating hot-path query-in-loop (MUL-2644)
+- Math.sqrt eliminated from 7 systems; repeated hot-path patterns removed
+
+### Fixes
+- SongSystem audio now plays on user interaction (browser autoplay policy compliance)
+- Security: high-severity CVEs resolved in react-router, rollup, flatted, brace-expansion
+- WildPlantEntity species now typed throughout all biomes (replaced legacy `createFiberPlant`)
+- Uplift system tests stabilized (ProtoSapience + BreedingProgram)
+
+---
+
+## v0.1.2 — 2026-03-19
+
+### What's New
+- **GreetingSystem** — agents greet each other on proximity (MUL-2165)
+- **Angel/Divine Chat prominent in NUX** — new players are guided to the AI companion on first session (MUL-2217)
+- **In-game support prompt** — players can request help from within the game (MUL-2175)
+- **Right-click tile inspection** — inspect any tile and its contents via right-click (MUL-2191)
+- **QA bypass token** — auth gate accepts a bypass token for automated testing (MUL-2147)
+
+### Fixes
+- **Critical (MUL-2174):** All TypeScript build errors resolved — CI/CD pipeline fully unblocked, production deploys restored
+- Agent freeze when LLM provider is slow or unavailable — agents continue processing normally (MUL-2189)
+- AgentBrainSystem now isolates per-agent errors, preventing cascading failures from one bad entity (MUL-1847)
+- SeekCoolingBehavior stale entity reference crash fixed (MUL-1847)
+- Lazy-registered windows now appear in menus; 'C' key shortcut conflict resolved (MUL-2323)
+- Settings save callback now logs an error when not wired, rather than silently failing (MUL-2212)
+- GriefResolutionSystem: agents who have never mourned no longer have cooldown treated as tick 0
+- 42+ broken tests repaired across 17 test files (reduced to 2 flaky)
+
+---
+
+<!-- PM: Add new release entries above this line, newest first -->
