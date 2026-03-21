@@ -82,16 +82,22 @@ export class ReflectionSystem extends BaseSystem {
   }
 
   protected onUpdate(ctx: SystemContext): void {
+    // PERF: Lazily cache broadcast query — avoid re-querying per trigger
+    let broadcastAgents: ReadonlyArray<Entity> | null = null;
+
     // Process reflection triggers
     for (const [agentId, trigger] of this.reflectionTriggers.entries()) {
       // Handle 'broadcast' triggers - apply to all agents with reflection components
       if (agentId === 'broadcast') {
-        const agents = ctx.world.query()
-          .with(CT.Agent)
-          .with(CT.EpisodicMemory)
-          .with(CT.SemanticMemory)
-          .with(CT.Reflection)
-          .executeEntities();
+        if (!broadcastAgents) {
+          broadcastAgents = ctx.world.query()
+            .with(CT.Agent)
+            .with(CT.EpisodicMemory)
+            .with(CT.SemanticMemory)
+            .with(CT.Reflection)
+            .executeEntities();
+        }
+        const agents = broadcastAgents;
 
         for (const agent of agents) {
           const episodicMem = getEpisodicMemory(agent);

@@ -206,8 +206,10 @@ export class GuardDutySystem extends BaseSystem {
       const pos = entity.getComponent('position') as PositionComponent | undefined;
       if (!pos) continue;
 
-      const distance = this.calculateDistance(location, pos);
-      if (distance > radius) continue;
+      // PERF: Use squared distance for early rejection, sqrt only for threats within range
+      const distanceSq = this.calculateDistanceSquared(location, pos);
+      if (distanceSq > radius * radius) continue;
+      const distance = Math.sqrt(distanceSq);
 
       // Check if entity is a threat
       const threatLevel = this.assessThreatLevel(entity);
