@@ -273,7 +273,14 @@ export class GameLoop {
         if (system.requiredComponents.length === 0) {
           // Systems with no required components get ALL entities
           // This allows them to do their own filtering (e.g., BeliefGenerationSystem)
-          entities = this._world.query().executeEntities();
+          // Cache the result so multiple zero-req systems share one query per tick
+          const allCached = this.queryCache.get('__all_entities__');
+          if (allCached !== undefined) {
+            entities = allCached;
+          } else {
+            entities = this._world.query().executeEntities();
+            this.queryCache.set('__all_entities__', entities);
+          }
         } else {
           // Check cache first
           const cached = this.queryCache.get(system.id);

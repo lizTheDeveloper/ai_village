@@ -45,6 +45,10 @@ export class SpellWorldEffectSystem extends BaseSystem {
   /** Pending fire removals: tick → [{x, y}] */
   private pendingFireRemovals: Map<number, Array<{ x: number; y: number }>> = new Map();
 
+  /** Per-tick cache for Position+Renderable query (avoids repeated full scans) */
+  private cachedRenderableEntities: ReadonlyArray<any> | null = null;
+  private cachedRenderableTick = -1;
+
   protected onInitialize(): void {
     this.events.onGeneric('spell_sandbox:world_effect', (data: unknown) => {
       this.pendingEffects.push(data as SpellWorldEffectData);
@@ -52,14 +56,24 @@ export class SpellWorldEffectSystem extends BaseSystem {
   }
 
   protected onUpdate(ctx: SystemContext): void {
+    // Reset per-tick cache
+    this.cachedRenderableEntities = null;
+
+    const hasEffects = this.pendingEffects.length > 0;
+    const removals = this.pendingFireRemovals.get(ctx.tick);
+
+    // Early out — nothing to do this tick
+    if (!hasEffects && !removals) return;
+
     // Process queued spell effects
-    for (const effectData of this.pendingEffects) {
-      this.dispatchEffect(ctx, effectData);
+    if (hasEffects) {
+      for (const effectData of this.pendingEffects) {
+        this.dispatchEffect(ctx, effectData);
+      }
+      this.pendingEffects.length = 0;
     }
-    this.pendingEffects.length = 0;
 
     // Process pending fire removals
-    const removals = this.pendingFireRemovals.get(ctx.tick);
     if (removals) {
       for (const removal of removals) {
         this.removeFire(ctx, removal.x, removal.y);
@@ -168,17 +182,7 @@ export class SpellWorldEffectSystem extends BaseSystem {
   private handleExtinguishFire(ctx: SystemContext, data: SpellWorldEffectData): void {
     const x = data.x ?? 50;
     const y = data.y ?? 50;
-    const entities = ctx.world.query().with(CT.Position).with(CT.Renderable).executeEntities();
-
-    for (const entity of entities) {
-      const pos = entity.getComponent(CT.Position) as { x: number; y: number } | undefined;
-      const renderable = entity.getComponent(CT.Renderable) as { spriteId?: string } | undefined;
-      if (!pos || !renderable) continue;
-
-      if (renderable.spriteId === 'fire' && Math.abs(pos.x - x) <= 3 && Math.abs(pos.y - y) <= 3) {
-        ctx.world.destroyEntity(entity.id, 'spell:extinguish_fire');
-      }
-    }
+    this.removeFireNear(ctx, x, y, 3, 'spell:extinguish_fire');
 
     this.events.emitGeneric('spell_sandbox:effect_applied', {
       effect: 'extinguish_fire',
@@ -215,13 +219,25 @@ export class SpellWorldEffectSystem extends BaseSystem {
   }
 
   private removeFire(ctx: SystemContext, x: number, y: number): void {
-    const entities = ctx.world.query().with(CT.Position).with(CT.Renderable).executeEntities();
-    for (const entity of entities) {
+    this.removeFireNear(ctx, x, y, 0, 'spell:fire_expired');
+  }
+
+  /**
+   * Shared fire-removal helper. Queries renderable entities once and removes
+   * fire sprites within `radius` tiles of (x, y).
+   */
+  private removeFireNear(ctx: SystemContext, x: number, y: number, radius: number, reason: string): void {
+    // Use cached query from the GameLoop (entities with Position+Renderable)
+    if (!this.cachedRenderableEntities || this.cachedRenderableTick !== ctx.tick) {
+      this.cachedRenderableEntities = ctx.world.query().with(CT.Position).with(CT.Renderable).executeEntities();
+      this.cachedRenderableTick = ctx.tick;
+    }
+    for (const entity of this.cachedRenderableEntities) {
       const pos = entity.getComponent(CT.Position) as { x: number; y: number } | undefined;
       const renderable = entity.getComponent(CT.Renderable) as { spriteId?: string } | undefined;
       if (!pos || !renderable) continue;
-      if (renderable.spriteId === 'fire' && pos.x === x && pos.y === y) {
-        ctx.world.destroyEntity(entity.id, 'spell:fire_expired');
+      if (renderable.spriteId === 'fire' && Math.abs(pos.x - x) <= radius && Math.abs(pos.y - y) <= radius) {
+        ctx.world.destroyEntity(entity.id, reason);
       }
     }
   }

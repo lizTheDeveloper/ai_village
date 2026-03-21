@@ -70,6 +70,7 @@ export class SongSystem extends BaseSystem {
   readonly id = 'song_system' as SystemId;
   readonly priority = 950; // Late in tick — this is a presentation concern
   readonly requiredComponents: readonly string[] = [];
+  readonly activationComponents = ['agent'] as const; // Only run when agents exist
   protected readonly throttleInterval = 100; // Check every 5s (ambient timer)
 
   private songsByOccasion = new Map<SongOccasion, SongEntry[]>();

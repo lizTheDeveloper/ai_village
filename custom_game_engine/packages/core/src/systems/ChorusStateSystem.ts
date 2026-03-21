@@ -122,6 +122,10 @@ export class ChorusStateSystem extends BaseSystem {
 
   protected readonly throttleInterval = 20; // Every 1 second at 20 TPS
 
+  /** Per-tick deity entity cache */
+  private cachedDeityEntities: ReadonlyArray<any> | null = null;
+  private cachedDeityTick = -1;
+
   protected onUpdate(ctx: SystemContext): void {
     const tick = ctx.tick;
 
@@ -175,7 +179,12 @@ export class ChorusStateSystem extends BaseSystem {
     // Find all entities with a Deity component that are dormant/new and stir them.
     // Agent entropy modifier (+10%) is applied by the LLM layer reading chorusState
     // directly via getChorusState() — not managed here.
-    const deityEntities = ctx.world.query().with(CT.Deity).executeEntities();
+    // Cache deity query per tick to avoid repeated full scans
+    if (!this.cachedDeityEntities || this.cachedDeityTick !== ctx.tick) {
+      this.cachedDeityEntities = ctx.world.query().with(CT.Deity).executeEntities();
+      this.cachedDeityTick = ctx.tick;
+    }
+    const deityEntities = this.cachedDeityEntities;
 
     for (const entity of deityEntities) {
       const deity = entity.getComponent(CT.Deity) as
