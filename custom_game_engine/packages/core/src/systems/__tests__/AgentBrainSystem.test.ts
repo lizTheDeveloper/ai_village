@@ -51,6 +51,8 @@ function createMockWorld(tick: number = 100): World {
       with: vi.fn().mockReturnThis(),
       executeEntities: vi.fn().mockReturnValue([]),
     }),
+    getEntitiesInChunk: vi.fn().mockReturnValue([]),
+    entities: new Map(),
   } as World;
 }
 
@@ -153,7 +155,18 @@ describe('AgentBrainSystem', () => {
       const entity = createAgentEntity(agent);
       const world = createMockWorld(100);
 
+      // Spy on console.error to detect if the catch block swallows an error
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
       system.update(world, [entity], 0.05);
+
+      // If the catch block fired, the handler won't be called — surface the actual error
+      if (errorSpy.mock.calls.length > 0) {
+        const errorMsg = errorSpy.mock.calls.map(c => c.join(' ')).join('\n');
+        errorSpy.mockRestore();
+        throw new Error(`AgentBrainSystem caught an error during update (this causes the handler not to be called):\n${errorMsg}`);
+      }
+      errorSpy.mockRestore();
 
       expect(handler).toHaveBeenCalledWith(entity, world);
     });
