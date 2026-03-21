@@ -38,7 +38,7 @@ export class AvatarRespawnSystem extends BaseSystem {
   protected readonly throttleInterval = 0; // EVERY_TICK
 
   protected onUpdate(ctx: SystemContext): void {
-    const world = ctx.world as unknown as World;
+    const world: World = ctx.world;
     const currentTick = ctx.tick;
 
     const avatarEntities = world

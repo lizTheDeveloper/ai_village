@@ -51,7 +51,7 @@ export class PlayerActionSystem extends BaseSystem {
   };
 
   protected onUpdate(ctx: SystemContext): void {
-    const world = ctx.world as unknown as World;
+    const world: World = ctx.world;
 
     const playerControlEntities = world
       .query()

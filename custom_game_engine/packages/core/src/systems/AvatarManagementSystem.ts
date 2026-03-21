@@ -39,7 +39,7 @@ export class AvatarManagementSystem extends BaseSystem {
   protected readonly throttleInterval = 0; // EVERY_TICK
 
   protected onUpdate(ctx: SystemContext): void {
-    const world = ctx.world as unknown as World;
+    const world: World = ctx.world;
     const currentTick = ctx.tick;
 
     // Process auto-respawn deadlines for avatars in destroyed state
