@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/browser';
 import {
   GameLoop,
   BuildingBlueprintRegistry,
@@ -280,6 +281,21 @@ import {
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 const LLM_PROXY_URL = (import.meta.env.VITE_LLM_PROXY_URL as string | undefined) ?? '';
 const METRICS_WS_URL = import.meta.env.VITE_METRICS_WS_URL || 'ws://localhost:8765';
+
+// ============================================================================
+// ERROR TRACKING (Sentry / GlitchTip)
+// ============================================================================
+if (import.meta.env.VITE_SENTRY_DSN) {
+  Sentry.init({
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+    environment: import.meta.env.MODE,
+    sendDefaultPii: false,
+    sampleRate: 1.0,
+    beforeSend(event) { delete event.user; return event; },
+  });
+  window.addEventListener('error', (e) => Sentry.captureException(e.error));
+  window.addEventListener('unhandledrejection', (e) => Sentry.captureException(e.reason));
+}
 
 // ============================================================================
 // DEPENDENCY INJECTION SETUP
@@ -723,6 +739,7 @@ function createUIPanels(
 // ============================================================================
 
 function setupWindowManager(
+  gameLoop: GameLoop,
   canvas: HTMLCanvasElement,
   renderer: Renderer,
   panels: UIPanelsResult,
@@ -4494,7 +4511,7 @@ async function main() {
 
   // Setup window manager
   const { windowManager, menuBar, controlsPanel, skillTreePanel, divineChatPanel } = setupWindowManager(
-    canvas, renderer, panels, keyboardRegistry, showNotification, gameLoop.systemRegistry
+    gameLoop, canvas, renderer, panels, keyboardRegistry, showNotification, gameLoop.systemRegistry
   );
 
   // Set world reference for content checkers (progressive disclosure of panels)
@@ -5765,7 +5782,7 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     waitForAuth()
       .then(() => main())
-      .catch(err => console.error('[Demo] FATAL ERROR in main():', err));
+      .catch(err => { Sentry.captureException(err); console.error('[Demo] FATAL ERROR in main():', err); });
   });
 } else {
   waitForAuth()
