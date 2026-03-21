@@ -1,0 +1,19 @@
+# MVEE — Prebuilt Production Dockerfile
+# Expects demo/dist/ and demo/server/ to already exist (via rsync from local build)
+
+FROM node:22-slim
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm install --omit=dev --ignore-scripts 2>/dev/null || npm install --ignore-scripts
+
+COPY demo/dist/ demo/dist/
+COPY demo/server/ demo/server/
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
+EXPOSE 3000
+
+CMD ["npx", "tsx", "demo/server/production.ts"]
