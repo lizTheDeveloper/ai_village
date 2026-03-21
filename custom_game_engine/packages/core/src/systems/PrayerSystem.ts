@@ -130,26 +130,13 @@ export class PrayerSystem extends BaseSystem {
   ): void {
     // Extract nearby spirits and deities for cosmology resolution
     // Note: Converting ECS components to interface types for CosmologyInteraction
-    const nearbySpirits: Spirit[] = nearbyEntities
+    const nearbySpirits: Pick<Spirit, 'id'>[] = nearbyEntities
       .filter(e => e.components.has(CT.Spirit) && e.getComponent<SpiritComponent>(CT.Spirit) !== undefined)
-      .map(e => {
-        const spiritComp = e.getComponent<SpiritComponent>(CT.Spirit)!;
-        return {
-          id: e.id,
-          entityType: 'spirit' as const,
-          ...spiritComp,
-        } as unknown as Spirit;
-      });
+      .map(e => ({ id: e.id }));
 
-    const nearbyDeities: Deity[] = nearbyEntities
+    const nearbyDeities: Pick<Deity, 'id'>[] = nearbyEntities
       .filter(e => e.components.has(CT.Deity))
-      .map(e => {
-        const deityComp = e.getComponent<DeityComponent>(CT.Deity);
-        return {
-          id: e.id,
-          ...deityComp,
-        } as unknown as Deity;
-      });
+      .map(e => ({ id: e.id }));
 
     // Use cosmology to resolve where this prayer should go
     const resolution = resolvePrayer(

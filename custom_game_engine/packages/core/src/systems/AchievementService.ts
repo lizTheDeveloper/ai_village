@@ -113,8 +113,8 @@ export class AchievementService extends BaseSystem {
     if (typeof fetch === 'undefined') return;
 
     const win = typeof window !== 'undefined' ? window : undefined;
-    const metricsUrl = win ? (win as unknown as Record<string, unknown>).__METRICS_URL : undefined;
-    const baseUrl = metricsUrl ? String(metricsUrl) : 'http://localhost:8766';
+    const metricsUrl = win ? (win as Window & { __METRICS_URL?: string }).__METRICS_URL : undefined;
+    const baseUrl = metricsUrl ?? 'http://localhost:8766';
 
     await fetch(`${baseUrl}/api/achievements/unlock`, {
       method: 'POST',

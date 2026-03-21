@@ -26,6 +26,8 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 import type { VisionComponent } from '../components/VisionComponent.js';
 import type { CombatStatsComponent } from '../components/CombatStatsComponent.js';
 import type { EquipmentComponent } from '../components/EquipmentComponent.js';
+import type { ProjectileComponent } from '../components/ProjectileComponent.js';
+import type { VelocityComponent } from '../components/VelocityComponent.js';
 import {
   calculatePowerDifferential,
   isCriticalThreat,
@@ -373,7 +375,7 @@ export class ThreatResponseSystem extends BaseSystem {
     world: World
   ): DetectedThreat | null {
     const projectilePos = projectile.getComponent<PositionComponent>(CT.Position);
-    const projectileComp = projectile.getComponent<any>(CT.Projectile);
+    const projectileComp = projectile.getComponent<ProjectileComponent>(CT.Projectile);
     if (!projectilePos || !projectileComp) return null;
 
     // Skip projectiles fired by this agent
@@ -393,7 +395,8 @@ export class ThreatResponseSystem extends BaseSystem {
     const distance = Math.sqrt(distSq);
 
     // Get projectile velocity
-    const velocity = projectile.getComponent<any>(CT.Velocity) ?? projectileComp.velocity;
+    const velComp = projectile.getComponent<VelocityComponent>(CT.Velocity);
+    const velocity = velComp ? { x: velComp.vx, y: velComp.vy } : projectileComp.velocity;
     if (!velocity || (velocity.x === 0 && velocity.y === 0)) return null;
 
     // Check if projectile is heading toward agent

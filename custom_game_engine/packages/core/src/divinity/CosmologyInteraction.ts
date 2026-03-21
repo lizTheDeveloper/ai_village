@@ -688,8 +688,8 @@ export function getPerception(
 export function resolvePrayer(
   _mortalId: string,
   targetDescription: string,
-  nearbySpirits: Spirit[],
-  nearbyDeities: Deity[]
+  nearbySpirits: Pick<Spirit, 'id'>[],
+  nearbyDeities: Pick<Deity, 'id'>[]
 ): PrayerResolution {
   // Prayer targeting is based on mortal's understanding
   // If they pray to "the spirit of the river" it goes to spirit
