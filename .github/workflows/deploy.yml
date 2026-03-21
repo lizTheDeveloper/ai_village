@@ -73,6 +73,7 @@ jobs:
           path: artifacts
 
       - name: Debug artifact structure
+        working-directory: ${{ github.workspace }}
         run: |
           echo "=== Artifact directory structure ==="
           find artifacts/ -maxdepth 4 -type f | head -30 || echo "No files found in artifacts/"
