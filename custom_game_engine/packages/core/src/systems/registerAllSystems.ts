@@ -390,6 +390,7 @@ import { EventCoalescingMonitorSystem } from './EventCoalescingMonitorSystem.js'
 // Lore — Audio
 import { SongSystem } from '../lore/SongSystem.js';
 import { ChorusStateSystem } from './ChorusStateSystem.js';
+import { ChorusWeatherEffectSystem } from './ChorusWeatherEffectSystem.js';
 import { SpellWorldEffectSystem } from './SpellWorldEffectSystem.js';
 import { AchievementService } from './AchievementService.js';
 
@@ -1163,6 +1164,11 @@ export function registerAllSystems(
   // CHORUS STATE (cross-game Folkfork collective intelligence — priority 45)
   // ============================================================================
   gameLoop.systemRegistry.register(new ChorusStateSystem());
+
+  // ============================================================================
+  // CHORUS WEATHER EFFECTS (terrain/sky anomalies for Blooming/Chorus — priority 46)
+  // ============================================================================
+  gameLoop.systemRegistry.register(new ChorusWeatherEffectSystem());
 
   // ============================================================================
   // SPELL WORLD EFFECTS (Drive 3 — Spell Sandbox world mutations, priority 160)

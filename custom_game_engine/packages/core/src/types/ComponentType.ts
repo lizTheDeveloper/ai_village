@@ -156,6 +156,7 @@ export enum ComponentType {
   Plant = 'plant',
   Seed = 'seed',
   WildSeedBank = 'wild_seed_bank',
+  PlantKnowledge = 'plant_knowledge',
 
   // Animals
   Animal = 'animal',

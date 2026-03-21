@@ -934,6 +934,17 @@ export interface MiscEvents {
     wovenAtTick: number;
   };
 
+  // === Epistemic Events ===
+  'epistemic:knowledge_injected': {
+    injectionId: string;
+    targetEntityId: string;
+    memoryId: string;
+    sourceType: string;
+    knowledgeType: string;
+    detected: boolean;
+    alienness: number;
+  };
+
   // === Test Events ===
   'test:event': {
     [key: string]: unknown;

@@ -374,8 +374,8 @@ export class ThreatResponseSystem extends BaseSystem {
     agentId: string,
     world: World
   ): DetectedThreat | null {
-    const projectilePos = projectile.getComponent<PositionComponent>(CT.Position);
-    const projectileComp = projectile.getComponent<ProjectileComponent>(CT.Projectile);
+    const projectilePos = projectile.getComponent(CT.Position);
+    const projectileComp = projectile.getComponent(CT.Projectile);
     if (!projectilePos || !projectileComp) return null;
 
     // Skip projectiles fired by this agent
@@ -395,7 +395,7 @@ export class ThreatResponseSystem extends BaseSystem {
     const distance = Math.sqrt(distSq);
 
     // Get projectile velocity
-    const velComp = projectile.getComponent<VelocityComponent>(CT.Velocity);
+    const velComp = projectile.getComponent(CT.Velocity);
     const velocity = velComp ? { x: velComp.vx, y: velComp.vy } : projectileComp.velocity;
     if (!velocity || (velocity.x === 0 && velocity.y === 0)) return null;
 
