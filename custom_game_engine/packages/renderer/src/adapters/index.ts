@@ -108,6 +108,7 @@ import type { ShopPanel } from '../ShopPanel.js';
 import type { TileInspectorPanel } from '../TileInspectorPanel.js';
 import type { MagicSystemsPanel } from '../MagicSystemsPanel.js';
 import type { SpellbookPanel } from '../SpellbookPanel.js';
+import type { SpellSandboxPanel } from '../SpellSandboxPanel.js';
 import type { SkillTreePanel } from '../panels/magic/SkillTreePanel.js';
 import type { DivinePowersPanel } from '../DivinePowersPanel.js';
 import type { DivineChatPanel } from '../DivineChatPanel.js';
@@ -773,6 +774,40 @@ export const SPELLBOOK_PANEL_CONFIG: PanelConfig<SpellbookPanel> = {
  */
 export function createSpellbookPanelAdapter(panel: SpellbookPanel): PanelAdapter<SpellbookPanel> {
   return new PanelAdapter(panel, SPELLBOOK_PANEL_CONFIG);
+}
+
+/**
+ * Configuration for SpellSandboxPanel adapter.
+ * Pattern: Delegate visibility - panel has isVisible/toggle methods
+ */
+export const SPELL_SANDBOX_PANEL_CONFIG: PanelConfig<SpellSandboxPanel> = {
+  id: 'spell-sandbox',
+  title: 'Research Casting Circle',
+  defaultWidth: 440,
+  defaultHeight: 640,
+  menuCategory: 'magic',
+  getVisible: (panel) => panel.isVisible(),
+  setVisible: (panel, visible) => {
+    if (visible !== panel.isVisible()) {
+      panel.toggle();
+    }
+  },
+  renderMethod: (panel, ctx, _x, _y, width, height, _world) => {
+    panel.render(ctx, _x, _y, width, height);
+  },
+  handleScroll: (panel, deltaY, contentHeight) => {
+    return panel.handleScroll(deltaY, contentHeight);
+  },
+  handleContentClick: (panel, x, y, _width, _height) => {
+    return panel.handleClick(x, y);
+  },
+};
+
+/**
+ * Create a SpellSandboxPanel adapter
+ */
+export function createSpellSandboxPanelAdapter(panel: SpellSandboxPanel): PanelAdapter<SpellSandboxPanel> {
+  return new PanelAdapter(panel, SPELL_SANDBOX_PANEL_CONFIG);
 }
 
 /**

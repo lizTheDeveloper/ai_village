@@ -26,6 +26,7 @@ import { TimeControlsPanel } from '../TimeControlsPanel';
 import { UniverseManagerPanel } from '../UniverseManagerPanel';
 import { MagicSystemsPanel } from '../MagicSystemsPanel';
 import { SpellbookPanel } from '../SpellbookPanel';
+import { SpellSandboxPanel } from '../SpellSandboxPanel';
 import { CivilizationChroniclePanel } from '../CivilizationChroniclePanel';
 import { DivinePowersPanel } from '../DivinePowersPanel';
 import { VisionComposerPanel } from '../VisionComposerPanel';
@@ -49,6 +50,7 @@ import {
   createTileInspectorPanelAdapter,
   createMagicSystemsPanelAdapter,
   createSpellbookPanelAdapter,
+  createSpellSandboxPanelAdapter,
   createDivinePowersPanelAdapter,
   createVisionComposerPanelAdapter,
   createDivineAnalyticsPanelAdapter,
@@ -213,6 +215,13 @@ export function createMagicSystemsPanelFactory(): () => IWindowPanel {
  */
 export function createSpellbookPanelFactory(): () => IWindowPanel {
   return () => createSpellbookPanelAdapter(new SpellbookPanel());
+}
+
+/**
+ * Factory for SpellSandboxPanel
+ */
+export function createSpellSandboxPanelFactory(): () => IWindowPanel {
+  return () => createSpellSandboxPanelAdapter(new SpellSandboxPanel());
 }
 
 /**
