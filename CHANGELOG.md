@@ -6,6 +6,17 @@ Format: [Semantic Versioning](https://semver.org/). Newest first.
 
 ---
 
+## v0.1.8 — 2026-03-21
+
+### What's New
+- Plant knowledge and wild seed bank serialization — `PlantKnowledgeSerializer` and `WildSeedBankSerializer` added to persistence layer (MUL-21)
+
+### Infrastructure
+- CI/CD pipeline is now fully operational — GitHub Actions deploys to play.multiversestudios.xyz on every push
+- Fixed 7 root causes that had blocked the pipeline since initial setup
+
+---
+
 ## v0.1.7 — 2026-03-21
 
 ### Fixes
