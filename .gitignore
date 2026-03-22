@@ -81,6 +81,7 @@ custom_game_engine/test-*.sh
 !*.config.js
 !vite.config.ts
 !custom_game_engine/env.d.ts
+!custom_game_engine/.env.production
 *.tsbuildinfo
 
 # Temporary files
