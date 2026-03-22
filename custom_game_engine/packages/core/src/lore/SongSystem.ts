@@ -98,6 +98,8 @@ export class SongSystem extends BaseSystem {
   private pendingOccasion: SongOccasion | null = null;
   /** Whether the user has interacted (unlocking audio) */
   private audioUnlocked = false;
+  /** Queued crossfade request if one arrives while fading */
+  private queuedCrossfade: { url: string; occasion: SongOccasion } | null = null;
   /** Bound handler so we can remove it after first gesture */
   private readonly onUserGesture = (): void => {
     this.audioUnlocked = true;
@@ -244,7 +246,11 @@ export class SongSystem extends BaseSystem {
   }
 
   private crossfadeTo(url: string, occasion: SongOccasion): void {
-    if (this.isFading) return;
+    if (this.isFading) {
+      // Queue request — will fire when current fade completes
+      this.queuedCrossfade = { url, occasion };
+      return;
+    }
 
     const oldAudio = this.currentAudio;
     if (!oldAudio) {
@@ -281,6 +287,13 @@ export class SongSystem extends BaseSystem {
           this.currentOccasion = occasion;
           this.lastSwitchTime = Date.now();
           this.isFading = false;
+
+          // Drain queued crossfade request if one arrived during fade
+          if (this.queuedCrossfade) {
+            const queued = this.queuedCrossfade;
+            this.queuedCrossfade = null;
+            this.crossfadeTo(queued.url, queued.occasion);
+          }
         }
       }, FADE_INTERVAL_MS);
     }).catch((err: DOMException) => {
@@ -355,8 +368,8 @@ export class SongSystem extends BaseSystem {
         }
       }
 
-      // Random jitter to break ties
-      score += Math.random() * 0.5;
+      // Random jitter to break ties — wide range for more variety
+      score += Math.random() * 1.5;
 
       if (score > bestScore) {
         bestScore = score;
@@ -434,6 +447,16 @@ export class SongSystem extends BaseSystem {
         pool.push(entry);
       } else {
         this.songsByOccasion.set(entry.occasion, [entry]);
+      }
+    }
+
+    // Shuffle each pool so iteration order varies per session
+    for (const pool of this.songsByOccasion.values()) {
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = pool[i];
+        pool[i] = pool[j]!;
+        pool[j] = temp!;
       }
     }
   }
