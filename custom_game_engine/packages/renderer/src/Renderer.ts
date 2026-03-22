@@ -682,9 +682,13 @@ export class Renderer {
       const alpha = renderable.alpha ?? 1.0;
       this.ctx.globalAlpha = effectiveOpacity * alpha;
 
+      // Baby norns render at 60% scale
+      const infant = entity.components.get('infant');
+      const babyScale = infant ? 0.6 : 1.0;
+
       // Calculate size with size multiplier
       const baseSize = this.tileSize * this.camera.zoom;
-      const scaledSize = baseSize * sizeMultiplier;
+      const scaledSize = baseSize * sizeMultiplier * babyScale;
 
       // Center the scaled sprite
       const offsetX = (scaledSize - baseSize) / 2;

@@ -1022,13 +1022,15 @@ export class Renderer3D {
       }
 
       // Update position in instanced renderer (Note: Three.js uses x,z,y coords)
+      const infant = entity.components.get('infant');
+      const entityScale = infant ? 2.0 * 0.6 : 2.0;
       this.instancedSpriteRenderer.setSprite(
         entity.id,
         x,
         y, // game Y -> instanced renderer handles swap
         elevation + 1.5,
         spriteKey,
-        2.0 // default scale
+        entityScale
       );
 
       // Update visibility for frustum culling
@@ -1223,7 +1225,10 @@ export class Renderer3D {
         transparent: true,
       });
       const sprite = new THREE.Sprite(material);
-      sprite.scale.set(2, 2, 1);
+      const infant = entity.components.get('infant');
+      const babyScale = infant ? 0.6 : 1.0;
+      const baseEntityScale = 2 * babyScale;
+      sprite.scale.set(baseEntityScale, baseEntityScale, 1);
 
       this.scene.add(sprite);
 
@@ -1261,7 +1266,10 @@ export class Renderer3D {
     const dz = y - camZ;  // Note: y is world Z in Three.js coords
     const distanceSquared = dx * dx + dz * dz;
     const lod = this.getLODLevel(distanceSquared);
-    const lodScale = 2 * lod.scale;  // Base scale is 2
+    const infant = entity.components.get('infant');
+    const babyScale = infant ? 0.6 : 1.0;
+    const baseEntityScale = 2 * babyScale;
+    const lodScale = baseEntityScale * lod.scale;
     data.sprite.scale.set(lodScale, lodScale, 1);
 
     // Let Three.js handle visibility automatically via frustum culling
