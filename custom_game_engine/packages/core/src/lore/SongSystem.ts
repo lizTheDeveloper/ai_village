@@ -61,6 +61,13 @@ const FADE_DURATION_MS = 2000;
 const COOLDOWN_MS = 90_000;
 const AMBIENT_IDLE_MS = 60_000;
 const FADE_INTERVAL_MS = 50;
+const MAX_VOLUME = 1 / 3;
+
+/** Songs played within this window get a recency penalty */
+const TAG_RECENCY_DECAY_MS = 5 * 60_000; // 5 minutes
+const RECENT_FILENAMES_MAX = 6;
+const STORAGE_KEY_TAG_LAST_PLAYED = 'songSystem.tagLastPlayed';
+const STORAGE_KEY_RECENT_FILENAMES = 'songSystem.recentFilenames';
 
 // ============================================================================
 // SongSystem
@@ -81,6 +88,11 @@ export class SongSystem extends BaseSystem {
   private isFading = false;
   private fadeTimer: ReturnType<typeof setInterval> | null = null;
   private initialized = false;
+
+  /** Tracks when each occasion tag was last played (ms timestamp) */
+  private tagLastPlayed = new Map<SongOccasion, number>();
+  /** Ring buffer of recently played filenames for variety */
+  private recentFilenames: string[] = [];
 
   /** Occasion queued because autoplay was blocked */
   private pendingOccasion: SongOccasion | null = null;
@@ -104,6 +116,7 @@ export class SongSystem extends BaseSystem {
     }
 
     this.buildOccasionIndex();
+    this.loadPlayHistory();
     this.subscribeToEvents();
     this.addGestureListeners();
     this.initialized = true;
@@ -196,8 +209,9 @@ export class SongSystem extends BaseSystem {
     const pool = this.songsByOccasion.get(occasion);
     if (!pool || pool.length === 0) return;
 
-    const song = pool[Math.floor(Math.random() * pool.length)];
+    const song = this.selectBestSong(pool, occasion);
     if (!song) return;
+    this.recordPlay(song, occasion);
     const url = AUDIO_BASE_PATH + encodeURIComponent(song.filename);
 
     if (this.currentAudio && !this.currentAudio.paused) {
@@ -224,7 +238,7 @@ export class SongSystem extends BaseSystem {
         // Browser blocked autoplay — store pending occasion for retry on user gesture
         this.pendingOccasion = occasion;
       } else {
-        console.warn('[SongSystem] Playback failed:', err.message);
+        console.error('[SongSystem] Playback failed:', err.message);
       }
     });
   }
@@ -254,7 +268,7 @@ export class SongSystem extends BaseSystem {
         const progress = step / steps;
 
         oldAudio.volume = Math.max(0, oldStartVolume * (1 - progress));
-        newAudio.volume = Math.min(1, progress);
+        newAudio.volume = Math.min(MAX_VOLUME, progress * MAX_VOLUME);
 
         if (step >= steps) {
           if (this.fadeTimer !== null) {
@@ -273,7 +287,7 @@ export class SongSystem extends BaseSystem {
       if (err.name === 'NotAllowedError') {
         this.pendingOccasion = occasion;
       } else {
-        console.warn('[SongSystem] Crossfade playback failed:', err.message);
+        console.error('[SongSystem] Crossfade playback failed:', err.message);
       }
       this.isFading = false;
     });
@@ -284,7 +298,7 @@ export class SongSystem extends BaseSystem {
     let step = 0;
     this.fadeTimer = setInterval(() => {
       step++;
-      audio.volume = Math.min(1, step / steps);
+      audio.volume = Math.min(MAX_VOLUME, (step / steps) * MAX_VOLUME);
       if (step >= steps) {
         if (this.fadeTimer !== null) {
           clearInterval(this.fadeTimer);
@@ -306,6 +320,106 @@ export class SongSystem extends BaseSystem {
     }
     this.currentOccasion = null;
     this.isFading = false;
+  }
+
+  // ============================================================================
+  // Adaptive Selection
+  // ============================================================================
+
+  /**
+   * Score each song in the pool and pick the best one.
+   * Base score 5, penalize recently played filenames (-3) and recently
+   * used occasion tags (up to -2 decaying over TAG_RECENCY_DECAY_MS),
+   * then add random jitter (0–0.5) so ties break differently each time.
+   */
+  private selectBestSong(pool: SongEntry[], occasion: SongOccasion): SongEntry | undefined {
+    const now = Date.now();
+    let bestSong: SongEntry | undefined;
+    let bestScore = -Infinity;
+
+    for (const song of pool) {
+      let score = 5;
+
+      // Penalize songs in the recent play ring buffer
+      if (this.recentFilenames.includes(song.filename)) {
+        score -= 3;
+      }
+
+      // Penalize the occasion tag if it was played recently
+      const tagTime = this.tagLastPlayed.get(occasion);
+      if (tagTime !== undefined) {
+        const elapsed = now - tagTime;
+        if (elapsed < TAG_RECENCY_DECAY_MS) {
+          // Linear decay: full -2 penalty at 0 elapsed, 0 at decay threshold
+          score -= 2 * (1 - elapsed / TAG_RECENCY_DECAY_MS);
+        }
+      }
+
+      // Random jitter to break ties
+      score += Math.random() * 0.5;
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestSong = song;
+      }
+    }
+
+    return bestSong;
+  }
+
+  /** Record that a song was played, updating recency maps and persisting. */
+  private recordPlay(song: SongEntry, occasion: SongOccasion): void {
+    const now = Date.now();
+
+    // Update tag recency
+    this.tagLastPlayed.set(occasion, now);
+
+    // Update filename ring buffer
+    this.recentFilenames.push(song.filename);
+    if (this.recentFilenames.length > RECENT_FILENAMES_MAX) {
+      this.recentFilenames.shift();
+    }
+
+    this.savePlayHistory();
+  }
+
+  // ============================================================================
+  // Persistence
+  // ============================================================================
+
+  private loadPlayHistory(): void {
+    try {
+      const tagJson = localStorage.getItem(STORAGE_KEY_TAG_LAST_PLAYED);
+      if (tagJson) {
+        const entries: [SongOccasion, number][] = JSON.parse(tagJson);
+        this.tagLastPlayed = new Map(entries);
+      }
+
+      const recentJson = localStorage.getItem(STORAGE_KEY_RECENT_FILENAMES);
+      if (recentJson) {
+        const filenames: string[] = JSON.parse(recentJson);
+        this.recentFilenames = filenames;
+      }
+    } catch {
+      // Corrupted storage — start fresh, no silent fallback needed
+      this.tagLastPlayed.clear();
+      this.recentFilenames = [];
+    }
+  }
+
+  private savePlayHistory(): void {
+    try {
+      localStorage.setItem(
+        STORAGE_KEY_TAG_LAST_PLAYED,
+        JSON.stringify(Array.from(this.tagLastPlayed.entries()))
+      );
+      localStorage.setItem(
+        STORAGE_KEY_RECENT_FILENAMES,
+        JSON.stringify(this.recentFilenames)
+      );
+    } catch {
+      // localStorage full or unavailable — non-critical, skip silently
+    }
   }
 
   // ============================================================================

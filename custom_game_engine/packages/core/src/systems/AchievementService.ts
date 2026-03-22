@@ -103,8 +103,8 @@ export class AchievementService extends BaseSystem {
 
     // Fire-and-forget POST to server proxy; failure is intentionally silent so
     // the local UI notification always shows regardless of server availability.
-    this.postAchievementUnlock(achievement.id).catch(() => {
-      // Silently fail — achievement UI still shows locally
+    this.postAchievementUnlock(achievement.id).catch((err) => {
+      console.error(`[AchievementService] Failed to post unlock for ${achievement.id}:`, err);
     });
   }
 
