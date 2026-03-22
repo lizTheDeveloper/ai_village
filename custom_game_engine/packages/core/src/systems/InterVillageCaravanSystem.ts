@@ -172,6 +172,7 @@ export class InterVillageCaravanSystem extends BaseSystem {
         targetVillageId: caravan.targetVillageId,
         tick: ctx.tick,
       });
+      ctx.world.destroyEntity(caravanEntity.id, 'caravan_lost');
       return;
     }
 
@@ -236,5 +237,6 @@ export class InterVillageCaravanSystem extends BaseSystem {
       cargo: caravan.cargo,
       tick: ctx.tick,
     });
+    ctx.world.destroyEntity(caravanEntity.id, 'caravan_delivered');
   }
 }

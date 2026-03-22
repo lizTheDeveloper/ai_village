@@ -394,12 +394,15 @@ export class PlantSystem extends BaseSystem {
           });
         }
 
-        // Emit event for dead plants (renderer/world can handle removal)
+        // Remove dead plant entities to prevent unbounded entity growth (MUL-3118)
+        // Emit plant:dead once for subscribers (e.g., WildPlantPopulationSystem seed bank)
         if (plant.stage === 'dead') {
           this.events.emit('plant:dead', {
             entityId: entity.id,
             position: plant.position
           });
+          world.destroyEntity(entity.id, 'plant_dead_cleanup');
+          continue;
         }
       } catch (error) {
         throw error; // Re-throw to ensure errors aren't silenced

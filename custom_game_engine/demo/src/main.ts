@@ -2008,6 +2008,13 @@ function setupVisualEventHandlers(
       throw new Error(`seed:dispersed event seed missing required genetics for ${speciesId}`);
     }
 
+    // Cap plant population to prevent unbounded entity growth (MUL-3118)
+    const MAX_PLANT_ENTITIES = 8000;
+    const plantCount = gameLoop.world.query().with('plant').executeEntities().length;
+    if (plantCount >= MAX_PLANT_ENTITIES) {
+      return;
+    }
+
     floatingTextRenderer?.add('🌰 Seed', position.x * 16, position.y * 16, '#8B4513', 1500);
 
     // Create plant entity from dispersed seed
