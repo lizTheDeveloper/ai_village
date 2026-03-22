@@ -176,7 +176,7 @@ export class PlanetClient {
   private chunkUpdateCallbacks: Map<string, Set<(chunk: SerializedChunk) => void>> = new Map();
   private pendingRequests: Map<string, Promise<any>> = new Map();
 
-  constructor(baseUrl: string = 'http://localhost:8766') {
+  constructor(baseUrl: string = (import.meta.env?.VITE_PLANET_SERVER_URL as string) || 'http://localhost:8766') {
     this.baseUrl = baseUrl;
   }
 

@@ -11,7 +11,7 @@
 import type { SettlementData } from '@ai-village/persistence';
 import { PlanetClient } from '@ai-village/persistence';
 import { getPlayerId } from './utils/GameStateHelpers.js';
-import { LLM_PROXY_URL } from './urlConfig.js';
+import { PLANET_SERVER_URL } from './urlConfig.js';
 
 export interface PlanetDetails {
   id: string;
@@ -42,7 +42,7 @@ export class SettlementSelectionScreen {
 
   constructor(containerId: string = 'settlement-selection-screen', callbacks: SettlementSelectionCallbacks) {
     this.callbacks = callbacks;
-    this.planetClient = new PlanetClient(LLM_PROXY_URL);
+    this.planetClient = new PlanetClient(PLANET_SERVER_URL);
 
     const existing = document.getElementById(containerId);
     if (existing) {

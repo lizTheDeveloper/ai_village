@@ -114,7 +114,7 @@ export class MultiverseClient {
   private baseUrl: string;
   private playerId: string | null = null;
 
-  constructor(baseUrl: string = 'http://localhost:3001/api') {
+  constructor(baseUrl: string = ((import.meta.env?.VITE_API_URL as string) ? `${import.meta.env.VITE_API_URL}/api` : 'http://localhost:3001/api')) {
     this.baseUrl = baseUrl;
   }
 
