@@ -1,236 +1,102 @@
 /**
- * ProxyLLMProvider - Client-side LLM provider that calls the server-side proxy
+ * ProxyLLMProvider - Client-side LLM provider that calls the game-proxy
  *
- * This provider sends LLM requests to the metrics server's `/api/llm/generate` endpoint
- * instead of calling LLM APIs directly from the browser. This provides:
- *
- * 1. **Security**: API keys never exposed to the client
- * 2. **Rate Limiting**: Multi-game fair-share rate limiting enforced on the server
- * 3. **Fallback**: Server automatically tries multiple providers (Groq → Cerebras)
- * 4. **Queuing**: Requests are queued server-side with proper concurrency control
- * 5. **Session Tracking**: Heartbeat keeps session active for cooldown calculation
+ * Sends LLM requests to the game-proxy's `/api/llm/think` endpoint.
+ * The proxy holds the API key server-side and forwards to Groq.
  *
  * Usage:
  * ```typescript
- * const provider = new ProxyLLMProvider('http://localhost:8766');
+ * const provider = new ProxyLLMProvider(import.meta.env.VITE_LLM_PROXY_URL);
  * const response = await provider.generate(request);
- * provider.destroy(); // Clean up when done
+ * provider.destroy();
  * ```
  */
 
 import type { LLMProvider, LLMRequest, LLMResponse, ProviderPricing } from './LLMProvider.js';
 
-/**
- * Extended LLM request with metadata fields used by the proxy
- */
 export interface ProxyLLMRequest extends LLMRequest {
   agentId?: string;
   model?: string;
-  tier?: string;  // Intelligence tier: 'simple', 'default', 'high', 'agi'
+  tier?: string;
 }
 
 export class ProxyLLMProvider implements LLMProvider {
   private readonly proxyUrl: string;
-  private readonly timeout = 60000; // 60 second timeout (increased for queue wait)
-  private readonly sessionId: string;
-  private heartbeatInterval: ReturnType<typeof setInterval> | null = null;
-  private cooldownState: Map<string, number> = new Map(); // provider → nextAllowedAt
+  private readonly timeout = 60000;
   private serverErrorCount: number = 0;
-  private disabledUntil: number = 0; // Circuit breaker: don't retry until this time
+  private disabledUntil: number = 0;
 
-  constructor(proxyUrl: string = 'http://localhost:8766') {
-    this.proxyUrl = proxyUrl.replace(/\/$/, ''); // Remove trailing slash
-    this.sessionId = this.generateSessionId();
-    this.startHeartbeat();
-  }
-
-  private generateSessionId(): string {
-    return `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-  }
-
-  private startHeartbeat(): void {
-    // Send heartbeat every 30 seconds to keep session active
-    this.heartbeatInterval = setInterval(() => {
-      this.sendHeartbeat().catch((err) => {
-        console.warn('[ProxyLLMProvider] Heartbeat failed:', err);
-      });
-    }, 30000);
-
-    // Send initial heartbeat
-    this.sendHeartbeat().catch((err) => {
-      // Initial heartbeat failure is non-critical (server may still be starting)
-      console.warn('[ProxyLLMProvider] Initial heartbeat failed:', err.message);
-    });
-  }
-
-  private async sendHeartbeat(): Promise<void> {
-    try {
-      await fetch(`${this.proxyUrl}/api/llm/heartbeat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: this.sessionId }),
-      });
-    } catch (error) {
-      // Heartbeat is best-effort, don't throw
-    }
-  }
-
-  private detectProvider(model?: string): string {
-    // Simple provider detection based on model name
-    if (!model) return 'cerebras'; // Default to cerebras now
-
-    // Check for Cerebras models first (more specific match)
-    if (model === 'qwen-3-32b' || model === 'qwen3-32b') return 'cerebras';
-
-    // Check for Groq models with slash prefix
-    if (model.includes('qwen/') || model.includes('llama')) return 'groq';
-
-    // Other providers
-    if (model.includes('cerebras')) return 'cerebras';
-    if (model.startsWith('gpt-')) return 'openai';
-    if (model.startsWith('claude-')) return 'anthropic';
-
-    return 'cerebras'; // Default to cerebras
-  }
-
-  private async sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+  constructor(proxyUrl: string) {
+    this.proxyUrl = proxyUrl.replace(/\/$/, '');
   }
 
   async generate(request: LLMRequest): Promise<LLMResponse> {
-    // Circuit breaker: if server has failed repeatedly, don't make network requests
     const now = Date.now();
     if (now < this.disabledUntil) {
-      throw new Error('LLM proxy temporarily disabled (no providers configured on server)');
+      throw new Error('LLM proxy temporarily disabled (repeated server errors)');
     }
 
     const proxyRequest = request as ProxyLLMRequest;
-    const provider = this.detectProvider(proxyRequest.model);
-    const maxRetries = 3; // Retry up to 3 times if server-side rate limited
-    let retryCount = 0;
 
-    while (retryCount <= maxRetries) {
-      // Check client-side cooldown
-      const nextAllowedAt = this.cooldownState.get(provider) || 0;
-      const now = Date.now();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
-      if (now < nextAllowedAt) {
-        const waitMs = nextAllowedAt - now;
-        await this.sleep(waitMs);
+    try {
+      const response = await fetch(`${this.proxyUrl}/api/llm/think`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: request.prompt }],
+          max_tokens: request.maxTokens ?? 256,
+          temperature: request.temperature ?? 0.7,
+          stripThinkTags: true,
+          playerId: proxyRequest.agentId,
+        }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.status === 429) {
+        throw new Error('Rate limited by LLM proxy — try again shortly');
       }
 
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-
-        const response = await fetch(`${this.proxyUrl}/api/llm/generate`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            sessionId: this.sessionId,
-            agentId: proxyRequest.agentId || 'unknown',
-            prompt: request.prompt,
-            model: proxyRequest.model,
-            tier: proxyRequest.tier,
-            maxTokens: request.maxTokens,
-            temperature: request.temperature,
-          }),
-          signal: controller.signal,
-        });
-
-        clearTimeout(timeoutId);
-
-        if (response.status === 429) {
-          let errorData: any = {};
-          try {
-            errorData = await response.json();
-          } catch (jsonError) {
-            // If we can't parse the 429 response, use defaults
-            console.warn('[ProxyLLMProvider] Failed to parse 429 response:', jsonError);
-          }
-
-          // Extract cooldown time from server response
-          const waitMs = errorData.cooldown?.waitMs ||
-                        errorData.waitMs ||
-                        2000; // Default 2 second wait if not specified (reduced from 8s)
-
-          // Update client-side cooldown state
-          this.cooldownState.set(provider, Date.now() + waitMs);
-
-          // If we haven't exceeded retries, wait and retry
-          if (retryCount < maxRetries) {
-            retryCount++;
-            await this.sleep(waitMs);
-            continue; // Retry the request
-          } else {
-            // Max retries exceeded, throw error
-            throw new Error(
-              `Rate limit cooldown: ${errorData.message || 'Max retries exceeded after rate limiting'}`
-            );
+      if (!response.ok) {
+        if (response.status === 500) {
+          this.serverErrorCount++;
+          if (this.serverErrorCount >= 2) {
+            this.disabledUntil = Date.now() + 60000;
           }
         }
-
-        if (!response.ok) {
-          let errorData: any = {};
-          try {
-            errorData = await response.json();
-          } catch (jsonError) {
-            // If we can't parse error response, construct informative message
-            throw new Error(
-              `Proxy error: ${response.status} ${response.statusText} (failed to parse error response: ${jsonError instanceof Error ? jsonError.message : 'unknown'})`
-            );
-          }
-          // If server returns 500 (no providers configured), enable circuit breaker
-          if (response.status === 500) {
-            this.serverErrorCount++;
-            // After 2 consecutive 500s, disable for 60 seconds
-            if (this.serverErrorCount >= 2) {
-              this.disabledUntil = Date.now() + 60000;
-            }
-          }
-          throw new Error(
-            errorData.message ||
-            errorData.error ||
-            `Proxy error: ${response.status} ${response.statusText}`
-          );
-        }
-
-        const data = await response.json();
-
-        // Update cooldown from server
-        if (data.cooldown) {
-          this.cooldownState.set(provider, data.cooldown.nextAllowedAt);
-        }
-
-        return {
-          text: data.text,
-          inputTokens: data.inputTokens,
-          outputTokens: data.outputTokens,
-          costUSD: data.costUSD,
-        };
-      } catch (error) {
-        if (error instanceof Error && error.name === 'AbortError') {
-          throw new Error('LLM proxy request timeout');
-        }
-        // Re-throw non-429 errors immediately
-        throw error;
+        let errorData: Record<string, unknown> = {};
+        try { errorData = await response.json(); } catch { /* ignore parse failure */ }
+        throw new Error(
+          (errorData.error as string) || `Proxy error: ${response.status} ${response.statusText}`
+        );
       }
+
+      // Reset error count on success
+      this.serverErrorCount = 0;
+
+      const data = await response.json();
+
+      return {
+        text: data.text ?? '',
+        inputTokens: 0,
+        outputTokens: 0,
+        costUSD: 0,
+      };
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('LLM proxy request timeout');
+      }
+      throw error;
     }
-
-    // Should never reach here (loop always returns or throws)
-    throw new Error('Unexpected error in generate loop');
   }
 
-  /**
-   * Clean up resources (stop heartbeat interval)
-   */
   destroy(): void {
-    if (this.heartbeatInterval) {
-      clearInterval(this.heartbeatInterval);
-      this.heartbeatInterval = null;
-    }
+    // No resources to clean up
   }
 
   getModelName(): string {
@@ -239,17 +105,18 @@ export class ProxyLLMProvider implements LLMProvider {
 
   async isAvailable(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.proxyUrl}/api/game/status`, {
+      const response = await fetch(`${this.proxyUrl}/api/llm/providers`, {
         method: 'GET',
       });
-      return response.ok;
+      if (!response.ok) return false;
+      const data = await response.json();
+      return data.available === true;
     } catch {
       return false;
     }
   }
 
   getPricing(): ProviderPricing {
-    // Pricing varies by backend provider - report as free since client doesn't control it
     return {
       providerId: 'proxy',
       providerName: 'LLM Proxy',
