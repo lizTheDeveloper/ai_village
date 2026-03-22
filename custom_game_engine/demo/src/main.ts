@@ -3379,7 +3379,6 @@ async function main() {
     const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
     const providers: LLMProvider[] = [
       new SameOriginChatProxy('qwen-3-235b-a22b-instruct-2507', 'https://api.cerebras.ai/v1', basePath),
-      new SameOriginChatProxy('llama3.1-8b', 'https://api.cerebras.ai/v1', basePath),
       new SameOriginChatProxy('openai/gpt-oss-120b', 'https://api.groq.com/openai/v1', basePath),
     ];
     llmProvider = new FallbackProvider(providers, {
