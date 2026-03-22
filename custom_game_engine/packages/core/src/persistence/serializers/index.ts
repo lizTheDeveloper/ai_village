@@ -26,6 +26,8 @@ import { ExplorationStateSerializer } from './ExplorationStateSerializer.js';
 import { SpatialMemorySerializer } from './SpatialMemorySerializer.js';
 import { JournalSerializer } from './JournalSerializer.js';
 import { CourtshipSerializer } from './CourtshipSerializer.js';
+import { PlantKnowledgeSerializer } from './PlantKnowledgeSerializer.js';
+import { WildSeedBankSerializer } from './WildSeedBankSerializer.js';
 
 /**
  * Register all component serializers.
@@ -56,6 +58,8 @@ export function registerAllSerializers(): void {
   componentSerializerRegistry.register('spatial_memory', new SpatialMemorySerializer());
   componentSerializerRegistry.register('journal', new JournalSerializer());
   componentSerializerRegistry.register('courtship', new CourtshipSerializer());
+  componentSerializerRegistry.register('plant_knowledge', new PlantKnowledgeSerializer());
+  componentSerializerRegistry.register('wild_seed_bank', new WildSeedBankSerializer());
 
   // Register generic serializers for all other components
   // These can be replaced with specific serializers later
@@ -232,3 +236,5 @@ export * from './PlantSerializer.js';
 export * from './SpatialMemorySerializer.js';
 export * from './JournalSerializer.js';
 export * from './CourtshipSerializer.js';
+export * from './PlantKnowledgeSerializer.js';
+export * from './WildSeedBankSerializer.js';
