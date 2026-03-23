@@ -1,13 +1,16 @@
-/** Vite import.meta.env type declarations for tsc --build composite mode */
-/* eslint-disable @typescript-eslint/no-empty-interface */
-declare interface ImportMetaEnv {
-  readonly VITE_METRICS_WS_URL?: string;
-  readonly VITE_API_URL?: string;
-  readonly VITE_LLM_PROXY_URL?: string;
-  readonly VITE_PLANET_SERVER_URL?: string;
-  readonly [key: string]: string | undefined;
-}
+/** Vite import.meta.env type declarations — uses export {} to force module mode + declare global */
+export {};
 
-declare interface ImportMeta {
-  readonly env: ImportMetaEnv;
+declare global {
+  interface ImportMetaEnv {
+    readonly VITE_METRICS_WS_URL?: string;
+    readonly VITE_API_URL?: string;
+    readonly VITE_LLM_PROXY_URL?: string;
+    readonly VITE_PLANET_SERVER_URL?: string;
+    readonly [key: string]: string | undefined;
+  }
+
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
 }
