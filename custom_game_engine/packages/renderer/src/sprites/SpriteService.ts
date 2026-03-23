@@ -153,19 +153,23 @@ function checkSpriteExists(folderId: string): boolean {
  * Asynchronously verify if a sprite exists by fetching its metadata
  */
 async function verifySpriteExists(folderId: string): Promise<boolean> {
+  const base = `${assetsBasePath}/${folderId}`;
   try {
-    const metadataUrl = `${assetsBasePath}/${folderId}/metadata.json`;
-    const response = await fetch(metadataUrl, { method: 'HEAD' });
-
-    if (response.ok) {
-      // Sprite exists! Add to known available set
-      KNOWN_AVAILABLE_SPRITES.add(folderId);
-      markSpriteAvailable(folderId);
-      return true;
+    // Check metadata.json first, then sprite-set.json (soul sprite format).
+    // Also verify the response is actually JSON, not an SPA HTML fallback.
+    for (const file of ['metadata.json', 'sprite-set.json']) {
+      const response = await fetch(`${base}/${file}`, { method: 'HEAD' });
+      if (response.ok) {
+        const ct = response.headers.get('content-type') || '';
+        if (ct.includes('json') || ct.includes('octet-stream')) {
+          KNOWN_AVAILABLE_SPRITES.add(folderId);
+          markSpriteAvailable(folderId);
+          return true;
+        }
+      }
     }
-
     return false;
-  } catch (error) {
+  } catch {
     return false;
   }
 }

@@ -17,6 +17,24 @@ export { PixelLabDirection } from './PixelLabSpriteDefs';
 import { getSpriteCache } from './SpriteCache';
 import { SPRITE_BASE_PATH } from './spriteBasePath.js';
 
+/**
+ * Normalize direction names to the canonical format used by PIXELLAB_DIRECTION_NAMES
+ * (no hyphens: "southwest" not "south-west").
+ * Metadata files and filenames may use either format.
+ */
+function normalizeDirectionName(name: string): string {
+  return name.replace(/-/g, '');
+}
+
+/** Map normalized direction names back to hyphenated file-path format */
+const DIR_TO_PATH: Record<string, string> = {
+  south: 'south', southwest: 'south-west', west: 'west', northwest: 'north-west',
+  north: 'north', northeast: 'north-east', east: 'east', southeast: 'south-east',
+};
+function directionToPath(normalized: string): string {
+  return DIR_TO_PATH[normalized] || normalized;
+}
+
 /** Metadata format from PixelLab (nested format) */
 interface PixelLabMetadataNested {
   character: {
@@ -41,6 +59,22 @@ interface PixelLabMetadataFlat {
   directions: 4 | 8 | string[]; // Can be number or array of direction names
   rotations?: string[]; // Optional - same as directions for backwards compatibility
   animations?: Record<string, unknown>;
+}
+
+/** sprite-set.json format used by soul sprites */
+interface SpriteSetMetadata {
+  entityId: string;
+  tier: number;
+  config: {
+    size: number;
+    directions: number;
+    animations: string[];
+    detail: string;
+    shading: string;
+  };
+  sprites: string[]; // e.g. ["sprites/south.png", "sprites/west.png"]
+  animations: string[];
+  generatedAt: number;
 }
 
 /** Combined metadata type */
@@ -127,18 +161,27 @@ export class PixelLabSpriteLoader {
     const cache = getSpriteCache();
 
     // Try to get metadata from cache first
-    let metadata: PixelLabMetadata = (await cache.getMetadata(folderId)) as PixelLabMetadata;
+    let metadata: PixelLabMetadata | null = (await cache.getMetadata(folderId)) as PixelLabMetadata | null;
 
     if (!metadata) {
-      // Load metadata from network
+      // Load metadata from network — try metadata.json first, then sprite-set.json
       const metadataResponse = await fetch(`${folderPath}/metadata.json`);
-      if (!metadataResponse.ok) {
+      if (metadataResponse.ok) {
+        metadata = await metadataResponse.json();
+        await cache.cacheMetadata(folderId, metadata);
+      } else {
+        // Try sprite-set.json format (used by soul sprites)
+        const spriteSetResponse = await fetch(`${folderPath}/sprite-set.json`);
+        if (spriteSetResponse.ok) {
+          const spriteSet: SpriteSetMetadata = await spriteSetResponse.json();
+          return this.doLoadFromSpriteSet(folderId, folderPath, spriteSet);
+        }
         throw new Error(`Failed to load metadata for ${folderId}`);
       }
-      metadata = await metadataResponse.json();
+    }
 
-      // Cache for next time
-      await cache.cacheMetadata(folderId, metadata);
+    if (!metadata) {
+      throw new Error(`Failed to load metadata for ${folderId}`);
     }
 
     const rotations = new Map<string, HTMLImageElement>();
@@ -159,31 +202,68 @@ export class PixelLabSpriteLoader {
         ];
       }
 
-      // Load rotation images (check both with and without rotations/ subfolder)
+      // Load rotation images — try rotations/, direct, then sprites/ subdirectory
+      // Store with normalized key (no hyphens) so render lookups via PIXELLAB_DIRECTION_NAMES match
+      // Try both hyphenated and unhyphenated filenames since assets vary
       const rotationPromises = directionNames.map(async (dirName) => {
-        // Try rotations/ subdirectory first (standard layout)
-        let imgPath = `${folderPath}/rotations/${dirName}.png`;
-        try {
-          const img = await this.loadImage(imgPath, metadata.id);
-          rotations.set(dirName, img);
-          return;
-        } catch {
-          // Fall back to direct path (flat layout)
+        const normalizedName = normalizeDirectionName(dirName);
+        const pathName = directionToPath(normalizedName);
+        // Try both the original name and the hyphenated path form
+        const candidates = dirName === pathName ? [dirName] : [dirName, pathName];
+        const paths: string[] = [];
+        for (const name of candidates) {
+          paths.push(
+            `${folderPath}/rotations/${name}.png`,
+            `${folderPath}/${name}.png`,
+            `${folderPath}/sprites/${name}.png`,
+          );
+        }
+        for (const imgPath of paths) {
           try {
-            imgPath = `${folderPath}/${dirName}.png`;
-            const img = await this.loadImage(imgPath, metadata.id);
-            rotations.set(dirName, img);
+            const img = await this.loadImage(imgPath, metadata!.id);
+            rotations.set(normalizedName, img);
+            return;
           } catch {
-            // Skip failed loads silently
+            // Try next path
           }
         }
       });
 
       await Promise.all(rotationPromises);
 
+      // Legacy soul sprites: single sprite.png (south-facing only)
+      if (rotations.size === 0) {
+        try {
+          const img = await this.loadImage(`${folderPath}/sprite.png`, metadata!.id);
+          rotations.set('south', img);
+        } catch {
+          // No rotations available
+        }
+      }
+
+      // Only probe for animation frames if we actually found directions.
+      // For single-image sprites (sprite.png) or sprites without animation
+      // directories, probing generates unnecessary 404 requests.
+      // Use a single test fetch for the first animation + first direction to
+      // check whether animations exist at all before probing every combination.
+      let hasAnimationDir = false;
+      if (rotations.size > 0) {
+        try {
+          const testDir = directionNames[0] || 'south';
+          await this.loadImage(
+            `${folderPath}/animations/breathing-idle/${testDir}/frame_000.png`,
+            metadata!.id
+          );
+          hasAnimationDir = true;
+        } catch {
+          // No animation directory — skip all animation probing
+        }
+      }
+
       // Load animations if they exist (flat format)
-      // Try standard animation names: breathing-idle, walking-8-frames, etc.
-      const commonAnimations = ['breathing-idle', 'idle', 'walking-8-frames', 'walking-4-frames', 'running'];
+      const commonAnimations = hasAnimationDir
+        ? ['breathing-idle', 'idle', 'walking-8-frames', 'walking-4-frames', 'running']
+        : [];
 
       for (const animName of commonAnimations) {
         const animMap = new Map<string, HTMLImageElement[]>();
@@ -194,6 +274,7 @@ export class PixelLabSpriteLoader {
           let frameIndex = 0;
 
           // Try loading frames until we hit a missing one
+          // File paths use original name (may have hyphens), map keys use normalized name
           while (true) {
             const framePath = `${folderPath}/animations/${animName}/${dirName}/frame_${frameIndex.toString().padStart(3, '0')}.png`;
             try {
@@ -207,7 +288,7 @@ export class PixelLabSpriteLoader {
           }
 
           if (frames.length > 0) {
-            animMap.set(dirName, frames);
+            animMap.set(normalizeDirectionName(dirName), frames);
           }
         }
 
@@ -291,6 +372,40 @@ export class PixelLabSpriteLoader {
       directions: metadata.character.directions,
       rotations,
       animations,
+    };
+  }
+
+  /**
+   * Load a character from sprite-set.json format (used by soul sprites).
+   */
+  private async doLoadFromSpriteSet(
+    folderId: string,
+    folderPath: string,
+    spriteSet: SpriteSetMetadata
+  ): Promise<LoadedPixelLabCharacter> {
+    const rotations = new Map<string, HTMLImageElement>();
+
+    const loadPromises = spriteSet.sprites.map(async (spritePath) => {
+      const match = spritePath.match(/([^/]+)\.png$/);
+      if (!match || !match[1]) return;
+      const dirName = normalizeDirectionName(match[1]);
+      try {
+        const img = await this.loadImage(`${folderPath}/${spritePath}`, folderId);
+        rotations.set(dirName, img);
+      } catch {
+        // Skip missing sprites
+      }
+    });
+
+    await Promise.all(loadPromises);
+
+    return {
+      id: folderId,
+      name: folderId,
+      size: spriteSet.config.size,
+      directions: (spriteSet.config.directions as 4 | 8),
+      rotations,
+      animations: new Map(),
     };
   }
 
@@ -426,6 +541,8 @@ export class PixelLabSpriteLoader {
 
   // Track which animations we're currently trying to load to avoid duplicate attempts
   private loadingAnimations = new Set<string>();
+  // Track animation probes that returned nothing — avoids repeated 404 floods
+  private failedAnimationProbes = new Set<string>();
 
   /**
    * Try to load an animation that may have been generated after the character was first loaded.
@@ -435,34 +552,52 @@ export class PixelLabSpriteLoader {
     // Already loaded?
     if (character.animations.has(animName)) return true;
 
-    // Already trying to load?
     const loadKey = `${character.id}:${animName}`;
+
+    // Already tried and failed? Don't re-probe.
+    if (this.failedAnimationProbes.has(loadKey)) return false;
+
+    // Already trying to load?
     if (this.loadingAnimations.has(loadKey)) return false;
 
     this.loadingAnimations.add(loadKey);
 
     try {
       const folderPath = `${this.basePath}/${character.id}`;
-      // Get direction names from the character's rotations (those are the directions we have)
       const directionNames = Array.from(character.rotations.keys());
+      if (directionNames.length === 0) return false;
 
+      // Single test fetch first — avoids probing all directions when no animations exist
+      const testDir = directionToPath(directionNames[0] || 'south');
+      try {
+        await this.loadImage(
+          `${folderPath}/animations/${animName}/${testDir}/frame_000.png`,
+          character.id
+        );
+      } catch {
+        // Animation directory doesn't exist — record failure and bail
+        this.failedAnimationProbes.add(loadKey);
+        return false;
+      }
+
+      // Test passed — now load all directions
       const animMap = new Map<string, HTMLImageElement[]>();
       let foundAnyFrames = false;
 
       for (const dirName of directionNames) {
+        const pathDir = directionToPath(dirName);
         const frames: HTMLImageElement[] = [];
         let frameIndex = 0;
 
-        // Try loading frames until we hit a missing one
-        while (frameIndex < 20) { // Cap at 20 frames to avoid infinite loop
-          const framePath = `${folderPath}/animations/${animName}/${dirName}/frame_${frameIndex.toString().padStart(3, '0')}.png`;
+        while (frameIndex < 20) {
+          const framePath = `${folderPath}/animations/${animName}/${pathDir}/frame_${frameIndex.toString().padStart(3, '0')}.png`;
           try {
             const img = await this.loadImage(framePath, character.id);
             frames.push(img);
             foundAnyFrames = true;
             frameIndex++;
           } catch {
-            break; // No more frames for this direction
+            break;
           }
         }
 
@@ -473,14 +608,15 @@ export class PixelLabSpriteLoader {
 
       if (foundAnyFrames && animMap.size > 0) {
         character.animations.set(animName, animMap);
-        // Clear generation request since we now have the animation
         this.generationRequests.delete(`${character.id}:${animName}`);
         return true;
       }
 
+      this.failedAnimationProbes.add(loadKey);
       return false;
     } catch (error) {
       console.warn(`[PixelLabLoader] Failed to load ${animName} for ${character.id}:`, error);
+      this.failedAnimationProbes.add(loadKey);
       return false;
     } finally {
       this.loadingAnimations.delete(loadKey);
@@ -620,8 +756,8 @@ export class PixelLabSpriteLoader {
   private getMirrorDirection(dirName: string): string | null {
     const mirrors: Record<string, string> = {
       east: 'west',
-      'north-east': 'north-west',
-      'south-east': 'south-west',
+      northeast: 'northwest',
+      southeast: 'southwest',
     };
     return mirrors[dirName] || null;
   }
