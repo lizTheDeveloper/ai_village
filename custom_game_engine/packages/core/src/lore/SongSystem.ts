@@ -2,7 +2,7 @@
  * SongSystem — Plays species songs at contextually appropriate moments
  *
  * Listens to game events (birth, mating, combat, death, age milestones)
- * and plays the appropriate Norn song from the audio catalogue.
+ * and plays the appropriate song from the audio catalogue.
  *
  * Uses HTML5 Audio API directly (not Phaser sound manager) since these
  * are long-form cultural tracks, not SFX.
@@ -14,28 +14,37 @@
  * - Never two songs at once
  * - Handles browser autoplay policy: stores pending occasion on
  *   NotAllowedError and retries on first user gesture
+ * - Audio path and song catalogue are configurable per game
  */
 
 import { BaseSystem } from '../ecs/SystemContext.js';
 import type { SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId } from '../types.js';
+import { ProceduralAudioEngine } from './ProceduralAudioEngine.js';
 
 // ============================================================================
 // Song Catalogue
 // ============================================================================
 
-interface SongEntry {
+export interface SongEntry {
   filename: string;
   occasion: SongOccasion;
 }
 
-type SongOccasion = 'grief' | 'elder' | 'warning' | 'ambient' | 'hearth' | 'birth';
+export type SongOccasion = 'grief' | 'elder' | 'warning' | 'ambient' | 'hearth' | 'birth';
+
+export interface SongSystemConfig {
+  /** Base path for audio files (e.g. '/audio/norn/' or '/audio/mvee/'). Must end with '/'. */
+  audioBasePath: string;
+  /** Song catalogue for this game. Empty array = no songs (silence). */
+  songCatalogue: readonly SongEntry[];
+}
 
 /**
- * Canonical song catalogue. Files served from /audio/norn/.
- * Occasions match the mp3s described in the task spec.
+ * Default Norn song catalogue. Files served from /audio/norn/.
+ * Used when no game-specific catalogue is provided (Creatures compatibility).
  */
-const SONG_CATALOGUE: readonly SongEntry[] = [
+export const NORN_SONG_CATALOGUE: readonly SongEntry[] = [
   // Grief / Elder
   { filename: 'Keth Kel Thren.mp3', occasion: 'grief' },
   // Elder
@@ -56,7 +65,7 @@ const SONG_CATALOGUE: readonly SongEntry[] = [
   { filename: 'Vel sha ornmir thi keloth.mp3', occasion: 'ambient' },
 ] as const;
 
-const AUDIO_BASE_PATH = '/audio/norn/';
+const DEFAULT_AUDIO_BASE_PATH = '/audio/norn/';
 const FADE_DURATION_MS = 2000;
 const COOLDOWN_MS = 90_000;
 const AMBIENT_IDLE_MS = 60_000;
@@ -80,6 +89,9 @@ export class SongSystem extends BaseSystem {
   readonly activationComponents = ['agent'] as const; // Only run when agents exist
   protected readonly throttleInterval = 100; // Check every 5s (ambient timer)
 
+  private readonly audioBasePath: string;
+  private readonly songCatalogue: readonly SongEntry[];
+
   private songsByOccasion = new Map<SongOccasion, SongEntry[]>();
   private currentAudio: HTMLAudioElement | null = null;
   private currentOccasion: SongOccasion | null = null;
@@ -100,6 +112,12 @@ export class SongSystem extends BaseSystem {
   private audioUnlocked = false;
   /** Queued crossfade request if one arrives while fading */
   private queuedCrossfade: { url: string; occasion: SongOccasion } | null = null;
+  /** Procedural audio engine — used when song catalogue is empty */
+  private proceduralEngine: ProceduralAudioEngine | null = null;
+  /** Whether we're using procedural audio (empty catalogue) */
+  private readonly useProceduralAudio: boolean;
+  /** Fade timer for procedural audio gain ramps */
+  private proceduralFadeTimer: ReturnType<typeof setInterval> | null = null;
   /** Bound handler so we can remove it after first gesture */
   private readonly onUserGesture = (): void => {
     this.audioUnlocked = true;
@@ -111,13 +129,24 @@ export class SongSystem extends BaseSystem {
     }
   };
 
+  constructor(config?: Partial<SongSystemConfig>) {
+    super();
+    this.audioBasePath = config?.audioBasePath ?? DEFAULT_AUDIO_BASE_PATH;
+    this.songCatalogue = config?.songCatalogue ?? NORN_SONG_CATALOGUE;
+    this.useProceduralAudio = this.songCatalogue.length === 0;
+  }
+
   protected onInitialize(): void {
     // Guard: only run in browser context
     if (typeof window === 'undefined' || typeof Audio === 'undefined') {
       return;
     }
 
-    this.buildOccasionIndex();
+    if (this.useProceduralAudio) {
+      this.proceduralEngine = new ProceduralAudioEngine();
+    } else {
+      this.buildOccasionIndex();
+    }
     this.loadPlayHistory();
     this.subscribeToEvents();
     this.addGestureListeners();
@@ -129,10 +158,14 @@ export class SongSystem extends BaseSystem {
 
     // Check ambient timer: if no event-triggered song for AMBIENT_IDLE_MS, play ambient
     const now = Date.now();
+    const isPlaying = this.useProceduralAudio
+      ? this.proceduralEngine?.isPlaying() ?? false
+      : this.currentAudio !== null && !this.currentAudio.paused;
+
     if (
       this.currentOccasion !== 'ambient' &&
       !this.isFading &&
-      now - this.lastEventTime > AMBIENT_IDLE_MS
+      (now - this.lastEventTime > AMBIENT_IDLE_MS || !isPlaying)
     ) {
       this.playSongForOccasion('ambient');
     }
@@ -208,13 +241,18 @@ export class SongSystem extends BaseSystem {
   }
 
   private playSongForOccasion(occasion: SongOccasion): void {
+    if (this.useProceduralAudio && this.proceduralEngine) {
+      this.playProceduralOccasion(occasion);
+      return;
+    }
+
     const pool = this.songsByOccasion.get(occasion);
     if (!pool || pool.length === 0) return;
 
     const song = this.selectBestSong(pool, occasion);
     if (!song) return;
     this.recordPlay(song, occasion);
-    const url = AUDIO_BASE_PATH + encodeURIComponent(song.filename);
+    const url = this.audioBasePath + encodeURIComponent(song.filename);
 
     if (this.currentAudio && !this.currentAudio.paused) {
       this.crossfadeTo(url, occasion);
@@ -228,6 +266,10 @@ export class SongSystem extends BaseSystem {
 
     const audio = new Audio(url);
     audio.volume = 0;
+    // Gracefully handle missing audio files — silence instead of crash
+    audio.onerror = () => {
+      this.stopCurrent();
+    };
     this.currentAudio = audio;
     this.currentOccasion = occasion;
     this.lastSwitchTime = Date.now();
@@ -239,6 +281,9 @@ export class SongSystem extends BaseSystem {
       if (err.name === 'NotAllowedError') {
         // Browser blocked autoplay — store pending occasion for retry on user gesture
         this.pendingOccasion = occasion;
+      } else if (err.name === 'AbortError' || err.name === 'NotSupportedError') {
+        // Missing or undecodable file — silence gracefully
+        this.stopCurrent();
       } else {
         console.error('[SongSystem] Playback failed:', err.message);
       }
@@ -261,6 +306,11 @@ export class SongSystem extends BaseSystem {
     this.isFading = true;
     const newAudio = new Audio(url);
     newAudio.volume = 0;
+    // Gracefully handle missing audio files — cancel crossfade, keep old playing
+    newAudio.onerror = () => {
+      this.isFading = false;
+      this.queuedCrossfade = null;
+    };
 
     // Fade out old, fade in new simultaneously
     const steps = FADE_DURATION_MS / FADE_INTERVAL_MS;
@@ -299,6 +349,8 @@ export class SongSystem extends BaseSystem {
     }).catch((err: DOMException) => {
       if (err.name === 'NotAllowedError') {
         this.pendingOccasion = occasion;
+      } else if (err.name === 'AbortError' || err.name === 'NotSupportedError') {
+        // Missing or undecodable file — cancel crossfade gracefully
       } else {
         console.error('[SongSystem] Crossfade playback failed:', err.message);
       }
@@ -321,15 +373,109 @@ export class SongSystem extends BaseSystem {
     }, FADE_INTERVAL_MS);
   }
 
+  // ============================================================================
+  // Procedural Audio Playback
+  // ============================================================================
+
+  private playProceduralOccasion(occasion: SongOccasion): void {
+    if (!this.proceduralEngine) return;
+
+    // If same occasion is already playing, skip
+    if (this.proceduralEngine.getCurrentOccasion() === occasion && this.proceduralEngine.isPlaying()) {
+      return;
+    }
+
+    // Crossfade: fade out current, start new
+    if (this.proceduralEngine.isPlaying()) {
+      this.proceduralCrossfadeTo(occasion);
+    } else {
+      this.proceduralStartFresh(occasion);
+    }
+  }
+
+  private proceduralStartFresh(occasion: SongOccasion): void {
+    this.proceduralEngine!.stop();
+    this.proceduralEngine!.play(occasion).then(started => {
+      if (!started) return;
+      this.currentOccasion = occasion;
+      this.lastSwitchTime = Date.now();
+      // Fade in
+      const gainNode = this.proceduralEngine!.getGainNode();
+      if (gainNode) {
+        this.proceduralFadeGain(gainNode, 0, MAX_VOLUME, FADE_DURATION_MS);
+      }
+    }).catch(() => {
+      // Tone.js failed to start — likely autoplay blocked, store pending
+      this.pendingOccasion = occasion;
+    });
+  }
+
+  private proceduralCrossfadeTo(occasion: SongOccasion): void {
+    if (this.isFading) return;
+    this.isFading = true;
+
+    const oldGain = this.proceduralEngine!.getGainNode();
+
+    // Fade out old scene
+    if (oldGain) {
+      this.proceduralFadeGain(oldGain, oldGain.gain.value, 0, FADE_DURATION_MS);
+    }
+
+    // After fade-out, stop old and start new
+    setTimeout(() => {
+      this.proceduralEngine!.stop();
+      this.proceduralEngine!.play(occasion).then(started => {
+        this.isFading = false;
+        if (!started) return;
+        this.currentOccasion = occasion;
+        this.lastSwitchTime = Date.now();
+        const newGain = this.proceduralEngine!.getGainNode();
+        if (newGain) {
+          this.proceduralFadeGain(newGain, 0, MAX_VOLUME, FADE_DURATION_MS);
+        }
+      }).catch(() => {
+        this.isFading = false;
+      });
+    }, FADE_DURATION_MS);
+  }
+
+  private proceduralFadeGain(gainNode: GainNode, from: number, to: number, durationMs: number): void {
+    if (this.proceduralFadeTimer !== null) {
+      clearInterval(this.proceduralFadeTimer);
+    }
+    const steps = durationMs / FADE_INTERVAL_MS;
+    let step = 0;
+    gainNode.gain.value = from;
+    this.proceduralFadeTimer = setInterval(() => {
+      step++;
+      const progress = step / steps;
+      gainNode.gain.value = from + (to - from) * progress;
+      if (step >= steps) {
+        gainNode.gain.value = to;
+        if (this.proceduralFadeTimer !== null) {
+          clearInterval(this.proceduralFadeTimer);
+          this.proceduralFadeTimer = null;
+        }
+      }
+    }, FADE_INTERVAL_MS);
+  }
+
   private stopCurrent(): void {
     if (this.fadeTimer !== null) {
       clearInterval(this.fadeTimer);
       this.fadeTimer = null;
     }
+    if (this.proceduralFadeTimer !== null) {
+      clearInterval(this.proceduralFadeTimer);
+      this.proceduralFadeTimer = null;
+    }
     if (this.currentAudio) {
       this.currentAudio.pause();
       this.currentAudio.src = '';
       this.currentAudio = null;
+    }
+    if (this.proceduralEngine?.isPlaying()) {
+      this.proceduralEngine.stop();
     }
     this.currentOccasion = null;
     this.isFading = false;
@@ -441,7 +587,7 @@ export class SongSystem extends BaseSystem {
 
   private buildOccasionIndex(): void {
     this.songsByOccasion.clear();
-    for (const entry of SONG_CATALOGUE) {
+    for (const entry of this.songCatalogue) {
       const pool = this.songsByOccasion.get(entry.occasion);
       if (pool) {
         pool.push(entry);

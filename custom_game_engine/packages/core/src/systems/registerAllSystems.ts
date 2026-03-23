@@ -389,6 +389,7 @@ import { EventCoalescingMonitorSystem } from './EventCoalescingMonitorSystem.js'
 
 // Lore — Audio
 import { SongSystem } from '../lore/SongSystem.js';
+import { MVEE_SONG_CATALOGUE } from '../data/mvee-songs.js';
 import { ChorusStateSystem } from './ChorusStateSystem.js';
 import { ChorusWeatherEffectSystem } from './ChorusWeatherEffectSystem.js';
 import { SpellWorldEffectSystem } from './SpellWorldEffectSystem.js';
@@ -1158,7 +1159,10 @@ export function registerAllSystems(
   // ============================================================================
   // LORE — AUDIO (browser-only, self-guards against non-browser contexts)
   // ============================================================================
-  gameLoop.systemRegistry.register(new SongSystem());
+  gameLoop.systemRegistry.register(new SongSystem({
+    audioBasePath: '/audio/mvee/',
+    songCatalogue: MVEE_SONG_CATALOGUE,
+  }));
 
   // ============================================================================
   // CHORUS STATE (cross-game Folkfork collective intelligence — priority 45)
