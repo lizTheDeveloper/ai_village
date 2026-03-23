@@ -23,7 +23,7 @@ import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
-import { EntityImpl } from '../ecs/Entity.js';
+import { EntityImpl, type Entity } from '../ecs/Entity.js';
 import type {
   FederationGovernanceComponent,
   FederalLaw,
@@ -100,12 +100,20 @@ export class FederationGovernanceSystem extends BaseSystem {
   // Last update tick per federation
   private federationLastUpdateTick: Map<string, number> = new Map();
 
+  private _cachedEmpires: Entity[] = [];
+  private _cachedNations: Entity[] = [];
+  private _cachedNavies: Entity[] = [];
+
   // ========================================================================
   // Main Update Loop
   // ========================================================================
 
   protected onUpdate(ctx: SystemContext): void {
     const tick = ctx.tick;
+
+    this._cachedEmpires = ctx.world.query().with(CT.Empire).executeEntities();
+    this._cachedNations = ctx.world.query().with(CT.Nation).executeEntities();
+    this._cachedNavies = ctx.world.query().with(CT.Navy).executeEntities();
 
     // Process each federation
     for (const federationEntity of ctx.activeEntities) {
@@ -216,9 +224,8 @@ export class FederationGovernanceSystem extends BaseSystem {
     let totalFleetCount = 0;
     let totalSystemCount = 0;
 
-    // Query all empires once (cached query pattern)
-    const allEmpires = world.query().with(CT.Empire).executeEntities();
-    const allNations = world.query().with(CT.Nation).executeEntities();
+    const allEmpires = this._cachedEmpires;
+    const allNations = this._cachedNations;
 
     // Aggregate empire stats
     for (const empireId of federation.memberEmpireIds) {
@@ -306,8 +313,8 @@ export class FederationGovernanceSystem extends BaseSystem {
     federation: FederationGovernanceComponent,
     federationEntity: EntityImpl
   ): void {
-    const allEmpires = world.query().with(CT.Empire).executeEntities();
-    const allNations = world.query().with(CT.Nation).executeEntities();
+    const allEmpires = this._cachedEmpires;
+    const allNations = this._cachedNations;
 
     for (const law of federation.federalLaws) {
       if (law.complianceRate >= 1.0) continue; // Already fully enforced
@@ -397,7 +404,7 @@ export class FederationGovernanceSystem extends BaseSystem {
     world: World,
     federation: FederationGovernanceComponent
   ): void {
-    const allNavies = world.query().with(CT.Navy).executeEntities();
+    const allNavies = this._cachedNavies;
 
     for (const operation of federation.military.activeJointOperations) {
       if (operation.status !== 'active') continue;
@@ -469,8 +476,8 @@ export class FederationGovernanceSystem extends BaseSystem {
     tick: number
   ): Map<string, MemberSatisfaction> {
     const satisfactionMap = new Map<string, MemberSatisfaction>();
-    const allEmpires = world.query().with(CT.Empire).executeEntities();
-    const allNations = world.query().with(CT.Nation).executeEntities();
+    const allEmpires = this._cachedEmpires;
+    const allNations = this._cachedNations;
 
     const allMembers = [
       ...federation.memberEmpireIds,
@@ -580,8 +587,8 @@ export class FederationGovernanceSystem extends BaseSystem {
     satisfactionMap: Map<string, MemberSatisfaction>,
     tick: number
   ): void {
-    const allEmpires = world.query().with(CT.Empire).executeEntities();
-    const allNations = world.query().with(CT.Nation).executeEntities();
+    const allEmpires = this._cachedEmpires;
+    const allNations = this._cachedNations;
 
     for (const [memberId, satisfaction] of satisfactionMap.entries()) {
       // Check secession threshold
@@ -876,8 +883,8 @@ export class FederationGovernanceSystem extends BaseSystem {
     federation: FederationGovernanceComponent,
     proposal: FederalProposal
   ): { votingPowerFor: number; votingPowerAgainst: number; votingPowerAbstained: number } {
-    const allEmpires = world.query().with(CT.Empire).executeEntities();
-    const allNations = world.query().with(CT.Nation).executeEntities();
+    const allEmpires = this._cachedEmpires;
+    const allNations = this._cachedNations;
 
     // Calculate total sqrt population for normalization
     let totalSqrtPopulation = 0;
@@ -967,7 +974,7 @@ export class FederationGovernanceSystem extends BaseSystem {
     world: World,
     federation: FederationGovernanceComponent
   ): number {
-    const allNavies = world.query().with(CT.Navy).executeEntities();
+    const allNavies = this._cachedNavies;
     let totalReadiness = 0;
     let fleetCount = 0;
 

@@ -975,7 +975,7 @@ export class AdminAngelSystem extends BaseSystem {
       speedMultiplier?: number;
     } | undefined;
 
-    const agents = world.query().with(CT.Agent).executeEntities();
+    const agents = this.getAgentEntities(world);
 
     // TODO: Get selected agent from somewhere
     // TODO: Get recent events
@@ -1970,7 +1970,7 @@ export class AdminAngelSystem extends BaseSystem {
    */
   private findAgentByName(world: World, name: string): Entity | null {
     const nameLower = name.toLowerCase().trim();
-    const agents = world.query().with(CT.Agent).executeEntities();
+    const agents = this.getAgentEntities(world);
 
     for (const agent of agents) {
       const identity = agent.getComponent(CT.Identity) as IdentityComponent | undefined;
@@ -2085,7 +2085,7 @@ export class AdminAngelSystem extends BaseSystem {
    * Phase 5: Handle status command - Village overview
    */
   private handleStatusCommand(world: World, angel: AdminAngelComponent): string {
-    const agents = world.query().with(CT.Agent).executeEntities();
+    const agents = this.getAgentEntities(world);
 
     if (agents.length === 0) {
       return 'no agents in the village rn';
@@ -2190,7 +2190,7 @@ export class AdminAngelSystem extends BaseSystem {
    * Returns 1-3 agents weighted by interest, player interaction, and notable states
    */
   private selectAgentsToObserve(world: World, angel: AdminAngelComponent): Entity[] {
-    const allAgents = world.query().with(CT.Agent).executeEntities();
+    const allAgents = this.getAgentEntities(world);
     if (allAgents.length === 0) return [];
 
     // Build weighted selection
@@ -2436,6 +2436,28 @@ export class AdminAngelSystem extends BaseSystem {
   private storageQueryCache: ReadonlyArray<Entity> | null = null;
   private storageQueryCacheTick = -1;
 
+  // Cached agent queries (invalidated each tick)
+  private agentQueryCache: ReadonlyArray<Entity> | null = null;
+  private agentQueryCacheTick = -1;
+  private agentNeedsQueryCache: ReadonlyArray<Entity> | null = null;
+  private agentNeedsQueryCacheTick = -1;
+
+  private getAgentEntities(world: World): ReadonlyArray<Entity> {
+    if (this.agentQueryCacheTick !== world.tick) {
+      this.agentQueryCache = world.query().with(CT.Agent).executeEntities();
+      this.agentQueryCacheTick = world.tick;
+    }
+    return this.agentQueryCache!;
+  }
+
+  private getAgentNeedsEntities(world: World): ReadonlyArray<Entity> {
+    if (this.agentNeedsQueryCacheTick !== world.tick) {
+      this.agentNeedsQueryCache = world.query().with(CT.Agent).with(CT.Needs).executeEntities();
+      this.agentNeedsQueryCacheTick = world.tick;
+    }
+    return this.agentNeedsQueryCache!;
+  }
+
   private checkForNearbyFood(world: World, agent: Entity): boolean {
     const pos = agent.getComponent(CT.Position) as { x: number; y: number } | undefined;
     if (!pos) return false;
@@ -2593,7 +2615,7 @@ export class AdminAngelSystem extends BaseSystem {
    * Checks for critical needs, deaths, achievements
    */
   private updateMood(world: World, angel: AdminAngelComponent): void {
-    const agents = world.query().with(CT.Agent).executeEntities();
+    const agents = this.getAgentEntities(world);
 
     // Count agents with critical needs
     let criticalCount = 0;
@@ -3341,7 +3363,7 @@ if u dont know something just say idk and figure it out together.`;
    */
   private scanForPatterns(ctx: SystemContext, angel: AdminAngelComponent): void {
     const narrative = angel.memory.narrative;
-    const agents = ctx.world.query().with(CT.Agent).executeEntities();
+    const agents = this.getAgentEntities(ctx.world);
 
     for (const agentEntity of agents) {
       const agent = agentEntity.getComponent(CT.Agent);
@@ -3852,7 +3874,7 @@ if u dont know something just say idk and figure it out together.`;
    * Generate a new goal for the angel
    */
   private generateGoal(ctx: SystemContext, angel: AdminAngelComponent): AngelGoal | null {
-    const agents = ctx.world.query().with(CT.Agent).with(CT.Needs).executeEntities();
+    const agents = this.getAgentNeedsEntities(ctx.world);
     if (agents.length === 0) return null;
 
     // Pick a goal type based on current situation
@@ -4005,7 +4027,7 @@ if u dont know something just say idk and figure it out together.`;
 
     if (parts[0] === 'village') {
       // Village-wide goal
-      const agents = ctx.world.query().with(CT.Agent).with(CT.Needs).executeEntities();
+      const agents = this.getAgentNeedsEntities(ctx.world);
       if (agents.length === 0) {
         return { completed: false, failed: false, progress: 0 };
       }

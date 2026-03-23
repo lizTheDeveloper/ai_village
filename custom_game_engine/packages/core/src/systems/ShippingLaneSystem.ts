@@ -28,7 +28,7 @@
 
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { SystemId, ComponentType } from '../types.js';
-import type { World } from '../ecs/World.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { ShippingLaneComponent, LaneHazard } from '../components/ShippingLaneComponent.js';
@@ -52,6 +52,9 @@ export class ShippingLaneSystem extends BaseSystem {
 
   private isInitialized = false;
 
+  /** Cached lane lookup: laneId → Entity. Rebuilt each update cycle. */
+  private laneCache: Map<string, Entity> = new Map();
+
   /**
    * Initialize the system
    */
@@ -71,6 +74,13 @@ export class ShippingLaneSystem extends BaseSystem {
     // Cache queries before loops (CLAUDE.md performance guideline)
     const laneEntities = ctx.world.query().with('shipping_lane').executeEntities();
     const caravanEntities = ctx.world.query().with('trade_caravan').executeEntities();
+
+    // Build lane lookup cache to avoid O(N) query in getLaneEntity per caravan
+    this.laneCache.clear();
+    for (const le of laneEntities) {
+      const lc = le.getComponent<ShippingLaneComponent>('shipping_lane');
+      if (lc) this.laneCache.set(lc.laneId, le);
+    }
 
     // Process each shipping lane
     for (const laneEntity of laneEntities) {
@@ -220,6 +230,7 @@ export class ShippingLaneSystem extends BaseSystem {
       });
 
       (entity as EntityImpl).updateComponent('trade_caravan', () => updatedCaravan);
+      (world as WorldMutator).destroyEntity(entity.id, 'caravan_lost_lane_not_found');
       return;
     }
 
@@ -235,6 +246,7 @@ export class ShippingLaneSystem extends BaseSystem {
       });
 
       (entity as EntityImpl).updateComponent('trade_caravan', () => updatedCaravan);
+      (world as WorldMutator).destroyEntity(entity.id, 'caravan_lost_lane_component_missing');
       return;
     }
 
@@ -282,6 +294,15 @@ export class ShippingLaneSystem extends BaseSystem {
 
       if (hazardResult.outcome === 'destroyed') {
         (entity as EntityImpl).updateComponent('trade_caravan', () => updatedCaravan);
+        // Remove from lane's active list
+        (laneEntity as EntityImpl).updateComponent('shipping_lane', (oldLane) => {
+          const typedLane = oldLane as ShippingLaneComponent;
+          return {
+            ...typedLane,
+            activeCaravans: typedLane.activeCaravans.filter((id: string) => id !== caravan.caravanId),
+          };
+        });
+        (world as WorldMutator).destroyEntity(entity.id, 'caravan_destroyed_by_hazard');
         return;
       }
     }
@@ -318,6 +339,11 @@ export class ShippingLaneSystem extends BaseSystem {
             activeCaravans: typedLane.activeCaravans.filter((id: string) => id !== caravan.caravanId),
           };
         });
+
+        // Destroy arrived caravan entity to prevent entity accumulation
+        (entity as EntityImpl).updateComponent('trade_caravan', () => updatedCaravan);
+        (world as WorldMutator).destroyEntity(entity.id, 'caravan_arrived');
+        return;
       }
     }
 
@@ -385,12 +411,8 @@ export class ShippingLaneSystem extends BaseSystem {
   /**
    * Get lane entity by lane ID
    */
-  private getLaneEntity(world: World, laneId: string): Entity | undefined {
-    const lanes = world.query().with('shipping_lane').executeEntities();
-    return lanes.find((e) => {
-      const lane = e.getComponent<ShippingLaneComponent>('shipping_lane');
-      return lane?.laneId === laneId;
-    });
+  private getLaneEntity(_world: World, laneId: string): Entity | undefined {
+    return this.laneCache.get(laneId);
   }
 
   // ===========================================================================

@@ -421,6 +421,7 @@ export class LLMScheduler {
     // If the NN is confident, synthesize a response and skip the LLM call.
     // This implements the Talker-Reasoner dual-process pattern.
     // -----------------------------------------------------------------------
+    let cachedPrompt: string | null = null;
     if (mveePolicy.isEnabled() && mveePolicy.hasSpeciesModels() && selection.layer !== 'autonomic') {
       const identity = agent.components.get('identity') as { species?: string } | undefined;
       const policySpecies = identity?.species ? IDENTITY_TO_POLICY_SPECIES[identity.species] : undefined;
@@ -439,16 +440,21 @@ export class LLMScheduler {
             reason: `${selection.reason} [NN:${policySpecies} conf=${nnResult.confidence.toFixed(2)}]`,
           };
         }
+
+        // NN wasn't confident — reuse the already-built prompt for the LLM queue
+        // instead of building another one. The prompt is still fresh (synchronous path).
+        cachedPrompt = prompt;
       }
     }
 
     // LAZY PROMPT BUILDING: Pass a builder function instead of a built prompt.
     // The prompt will be built at send-time (when request reaches front of queue),
     // ensuring it reflects the agent's current state, not stale queue-time state.
-    // This is both more efficient (no wasted builds for stale requests) and more
-    // accurate (prompt reflects reality when LLM actually processes it).
+    // If NN already built a prompt above, reuse it to avoid double work.
     const layer = selection.layer; // Capture for closure
-    const promptBuilder = () => this.buildPrompt(layer, agent, world);
+    const promptBuilder = cachedPrompt
+      ? () => cachedPrompt!
+      : () => this.buildPrompt(layer, agent, world);
 
     // Queue decision with lazy prompt builder
     try {

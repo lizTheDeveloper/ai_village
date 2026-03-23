@@ -152,6 +152,7 @@ export class DeathTransitionSystem extends BaseSystem {
   private processedDeaths: Set<string> = new Set();
   private deathBargainSystem?: DeathBargainSystem;
   private knowledgeLossEntityId: string | null = null; // Cache singleton entity ID
+  private cachedHiveCombatEntities: Entity[] = [];
 
   /**
    * Set the death bargain system for hero resurrection challenges
@@ -161,6 +162,8 @@ export class DeathTransitionSystem extends BaseSystem {
   }
 
   protected onUpdate(ctx: SystemContext): void {
+    this.cachedHiveCombatEntities = ctx.world.query().with(CT.HiveCombat).executeEntities();
+
     // Check for newly dead entities
     for (const entity of ctx.activeEntities) {
       const needs = entity.components.get('needs') as NeedsComponent | undefined;
@@ -1006,9 +1009,7 @@ export class DeathTransitionSystem extends BaseSystem {
       }
 
       // Worker death - remove from hive workers list
-      const hives = world.query()
-        .with(CT.HiveCombat)
-        .executeEntities();
+      const hives = this.cachedHiveCombatEntities;
 
       for (const hiveEntity of hives) {
         const hiveCombat = hiveEntity.components.get('hive_combat') as HiveCombatComp | undefined;
@@ -1038,9 +1039,7 @@ export class DeathTransitionSystem extends BaseSystem {
     }
 
     // Queen death - trigger hive collapse
-    const hives = world.query()
-      .with(CT.HiveCombat)
-      .executeEntities();
+    const hives = this.cachedHiveCombatEntities;
 
     for (const hiveEntity of hives) {
       const hiveCombat = hiveEntity.components.get('hive_combat') as HiveCombatComp | undefined;

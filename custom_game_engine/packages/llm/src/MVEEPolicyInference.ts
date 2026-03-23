@@ -28,6 +28,48 @@ const FEATURE_DIM = 40;
 /** Confidence threshold for LLM bypass. From Experiment B design in MUL-1020 lit review. */
 export const NN_CONFIDENCE_THRESHOLD = 0.85;
 
+// ---------------------------------------------------------------------------
+// Pre-compiled regex patterns for extractFeatures (avoid per-call RegExp construction)
+// ---------------------------------------------------------------------------
+
+const _SKILL_NAMES_FOR_RE = ['farming', 'gathering', 'building', 'animal', 'medicine', 'combat'] as const;
+
+/** "farming: expert (level 4.0)" */
+const SKILL_LEVEL_RE: Record<string, RegExp> = {};
+/** "Farming: Expert (4)" */
+const SKILL_PARENS_RE: Record<string, RegExp> = {};
+/** "farming: expert" */
+const SKILL_WORD_RE: Record<string, RegExp> = {};
+for (const sk of _SKILL_NAMES_FOR_RE) {
+  SKILL_LEVEL_RE[sk] = new RegExp(`${sk}[^(]*\\(level\\s*([\\d.]+)\\)`, 'i');
+  SKILL_PARENS_RE[sk] = new RegExp(`${sk}:\\s*(\\w+)\\s*\\((\\d+)\\)`, 'i');
+  SKILL_WORD_RE[sk] = new RegExp(`${sk}:\\s*(\\w+)`, 'i');
+}
+
+/** Priority block inner: "farming: 0.5" */
+const PRIO_BLOCK_RE: Record<string, RegExp> = {};
+for (const k of ['farming', 'gathering', 'building', 'social']) {
+  PRIO_BLOCK_RE[k] = new RegExp(`${k}:\\s*([\\d.]+)`, 'i');
+}
+
+/** "farming (31%)" */
+const PCT_MATCH_RE: Record<string, RegExp> = {};
+for (const name of ['farming', 'gathering', 'building', 'social']) {
+  PCT_MATCH_RE[name] = new RegExp(`${name}[^%]*\\((\\d+)%\\)`, 'i');
+}
+
+/** "fiber: 12 available" */
+const RES_AVAILABLE_RE: Record<string, RegExp> = {};
+for (const name of ['fiber', 'wood', 'stone', 'berry']) {
+  RES_AVAILABLE_RE[name] = new RegExp(`${name}:\\s*(\\d+)\\s*available`, 'i');
+}
+
+/** Inventory: "wood (12)" */
+const INV_RES_RE: Record<string, RegExp> = {};
+for (const name of ['wood', 'stone', 'berry', 'fiber']) {
+  INV_RES_RE[name] = new RegExp(`${name}\\s*\\((\\d+)\\)`, 'i');
+}
+
 /** Action lists — must match training/feature_extractor.py */
 export const TALKER_ACTIONS = [
   'talk',
@@ -170,13 +212,13 @@ function extractFeatures(prompt: string): Float32Array {
   for (let i = 0; i < SKILL_NAMES.length; i++) {
     const sk = SKILL_NAMES[i] ?? '';
     // "farming: expert (level 4.0)"
-    let m = prompt.match(new RegExp(`${sk}[^(]*\\(level\\s*([\\d.]+)\\)`, 'i'));
+    let m = prompt.match(SKILL_LEVEL_RE[sk] ?? new RegExp(`${sk}[^(]*\\(level\\s*([\\d.]+)\\)`, 'i'));
     if (m) { feat[i] = Math.min(parseFloat(m[1] ?? '0') / 10, 1); continue; }
     // "Farming: Expert (4)"
-    m = prompt.match(new RegExp(`${sk}:\\s*(\\w+)\\s*\\((\\d+)\\)`, 'i'));
+    m = prompt.match(SKILL_PARENS_RE[sk] ?? new RegExp(`${sk}:\\s*(\\w+)\\s*\\((\\d+)\\)`, 'i'));
     if (m) { feat[i] = Math.min(parseInt(m[2] ?? '0') / 10, 1); continue; }
     // "farming: expert"
-    m = prompt.match(new RegExp(`${sk}:\\s*(\\w+)`, 'i'));
+    m = prompt.match(SKILL_WORD_RE[sk] ?? new RegExp(`${sk}:\\s*(\\w+)`, 'i'));
     if (m) feat[i] = Math.min((SKILL_LEVELS[(m[1] ?? '').toLowerCase()] ?? 0) / 10, 1);
   }
 
@@ -186,13 +228,13 @@ function extractFeatures(prompt: string): Float32Array {
     const pb = prioBlock[1] ?? '';
     const pmap: Record<string, number> = { farming: 6, gathering: 7, building: 8, social: 9 };
     for (const [k, idx] of Object.entries(pmap)) {
-      const pm = pb.match(new RegExp(`${k}:\\s*([\\d.]+)`, 'i'));
+      const pm = pb.match(PRIO_BLOCK_RE[k] ?? new RegExp(`${k}:\\s*([\\d.]+)`, 'i'));
       if (pm) feat[idx] = Math.min(parseFloat(pm[1] ?? '0'), 1);
     }
   } else {
     // "farming (31%)"
     const pctMatch = (name: string) => {
-      const m = prompt.match(new RegExp(`${name}[^%]*\\((\\d+)%\\)`, 'i'));
+      const m = prompt.match(PCT_MATCH_RE[name] ?? new RegExp(`${name}[^%]*\\((\\d+)%\\)`, 'i'));
       return m ? parseFloat(m[1] ?? '0') / 100 : 0;
     };
     feat[6] = pctMatch('farming'); feat[7] = pctMatch('gathering');
@@ -201,7 +243,7 @@ function extractFeatures(prompt: string): Float32Array {
 
   // Environment resources [10-13]
   const res = (name: string) => {
-    const m = prompt.match(new RegExp(`${name}:\\s*(\\d+)\\s*available`, 'i'));
+    const m = prompt.match(RES_AVAILABLE_RE[name] ?? new RegExp(`${name}:\\s*(\\d+)\\s*available`, 'i'));
     return m ? Math.min(parseInt(m[1] ?? '0') / 100, 1) : 0;
   };
   feat[10] = res('fiber'); feat[11] = res('wood'); feat[12] = res('stone'); feat[13] = res('berry');
@@ -271,7 +313,7 @@ function extractFeatures(prompt: string): Float32Array {
   if (inv) {
     const it = inv[1] ?? '';
     const invRes = (name: string, idx: number) => {
-      const m = it.match(new RegExp(`${name}\\s*\\((\\d+)\\)`, 'i'));
+      const m = it.match(INV_RES_RE[name] ?? new RegExp(`${name}\\s*\\((\\d+)\\)`, 'i'));
       if (m) feat[idx] = Math.min(parseInt(m[1] ?? '0') / 50, 1);
     };
     invRes('wood', 32); invRes('stone', 33); invRes('berry', 34); invRes('fiber', 35);
