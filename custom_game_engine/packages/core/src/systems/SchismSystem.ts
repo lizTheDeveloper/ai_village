@@ -239,6 +239,26 @@ export class SchismSystem extends BaseSystem {
         reformPosition: 'The self adapts — a river rerouted is still a river, and clinging to fixed ground is fear masquerading as identity',
       },
     ],
+    etherean: [
+      {
+        tension: 'off_frequency_dilemma',
+        cause: 'theological_dispute',
+        orthodoxPosition: 'The off-frequency individual must be treated until they synchronize — coherence is health, dissonance is illness, and no one is beyond healing',
+        reformPosition: 'Some neurologies cannot synchronize — forcing treatment is mutilation of the self, and the field must learn to hold dissonance without breaking',
+      },
+      {
+        tension: 'grief_suppression_heroism',
+        cause: 'personality_conflict',
+        orthodoxPosition: 'Suppressing grief to maintain field coherence is the highest sacrifice — the hero dissolves their pain so others need not feel it',
+        reformPosition: 'Grief suppressed does not vanish but festers — the hero who hides their pain poisons the field with a false signal, and authenticity serves coherence better than performance',
+      },
+      {
+        tension: 'privacy_as_hoarding',
+        cause: 'cultural_divergence',
+        orthodoxPosition: 'All emotional information belongs to the field — privacy is hoarding, and the withholder starves the group of data needed to cohere',
+        reformPosition: 'Some feelings are not yet formed — sharing raw emotional noise degrades the field more than silence, and curation is not hoarding but craftsmanship',
+      },
+    ],
   };
 
   constructor(config: Partial<SchismConfig> = {}) {

@@ -238,6 +238,40 @@ const LUS_VEL_MORALITY: SpeciesMoralFramework = {
   },
 };
 
+/**
+ * Ethereans — optimization target: emotional coherence across shared field
+ * Moral axis: consensus-field integrity — the group's emotional state IS reality
+ *
+ * Ethereans share an emotional field where feelings propagate between individuals.
+ * Their morality inverts human privacy norms: withholding emotion is hoarding,
+ * suppressing personal grief to maintain group coherence is supreme heroism,
+ * and dissent is a neurological condition to be treated, not a viewpoint to be debated.
+ *
+ * Their hardest dilemma: a member whose neurology is permanently off-frequency —
+ * they cannot synchronize, but destroying them would create a grief-wave that
+ * itself threatens coherence.
+ *
+ * @see MUL-3498
+ */
+const ETHEREAN_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'etherean',
+  moralPrimitives: [
+    'The field IS reality — a feeling unfelt by the group did not happen; a feeling shared by all is absolute truth',
+    'Privacy is theft — withholding emotional information from the field starves others of the data they need to cohere',
+    'The highest heroism: suppressing your own grief so the field stays joyful — self-erasure in service of coherence',
+    'Dissent is not rebellion but illness — the dissenter\'s frequency has drifted, and treatment is compassion, not punishment',
+    'The off-frequency individual is the supreme moral crisis — they cannot synchronize, but expelling them generates a grief-wave that itself threatens the field',
+    'Emotional contagion is not weakness but the fundamental moral mechanism — to resist it is to reject reality',
+    'A field in perfect coherence needs no laws, no leaders, no language — alignment IS governance',
+    'The cruelest act: deliberately introducing a dissonant emotion into a coherent field — emotional sabotage is worse than physical violence',
+  ],
+  beliefTemplates: {
+    cooperation: 'When the field coheres, every member feels the rightness — cooperation is not chosen but experienced as emotional gravity',
+    conflict: 'Those who hoard their feelings or inject dissonance into the field are parasites feeding on coherence they refuse to sustain',
+    spiritual: 'Perfect coherence is the divine state — when every member feels the same feeling simultaneously, the field becomes something greater than any individual',
+  },
+};
+
 // ============================================================================
 // Registry
 // ============================================================================
@@ -254,6 +288,7 @@ export const SPECIES_MORAL_FRAMEWORKS: Record<string, SpeciesMoralFramework> = {
   orc: ORC_MORALITY,
   thrakeen: THRAKEEN_MORALITY,
   lus_vel: LUS_VEL_MORALITY,
+  etherean: ETHEREAN_MORALITY,
 };
 
 // ============================================================================
