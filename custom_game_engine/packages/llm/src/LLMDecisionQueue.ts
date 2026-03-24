@@ -12,6 +12,7 @@ export interface CustomLLMConfig {
   apiKey?: string;
   customHeaders?: Record<string, string>;
   tier?: string;  // Intelligence tier: 'simple', 'default', 'high', 'agi'
+  chatOnly?: boolean;  // Skip tool-calling and JSON format — plain chat completion
 }
 
 interface DecisionRequest {
@@ -190,6 +191,7 @@ export class LLMDecisionQueue {
         prompt, // Use lazily-built prompt (or pre-built if no builder)
         temperature: 0.7,
         maxTokens, // Thinking models need room for reasoning + tool call
+        chatOnly: request.customConfig?.chatOnly,  // Skip tool-calling and JSON format for freeform chat
         // Let OllamaProvider handle stop sequences
       };
 

@@ -751,7 +751,7 @@ export class AdminAngelSystem extends BaseSystem {
     // Angels use 'high' intelligence tier for better responses
     if (this.llmQueue) {
       try {
-        const response = await this.llmQueue.requestDecision(agentId, prompt, { tier: 'high' });
+        const response = await this.llmQueue.requestDecision(agentId, prompt, { tier: 'high', chatOnly: true });
         // Strip thinking tags if present (qwen models use them)
         return response.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
       } catch (error) {
@@ -1298,6 +1298,29 @@ export class AdminAngelSystem extends BaseSystem {
 
     // Use cleaned response for rest of processing
     response = cleanedResponse;
+
+    // Defense in depth: detect prompt leakage
+    // If the LLM echoed back recognizable prompt fragments, suppress the response
+    const promptLeakPatterns = [
+      /ur [\w]+\. ur an angel in the chat/i,
+      /PERSONALITY GUIDE/,
+      /KEY PRINCIPLES:/,
+      /IMPORTANT:.*\[commands?\]/i,
+      /commands:\s*\n-\s*time:/,
+      /respond like ur texting/i,
+      /BAD responses \(generic/i,
+      /GOOD responses \(specific/i,
+      /proactive turn/i,
+      /divine power:/i,
+    ];
+
+    for (const pattern of promptLeakPatterns) {
+      if (pattern.test(response)) {
+        console.warn('[AdminAngelSystem] Prompt leak detected in LLM response, suppressing');
+        response = '';
+        break;
+      }
+    }
 
     // Clear typing indicator
     world.eventBus.emit({

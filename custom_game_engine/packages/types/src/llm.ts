@@ -51,6 +51,8 @@ export interface CustomLLMConfig {
   customHeaders?: Record<string, string>;
   /** Intelligence tier: 'simple', 'default', 'high', 'agi' - determines which LLM model to use */
   tier?: string;
+  /** Skip tool-calling and JSON format — plain chat completion for freeform text responses */
+  chatOnly?: boolean;
 }
 
 /**
@@ -107,6 +109,7 @@ export interface LLMRequest {
   temperature?: number;
   maxTokens?: number;
   stopSequences?: string[];
+  chatOnly?: boolean;  // Skip tool-calling and JSON format — use plain chat completion
 }
 
 /**

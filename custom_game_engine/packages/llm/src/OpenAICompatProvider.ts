@@ -248,6 +248,12 @@ export class OpenAICompatProvider implements LLMProvider {
       // Ensure capabilities are known (runs discovery on first call for unknown models)
       await this.ensureCapabilitiesKnown();
 
+      // Chat-only mode: skip tool calling, use simple chat completion
+      // Used by AdminAngelSystem which needs freeform text responses, not JSON/tool calls
+      if (request.chatOnly) {
+        return this.generateChatOnly(request);
+      }
+
       // NOTE: We always use tool calling now. The prompts should NOT include
       // "RESPOND IN JSON" instructions - tool calling is the standard.
       // If you see JSON format issues, fix the prompt builders, not here.
@@ -837,6 +843,56 @@ Keep speech brief and natural.`
       });
       throw error;
     }
+  }
+
+  /**
+   * Simple chat completion without tool calling or JSON format instructions.
+   * Used for freeform text generation (e.g., admin angel chat).
+   */
+  private async generateChatOnly(request: LLMRequest): Promise<LLMResponse> {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (this.apiKey) {
+      headers['Authorization'] = `Bearer ${this.apiKey}`;
+    }
+    if (this.customHeaders) {
+      Object.assign(headers, this.customHeaders);
+    }
+
+    const messages = [
+      { role: 'user', content: request.prompt }
+    ];
+
+    const response = await this.fetchWithRetry(`${this.baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        model: this.model,
+        messages,
+        temperature: request.temperature ?? 0.8,
+        max_tokens: request.maxTokens ?? 512,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      if (response.status === 401 || response.status === 403) {
+        throw new LLMAuthError(this.getProviderId(), response.status, errorText.substring(0, 200));
+      }
+      throw new Error(`LLM API error: ${response.status} - ${errorText.substring(0, 200)}`);
+    }
+
+    const data = await response.json();
+    const choice = data.choices?.[0];
+    const text = choice?.message?.content ?? '';
+
+    return {
+      text,
+      inputTokens: data.usage?.prompt_tokens ?? 0,
+      outputTokens: data.usage?.completion_tokens ?? 0,
+      costUSD: 0,
+    };
   }
 
   /**

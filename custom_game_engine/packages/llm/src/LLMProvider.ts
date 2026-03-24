@@ -7,6 +7,7 @@ export interface LLMRequest {
   temperature?: number;
   maxTokens?: number;
   stopSequences?: string[];
+  chatOnly?: boolean;  // Skip tool-calling and JSON format — use plain chat completion
 }
 
 export interface LLMResponse {

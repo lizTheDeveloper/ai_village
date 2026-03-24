@@ -42,6 +42,12 @@ export class ProxyLLMProvider implements LLMProvider {
 
     const proxyRequest = request as ProxyLLMRequest;
 
+    // Chat-only mode: skip JSON format suffix
+    // Used for freeform text generation (e.g., admin angel chat)
+    const promptContent = request.chatOnly
+      ? request.prompt
+      : request.prompt + JSON_FORMAT_SUFFIX;
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
@@ -50,7 +56,7 @@ export class ProxyLLMProvider implements LLMProvider {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [{ role: 'user', content: request.prompt + JSON_FORMAT_SUFFIX }],
+          messages: [{ role: 'user', content: promptContent }],
           max_tokens: request.maxTokens ?? 256,
           temperature: request.temperature ?? 0.7,
           stripThinkTags: true,
@@ -62,7 +68,14 @@ export class ProxyLLMProvider implements LLMProvider {
       clearTimeout(timeoutId);
 
       if (response.status === 429) {
-        throw new Error('Rate limited by LLM proxy — try again shortly');
+        const rateLimitError = new Error('Rate limited by LLM proxy — try again shortly') as Error & { status: number; headers?: Record<string, string> };
+        rateLimitError.status = 429;
+        // Extract Retry-After if the proxy provides it
+        const retryAfter = response.headers.get('retry-after');
+        if (retryAfter) {
+          rateLimitError.headers = { 'retry-after': retryAfter };
+        }
+        throw rateLimitError;
       }
 
       if (!response.ok) {
