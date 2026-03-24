@@ -13,7 +13,7 @@ const STORAGE_KEY = 'mvee.supportPrompt.dismissedAt';
 const SESSION_KEY = 'mvee.supportPrompt.shown';
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 const TRIGGER_PLAYTIME_MS = 10 * 60 * 1000;
-const STRIPE_URL = 'https://buy.stripe.com/dRm00i4IO1jRdZX19L6c006';
+const CHECKOUT_API_URL = 'https://pay.multiversestudios.xyz/create-checkout-session';
 
 let _shown = false;
 let _activeMs = 0;
@@ -96,10 +96,8 @@ function _render(): void {
     <span style="flex: 1; line-height: 1.6;">
       Enjoying MVEE? Support the team &mdash;
       <a id="support-cta"
-         href="${STRIPE_URL}"
-         target="_blank"
          rel="noopener noreferrer"
-         style="color: #4ade80; text-decoration: none;"
+         style="color: #4ade80; text-decoration: none; cursor: pointer;"
          data-umami-event="ingame-support-prompt-clicked">pay what you can</a>.
     </span>
     <button id="support-dismiss"
@@ -119,6 +117,33 @@ function _render(): void {
 
   document.body.appendChild(banner);
   _el = banner;
+
+  const ctaLink = banner.querySelector<HTMLAnchorElement>('#support-cta')!;
+  ctaLink.addEventListener('click', () => {
+    ctaLink.textContent = 'Connecting...';
+    fetch(CHECKOUT_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ game: 'mvee', amount: 1500 }),
+    })
+      .then((res): Promise<{ url: string }> => {
+        if (!res.ok) {
+          return res.text().then((response) => {
+            console.error('PWYC: checkout session failed', { status: res.status, response, game: 'mvee' });
+            return Promise.reject(new Error(`HTTP ${res.status}`));
+          });
+        }
+        return res.json() as Promise<{ url: string }>;
+      })
+      .then((data) => {
+        window.open(data.url, '_blank');
+        ctaLink.textContent = 'pay what you can';
+      })
+      .catch((err: unknown) => {
+        const message = err instanceof Error ? err.message : 'unknown error';
+        ctaLink.textContent = `Error: ${message}`;
+      });
+  });
 
   const dismissBtn = banner.querySelector<HTMLButtonElement>('#support-dismiss')!;
   dismissBtn.addEventListener('mouseenter', () => { dismissBtn.style.color = 'rgba(134,239,172,0.7)'; });
