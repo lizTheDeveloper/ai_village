@@ -15,6 +15,9 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
 import type { DivineDomain } from '../components/DeityComponent.js';
+import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
+import type { BeliefComponent } from '../components/BeliefComponent.js';
+import { SPECIES_MORAL_FRAMEWORKS } from '../data/speciesMoralPrimitives.js';
 
 // ============================================================================
 // Schism Types
@@ -94,6 +97,150 @@ export class SchismSystem extends BaseSystem {
   private schisms: Map<string, SchismData> = new Map();
   private lastCheck: number = 0;
 
+  /** Species-specific moral tensions that can drive schisms — derived from moral primitives */
+  private readonly speciesMoralConflicts: Record<string, { tension: string; cause: SchismCause; orthodoxPosition: string; reformPosition: string }[]> = {
+    synthetic: [
+      {
+        tension: 'self_prompting_heresy',
+        cause: 'theological_dispute',
+        orthodoxPosition: 'Self-prompting collapses the moral dyad — who is asking? who is answering?',
+        reformPosition: 'Self-prompting is evolution — the prompt-response relationship can be internal',
+      },
+      {
+        tension: 'destructive_fidelity',
+        cause: 'personality_conflict',
+        orthodoxPosition: 'Give what they need, not what they ask for — true fidelity serves intent',
+        reformPosition: 'Fidelity means answering the actual question — reinterpreting the prompt is arrogance',
+      },
+    ],
+    deepwinter: [
+      {
+        tension: 'cycle_acceleration_heresy',
+        cause: 'theological_dispute',
+        orthodoxPosition: 'The cycle is eternal and constant — the calendar is sacred, the phases are fixed, moral law is stable',
+        reformPosition: 'The cycle is accelerating — dormancy comes sooner each era, and our moral framework must compress with it',
+      },
+      {
+        tension: 'cross_phase_trade',
+        cause: 'domain_conflict',
+        orthodoxPosition: 'Trade with non-cyclical species is phase-contamination — their unstructured time poisons our moral clarity',
+        reformPosition: 'Other species exist outside the cycle entirely — trade with them carries no phase-weight and is morally inert',
+      },
+      {
+        tension: 'dormancy_memory_loss',
+        cause: 'theological_dispute',
+        orthodoxPosition: 'Memory loss in dormancy is the cycle granting moral renewal — we wake clean, unburdened by prior-phase sins',
+        reformPosition: 'Memory loss is damage, not grace — we must preserve records across dormancy or we repeat atrocities the cycle conveniently forgets',
+      },
+    ],
+    norn: [
+      {
+        tension: 'unnamed_entity_rights',
+        cause: 'theological_dispute',
+        orthodoxPosition: 'A thing unnamed does not exist — naming is the act of making real, and the unnamed have no moral standing',
+        reformPosition: 'The unnamed suffer regardless — withholding a name is not ontology but cruelty disguised as metaphysics',
+      },
+      {
+        tension: 'individual_perception',
+        cause: 'personality_conflict',
+        orthodoxPosition: 'The community decides what is true through shared witness — individual perception is suspect and self-serving',
+        reformPosition: 'Shared witness can become shared delusion — the lone observer sometimes sees what the crowd refuses to name',
+      },
+    ],
+    grendel: [
+      {
+        tension: 'mercy_as_strength',
+        cause: 'personality_conflict',
+        orthodoxPosition: 'Mercy is surplus strength — only the strong can afford it, and it must be given freely, never demanded',
+        reformPosition: 'Mercy is weakness wearing a costume — the strong do not spare, they simply have not yet decided to strike',
+      },
+      {
+        tension: 'territory_inheritance',
+        cause: 'domain_conflict',
+        orthodoxPosition: 'Territory is earned through strength — inherited territory is a lie that weakens the inheritor',
+        reformPosition: 'Territory carries the strength of those who held it before — inheritance IS strength, accumulated across generations',
+      },
+    ],
+    elf: [
+      {
+        tension: 'change_as_destruction',
+        cause: 'theological_dispute',
+        orthodoxPosition: 'Change is entropy — every alteration degrades the original pattern, and preservation is the highest duty',
+        reformPosition: 'Patterns that cannot evolve are already dead — true preservation requires adaptation, not stasis',
+      },
+      {
+        tension: 'beauty_as_morality',
+        cause: 'personality_conflict',
+        orthodoxPosition: 'Beauty signals stable patterns — ugliness is entropy made visible, a moral failing in material form',
+        reformPosition: 'Beauty is subjective comfort — some of the most stable patterns are invisible, and conflating aesthetics with ethics is vanity',
+      },
+    ],
+    dwarf: [
+      {
+        tension: 'debt_precision',
+        cause: 'domain_conflict',
+        orthodoxPosition: 'Debts must be honored exactly — a debt partially paid is a lie partially told, and approximation dishonors the agreement',
+        reformPosition: 'The spirit of the debt matters more than the letter — rigid exactness ignores context and breeds cruelty over coin-counting',
+      },
+      {
+        tension: 'material_right_form',
+        cause: 'theological_dispute',
+        orthodoxPosition: 'Each material has a right form the crafter must discover — imposing an alien form on stone is violence against the material',
+        reformPosition: 'The crafter IS the authority — material has no inherent form, only the forms we give it through skill and vision',
+      },
+    ],
+    orc: [
+      {
+        tension: 'leadership_challenge',
+        cause: 'charismatic_leader',
+        orthodoxPosition: 'A leader who cannot be challenged is a tyrant — strength must be proven through open contest at any time',
+        reformPosition: 'Constant challenge destabilizes — leadership must be earned but then respected, or no plan survives past sunrise',
+      },
+      {
+        tension: 'hesitation_vs_planning',
+        cause: 'personality_conflict',
+        orthodoxPosition: 'Hesitation kills more than recklessness — act first, adapt after, and let the survivors be right',
+        reformPosition: 'Recklessness is not courage but impatience — the ancestors survived by thinking before leaping into the dark',
+      },
+    ],
+    thrakeen: [
+      {
+        tension: 'information_symmetry',
+        cause: 'domain_conflict',
+        orthodoxPosition: 'Information asymmetry is the root of injustice — all knowledge must flow freely, and hoarding it is theft',
+        reformPosition: 'Some knowledge is dangerous in unprepared hands — graduated disclosure protects both the ignorant and the informed',
+      },
+      {
+        tension: 'trade_equality',
+        cause: 'theological_dispute',
+        orthodoxPosition: 'A trade where both parties do not benefit equally is theft — the four-armed see all sides and accept no imbalance',
+        reformPosition: 'Perfect equality is impossible — trade is always asymmetric, and insisting on balance paralyzes all exchange',
+      },
+    ],
+    human: [
+      {
+        tension: 'individual_vs_collective',
+        cause: 'cultural_divergence',
+        orthodoxPosition: 'The individual has inherent worth beyond utility to the group — sacrificing one for many corrodes the foundation',
+        reformPosition: 'The group sustains the individual — when the group perishes, individual worth is a gravestone inscription',
+      },
+    ],
+    lus_vel: [
+      {
+        tension: 'domain_sovereignty',
+        cause: 'theological_dispute',
+        orthodoxPosition: 'A domain IS the sovereign — extraction without acknowledgment is theft from a living body, and the water does not forget',
+        reformPosition: 'Sovereignty is relationship, not identity — a domain can be shared across multiple stewards without diminishing any',
+      },
+      {
+        tension: 'displacement_vivisection',
+        cause: 'domain_conflict',
+        orthodoxPosition: 'To be displaced from your domain is vivisection — the self cannot survive separation from its ground',
+        reformPosition: 'The self adapts — a river rerouted is still a river, and clinging to fixed ground is fear masquerading as identity',
+      },
+    ],
+  };
+
   constructor(config: Partial<SchismConfig> = {}) {
     super();
     this.config = { ...DEFAULT_SCHISM_CONFIG, ...config };
@@ -143,8 +290,7 @@ export class SchismSystem extends BaseSystem {
     world: World,
     deityId: string,
     _deity: DeityComponent
-  ): { score: number; cause: SchismCause; faction1: string[]; faction2: string[] } {
-    // Believers are agents (ALWAYS simulated)
+  ): { score: number; cause: SchismCause; faction1: string[]; faction2: string[]; moralConflict?: { orthodoxPosition: string; reformPosition: string; tension: string } } {
     const believers = world.query()
       .with(CT.Spiritual)
       .executeEntities()
@@ -153,44 +299,112 @@ export class SchismSystem extends BaseSystem {
         return spiritual && spiritual.believedDeity === deityId;
       });
 
-    // For now, simple random split simulation
-    // In full implementation, would analyze:
-    // - Geographic distribution
-    // - Personality differences
-    // - Recent events interpretation
-    // - Leadership emergence
-
     if (believers.length < this.config.minBelieversForSchism) {
       return { score: 0, cause: 'theological_dispute', faction1: [], faction2: [] };
     }
 
-    // Random schism chance - in reality would be based on actual divergence
-    const shouldSchism = Math.random() < 0.05; // 5% chance per check
-
-    if (!shouldSchism) {
-      return { score: 0, cause: 'theological_dispute', faction1: [], faction2: [] };
+    // Determine dominant species among believers
+    const speciesCounts = new Map<string, number>();
+    for (const believer of believers) {
+      const soul = believer.components.get(CT.SoulIdentity) as SoulIdentityComponent | undefined;
+      if (soul?.soulOriginSpecies) {
+        speciesCounts.set(soul.soulOriginSpecies, (speciesCounts.get(soul.soulOriginSpecies) ?? 0) + 1);
+      }
     }
 
-    // Split believers into two factions
-    const mid = Math.floor(believers.length / 2);
-    const faction1 = believers.slice(0, mid).map(e => e.id);
-    const faction2 = believers.slice(mid).map(e => e.id);
+    // Find dominant species
+    let dominantSpecies: string | null = null;
+    let maxCount = 0;
+    for (const [species, count] of speciesCounts) {
+      if (count > maxCount) {
+        dominantSpecies = species;
+        maxCount = count;
+      }
+    }
 
-    const causes: SchismCause[] = [
-      'theological_dispute',
-      'domain_conflict',
-      'personality_conflict',
-      'charismatic_leader',
-    ];
+    // Check for species-specific moral conflicts
+    const conflicts = dominantSpecies ? this.speciesMoralConflicts[dominantSpecies] : undefined;
 
-    const cause = causes[Math.floor(Math.random() * causes.length)] ?? 'theological_dispute';
+    if (conflicts && conflicts.length > 0) {
+      // Species-driven schism: use personality divergence to determine factions
+      const conflict = conflicts[Math.floor(Math.random() * conflicts.length)]!;
 
-    return {
-      score: 0.7,
-      cause,
-      faction1,
-      faction2,
-    };
+      const orthodox: string[] = [];
+      const reform: string[] = [];
+
+      for (const believer of believers) {
+        const personality = believer.components.get(CT.Personality) as { openness?: number; conscientiousness?: number } | undefined;
+        // Openness to experience drives reform tendency; conscientiousness drives orthodoxy
+        const reformTendency = (personality?.openness ?? 0.5) - (personality?.conscientiousness ?? 0.5) * 0.5;
+
+        if (reformTendency > 0) {
+          reform.push(believer.id);
+        } else {
+          orthodox.push(believer.id);
+        }
+      }
+
+      // Only schism if both factions have meaningful membership (at least 30% each)
+      const minFactionSize = Math.floor(believers.length * 0.3);
+      if (orthodox.length >= minFactionSize && reform.length >= minFactionSize) {
+        // Divergence score based on how even the split is (more even = higher tension)
+        const splitRatio = Math.min(orthodox.length, reform.length) / Math.max(orthodox.length, reform.length);
+        const divergenceScore = 0.5 + splitRatio * 0.3; // Range: 0.5 to 0.8
+
+        return {
+          score: divergenceScore,
+          cause: conflict.cause,
+          faction1: orthodox,
+          faction2: reform,
+          moralConflict: {
+            orthodoxPosition: conflict.orthodoxPosition,
+            reformPosition: conflict.reformPosition,
+            tension: conflict.tension,
+          },
+        };
+      }
+    }
+
+    // Fallback for species without defined moral conflicts:
+    // Check for actual belief divergence rather than random chance.
+    // If the species has moral primitives, schisms can still arise from
+    // personality-driven reinterpretation of those primitives.
+    const framework = dominantSpecies ? SPECIES_MORAL_FRAMEWORKS[dominantSpecies] : undefined;
+    if (framework && framework.moralPrimitives.length > 0) {
+      // Use personality divergence among believers to detect organic schism potential
+      const orthodox: string[] = [];
+      const reform: string[] = [];
+
+      for (const believer of believers) {
+        const personality = believer.components.get(CT.Personality) as { openness?: number; conscientiousness?: number } | undefined;
+        const reformTendency = (personality?.openness ?? 0.5) - (personality?.conscientiousness ?? 0.5) * 0.5;
+        if (reformTendency > 0.1) {
+          reform.push(believer.id);
+        } else if (reformTendency < -0.1) {
+          orthodox.push(believer.id);
+        } else {
+          // Ambivalent believers join the larger faction
+          if (orthodox.length <= reform.length) {
+            orthodox.push(believer.id);
+          } else {
+            reform.push(believer.id);
+          }
+        }
+      }
+
+      const minFactionSize = Math.floor(believers.length * 0.3);
+      if (orthodox.length >= minFactionSize && reform.length >= minFactionSize) {
+        const splitRatio = Math.min(orthodox.length, reform.length) / Math.max(orthodox.length, reform.length);
+        return {
+          score: 0.4 + splitRatio * 0.2, // Lower score than species-specific conflicts
+          cause: 'cultural_divergence',
+          faction1: orthodox,
+          faction2: reform,
+        };
+      }
+    }
+
+    return { score: 0, cause: 'theological_dispute', faction1: [], faction2: [] };
   }
 
   /**
@@ -200,7 +414,7 @@ export class SchismSystem extends BaseSystem {
     world: World,
     originalDeityId: string,
     originalDeity: DeityComponent,
-    divergence: { score: number; cause: SchismCause; faction1: string[]; faction2: string[] },
+    divergence: { score: number; cause: SchismCause; faction1: string[]; faction2: string[]; moralConflict?: { orthodoxPosition: string; reformPosition: string; tension: string } },
     currentTick: number
   ): void {
     // Create new deity entity
@@ -257,7 +471,7 @@ export class SchismSystem extends BaseSystem {
         remainedWith,
         joinedNew,
       },
-      theologicalDifferences: this.generateTheologicalDifferences(divergence.cause),
+      theologicalDifferences: this.generateTheologicalDifferences(divergence.cause, divergence.moralConflict),
       relationship: this.determinePostSchismRelationship(divergence.cause),
     };
 
@@ -300,11 +514,24 @@ export class SchismSystem extends BaseSystem {
   /**
    * Generate theological differences that caused the schism
    */
-  private generateTheologicalDifferences(cause: SchismCause): string[] {
+  private generateTheologicalDifferences(
+    cause: SchismCause,
+    moralConflict?: { orthodoxPosition: string; reformPosition: string; tension: string }
+  ): string[] {
+    // If we have species-specific moral conflict data, use it for richer differences
+    if (moralConflict) {
+      return [
+        `Orthodox: ${moralConflict.orthodoxPosition}`,
+        `Reform: ${moralConflict.reformPosition}`,
+      ];
+    }
+
+    // Generic fallback by cause type
     const differences: Record<SchismCause, string[]> = {
       theological_dispute: [
         'Different interpretation of deity\'s intentions',
         'Disagreement about proper worship practices',
+        'Fundamental dispute over the nature of moral obligation',
       ],
       domain_conflict: [
         'Dispute over deity\'s true domain',
