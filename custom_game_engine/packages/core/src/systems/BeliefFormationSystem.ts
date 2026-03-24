@@ -5,6 +5,8 @@ import type { Entity } from '../ecs/Entity.js';
 import type { BeliefType, EvidenceType } from '../components/BeliefComponent.js';
 import type { EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
 import { getAgent, getEpisodicMemory, getBelief, getTrustNetwork } from '../utils/componentHelpers.js';
+import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
+import { getBeliefTemplates, DEFAULT_BELIEF_TEMPLATES } from '../data/speciesMoralPrimitives.js';
 
 /**
  * BeliefFormationSystem detects patterns in episodic memories and forms beliefs
@@ -200,13 +202,49 @@ export class BeliefFormationSystem extends BaseSystem {
     ).length;
 
     if (cooperationCount >= this.patternThreshold) {
+      // Get species-specific belief framing
+      const beliefContent = this._getSpeciesBeliefContent(entity, 'cooperation');
       belief.recordEvidence(
         'social' as BeliefType,
-        'Cooperation leads to better outcomes',
+        beliefContent,
         'experience' as EvidenceType,
         currentTick
       );
     }
+
+    // Also form conflict beliefs from negative social interactions
+    const conflictCount = socialMemories.filter(m =>
+      m.eventType === 'trust_violated'
+    ).length;
+
+    if (conflictCount >= this.patternThreshold) {
+      const conflictBelief = this._getSpeciesBeliefContent(entity, 'conflict');
+      belief.recordEvidence(
+        'social' as BeliefType,
+        conflictBelief,
+        'experience' as EvidenceType,
+        currentTick
+      );
+    }
+  }
+
+  /**
+   * Get species-specific belief content for a given belief category.
+   * Driven by moral primitives from shared SpeciesMoralPrimitives registry.
+   * Falls back to generic beliefs for species without moral frameworks.
+   */
+  private _getSpeciesBeliefContent(entity: Entity, category: 'cooperation' | 'conflict' | 'spiritual'): string {
+    const soulIdentity = entity.components.get(CT.SoulIdentity) as SoulIdentityComponent | undefined;
+    const species = soulIdentity?.soulOriginSpecies;
+
+    if (species) {
+      const templates = getBeliefTemplates(species);
+      if (templates) {
+        return templates[category];
+      }
+    }
+
+    return DEFAULT_BELIEF_TEMPLATES[category];
   }
 
   // Future: Add _checkSelfBeliefs method for epistemic humility features

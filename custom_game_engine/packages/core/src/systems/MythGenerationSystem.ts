@@ -16,6 +16,8 @@ import type { IdentityComponent } from '../components/IdentityComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
 import type { NarrativeSedimentSystem } from './NarrativeSedimentSystem.js';
+import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
+import { getMoralPrimitives } from '../data/speciesMoralPrimitives.js';
 
 /**
  * Myth event types that can trigger myth generation
@@ -88,6 +90,8 @@ export class MythGenerationSystem extends BaseSystem {
 
   // Reusable working arrays (zero allocations)
   private readonly workingNearbyAgents: Entity[] = [];
+
+  // Species moral primitives now sourced from shared data/speciesMoralPrimitives.ts
 
   constructor(llmQueue: LLMDecisionQueue) {
     super();
@@ -714,6 +718,32 @@ export class MythGenerationSystem extends BaseSystem {
   }
 
   /**
+   * Get species-specific moral framing for myth generation.
+   * Returns a prompt section that contextualizes the myth within the species' moral framework.
+   */
+  private _getSpeciesMoralFraming(agentId: string | undefined, entities: ReadonlyArray<Entity>): string | null {
+    if (!agentId) return null;
+
+    const agent = entities.find(e => e.id === agentId);
+    if (!agent) return null;
+
+    const soulIdentity = agent.components.get(CT.SoulIdentity) as SoulIdentityComponent | undefined;
+    if (!soulIdentity) return null;
+
+    const species = soulIdentity.soulOriginSpecies;
+    const moralPrimitives = getMoralPrimitives(species);
+    if (moralPrimitives.length === 0) return null;
+
+    let framing = `\nThe people telling this story hold these moral truths as self-evident:\n`;
+    for (const primitive of moralPrimitives) {
+      framing += `- ${primitive}\n`;
+    }
+    framing += `The myth should reflect this moral worldview — not as explicit moralizing, but as the unconscious assumptions of the storyteller.\n`;
+
+    return framing;
+  }
+
+  /**
    * Process a pending myth - queue LLM request for myth generation
    */
   private _processPendingMyth(
@@ -725,6 +755,12 @@ export class MythGenerationSystem extends BaseSystem {
     // Build prompt based on event type
     let prompt = this._buildMythPromptForEventType(pending, entities);
     if (!prompt) return;
+
+    // Inject species moral framing into myth context
+    const moralFraming = this._getSpeciesMoralFraming(pending.agentId, entities);
+    if (moralFraming) {
+      prompt += moralFraming;
+    }
 
     // Inject narrative weathering from NEL reader sediment (The Shared Retelling)
     const weathering = this._getNarrativeWeathering(world);
