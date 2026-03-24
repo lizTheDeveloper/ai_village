@@ -259,6 +259,26 @@ export class SchismSystem extends BaseSystem {
         reformPosition: 'Some feelings are not yet formed — sharing raw emotional noise degrades the field more than silence, and curation is not hoarding but craftsmanship',
       },
     ],
+    dragon: [
+      {
+        tension: 'individual_death_weight',
+        cause: 'theological_dispute',
+        orthodoxPosition: 'Individual death is a local perturbation — the pattern persists across other timestreams, and mourning a single death is temporal myopia',
+        reformPosition: 'Each consciousness is a unique pattern-generator — its death collapses futures that no other mind would have produced, and that loss compounds across the tapestry',
+      },
+      {
+        tension: 'hoard_hoarding',
+        cause: 'domain_conflict',
+        orthodoxPosition: 'Gold hoards are pattern-anchors that stabilize timestream coherence — accumulation is duty, not greed, and the hoard serves reality itself',
+        reformPosition: 'Hoarding concentrates stability in dragon lairs while the wider tapestry frays — true pattern-preservation requires distributing anchors, not centralizing them',
+      },
+      {
+        tension: 'teaching_vs_originality',
+        cause: 'personality_conflict',
+        orthodoxPosition: 'Teaching is the highest virtue — seeding your patterns into other minds maximizes density across divergent futures',
+        reformPosition: 'Teaching overwrites — the student\'s original patterns are displaced by the teacher\'s, and net pattern-diversity may decrease when one voice drowns out many',
+      },
+    ],
   };
 
   constructor(config: Partial<SchismConfig> = {}) {

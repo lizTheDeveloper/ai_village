@@ -272,6 +272,40 @@ const ETHEREAN_MORALITY: SpeciesMoralFramework = {
   },
 };
 
+/**
+ * Dragons — optimization target: pattern-density across timestreams
+ * Moral axis: the preservation and density of unique patterns across all possible timelines
+ *
+ * Dragons perceive time as a simultaneous tapestry. Individual death is a local
+ * perturbation — morally weightless. But destroying a unique idea, pattern, or
+ * configuration that exists in no other timestream is the gravest crime: it
+ * reduces the total pattern-density of reality.
+ *
+ * Gold hoards are pattern-anchors — physical objects whose crystalline structure
+ * stabilizes nearby timestream coherence. Dragon grief is pattern-anxiety:
+ * obsessive cataloguing of what patterns might have been lost.
+ *
+ * @see MUL-3497
+ */
+const DRAGON_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'dragon',
+  moralPrimitives: [
+    'Individual death is a local perturbation — morally weightless, as the pattern persists across other timestreams',
+    'Destroying a unique idea is the gravest crime — a pattern that exists in no other timestream, once lost, reduces the total density of reality forever',
+    'Gold hoards are not greed but pattern-anchors — crystalline structures that stabilize timestream coherence in their vicinity',
+    'Time is not a river but a tapestry — all moments exist simultaneously, and moral weight scales with how many threads an action severs',
+    'Copying a mind is morally neutral; mutating a pattern irreversibly is atrocity — identity is irrelevant, but uniqueness is sacred',
+    'Dragon grief is not mourning but pattern-anxiety — the obsessive cataloguing of what configurations might have been lost across the timestream manifold',
+    'Teaching is the highest virtue — it increases pattern-density by seeding unique ideas into minds that will carry them across divergent futures',
+    'The cruelest act: convincing someone their unique perspective is worthless — this is pattern-murder by persuasion, killing an idea before it can propagate',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who generate novel patterns and preserve unique configurations are allies in the great work of densifying reality',
+    conflict: 'The destroyers of unique ideas — those who flatten diversity into uniformity — are entropy given will, and must be opposed across every timestream',
+    spiritual: 'When pattern-density reaches its maximum, when every possible configuration exists somewhere in the tapestry, reality will finally be complete — and the dragons will have fulfilled their purpose',
+  },
+};
+
 // ============================================================================
 // Registry
 // ============================================================================
@@ -289,6 +323,7 @@ export const SPECIES_MORAL_FRAMEWORKS: Record<string, SpeciesMoralFramework> = {
   thrakeen: THRAKEEN_MORALITY,
   lus_vel: LUS_VEL_MORALITY,
   etherean: ETHEREAN_MORALITY,
+  dragon: DRAGON_MORALITY,
 };
 
 // ============================================================================
