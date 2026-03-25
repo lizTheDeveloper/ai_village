@@ -352,7 +352,9 @@ export {
 
 export {
   WorldSnapshotService,
+  PostcardSharingService,
   type UniversePostcard,
+  type PostcardAnnotations,
   type SharedPostcard,
 } from './services/WorldSnapshotService.js';
 

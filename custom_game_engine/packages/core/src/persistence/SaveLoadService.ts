@@ -20,6 +20,12 @@ import { multiverseCoordinator } from '../multiverse/MultiverseCoordinator.js';
 import { createPassageComponent } from '../components/PassageComponent.js';
 import { createPassageExtended } from '../components/PassageExtendedComponent.js';
 import { EntityImpl } from '../ecs/Entity.js';
+import {
+  PostcardSharingService,
+  type UniversePostcard,
+  type PostcardAnnotations,
+  type SharedPostcard,
+} from '../services/WorldSnapshotService.js';
 
 // Canon event types for multiverse server sync
 export type CanonEventType =
@@ -707,6 +713,42 @@ export class SaveLoadService {
    */
   async isServerAvailable(): Promise<boolean> {
     return this.checkServerAvailable();
+  }
+
+  // ============================================================
+  // POSTCARD SHARING
+  // ============================================================
+
+  private postcardService: PostcardSharingService | null = null;
+
+  /**
+   * Get or create the PostcardSharingService instance.
+   * Uses the same server base URL as the multiverse client when server sync is enabled.
+   */
+  private getPostcardService(): PostcardSharingService {
+    if (!this.postcardService) {
+      this.postcardService = new PostcardSharingService();
+    }
+    return this.postcardService;
+  }
+
+  /**
+   * Upload a universe postcard with player annotations to the shared gallery.
+   * Uses server if available, falls back to localStorage.
+   */
+  async uploadPostcard(
+    postcard: UniversePostcard,
+    annotations: PostcardAnnotations
+  ): Promise<SharedPostcard> {
+    return this.getPostcardService().sharePostcard(postcard, annotations);
+  }
+
+  /**
+   * Fetch all shared postcards from the gallery.
+   * Uses server if available, falls back to localStorage.
+   */
+  async fetchGallery(): Promise<SharedPostcard[]> {
+    return this.getPostcardService().listSharedPostcards();
   }
 }
 

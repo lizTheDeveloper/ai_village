@@ -13,6 +13,9 @@ export {
   SaveLoadService,
   saveLoadService,
 
+  // Postcard sharing
+  PostcardSharingService,
+
   // Save state management
   SaveStateManager,
 
@@ -137,4 +140,7 @@ export type {
   Migration,
   MigrationContext,
   ComponentSerializer,
+  UniversePostcard,
+  SharedPostcard,
+  PostcardAnnotations,
 } from '@ai-village/core';

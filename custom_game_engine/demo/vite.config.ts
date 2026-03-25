@@ -7,6 +7,10 @@ import { sharedArrayBufferPlugin } from './vite-sab-plugin.js';
 // Queue file path for pixellab daemon
 const QUEUE_FILE = path.resolve(__dirname, '../scripts/sprite-generation-queue.json');
 
+// Sprite assets live in renderer package, not in demo/public
+const PIXELLAB_ASSETS_DIR = path.resolve(__dirname, '../packages/renderer/assets/sprites/pixellab');
+const MAP_OBJECTS_ASSETS_DIR = path.resolve(__dirname, '../packages/renderer/assets/sprites/map_objects');
+
 // Load environment variables from parent directory
 const envPath = path.resolve(__dirname, '../.env');
 const envConfig = dotenv.config({ path: envPath }).parsed || {};
@@ -18,6 +22,55 @@ export default defineConfig({
   plugins: [
     // SharedArrayBuffer support (COOP/COEP headers)
     sharedArrayBufferPlugin(),
+    {
+      name: 'serve-sprite-assets',
+      configureServer(server) {
+        // Serve pixellab sprites from packages/renderer/assets/ since they
+        // are not in demo/public/ (the daemon writes to renderer/assets/).
+        server.middlewares.use((req, res, next) => {
+          const url = req.url || '';
+
+          let filePath: string | null = null;
+          if (url.startsWith('/assets/sprites/pixellab/')) {
+            const rel = url.slice('/assets/sprites/pixellab/'.length);
+            filePath = path.join(PIXELLAB_ASSETS_DIR, decodeURIComponent(rel));
+          } else if (url.startsWith('/assets/sprites/map_objects/')) {
+            const rel = url.slice('/assets/sprites/map_objects/'.length);
+            filePath = path.join(MAP_OBJECTS_ASSETS_DIR, decodeURIComponent(rel));
+          }
+
+          if (!filePath) return next();
+
+          // Prevent path traversal
+          if (!filePath.startsWith(PIXELLAB_ASSETS_DIR) && !filePath.startsWith(MAP_OBJECTS_ASSETS_DIR)) {
+            res.statusCode = 403;
+            res.end();
+            return;
+          }
+
+          fs.stat(filePath, (err, stats) => {
+            if (err || !stats.isFile()) return next();
+
+            // Determine content type
+            const ext = path.extname(filePath!).toLowerCase();
+            const contentTypes: Record<string, string> = {
+              '.png': 'image/png',
+              '.jpg': 'image/jpeg',
+              '.jpeg': 'image/jpeg',
+              '.json': 'application/json',
+              '.gif': 'image/gif',
+              '.webp': 'image/webp',
+            };
+            const contentType = contentTypes[ext] || 'application/octet-stream';
+
+            res.setHeader('Content-Type', contentType);
+            res.setHeader('Content-Length', stats.size);
+            res.setHeader('Cache-Control', 'public, max-age=3600');
+            fs.createReadStream(filePath!).pipe(res);
+          });
+        });
+      },
+    },
     {
       name: 'selective-cache-control',
       configureServer(server) {
@@ -203,6 +256,54 @@ export default defineConfig({
               res.end(JSON.stringify({ error: String(error) }));
             }
           });
+        });
+      },
+    },
+    {
+      name: 'postcards-api',
+      configureServer(server) {
+        // In-memory store for dev server (resets on server restart, same as prod in-memory store)
+        const postcards: unknown[] = [];
+
+        server.middlewares.use('/api/postcards', (req, res, next) => {
+          if (req.method === 'GET') {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ postcards }));
+            return;
+          }
+
+          if (req.method === 'HEAD') {
+            res.writeHead(200);
+            res.end();
+            return;
+          }
+
+          if (req.method === 'POST') {
+            let body = '';
+            req.on('data', (chunk: Buffer) => {
+              body += chunk.toString();
+            });
+
+            req.on('end', () => {
+              try {
+                const postcard = JSON.parse(body);
+                if (!postcard || !postcard.title) {
+                  res.writeHead(400, { 'Content-Type': 'application/json' });
+                  res.end(JSON.stringify({ error: 'Invalid postcard: title is required' }));
+                  return;
+                }
+                postcards.push(postcard);
+                res.writeHead(201, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true, count: postcards.length }));
+              } catch (err) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Invalid JSON body' }));
+              }
+            });
+            return;
+          }
+
+          next();
         });
       },
     },

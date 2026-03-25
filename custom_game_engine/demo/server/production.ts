@@ -117,15 +117,45 @@ app.post(`${BASE_PATH}/api/llm/chat`, async (req, res) => {
   }
 });
 
+// ============================================================
+// POSTCARD GALLERY — in-memory store for universe postcards
+// ============================================================
+
+const postcards: unknown[] = [];
+
+// List all postcards
+app.get(`${BASE_PATH}/api/postcards`, (_req, res) => {
+  res.json({ postcards });
+});
+
+// HEAD check (used by PostcardSharingService to detect server availability)
+app.head(`${BASE_PATH}/api/postcards`, (_req, res) => {
+  res.sendStatus(200);
+});
+
+// Upload a postcard
+app.post(`${BASE_PATH}/api/postcards`, (req, res) => {
+  const postcard = req.body;
+  if (!postcard || !postcard.title) {
+    res.status(400).json({ error: 'Invalid postcard: title is required' });
+    return;
+  }
+  postcards.push(postcard);
+  res.status(201).json({ success: true, count: postcards.length });
+});
+
 // Health check under base path for Traefik routing
 app.get(`${BASE_PATH}/api/health`, (_req, res) => {
   res.json({ status: 'ok', timestamp: Date.now(), env: 'production' });
 });
 
-// COOP/COEP headers for SharedArrayBuffer support
+// COOP/COEP headers for SharedArrayBuffer support.
+// Use 'credentialless' instead of 'require-corp' — it still enables SAB
+// but doesn't block cross-origin resources (analytics, fonts) that lack
+// Cross-Origin-Resource-Policy headers.
 app.use((_req, res, next) => {
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless');
   next();
 });
 
