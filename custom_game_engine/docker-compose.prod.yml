@@ -16,6 +16,8 @@ services:
     environment:
       - PORT=3000
       - NODE_ENV=production
+    volumes:
+      - mvee-data:/app/demo/multiverse-data
     networks:
       - coolify
     labels:
@@ -31,6 +33,9 @@ services:
       - traefik.http.middlewares.mvee-redirect.redirectscheme.scheme=https
       - traefik.http.middlewares.mvee-redirect.redirectscheme.permanent=true
       - traefik.http.services.mvee.loadbalancer.server.port=3000
+
+volumes:
+  mvee-data:
 
 networks:
   coolify:

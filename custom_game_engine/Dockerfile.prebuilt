@@ -10,6 +10,7 @@ RUN npm install --omit=dev --ignore-scripts 2>/dev/null || npm install --ignore-
 
 COPY demo/dist/ demo/dist/
 COPY demo/server/ demo/server/
+COPY demo/src/universe-api.ts demo/src/multiverse-storage.ts demo/src/planet-storage.ts demo/src/
 
 ENV NODE_ENV=production
 ENV PORT=3000

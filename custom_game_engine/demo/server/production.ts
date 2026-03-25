@@ -9,6 +9,9 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createUniverseApiRouter } from '../src/universe-api.js';
+import { multiverseStorage } from '../src/multiverse-storage.js';
+import { planetStorage } from '../src/planet-storage.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = parseInt(process.env.PORT || '3000', 10);
@@ -16,7 +19,7 @@ const DIST_DIR = path.resolve(__dirname, '..', 'dist');
 const BASE_PATH = process.env.BASE_PATH || '/mvee';
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 
 // Allowlisted LLM provider hostnames — prevents SSRF via the proxy endpoints
 const ALLOWED_LLM_HOSTS = new Set([
@@ -144,6 +147,10 @@ app.post(`${BASE_PATH}/api/postcards`, (req, res) => {
   res.status(201).json({ success: true, count: postcards.length });
 });
 
+// Multiverse API routes — universe, snapshot, player, passage management
+const universeRouter = createUniverseApiRouter();
+app.use(`${BASE_PATH}/api/multiverse`, universeRouter);
+
 // Health check under base path for Traefik routing
 app.get(`${BASE_PATH}/api/health`, (_req, res) => {
   res.json({ status: 'ok', timestamp: Date.now(), env: 'production' });
@@ -159,11 +166,25 @@ app.use((_req, res, next) => {
   next();
 });
 
+// Cache policy: HTML = never cache (so deploys are picked up immediately),
+// hashed build artifacts = immutable/1yr, everything else = 1 day.
+app.use((_req, res, next) => {
+  const ext = path.extname(_req.path).toLowerCase();
+  if (ext === '.html' || !ext) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+  } else if (ext === '.js' || ext === '.css' || ext === '.wasm') {
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  } else {
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+  }
+  next();
+});
+
 // Serve static files at root (for absolute sprite paths like /assets/sprites/...)
 // AND under the base path (for Vite-generated references like /mvee/assets/...)
 // express.static handles MIME types correctly — .png → image/png, .js → application/javascript
 const staticOpts = {
-  maxAge: '1d',
   // Fall through to next middleware if file not found (don't 404 here)
   fallthrough: true,
 };
@@ -175,7 +196,7 @@ app.use(BASE_PATH, express.static(DIST_DIR, staticOpts));
 // express.static above should 404, NOT get the SPA HTML fallback.
 // This prevents sprites from getting text/html content-type.
 app.get('/{*splat}', (req, res, next) => {
-  if (req.path.startsWith('/api/')) return next();
+  if (req.path.startsWith('/api/') || req.path.startsWith(`${BASE_PATH}/api/`)) return next();
 
   // If the path has a file extension, it's a static asset request that wasn't
   // found — return 404 instead of serving game.html as text/html
@@ -184,9 +205,21 @@ app.get('/{*splat}', (req, res, next) => {
     return;
   }
 
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
   res.sendFile(path.join(DIST_DIR, 'game.html'));
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`[server] MVEE production server on port ${PORT} (base: ${BASE_PATH})`);
+async function start() {
+  await multiverseStorage.init();
+  await planetStorage.init();
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`[server] MVEE production server on port ${PORT} (base: ${BASE_PATH})`);
+    console.log(`[server] Multiverse API mounted at ${BASE_PATH}/api/multiverse`);
+  });
+}
+
+start().catch((err) => {
+  console.error('[server] Failed to start:', err);
+  process.exit(1);
 });
