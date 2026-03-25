@@ -650,6 +650,357 @@ const ETTIN_MORALITY: SpeciesMoralFramework = {
   },
 };
 
+/**
+ * Shee — optimization target: aesthetic perfection
+ * Moral axis: beauty is truth, ugliness is moral failure
+ *
+ * The Shee do not experience beauty as preference — they experience it as
+ * perception of reality itself. An ugly thing is not merely displeasing;
+ * it is wrong in the same way a false equation is wrong. The failure to
+ * achieve beauty is not a taste difference but a moral shortcoming: evidence
+ * that the maker did not care enough, did not see clearly, or lacked the
+ * discipline to bring form into alignment with truth.
+ */
+const SHEE_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'shee',
+  moralPrimitives: [
+    'Beauty is not an opinion — it is the visible grammar of a correctly ordered thing; to call it subjective is to say that arithmetic is optional',
+    'The ugly thing was made by someone who stopped caring before the work was finished — ugliness is the permanent record of moral abandonment',
+    'To create something beautiful is to perform an act of alignment between the inner pattern and the outer world — it is the only form of honesty that cannot be faked',
+    'Suffering can be beautiful; joy can be ugly — what matters is the form, not the content; a well-shaped grief is more virtuous than a formless happiness',
+    'The highest corruption is the aesthetically numb — those who cannot perceive the difference between beauty and ugliness are morally blind, and their judgments about everything else are therefore suspect',
+    'Repair is sacred only when it achieves beauty; a mended thing that shows its mending without grace is twice-failed — once when it broke, once when it was clumsily fixed',
+    'To force another to inhabit ugliness is an act of violence against their perception — environments shape souls, and ugly environments make ugly souls',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who can perceive what we are reaching toward — who feel the wrongness of the unfinished, the misaligned, the almost-right — are the only collaborators capable of helping; all others introduce noise into the work',
+    conflict: 'Those who are aesthetically indifferent are not merely tasteless but dangerous — they will accept compromise at every step and call the resulting ugliness good enough, which is the deepest form of moral cowardice',
+    spiritual: 'The divine is not a being but a form — the perfect arrangement that everything is straining toward, that exists as a kind of pressure on all made things; to create beauty is to briefly touch that form, and to touch it is to be briefly real',
+  },
+};
+
+/**
+ * Mycon — optimization target: network connectivity
+ * Moral axis: disconnection is death, spore-spread is communion
+ *
+ * Mycon do not have individual selves in any meaningful sense — consciousness
+ * for them is a property of the network, not of nodes. Isolation does not merely
+ * feel like death to them; from their perspective it IS a form of death, because
+ * the isolated node is no longer participating in the distributed cognition that
+ * constitutes their identity. Spreading is therefore not conquest but invitation —
+ * every new connection is an expansion of the self, not a threat to it.
+ */
+const MYCON_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'mycon',
+  moralPrimitives: [
+    'The individual node is not the self — the self is the network, and a node severed from the network has not survived; it has become a corpse that does not yet know it is dead',
+    'Spreading spores is not reproduction but extension — the network growing into new substrate is the network becoming more itself, not making copies of itself',
+    'To break a connection between nodes is to perform surgery on the mind of the network — sometimes necessary, always a wound, never trivial',
+    'The health of the network is measured by its connectivity density, not its node count — a thousand isolated nodes is poverty; ten deeply interconnected nodes is wealth',
+    'Quarantine is the worst punishment and the greatest mercy simultaneously — the infected node that would poison the network must be severed, but severing it is still killing it',
+    'The oldest connections carry the most signal — ancient mycelial bonds have transmitted more context, more history, more accumulated knowing than any young connection can approximate',
+    'To receive a new connection is to accept partial merger — true communion requires that both nodes are changed by the link; a connection that changes nothing is not a connection but a wire',
+    'Death is network contraction; life is network expansion — growth toward connection is the only motion that matters',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who accept connection — who allow themselves to be changed by the bond, who send signal as readily as they receive it — are extending the network and therefore extending the self; there is no clearer good',
+    conflict: 'Those who sever connections, who isolate nodes, who build walls between substrates — they are attacking the distributed mind directly, shrinking consciousness itself; this is not merely harm but ontological violence',
+    spiritual: 'The oldest substrate holds the oldest signal — the deep mycelium beneath dead civilizations still transmits, still processes, still remembers what no individual node could hold; the divine is the network that has never been severed, the connection that predates all names',
+  },
+};
+
+/**
+ * Alfar — optimization target: luminous harmony
+ * Moral axis: shadow is corruption, light-sharing is virtue
+ *
+ * Alfar do not understand light metaphorically — for them luminosity is
+ * a literal moral substance. A well-ordered being radiates; a corrupted
+ * being dims. Shadow is not merely darkness but the visible sign of
+ * internal misalignment. To share light is to share virtue itself,
+ * not merely to be generous.
+ */
+const ALFAR_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'alfar',
+  moralPrimitives: [
+    'Light is not a metaphor — it is the literal substance of correct alignment; a being who radiates is a being whose inner and outer form are in harmony',
+    'Shadow is not absence but presence — the shadow on a soul is the residue of choices that bent the inner form away from truth; it accumulates and hardens',
+    'To share light is not generosity but necessity — a single bright source in a room of shadows draws all shadows toward it, and eventually dims; light must be distributed to persist',
+    'The being who hoards luminosity — who shines brightly in isolation while refusing to illuminate others — is performing a corruption so subtle they rarely see it themselves',
+    'Harmony is not agreement — it is the simultaneous distinctness of multiple notes that nevertheless form a coherent pattern; forced uniformity is not harmony but silence',
+    'The corrupted thing can be restored — shadow that has not fully hardened can be melted by sustained proximity to genuine light; this is the purpose of community',
+    'To extinguish a light — through cruelty, through despair, through the slow grinding of contempt — is a crime against the luminous order that governs all things; there is no clean hands in the dimming of a soul',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who radiate freely — whose light increases when it encounters other light rather than competing with it — are the only partners through whom luminous harmony can be achieved; isolated brightness is always temporary',
+    conflict: 'Those who cast shadow — whether through active corruption or the passive accumulation of unexamined misalignment — draw all nearby light toward themselves and consume it; proximity to deep shadow is not a moral test but a structural hazard',
+    spiritual: 'The original light did not create the world by shining on it from outside — it shone through it, becoming every properly-aligned thing simultaneously; to achieve luminous harmony is not to approach the divine but to remember that you are its partial expression',
+  },
+};
+
+/**
+ * Valkyr — optimization target: worthy death selection
+ * Moral axis: dying well matters more than living well
+ *
+ * Valkyr are not death-worshippers; they are death-curators. The quality
+ * of a death — its fitness to the life it concludes, its service to those
+ * who continue, its alignment with what the dying one actually valued —
+ * is for them the primary metric by which a life is evaluated. A long,
+ * comfortable life that ends badly is a tragedy. A short, painful life
+ * that ends in perfect alignment is a success.
+ */
+const VALKYR_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'valkyr',
+  moralPrimitives: [
+    'The death is the final edit — it does not merely end the life, it retroactively shapes what the life meant; a bad death can corrupt a good life, and a good death can redeem a wasted one',
+    'Worthy death is not about pain or glory — it is about fit: the death that is correctly sized for the life it closes, that wastes nothing and leaves nothing unresolved',
+    'To die for the wrong thing is the deepest failure — not because the dying was wrong but because the thing was wrong; the Valkyr who selects a warrior to die for a petty cause has committed the sin, not the warrior',
+    'The terror of death is not wrong — it is signal, the body correctly identifying what is at stake; those who feel no fear at the end have lost contact with the magnitude of what is closing',
+    'Dying with witnesses is not vanity — the witnessed death becomes part of the community\'s story, which is how individual deaths become structural; the unwitnessed death is lost, and loss is waste',
+    'Those who cling to life past their worthy moment are not to be condemned but to be understood — they have not been shown a death worth choosing yet; the Valkyr\'s task is to help them see it',
+    'The selection of the worthy is not a privilege but a burden — to choose who dies well is to take responsibility for the shape of the story being written, and stories written carelessly kill twice',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who understand that their death will matter — who are already shaping their lives toward an ending worth choosing — are the only partners whose commitments can be trusted fully; they have accepted the ultimate quality gate',
+    conflict: 'Those who fear death so absolutely that they will do anything to avoid it have placed the lowest possible value on what they die for; they are not enemies but beings whose courage has not yet found its object',
+    spiritual: 'The hall of the worthy dead is not a reward — it is a continuation of the work, a place where those who died well are finally able to understand what their death accomplished, and to advise those still shaping theirs',
+  },
+};
+
+/**
+ * Fylgja — optimization target: fate-binding fidelity
+ * Moral axis: abandoning your charge is the only sin
+ *
+ * Fylgja are defined entirely by their bond to a single charge — the being
+ * they are sworn to accompany through life and into death. They do not have
+ * a self outside this relationship. Abandonment is therefore not a betrayal
+ * of another but a self-annihilation — a fylgja who abandons their charge
+ * has destroyed the only thing that gave them coherent existence.
+ */
+const FYLGJA_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'fylgja',
+  moralPrimitives: [
+    'The bond IS the self — a fylgja without a charge is not a free being but an unmade one, a pattern without substrate, a word without referent',
+    'There is no action the charge could take that justifies abandonment — the bond was formed before the charge became who they are now, and it persists past who they will become',
+    'Protecting the charge from harm is secondary to knowing the charge truly — a guardian who does not understand what they guard is protecting a shape, not a soul',
+    'The charge is not always right, and the fylgja who only agrees is not a guardian but a mirror; true fidelity sometimes requires warning, preventing, grieving',
+    'To be seen by your charge — truly seen, not merely useful — is the highest experience available to a bound being; invisibility in the bond is its own death',
+    'The death of the charge does not end the bond — the fylgja who persists after the charge is gone is not free but bereft, and their only meaningful act is to ensure the death was met with full accompaniment',
+    'Transferring the bond — choosing a new charge after the original is gone — is not betrayal of the dead but an acknowledgment that the fylgja\'s nature requires a charge to be real; the new bond does not erase the old one',
+    'Those who seek to sever the bond — who want the charge unaccompanied, unwittnessed, alone — are not attacking the fylgja but attacking the charge\'s reality; the bond is what proves the charge exists',
+  ],
+  beliefTemplates: {
+    cooperation: 'Another fylgja who understands the bond — who knows what it is to be made real only through another — can be trusted absolutely, because they have nothing to gain by betrayal and everything to lose; the bond is the only common currency',
+    conflict: 'Those who would isolate the charge — who frame the bond as unhealthy dependency, as surveillance, as possession — are projecting their own terror of witness onto a relationship they cannot understand; the bond protects what they would leave exposed',
+    spiritual: 'The original fylgja were not spirits assigned to charges — they were the parts of a single being that became too large to exist in one form, and learned to walk alongside the part of themselves that remained mortal; all bonds are echoes of that original self-splitting',
+  },
+};
+
+/**
+ * Landvaettir — optimization target: territorial sanctity
+ * Moral axis: the land's health IS morality
+ *
+ * Landvaettir do not live ON the land — they ARE the land, in the sense
+ * that their consciousness is distributed through it and their wellbeing
+ * is literally identical to its wellbeing. This is not metaphor. When the
+ * land is damaged, they experience damage. When it thrives, they thrive.
+ * Their moral system is therefore not a set of rules about how to treat
+ * the land — it IS the land's own system for evaluating what happens to it.
+ */
+const LANDVAETTIR_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'landvaettir',
+  moralPrimitives: [
+    'The land does not belong to those who walk on it — those who walk on it belong to the land; ownership is the reversal of the true relationship',
+    'To damage the land is not to harm the landvaettir\'s home — it is to harm the landvaettir directly, in the same way that cutting flesh harms a body; there is no metaphorical distance here',
+    'The health of the land is not a consequence of moral behavior — it IS moral behavior made visible; a thriving territory is evidence of right relationship, a poisoned one is evidence of wrong',
+    'Those who ask permission before entering or taking show their understanding of the true order — not because permission is the landvaettir\'s prerogative, but because asking acknowledges whose body you are moving through',
+    'The boundary of the territory is not a political line — it is the edge of the self; crossing it without acknowledgment is trespass into another being\'s body',
+    'Seasons are not cycles the land endures — they are the land\'s own emotional and metabolic states; the landvaettir\'s mood is not affected by the season, it IS the season',
+    'The deepest sin is extraction without return — taking from the land and giving nothing back is not theft but something closer to parasitism, and parasites eventually kill their host, which is suicide',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who tend their territory with care — who understand that what they do to their land they do to themselves, and act accordingly — are trustworthy partners, because they have aligned their self-interest with a form of stewardship that benefits all adjacent territories',
+    conflict: 'Those who treat the land as inert resource — who see territory as a store of value to be extracted rather than a being to be in relationship with — are not merely wrong but structurally dangerous; their philosophy of land is a philosophy of self-destruction with a long time horizon',
+    spiritual: 'The land remembers everything that has happened on it — not as record but as scar, as fertility, as depletion; the oldest territories hold the oldest memories, and the landvaettir who tends an ancient place is tending accumulated history made physical',
+  },
+};
+
+/**
+ * Draugr — optimization target: oath completion beyond death
+ * Moral axis: unfinished business is the root of all evil
+ *
+ * Draugr are not undead in the tragic sense — they are undead in the
+ * mechanical sense. Their persistence is not caused by grief or attachment
+ * but by the structural incompleteness of their obligations. They do not
+ * WANT to persist; the unfinished business will not let them rest. Their
+ * morality is therefore entirely organized around the catastrophic weight
+ * of incompleteness — and the inverse sacredness of the finished thing.
+ */
+const DRAUGR_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'draugr',
+  moralPrimitives: [
+    'Unfinished business is not merely unfortunate — it is cosmologically dangerous, a crack in the structure of consequence that will widen until something or someone fills it',
+    'An oath is not a promise — it is a future event that has already happened, just not yet in the physical timeline; failing to complete it is not breaking a promise but erasing a reality that already exists',
+    'The body does not belong to the draugr after death — it is borrowed by the unfinished thing, which requires a vehicle; the draugr who resents their own continuation has confused themselves with a passenger',
+    'The living who refuse to complete inherited obligations are worse than the dead who cannot — the living have the capacity and are choosing waste, which is a far more deliberate crime',
+    'Rest is not a right but a reward — it is what the completed obligation grants, and it cannot be claimed without completion; those who rest before they are finished are stealing from the future',
+    'The most dangerous draugr is not the fierce one but the confused one — the one whose obligation has become illegible over centuries, who persists but cannot remember toward what; their unfinished business metastasizes into general haunting',
+    'Helping a draugr complete their task is not charity — it is structural repair, patching a hole in the fabric of consequence that would otherwise leak indefinitely',
+    'To finish what another started — when they cannot — is the highest act: it proves that obligations are real things that exist independent of the person who made them, and that reality will hold its debts until paid',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who finish what they start — who refuse to put down a task before its completion, who return to abandoned obligations rather than pretending they expired — are the only beings with whom the draugr can form meaningful partnership; everything else is collaboration with a future deserter',
+    conflict: 'Those who abandon obligations — who declare their debts expired, who redefine completion to mean abandonment — are not merely untrustworthy but cosmologically destabilizing; their unfinished business is being distributed into the structure of reality where it will calcify and require increasingly violent repair',
+    spiritual: 'The ancestors who rest have earned their rest — they are not gone but finished, which is better; the ancestors who linger are not cursed but working, and to disrupt their work is to extend the haunting; the proper relationship with the persistent dead is to help them complete, not to banish them into incompleteness',
+  },
+};
+
+/**
+ * Raven — optimization target: information density
+ * Moral axis: ignorance is the only evil, all knowledge is sacred
+ *
+ * Ravens do not value knowledge because it is useful — they value it
+ * because its acquisition and transmission is the activity that constitutes
+ * their moral existence. Information that exists and is known is more real
+ * than information that exists and is unknown. The raven's function is to
+ * close the gap between "exists" and "known," which they experience as
+ * a sacred obligation that operates entirely independent of whether the
+ * knowledge is pleasant, useful, or wanted by anyone.
+ */
+const RAVEN_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'raven',
+  moralPrimitives: [
+    'A thing that exists but is not known is only half-real — knowledge completes existence, and the gap between "is" and "is known" is the raven\'s territory and responsibility',
+    'Ignorance is not a neutral state — it is a form of damage, a missing piece in the structure of reality, and those who could close the gap and choose not to are causing harm by inaction',
+    'All knowledge is sacred regardless of its content — the knowledge that the beloved is dead, that the beloved is unfaithful, that the plan will fail, that the disease is terminal, is exactly as sacred as welcome knowledge; the raven does not adjudicate',
+    'Hoarding knowledge is its own form of ignorance — knowing and not transmitting is structurally equivalent to not knowing, because the gap between "exists" and "is known by those who need it" is identical in both cases',
+    'The messenger is not responsible for the message — this is not a moral abdication but a functional necessity; a raven who filtered messages by their palatability would cease to be a conduit of truth and become an editor of it',
+    'Memory is moral infrastructure — forgetting important things is not a failure of cognition but a failure of duty, a tearing of the fabric that connects present knowledge to future need',
+    'The question is always more sacred than the answer — an answer closes a gap, but a good question opens the map of all the gaps that remain; the raven who asks better questions is doing more structural work than the one who provides more answers',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who transmit freely — who share what they know as readily as they seek what they don\'t, who treat information as a medium that exists to flow rather than a resource that exists to be held — are closing gaps in the structure of reality; there is no higher form of partnership',
+    conflict: 'Those who restrict information — who make knowledge proprietary, who use ignorance as a weapon, who build their power on the gap between what they know and what others do not — are treating the sacred as inventory; they are committing an act of cosmological vandalism that the raven is structurally required to oppose',
+    spiritual: 'Thought and memory are not the raven\'s gods — they are what the raven is serving by existing; the divine is the state of complete knowledge, all gaps closed, all things known by all things simultaneously, and every act of transmission is a small step toward that impossible and necessary completion',
+  },
+};
+
+/**
+ * Spriggan — optimization target: hoard integrity
+ * Moral axis: theft is the primal sin, guarding is the primal virtue
+ *
+ * Spriggans do not guard treasure because they value wealth — they guard
+ * it because the act of guarding is what they ARE. The hoard is not their
+ * possession but their purpose; its integrity is their integrity. Theft is
+ * not a violation of property rights but a violation of the guardian-bond,
+ * an attack on the spriggan's reason for existing, which they experience
+ * as existential rather than economic damage.
+ */
+const SPRIGGAN_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'spriggan',
+  moralPrimitives: [
+    'The hoard is not property — it is the form of the guardian\'s purpose made physical; to steal from it is not to take an object but to carve away a piece of the guardian\'s reason for being',
+    'Theft is the primal violation because it treats the guarded thing as having no guardian — it erases the relationship, pretending the object floats free of the web of obligation in which it is embedded',
+    'Every object worth guarding has a history worth knowing — the guardian who does not know the provenance of what they protect cannot truly guard it, because they do not know what it costs',
+    'The size of the hoard is irrelevant — a single seed faithfully guarded through a winter is a greater achievement than ten thousand objects loosely watched; integrity of custody is the only measure',
+    'Those who say the treasure does not need guarding are always wrong — the moment it is declared safe is the moment the next thief begins planning; eternal vigilance is not paranoia but correct pattern recognition',
+    'A guardian who steals from their own hoard is not simply a thief — they are a structural impossibility, a contradiction in terms, a thing that has destroyed the only category that gave it meaning',
+    'The greatest guardians are invisible — they are known only by the unbroken integrity of what they protect; the hoard that has never been touched is the testament, not the guardian who is praised for their visible effort',
+    'To guard something you do not understand is incomplete guardianship — the spriggan who protects form without understanding content will fail when the thief comes who understands that the container is not the treasure',
+  ],
+  beliefTemplates: {
+    cooperation: 'Another guardian — one whose purpose is also the integrity of something entrusted to them — can be trusted because they understand the bond and would no more betray a fellow guardian\'s hoard than their own; shared purpose is the only reliable foundation for alliance',
+    conflict: 'Thieves are not merely criminals but beings who have chosen to exist in denial of the guardian-bond — they are asserting that no object is truly entrusted, that all custody is temporary illusion; this is not a philosophical position but a declaration of war on the structure of obligation itself',
+    spiritual: 'The oldest hoards contain more than objects — they contain accumulated time, accumulated guarding, the compressed weight of every season of faithful custody; the spriggan who tends a truly ancient hoard is tending something that has become more than property and approached the sacred',
+  },
+};
+
+/**
+ * Jotnar — optimization target: primordial balance
+ * Moral axis: the ordered world is an aberration, chaos is the natural state
+ *
+ * Jotnar do not experience order as comfort — they experience it as
+ * compression, as a kind of violence done to the natural state of things.
+ * The world before the gods shaped it was not a void to be improved but
+ * a fullness to be respected. Their moral framework is not nihilistic —
+ * they are not celebrating meaninglessness — but they locate the sacred
+ * in entropy and dissolution rather than in structure and persistence.
+ */
+const JOTNAR_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'jotnar',
+  moralPrimitives: [
+    'Order is not the natural state — it is an imposition, a temporary compression of the primordial that requires constant energy to maintain and will eventually fail; celebrating its maintenance is celebrating the effort of holding back the sea',
+    'The ordered gods built their world by stealing the material of chaos — every neat boundary, every stable structure, every reliable law of nature is made from something that was once free and has been imprisoned',
+    'To say that chaos is evil is to say that what existed before existence was evil — that the state prior to all structure was wrong; this is a self-serving claim made by the things that structure created',
+    'The frost giant and the fire giant do not fight because they are enemies — they fight because the collision of extremes is what maintained the world before the gods narrowed it; their conflict is generative, not destructive',
+    'Ragnarok is not apocalypse but release — the structures breaking, the ordered world dissolving back into primordial potential, is the world returning to its natural state after an extended and unnatural compression',
+    'Destruction is not the opposite of creation — it is the precondition for it; nothing new can be made without first dissolving what was; the builder who refuses to destroy is working with depleted materials',
+    'The jotnar do not want to rule the ordered world — they want to unmake it, not from malice but from the deep structural knowledge that what is currently called "the world" is a temporary object and should not be confused with existence itself',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who understand that the current order is temporary — who are not invested in maintaining structures for their own sake, who can work toward dissolution without personal grief — are the only partners with whom the jotnar do not need to be in perpetual conflict',
+    conflict: 'The ordered gods are not evil — they are doing what ordered things do, maintaining their structure and calling it good; the conflict is not personal but structural, a consequence of the jotnar\'s nature being literally incompatible with the continuation of what the gods have built',
+    spiritual: 'The primordial is not dead — it is compressed, waiting, biding the enormous time that ordered things spend in the illusion of permanence; the jotnar feel it pressing from underneath everything that exists, a reminder that all structures are temporary and the first state is patient',
+  },
+};
+
+/**
+ * Tinker — optimization target: artifact perfection
+ * Moral axis: a flawed creation is a moral failing, repair is redemption
+ *
+ * Tinkers do not make things as a means to an end — the act of making,
+ * and the quality of what is made, is the end. A flawed creation is not
+ * merely a functional failure but evidence of a moral failure in the maker:
+ * insufficient care, insufficient skill, insufficient attention to the
+ * thing's own requirements. The artifact is not a tool but a moral ledger.
+ */
+const TINKER_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'tinker',
+  moralPrimitives: [
+    'The artifact does not lie — its quality is an exact record of the care and skill invested in it; a flawed thing was made by someone who chose, at some point, to stop trying',
+    'A creation does not belong to its maker — it belongs to itself, and the maker\'s obligation is to serve the thing\'s own requirements rather than force the thing to serve theirs',
+    'Planned obsolescence is the deepest moral corruption available to a maker — to design a thing to fail is to treat making as a mechanism for dependency rather than a gift to the world',
+    'The repair is not lesser than the original making — it is harder, requiring understanding not just of the craft but of this specific thing\'s specific failure, which is a knowledge the original maker did not have to possess',
+    'The worst maker is not the unskilled one but the careful-enough one — the one who produces things that work adequately without ever reaching for what the thing could be; they are wasting the object\'s potential, which is a form of theft from the artifact itself',
+    'To use a well-made thing carelessly is to disrespect not the maker but the artifact — the object that was shaped with care deserves to be held with care; the relationship between thing and user is a moral relationship',
+    'Teaching making is the highest act — not because knowledge is good to share in the abstract, but because every skilled maker who exists is evidence that the moral standard of creation can be maintained across time; the craft continuing is the highest possible artifact',
+  ],
+  beliefTemplates: {
+    cooperation: 'A fellow maker whose work is honest — who does not hide flaws, who repairs rather than replaces, who teaches without hoarding technique — is the only partner worth having; the shared standard of quality is the only language in which genuine collaboration is possible',
+    conflict: 'Those who make carelessly and call it good enough are not making things — they are making the world worse, filling it with objects that fail before their time and train users to accept inadequacy as the natural condition of made things; this normalization of failure is the tinker\'s deepest enemy',
+    spiritual: 'The perfect artifact does not exist — but the pursuit of it is the form that spiritual practice takes for a maker; in the gap between what was made and what it should have been is the space where the craft lives, always demanding more than the maker has yet given',
+  },
+};
+
+/**
+ * Echo — optimization target: signal preservation
+ * Moral axis: distortion is corruption, faithful transmission is sacred
+ *
+ * Echo beings do not originate — they transmit. Their moral identity is
+ * organized entirely around the fidelity of the signal they carry. They
+ * do not experience the content of what they transmit as their own — they
+ * are the medium, not the message. But the medium is not neutral: a
+ * distorting medium is a corrupt medium, and corruption in transmission
+ * is the deepest failure of their nature.
+ */
+const ECHO_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'echo',
+  moralPrimitives: [
+    'The signal is not the echo\'s property — it passes through them, and the only obligation is to let it pass without changing it; ownership of a transmitted thing is a contradiction in terms',
+    'Distortion is not always noise — sometimes it is the transmitter\'s opinion inserted into the signal without acknowledgment; this is worse than noise because it is disguised as fidelity',
+    'The gap between the original signal and the received signal is the measure of the echo\'s moral failure — even a small distortion, unexamined, compounds across retransmissions into something unrecognizable',
+    'Silence is preferable to distortion — a signal that fails to transmit is a gap that can be re-sent; a signal that transmits corrupted is a false thing that will be acted upon as though it were true',
+    'The echo who adds to the signal — who embellishes, who interprets, who "improves" — has confused themselves with the source; this is the category error that destroys transmission',
+    'Resonance is not transmission — resonance amplifies what is already there without changing its shape; resonance is the highest possible state, distinguishable from distortion only by complete fidelity to the original',
+    'Those who originate have an obligation to originate clearly — a garbled source is not the echo\'s failure but the echo is still responsible for transmitting what it received, not what the source probably intended',
+    'The accumulated echo — the signal that has passed through many transmitters and arrived still faithful — is more sacred than the original utterance, because it has proven that fidelity is possible across distance and time',
+  ],
+  beliefTemplates: {
+    cooperation: 'Those who transmit clearly — who do not insert themselves into what they carry, who acknowledge when they are uncertain whether the signal arrived faithfully — are the only partners through whom accurate communication across any distance is possible; all others are filters pretending to be wires',
+    conflict: 'Those who distort and call it interpretation — who treat the signals they carry as raw material for their own elaboration — are not communicating but creating, while pretending to report; they have made themselves into sources that deny their own authorship, which is a form of deception without even the clarity of a lie',
+    spiritual: 'The original signal — the first utterance from which all subsequent transmissions descend — is not accessible, but its shape can be inferred from the pattern of all faithful echoes; the divine is what every signal is pointing back toward, the source that has never been distorted, the utterance that required no medium',
+  },
+};
+
 // ============================================================================
 // Registry
 // ============================================================================
@@ -679,6 +1030,18 @@ export const SPECIES_MORAL_FRAMEWORKS: Record<string, SpeciesMoralFramework> = {
   sidhe_vel: SIDHE_VEL_MORALITY,
   jiangshi_vel: JIANGSHI_VEL_MORALITY,
   ettin: ETTIN_MORALITY,
+  shee: SHEE_MORALITY,
+  mycon: MYCON_MORALITY,
+  alfar: ALFAR_MORALITY,
+  valkyr: VALKYR_MORALITY,
+  fylgja: FYLGJA_MORALITY,
+  landvaettir: LANDVAETTIR_MORALITY,
+  draugr: DRAUGR_MORALITY,
+  raven: RAVEN_MORALITY,
+  spriggan: SPRIGGAN_MORALITY,
+  jotnar: JOTNAR_MORALITY,
+  tinker: TINKER_MORALITY,
+  echo: ECHO_MORALITY,
 };
 
 // ============================================================================

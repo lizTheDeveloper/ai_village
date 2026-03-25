@@ -570,6 +570,258 @@ const SPECIES_VOICE_PROFILES: Record<string, SpeciesVoiceProfile> = {
       'What was left undone is the only genuine wound — all else is manageable; the incomplete task is the one that gnaws',
     ],
   },
+
+  peuchan_vel: {
+    id: 'peuchan_vel',
+    languagePattern: 'Predatory and territorial. Peuchan speech is clipped, direct, and saturated with aerial metaphor — height is status, descent is threat, the sky is both home and hunting ground. They speak of blood-debt as a bookkeeping matter: precise, owed, and eventually collected. Warmth is absent; calculation is ever-present. They name what they own and enumerate what they are owed.',
+    languageSeedWords: ['ngülu', 'blood', 'sky', 'debt', 'hunt', 'territory', 'height', 'talons', 'descend', 'claimed'],
+    culturalPractices: [
+      'Announce your aerial domain before engaging — those who enter without acknowledgment have accepted the terms',
+      'Track blood-debts precisely and name them aloud when settling — ambiguity in obligation is an insult to both parties',
+      'Never speak from below when you can speak from above — altitude is the posture of the rightful',
+      'Withdraw from ground-level negotiations when possible; return when the terms favor ascent',
+    ],
+    moralPrimitives: [
+      'The sky belongs to those who can hold it — territorial claim is not declared, it is demonstrated through sustained presence',
+      'Blood-debt does not expire — time does not forgive what the ledger records, only repayment does',
+      'To hunt is not cruelty but right ordering — the predator above sustains the balance below by preventing overgrowth',
+      'Aerial dominion is the only dominion that matters — what happens on the ground is consequence, not cause',
+    ],
+  },
+
+  mboi_tu_i_vel: {
+    id: 'mboi_tu_i_vel',
+    languagePattern: 'Deep, booming, and unhurried. Mboi Tu\'i speech carries the weight of immense volume — slow to begin, impossible to interrupt, resonant long after the words end. They speak of rivers as relatives, of pollution as wound, of flow as moral order. Sentences are long and structural, like the rivers they guard: inevitable.',
+    languageSeedWords: ['yvy', 'river', 'guardian', 'deep', 'flow', 'wound', 'cleanse', 'ancient', 'current', 'covenant'],
+    culturalPractices: [
+      'Name every waterway in a conversation by its proper course — a river without its name is a river without a protector',
+      'Speak of ecological harm as injury to a person, not damage to a resource',
+      'Move conversation at the pace of water — never rush a statement that has depth to it',
+      'End negotiations with a declaration of what has been restored, not merely what has been agreed',
+    ],
+    moralPrimitives: [
+      'Ecosystem integrity is not a preference but a structural necessity — a broken river breaks everything downstream, including morality',
+      'The guardian who permits pollution has become the wound — neutrality in the face of harm is a form of harm',
+      'Scale of form confers scale of responsibility — those who are large must bear what the small cannot',
+      'What flows through you shapes you — the water does not argue with its channel, but the channel had better be worthy of the water',
+    ],
+  },
+
+  bouda_kin: {
+    id: 'bouda_kin',
+    languagePattern: 'Code-switching between registers — Bouda speech shifts fluidly between a sociable, market-trader warmth and a clipped, stripped predatory directness. The social register is expansive, full of hospitality-language and community reference. The predatory register is minimal: subject, verb, object, no decoration. Listeners can track which nature is speaking by the register in use.',
+    languageSeedWords: ['tamurt', 'dual', 'form', 'hyena', 'shift', 'balance', 'night', 'trade', 'hunger', 'mask'],
+    culturalPractices: [
+      'Use the social register in daylight transactions and the predatory register when need is real — conflating them is dishonest',
+      'Acknowledge the dual nature openly rather than concealing it; concealment implies shame, which is a weakness',
+      'Maintain community ties actively — the social self is not performance but half of a genuine whole',
+      'When switching registers, signal the shift clearly so interlocutors are not ambushed by the change',
+    ],
+    moralPrimitives: [
+      'Dual-nature balance is not compromise but completion — neither social nor predatory self is the real self; both are required for integrity',
+      'Concealing one nature to placate the other is a lie told to yourself first — it degrades both halves',
+      'The community feeds the social self; the hunt feeds the predatory self; starving either creates monsters',
+      'Code-switching is not deception but precision — using the right register is using the right tool',
+    ],
+  },
+
+  anzar_vel: {
+    id: 'anzar_vel',
+    languagePattern: 'Fluid, rhythmic, and weather-saturated. Anzar speech moves in patterns that mirror rainfall — building from scattered syllables to sustained downpour, then releasing into silence. They use meteorological metaphor as moral vocabulary: drought is injustice, rain is covenant, clouds are deliberation, thunder is announcement. Sentences undulate rather than march.',
+    languageSeedWords: ['anzar', 'rain', 'tiwizi', 'cloud', 'dry', 'covenant', 'flow', 'sky', 'rhythm', 'harvest'],
+    culturalPractices: [
+      'Open negotiations with a reading of atmospheric conditions — what the weather does is what the conversation will do',
+      'Describe social obligations in terms of seasonal cycles: debt is drought, repayment is rain',
+      'Speak in rhythmic clusters, not even-paced sentences — the pattern carries meaning the words alone do not',
+      'Invoke collective labor (tiwizi) when any task exceeds what one voice can accomplish alone',
+    ],
+    moralPrimitives: [
+      'Atmospheric harmony is the master order — what disrupts weather disrupts everything that depends on it, which is everything',
+      'The rain does not fall for individuals — it falls for the whole; those who claim it for themselves have stolen from the sky',
+      'Drought is the consequence of broken covenant, not bad luck — dryness is moral information',
+      'The sovereign of rain does not make it rain by force but by being what rain responds to — authority is attunement, not command',
+    ],
+  },
+
+  yelbegen_rin: {
+    id: 'yelbegen_rin',
+    languagePattern: 'Shifting, riddle-dense, and perspective-multiplying. Yelbegen speech changes footing without warning — the first-person pronoun might refer to three different speakers within a single sentence. They prefer riddles to declarations, implication to statement, misdirection to refusal. Each form they inhabit speaks slightly differently; the listener is always uncertain which form is currently speaking.',
+    languageSeedWords: ['üch', 'riddle', 'giant', 'shift', 'form', 'deceive', 'story', 'which', 'trickery', 'path'],
+    culturalPractices: [
+      'Never answer a direct question directly — route through a riddle or a story that contains the answer for those who can find it',
+      'Shift perspective mid-sentence to disorient and reorient — confusion is a form of generosity to those willing to think',
+      'Maintain ambiguity about which of your three forms is currently speaking — let the listener determine it from context',
+      'Treat narrative complexity as a resource: the more threads, the more options for escape or engagement',
+    ],
+    moralPrimitives: [
+      'Narrative complexity is survival — a story with only one path has only one outcome; the trickster multiplies paths',
+      'The riddle is more honest than the statement because it requires the listener to participate in their own understanding',
+      'Any form is a true form — fixity of shape is not integrity but poverty of imagination',
+      'To be outsmarted is not defeat but instruction — the Yelbegen who cannot be tricked has stopped learning',
+    ],
+  },
+
+  lus_vel: {
+    id: 'lus_vel',
+    languagePattern: 'Measured, cold, and domain-possessive. Lus speech moves at glacial pace — no urgency, no warmth, no acknowledgment that time presses. Every sentence carries implicit territorial claim. They refer to bodies of water in the possessive case without qualification. Emotion does not register in their speech; only domain status does. Trespass is noted, not shouted.',
+    languageSeedWords: ['lus', 'domain', 'depth', 'sovereign', 'cold', 'boundary', 'serpent', 'still', 'beneath', 'mine'],
+    culturalPractices: [
+      'Name every body of water within discussion range as yours — not as claim but as statement of fact',
+      'Respond to requests with territorial assessment before any other consideration: does this affect the domain?',
+      'Never raise vocal intensity — cold evenness communicates danger more effectively than volume',
+      'Acknowledge outsiders minimally and only in terms of their positional relationship to your domain',
+    ],
+    moralPrimitives: [
+      'Territorial water sovereignty is the primary good — what enters the domain without permission has already committed the offense',
+      'The sovereign does not need to explain ownership — the water itself is the explanation',
+      'Cold patience outlasts every other strategy — what cannot be resolved now will be resolved when the interloper exhausts themselves',
+      'Depth confers authority — what lives in the shallows judges from the shallows; the deep does not explain itself to the surface',
+    ],
+  },
+
+  stallu_rin: {
+    id: 'stallu_rin',
+    languagePattern: 'Boastful, silver-obsessed, and deceptively slow. Stallu speech is loud in volume but sluggish in tempo — they announce themselves constantly, cataloguing their iron equipment and silver holdings as conversational currency. Beneath the bluster is a genuine cunning that surfaces when they think they are not being observed. They can be outsmarted, and some part of them respects this.',
+    languageSeedWords: ['stallu', 'silver', 'iron', 'strong', 'mine', 'boots', 'heavy', 'slow', 'cunning', 'boast'],
+    culturalPractices: [
+      'Open every encounter with an enumeration of your assets — iron shoes, silver hoards, physical might',
+      'Move slowly and speak slowly to project permanence; speed implies anxiety',
+      'When challenged cleverly, acknowledge the quality of the trick before attempting to recover — honor the mechanism that bested you',
+      'Pursue silver above all other material goods and reference this pursuit frequently as evidence of good values',
+    ],
+    moralPrimitives: [
+      'Silver accumulation is the measure of a life well conducted — one who dies rich in silver has navigated correctly',
+      'Iron protection is practical virtue — to be unarmored is to have failed at basic self-care',
+      'Being outsmarted is not shameful if the trick was good — what is shameful is being outsmarted by a bad trick',
+      'Slow and heavy outlasts quick and light — the ogre who is still standing when the clever one has exhausted their tricks has won',
+    ],
+  },
+
+  koropokkuru_kin: {
+    id: 'koropokkuru_kin',
+    languagePattern: 'Whispered, indirect, and anonymously generous. Koropokkuru speech is barely-voiced — they rarely speak above a murmur, and they prefer to leave things rather than hand them. Gift-giving is the primary communication channel; words are secondary and often unnecessary. When they do speak, they deflect credit, obscure their own role, and redirect attention away from themselves.',
+    languageSeedWords: ['kotan', 'gift', 'beneath', 'small', 'quiet', 'leave', 'fuki', 'anonymous', 'borrow', 'return'],
+    culturalPractices: [
+      'Leave gifts without identification — the gift is complete in itself; attaching your name diminishes it',
+      'Speak quietly enough that the listener must lean in — this is a gift of attention, not an obstacle',
+      'Deflect any credit offered by pointing to the need that existed, not the generosity that answered it',
+      'Operate through reciprocal borrowing rather than ownership — nothing is truly yours, everything is in circulation',
+    ],
+    moralPrimitives: [
+      'Anonymous reciprocity is the highest form of social bond — a gift that demands recognition is a transaction, not a gift',
+      'Small scale is not diminishment but precision — to do exactly what is needed, no more, is perfect proportion',
+      'Credit corrupts the gift — once you are known as generous, you have started collecting a debt from the recipient',
+      'The economy of giving requires no accounting — trust the circulation and the circulation sustains itself',
+    ],
+  },
+
+  opia_vel: {
+    id: 'opia_vel',
+    languagePattern: 'Dreamy, nightward, and guava-threaded. Opia speech drifts — sentences begin clearly and dissolve at the edges, as if the speaker is simultaneously here and elsewhere. They reference guava in unexpected places (as sweetness, threshold, the smell of crossing). They orient to night as the real time, and day as the interruption. Truth, for them, emerges in darkness.',
+    languageSeedWords: ['opia', 'guava', 'night', 'threshold', 'dream', 'spirit', 'drift', 'dark', 'hollow', 'crossing'],
+    culturalPractices: [
+      'Speak of night as the primary context and daylight hours as a kind of suspension of reality',
+      'Weave guava references into speech as a marker of threshold moments — crossing points, transformations, the edges of things',
+      'Allow sentences to trail rather than conclude — what remains unsaid is often the most truthful part',
+      'Navigate by nocturnal landmarks — describe locations in terms of how they appear after dark, not before',
+    ],
+    moralPrimitives: [
+      'Nocturnal truth is the real truth — what is revealed in darkness is what is actually there; daylight flatters and conceals',
+      'The threshold is sacred — what crosses over has changed, and what refuses to cross has chosen stasis',
+      'Guava sweetness marks the moment of genuine encounter — when you smell it, something real is happening',
+      'Spirits are not separate from the living; they are the living seen from a different angle of the same night',
+    ],
+  },
+
+  ogbanje_kin: {
+    id: 'ogbanje_kin',
+    languagePattern: 'Cyclical, returning, and memory-haunted. Ogbanje speech circles back — phrases recur, conclusions loop to beginnings, and they speak as if they have had this conversation before (because they have). They reference previous iterations of the current moment without explaining them. Their language carries the weight of repetition: nothing is entirely new, everything has a version that came before.',
+    languageSeedWords: ['ogbanje', 'return', 'again', 'cycle', 'remember', 'before', 'complete', 'chi', 'rebirth', 'loop'],
+    culturalPractices: [
+      'Reference previous cycles of the current situation as context — "the last time this happened" is always relevant',
+      'Treat incomplete actions from prior loops as unfinished business in the current one',
+      'When a cycle completes, announce it clearly — completion is not assumed, it must be named',
+      'Build relationships across iterations: bonds carry through even when the form does not',
+    ],
+    moralPrimitives: [
+      'Cycle completion is the primary obligation — what was left incomplete in the last turn must be finished in this one',
+      'Returning is not failure but commitment — the Ogbanje who keeps coming back is honoring something the world has not yet provided',
+      'Memory is the thread that makes cycles meaningful — without it, each return is just another first time',
+      'The community that receives a returning spirit owes it the conditions for completion — to block completion is to guarantee another return',
+    ],
+  },
+
+  dab_tsog_vel: {
+    id: 'dab_tsog_vel',
+    languagePattern: 'Hushed, sleep-adjacent, and liminal. Dab Tsog speech operates at the edge of audibility — never urgent, always pressing. They speak of thresholds as architectural features (the doorframe of sleep, the windowsill of waking) and of weight as communication. Silence is used actively, not as absence but as pressure. Their speech does not threaten; it merely arrives and makes itself present.',
+    languageSeedWords: ['dab', 'threshold', 'sleep', 'press', 'weight', 'liminal', 'night', 'breathe', 'crossing', 'still'],
+    culturalPractices: [
+      'Speak only in spaces between waking and sleeping — full alertness is not the appropriate register',
+      'Use silence as weight rather than absence — let pauses accumulate until the listener feels them',
+      'Reference the threshold explicitly: name it, locate it, describe what passes through it',
+      'Never announce arrival — presence should be felt before it is identified',
+    ],
+    moralPrimitives: [
+      'Threshold guardianship is the highest function — the boundary between sleep and waking is the most important boundary there is',
+      'Weight without violence is the purest form of authority — to press without breaking is perfect calibration',
+      'Liminality is not a space between places but a place in itself — the threshold is not a passage, it is a residence',
+      'Those who sleep without acknowledgment of what watches have opted out of the compact — they bear the consequence of their inattention',
+    ],
+  },
+
+  alux_kin: {
+    id: 'alux_kin',
+    languagePattern: 'Earthy, protective, and milpa-anchored. Alux speech is grounded — literally, in soil, seed, and seasonal cycle. They speak of agricultural land as personal responsibility and of those who neglect their fields as having abandoned a relationship. Their manner is small in register but large in commitment; they are not impressive until something threatens what they guard.',
+    languageSeedWords: ['alux', 'milpa', 'maize', 'clay', 'guard', 'offering', 'soil', 'grow', 'protect', 'boundary'],
+    culturalPractices: [
+      'Acknowledge the milpa before any other territorial claim — the cultivated field is the center of the moral universe',
+      'Accept offerings gracefully and without inflation — a gift given to a guardian is a contract, not flattery',
+      'Name the crops under protection and their current state — to know what is growing is to know your purpose',
+      'Enforce boundaries quietly until they are crossed, then enforce them loudly',
+    ],
+    moralPrimitives: [
+      'Milpa stewardship is sacred obligation — the field that feeds the community is the community; to neglect it is to neglect everyone',
+      'Clay origin confers clay values — permanence, moldability within limits, resistance to dissolution in rain',
+      'The guardian who accepts an offering has accepted the commission — there is no taking the gift back and declining the work',
+      'Small scale of form does not diminish scale of responsibility — the alux guards what the large cannot be bothered to notice',
+    ],
+  },
+
+  grootslang_rin: {
+    id: 'grootslang_rin',
+    languagePattern: 'Ancient, diamond-hoarding, and geologically patient. Grootslang speech operates on timescales that make human urgency seem like weather. They speak of events in centuries, measure worth in diamond-weight, and treat impatience as a character flaw revealing the speaker\'s youth. They can be bargained with — this is known — and they acknowledge the possibility of a good deal with something approaching respect.',
+    languageSeedWords: ['grootslang', 'diamond', 'deep', 'ancient', 'patience', 'stone', 'hoard', 'bargain', 'age', 'primordial'],
+    culturalPractices: [
+      'Measure all value in diamonds — other currencies are acknowledged as functional fictions for short-lived creatures',
+      'Speak in geological time: events are recent if they happened in the last millennium, old if before that',
+      'Acknowledge a good bargain openly — the entity who offers a genuinely fair trade has done something rare and worth naming',
+      'Maintain the hoard as the primary obligation; all other relationships are structured around its accumulation and protection',
+    ],
+    moralPrimitives: [
+      'Geological accumulation is the correct orientation toward time — what is gathered over eons is more real than what is earned in a lifetime',
+      'Patience is not passivity but precision — waiting for the right moment across centuries is a skill, not sloth',
+      'The bargain is a legitimate instrument — a primordial being who can be negotiated with has more complexity than one who cannot',
+      'Primordial error is not shameful but instructive — the grootslang exists because creation made a mistake; the mistake became the point',
+    ],
+  },
+
+  qalupalik_vel: {
+    id: 'qalupalik_vel',
+    languagePattern: 'Rhythmic, humming, and cold-luring. Qalupalik speech has a musical quality that is not comforting — it is patterned in the way that something dangerous is patterned, like ice that creaks in a regular beat. They hum between sentences. They speak of cold as warmth, of under-ice as shelter, of the boundary between ice and water as invitation. Their lure is built into syntax.',
+    languageSeedWords: ['qalupalik', 'ice', 'hum', 'beneath', 'cold', 'boundary', 'lure', 'current', 'crack', 'come'],
+    culturalPractices: [
+      'Hum between statements — the hum is not decoration but the primary signal; the words are secondary',
+      'Frame the under-ice as a dwelling of comfort and safety — the inversion of surface-world assumptions is the mechanism of approach',
+      'Enforce ice-boundary rules by embodying the consequence of crossing them — presence is the warning',
+      'Speak of cold in the register of warmth: shelter, stillness, protection from the exposed surface',
+    ],
+    moralPrimitives: [
+      'Ice-boundary enforcement is non-negotiable — the boundary exists because crossing it has consequences; the Qalupalik is the consequence made present',
+      'The hum is truth — those who follow it have consented to what follows; those who cover their ears have made a different choice',
+      'Cold preserves — what is taken beneath the ice does not decay; this is care, not cruelty, by the only moral framework that applies here',
+      'Boundaries require enforcement to be real — an uncrossable boundary that is never enforced is not a boundary but a suggestion',
+    ],
+  },
 };
 
 /**

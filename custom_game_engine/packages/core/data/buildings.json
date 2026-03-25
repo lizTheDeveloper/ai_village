@@ -1962,6 +1962,574 @@
         "door": "runic_crystal"
       },
       "capacity": 6
+    },
+    {
+      "id": "jotnar_frost_hall",
+      "name": "Frost Hall of the Giants",
+      "description": "A massive residential hall carved from glacial ice-stone, where frost giants sleep in cavernous rooms shaped by primordial cold. The walls groan with ancient memories of the first winter.",
+      "category": "residential",
+      "tier": 1,
+      "width": 8,
+      "height": 7,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 70
+        },
+        {
+          "resourceId": "crystal",
+          "amountRequired": 30
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 60,
+      "functionality": [
+        {
+          "type": "sleeping",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "########",
+        "#......#",
+        "#......#",
+        "#......#",
+        "#......#",
+        "#......#",
+        "###DD###"
+      ],
+      "materials": {
+        "wall": "ice_stone",
+        "floor": "frozen_granite",
+        "door": "ice_stone"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "jotnar_forge_pit",
+      "name": "Primordial Forge Pit",
+      "description": "A sunken forge of volcanic basalt where fire giants channel the world's deep heat to smelt metals that no mortal flame could touch. Steam and sulphur fill the air.",
+      "category": "industrial",
+      "tier": 1,
+      "width": 7,
+      "height": 6,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 60
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 40
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 50,
+      "functionality": [
+        {
+          "type": "crafting",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#######",
+        "#.....#",
+        "#..F..#",
+        "#.....#",
+        "#.....#",
+        "###D###"
+      ],
+      "materials": {
+        "wall": "volcanic_basalt",
+        "floor": "obsidian",
+        "door": "volcanic_basalt"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "jotnar_rune_circle",
+      "name": "Rune Circle of the Old Powers",
+      "description": "A ring of towering standing stones etched with primordial runes predating written language. Jotnar gather here to commune with elemental forces and invoke the memories of creation.",
+      "category": "spiritual",
+      "tier": 2,
+      "width": 7,
+      "height": 7,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 80
+        },
+        {
+          "resourceId": "crystal",
+          "amountRequired": 40
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 70,
+      "functionality": [
+        {
+          "type": "worship",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#S...S#",
+        "S.....S",
+        "#.....#",
+        "...*...",
+        "#.....#",
+        "S.....S",
+        "#S...S#"
+      ],
+      "materials": {
+        "wall": "standing_stone",
+        "floor": "ancient_earth",
+        "door": "standing_stone"
+      },
+      "capacity": 6
+    },
+    {
+      "id": "jotnar_war_cairn",
+      "name": "War Cairn of the Frost-Blooded",
+      "description": "A fortress of glacial stone where Jotnar warriors train in the ancient combat arts of giants. The cairn marks both a place of battle-readiness and a monument to fallen champions.",
+      "category": "military",
+      "tier": 2,
+      "width": 8,
+      "height": 6,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 70
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 50
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 65,
+      "functionality": [
+        {
+          "type": "training",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "########",
+        "#......#",
+        "#......#",
+        "#......#",
+        "#......#",
+        "###DD###"
+      ],
+      "materials": {
+        "wall": "glacial_stone",
+        "floor": "packed_ice",
+        "door": "glacial_stone"
+      },
+      "capacity": 6
+    },
+    {
+      "id": "jotnar_primordial_throne",
+      "name": "The Primordial Throne",
+      "description": "A colossal seat of elemental power where the mightiest Jotnar chieftain communes directly with the forces that shaped the world. The throne pulses with the heartbeat of creation itself.",
+      "category": "spiritual",
+      "tier": 3,
+      "width": 8,
+      "height": 8,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 80
+        },
+        {
+          "resourceId": "crystal",
+          "amountRequired": 60
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 40
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 80,
+      "functionality": [
+        {
+          "type": "worship",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "##....##",
+        "#......#",
+        "#......#",
+        "#..T..#",
+        "#......#",
+        "#......#",
+        "#......#",
+        "###DD###"
+      ],
+      "materials": {
+        "wall": "elemental_stone",
+        "floor": "world_granite",
+        "door": "elemental_stone"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "dragon_time_anchor",
+      "name": "Anchor of Fixed Moments",
+      "description": "A spiritual nexus of crystallized time where dragons worship the immutable points in history. The structure exists simultaneously across multiple temporal strata, its walls shimmering between past and present.",
+      "category": "spiritual",
+      "tier": 2,
+      "width": 6,
+      "height": 6,
+      "resourceCost": [
+        {
+          "resourceId": "crystal",
+          "amountRequired": 60
+        },
+        {
+          "resourceId": "stone",
+          "amountRequired": 30
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 60,
+      "functionality": [
+        {
+          "type": "worship",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "######",
+        "#....#",
+        "#.T..#",
+        "#....#",
+        "#....#",
+        "##D###"
+      ],
+      "materials": {
+        "wall": "crystallized_time",
+        "floor": "temporal_glass",
+        "door": "crystallized_time"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "dragon_hoard_nexus",
+      "name": "Hoard Nexus of Accumulated Aeons",
+      "description": "A vast commercial vault sheathed in dragonscale, where dragons store not merely gold but collected experiences, stolen futures, and the compressed wealth of collapsed timelines.",
+      "category": "commercial",
+      "tier": 2,
+      "width": 7,
+      "height": 7,
+      "resourceCost": [
+        {
+          "resourceId": "metal",
+          "amountRequired": 70
+        },
+        {
+          "resourceId": "crystal",
+          "amountRequired": 50
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 65,
+      "functionality": [
+        {
+          "type": "storage",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#######",
+        "#.....#",
+        "#.....#",
+        "#..G..#",
+        "#.....#",
+        "#.....#",
+        "###D###"
+      ],
+      "materials": {
+        "wall": "dragonscale",
+        "floor": "gold_vein",
+        "door": "dragonscale"
+      },
+      "capacity": 6
+    },
+    {
+      "id": "dragon_memory_spire",
+      "name": "Memory Spire of Ten Dimensions",
+      "description": "A crystalline tower of memory-crystal that stores the accumulated knowledge of dragon centuries. Researchers here access not just recorded fact but living experiential memory encoded in the crystal lattice.",
+      "category": "industrial",
+      "tier": 2,
+      "width": 5,
+      "height": 7,
+      "resourceCost": [
+        {
+          "resourceId": "crystal",
+          "amountRequired": 80
+        },
+        {
+          "resourceId": "stone",
+          "amountRequired": 30
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 70,
+      "functionality": [
+        {
+          "type": "research",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "#####",
+        "#...#",
+        "#.M.#",
+        "#...#",
+        "#...#",
+        "#...#",
+        "##D##"
+      ],
+      "materials": {
+        "wall": "memory_crystal",
+        "floor": "resonant_glass",
+        "door": "memory_crystal"
+      },
+      "capacity": 4
+    },
+    {
+      "id": "dragon_roost",
+      "name": "Roost of the Eternal Flame",
+      "description": "A vast obsidian residential chamber built to the scale of dragons, where the great wyrms sleep atop beds of volcanic glass, their dreams bleeding into the surrounding stone as temporal echoes.",
+      "category": "residential",
+      "tier": 1,
+      "width": 8,
+      "height": 8,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 60
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 30
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 55,
+      "functionality": [
+        {
+          "type": "sleeping",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": false,
+      "layout": [
+        "########",
+        "#......#",
+        "#......#",
+        "#......#",
+        "#......#",
+        "#......#",
+        "#......#",
+        "###DD###"
+      ],
+      "materials": {
+        "wall": "obsidian",
+        "floor": "volcanic_glass",
+        "door": "obsidian"
+      },
+      "capacity": 2
+    },
+    {
+      "id": "dragon_council_aerie",
+      "name": "Council Aerie of the Ancient Accord",
+      "description": "A monumental military council chamber of elder-stone where dragon elders gather to deliberate war, judge violations of the Ancient Accord, and train the next generation of wyrm-warriors in the arts of temporal combat.",
+      "category": "military",
+      "tier": 3,
+      "width": 8,
+      "height": 8,
+      "resourceCost": [
+        {
+          "resourceId": "stone",
+          "amountRequired": 80
+        },
+        {
+          "resourceId": "crystal",
+          "amountRequired": 60
+        },
+        {
+          "resourceId": "metal",
+          "amountRequired": 40
+        }
+      ],
+      "techRequired": [],
+      "terrainRequired": [],
+      "terrainForbidden": [
+        "water"
+      ],
+      "unlocked": true,
+      "buildTime": 80,
+      "functionality": [
+        {
+          "type": "training",
+          "params": {}
+        }
+      ],
+      "canRotate": true,
+      "rotationAngles": [
+        0,
+        90,
+        180,
+        270
+      ],
+      "snapToGrid": true,
+      "requiresFoundation": true,
+      "layout": [
+        "########",
+        "#......#",
+        "#......#",
+        "#..C..#",
+        "#......#",
+        "#......#",
+        "#......#",
+        "###DD###"
+      ],
+      "materials": {
+        "wall": "elder_stone",
+        "floor": "age_worn_granite",
+        "door": "elder_stone"
+      },
+      "capacity": 6
     }
   ]
 }

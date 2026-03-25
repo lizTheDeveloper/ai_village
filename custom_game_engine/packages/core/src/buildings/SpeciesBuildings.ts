@@ -111,6 +111,42 @@ export const ALL_DVERGAR_BUILDINGS = [
 ];
 
 // =============================================================================
+// JOTNAR BUILDINGS - Massive primordial architecture, ice and fire
+// =============================================================================
+
+export const JOTNAR_FROST_HALL: BuildingBlueprint = getBuilding('jotnar_frost_hall');
+export const JOTNAR_FORGE_PIT: BuildingBlueprint = getBuilding('jotnar_forge_pit');
+export const JOTNAR_RUNE_CIRCLE: BuildingBlueprint = getBuilding('jotnar_rune_circle');
+export const JOTNAR_WAR_CAIRN: BuildingBlueprint = getBuilding('jotnar_war_cairn');
+export const JOTNAR_PRIMORDIAL_THRONE: BuildingBlueprint = getBuilding('jotnar_primordial_throne');
+
+export const ALL_JOTNAR_BUILDINGS = [
+  JOTNAR_FROST_HALL,
+  JOTNAR_FORGE_PIT,
+  JOTNAR_RUNE_CIRCLE,
+  JOTNAR_WAR_CAIRN,
+  JOTNAR_PRIMORDIAL_THRONE,
+];
+
+// =============================================================================
+// DRAGON BUILDINGS - Post-temporal 10D architecture, time and memory
+// =============================================================================
+
+export const DRAGON_TIME_ANCHOR: BuildingBlueprint = getBuilding('dragon_time_anchor');
+export const DRAGON_HOARD_NEXUS: BuildingBlueprint = getBuilding('dragon_hoard_nexus');
+export const DRAGON_MEMORY_SPIRE: BuildingBlueprint = getBuilding('dragon_memory_spire');
+export const DRAGON_ROOST: BuildingBlueprint = getBuilding('dragon_roost');
+export const DRAGON_COUNCIL_AERIE: BuildingBlueprint = getBuilding('dragon_council_aerie');
+
+export const ALL_DRAGON_BUILDINGS = [
+  DRAGON_TIME_ANCHOR,
+  DRAGON_HOARD_NEXUS,
+  DRAGON_MEMORY_SPIRE,
+  DRAGON_ROOST,
+  DRAGON_COUNCIL_AERIE,
+];
+
+// =============================================================================
 // SPECIES COLLECTIONS
 // =============================================================================
 
@@ -123,6 +159,8 @@ export const BUILDINGS_BY_SPECIES = {
   angelic: ALL_ANGELIC_BUILDINGS,
   high_fae: ALL_HIGH_FAE_BUILDINGS,
   dvergar: ALL_DVERGAR_BUILDINGS,
+  jotnar: ALL_JOTNAR_BUILDINGS,
+  dragon: ALL_DRAGON_BUILDINGS,
 };
 
 /**
@@ -134,6 +172,8 @@ export const ALL_SPECIES_BUILDINGS = [
   ...ALL_ANGELIC_BUILDINGS,
   ...ALL_HIGH_FAE_BUILDINGS,
   ...ALL_DVERGAR_BUILDINGS,
+  ...ALL_JOTNAR_BUILDINGS,
+  ...ALL_DRAGON_BUILDINGS,
 ];
 
 /**
@@ -156,6 +196,12 @@ export function getBuildingsForSpecies(species: string): BuildingBlueprint[] {
   }
   if (normalized.includes('dvergar') || normalized.includes('dwarf')) {
     return ALL_DVERGAR_BUILDINGS;
+  }
+  if (normalized.includes('jotnar') || normalized.includes('giant') || normalized.includes('jotunn')) {
+    return ALL_JOTNAR_BUILDINGS;
+  }
+  if (normalized.includes('dragon')) {
+    return ALL_DRAGON_BUILDINGS;
   }
 
   return [];
