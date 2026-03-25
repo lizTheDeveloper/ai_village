@@ -3319,6 +3319,9 @@ async function main() {
   metricsEl.setAttribute('data-fps', '0');
   document.body.appendChild(metricsEl);
 
+  // Always-visible PWYC heart button — mount immediately, no game dependencies
+  import('./ui/PWYCButton').then(({ PWYCButton }) => new PWYCButton()).catch(() => {});
+
   // Track intervals for cleanup to prevent memory leaks
   const intervalIds: ReturnType<typeof setInterval>[] = [];
 
@@ -5734,9 +5737,7 @@ async function main() {
   const { initSupportPrompt } = await import('./ui/supportPrompt');
   initSupportPrompt();
 
-  // Always-visible PWYC heart button
-  const { PWYCButton } = await import('./ui/PWYCButton');
-  new PWYCButton();
+  // PWYC heart button is mounted early in main() — no action needed here
 
   // Set up periodic auto-saves every 5 minutes (real time)
   // Note: AutoSaveSystem also saves daily at midnight (game time) with canon events
