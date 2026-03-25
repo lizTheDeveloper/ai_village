@@ -376,6 +376,30 @@ export default defineConfig({
         });
       },
     },
+    {
+      name: 'admin-spa',
+      configureServer(server) {
+        const adminDir = path.resolve(__dirname, 'admin');
+        server.middlewares.use('/mvee/admin', (req, res, next) => {
+          const url = (req.url || '/').split('?')[0];
+          const filePath = path.join(adminDir, url === '/' ? 'index.html' : url);
+          // Prevent path traversal
+          if (!filePath.startsWith(adminDir)) { res.statusCode = 403; res.end(); return; }
+          if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+            const ext = path.extname(filePath);
+            const mimeTypes: Record<string, string> = { '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css', '.json': 'application/json' };
+            res.setHeader('Content-Type', mimeTypes[ext] || 'application/octet-stream');
+            res.end(fs.readFileSync(filePath));
+          } else if (!path.extname(url)) {
+            // SPA fallback — serve index.html for non-file routes
+            res.setHeader('Content-Type', 'text/html');
+            res.end(fs.readFileSync(path.join(adminDir, 'index.html')));
+          } else {
+            next();
+          }
+        });
+      },
+    },
   ],
 
   server: {

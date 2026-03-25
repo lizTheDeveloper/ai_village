@@ -13,6 +13,7 @@ import { fileURLToPath } from 'url';
 import { createUniverseApiRouter } from '../src/universe-api.js';
 import { multiverseStorage } from '../src/multiverse-storage.js';
 import { planetStorage } from '../src/planet-storage.js';
+import { createAdminApiRouter } from './admin-api.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = parseInt(process.env.PORT || '3000', 10);
@@ -391,9 +392,43 @@ for (const prefix of [BASE_PATH, '']) {
   });
 }
 
+// Admin API routes — Lore Bible admin SPA data endpoints (auth-gated)
+const adminApiRouter = createAdminApiRouter();
+app.use(`${BASE_PATH}/admin/api`, adminApiRouter);
+
+// Admin SPA — Preact app served from admin/ directory (no build step)
+const ADMIN_DIR = path.resolve(__dirname, '..', 'admin');
+app.use(`${BASE_PATH}/admin`, express.static(ADMIN_DIR, { fallthrough: true }));
+// SPA fallback for admin routes — serve admin/index.html for non-file requests
+app.get(`${BASE_PATH}/admin/{*splat}`, (req, res, next) => {
+  if (req.path.startsWith(`${BASE_PATH}/admin/api`)) return next();
+  if (path.extname(req.path)) { res.status(404).send('Not found'); return; }
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.sendFile(path.join(ADMIN_DIR, 'index.html'));
+});
+
 // Multiverse API routes — universe, snapshot, player, passage management
 const universeRouter = createUniverseApiRouter();
 app.use(`${BASE_PATH}/api/multiverse`, universeRouter);
+
+// Planet API routes — used by PlanetClient for planet listing, stats, and liveness probes
+app.get(`${BASE_PATH}/api/planets/stats`, async (_req, res) => {
+  try {
+    const stats = await planetStorage.getStats();
+    res.json({ success: true, stats });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to get planet stats' });
+  }
+});
+
+app.get(`${BASE_PATH}/api/planets`, async (_req, res) => {
+  try {
+    const planets = await planetStorage.listPlanets();
+    res.json({ success: true, planets });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to list planets' });
+  }
+});
 
 // Health check under base path for Traefik routing
 app.get(`${BASE_PATH}/api/health`, (_req, res) => {
@@ -451,6 +486,8 @@ app.use(BASE_PATH, express.static(DIST_DIR, staticOpts));
 // This prevents sprites from getting text/html content-type.
 app.get('/{*splat}', (req, res, next) => {
   if (req.path.startsWith('/api/') || req.path.startsWith(`${BASE_PATH}/api/`)) return next();
+  // Admin SPA is handled by its own route — don't serve game.html for /admin/ paths
+  if (req.path.startsWith(`${BASE_PATH}/admin`)) return next();
 
   // If the path has a file extension, it's a static asset request that wasn't
   // found — return 404 instead of serving game.html as text/html
