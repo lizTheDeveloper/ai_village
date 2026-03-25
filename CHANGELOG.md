@@ -6,6 +6,28 @@ Format: [Semantic Versioning](https://semver.org/). Newest first.
 
 ---
 
+## v0.2.0 — 2026-03-24
+
+### What's New
+- **Species morality system** — each species now has unique moral frameworks: Dragons evaluate pattern-density across timestreams, Ethereans use consensus-field coherence
+- **Moral-conflict-driven schisms** — village schisms now emerge from genuine moral disagreements instead of random triggers
+- **Species moral primitives registry** — shared belief templates replaced with per-species moral foundations
+- **Items Browser** — new admin capability tab for browsing items by species
+- **LLM auto-recovery** — automatic 401 recovery for LLM providers prevents auth disruptions
+
+### Performance
+- Pre-compiled regex patterns and eliminated allocations in NN feature extraction (MUL-3511)
+- Removed proportional yielding from NN inference — reclaimed 8-48ms/tick (MUL-3510)
+
+### Fixes
+- Graceful degradation when multiverse API and species NNs are unavailable (MUL-3508)
+- Migrated support prompt to Checkout Sessions API (MUL-3514)
+- Admin angel no longer echoes system prompt into chat (MUL-3397)
+- Disabled broken SoA batch path — agents now move via per-entity loop (MUL-3342)
+- Resolved sprite 404s for characters without animations (MUL-2645)
+
+---
+
 ## v0.1.9 — 2026-03-23
 
 ### What's New
