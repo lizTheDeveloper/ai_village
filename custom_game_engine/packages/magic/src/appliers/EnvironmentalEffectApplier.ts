@@ -17,8 +17,8 @@ import type {
   EffectApplicationResult,
   ActiveEffect,
 } from '../SpellEffect.js';
-import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
-import type { EnvironmentComponent, EnvironmentalZoneComponent } from '../types/ComponentTypes.js';
+import type { EffectApplier, SpellEffectContext } from '../SpellEffectExecutor.js';
+import type { EnvironmentComponent, EnvironmentalZoneComponent, PositionComponentData } from '../types/ComponentTypes.js';
 
 // ============================================================================
 // EnvironmentalEffectApplier
@@ -35,10 +35,10 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
     caster: Entity,
     _target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     // Get area center (caster position)
-    const centerPos = caster.getComponent('position') as { x: number; y: number } | undefined;
+    const centerPos = caster.getComponent('position') as PositionComponentData | undefined;
     if (!centerPos) {
       return {
         success: false,
@@ -115,7 +115,7 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
     _effect: EnvironmentalEffect,
     _target: Entity,
     _world: World,
-    _context: EffectContext
+    _context: SpellEffectContext
   ): void {
     // Environmental effects typically persist passively
     // Future: Add ticking zone damage, weather intensity changes, etc.
@@ -339,7 +339,7 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
       weatherIntensity: 0,
       globalLightLevel: 0,
       temperatureModifier: 0,
-      globalZones: [],
+      globalZones: [] as any[],
     };
     (world as WorldMutator).addComponent(envEntity.id, environmentComp as Component);
 
@@ -406,7 +406,7 @@ class EnvironmentalEffectApplierClass implements EffectApplier<EnvironmentalEffe
 
     for (const zone of zones) {
       const zoneComp = zone.getComponent('environmental_zone') as EnvironmentalZoneComponent | undefined;
-      const zonePos = zone.getComponent('position') as { x: number; y: number } | undefined;
+      const zonePos = zone.getComponent('position') as PositionComponentData | undefined;
 
       if (
         zoneComp?.effectId === effect.id &&

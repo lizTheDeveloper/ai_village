@@ -21,7 +21,7 @@ import type {
   EffectApplicationResult,
   ActiveEffect,
 } from '../SpellEffect.js';
-import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { EffectApplier, SpellEffectContext } from '../SpellEffectExecutor.js';
 import type {
   PositionComponentData,
   OrientationComponent,
@@ -181,7 +181,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
     caster: Entity,
     target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): TeleportEffectApplicationResult {
 
     // Validate target has position component
@@ -221,7 +221,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
         targetId: target.id,
         appliedValues: {},
         resisted: false,
-        error: destination.error || 'Failed to calculate destination',
+        error: 'error' in destination ? destination.error : 'Failed to calculate destination',
         appliedAt: context.tick,
         casterId: caster.id,
         spellId: context.spell.id,
@@ -335,7 +335,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
         targetId: target.id,
         appliedValues: {},
         resisted: false,
-        error: teleportResult.error,
+        error: 'error' in teleportResult ? teleportResult.error : 'Teleport failed',
         appliedAt: context.tick,
         casterId: caster.id,
         spellId: context.spell.id,
@@ -391,7 +391,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
     _effect: TeleportEffect,
     _target: Entity,
     _world: World,
-    _context: EffectContext
+    _context: SpellEffectContext
   ): void {
     // Future: Handle blink effect (repeated micro-teleports)
     // Would track blink interval and perform periodic random teleports
@@ -419,7 +419,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
     effect: TeleportEffect,
     caster: Entity,
     target: Entity,
-    context: EffectContext,
+    context: SpellEffectContext,
     teleportType: string
   ): { success: true; x: number; y: number; targetPlane?: string } | { success: false; error: string } {
     const targetPosRaw = target.getComponent('position');
@@ -575,7 +575,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
     caster: Entity,
     target: Entity,
     destination: { x: number; y: number; targetPlane?: string },
-    context: EffectContext,
+    context: SpellEffectContext,
     teleportType: string
   ): { success: true; targetsTeleported?: number } | { success: false; error: string } {
     const targetPosRaw = target.getComponent('position');
@@ -641,7 +641,7 @@ class TeleportEffectApplierClass implements EffectApplier<TeleportEffect> {
   /**
    * Check if target resists teleportation.
    */
-  private checkResistance(target: Entity, context: EffectContext): boolean {
+  private checkResistance(target: Entity, context: SpellEffectContext): boolean {
     // Check willpower resistance
     const statsRaw = target.getComponent('stats');
     const stats = statsRaw && isStatsComponent(statsRaw) ? statsRaw : undefined;

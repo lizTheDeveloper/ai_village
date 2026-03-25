@@ -14,7 +14,7 @@ import type {
   EffectApplicationResult,
   ActiveEffect,
 } from '../SpellEffect.js';
-import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { EffectApplier, SpellEffectContext } from '../SpellEffectExecutor.js';
 
 /**
  * Transform applier implementation.
@@ -30,12 +30,12 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
     caster: Entity,
     target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const appliedValues: Record<string, any> = {};
 
     // Create appearance component if missing (defensive programming)
-    interface AppearanceComponent {
+    interface AppearanceComponent extends Component {
       type: 'appearance';
       form: string;
       size: number;
@@ -150,7 +150,7 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
     _effect: TransformEffect,
     _target: Entity,
     _world: World,
-    _context: EffectContext
+    _context: SpellEffectContext
   ): void {
     // Transformations don't typically need tick processing
     // but we could check for conditions that break the transformation early
@@ -165,7 +165,7 @@ export class TransformEffectApplier implements EffectApplier<TransformEffect> {
     // Restore original form
     const originalForm = this.originalForms.get(target.id);
     if (originalForm) {
-      interface AppearanceComponent {
+      interface AppearanceComponent extends Component {
         type: 'appearance';
         form: string;
         size: number;

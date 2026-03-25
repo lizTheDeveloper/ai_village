@@ -11,7 +11,7 @@ import type { Component } from '@ai-village/core';
 // Position & Movement
 // ============================================================================
 
-export interface PositionComponentData {
+export interface PositionComponentData extends Component {
   type: string;
   version: number;
   x: number;
@@ -25,7 +25,7 @@ export interface VelocityComponentData {
   vz?: number;
 }
 
-export interface OrientationComponent {
+export interface OrientationComponent extends Component {
   type: 'orientation';
   facing: number; // Angle in radians
 }
@@ -70,7 +70,7 @@ export interface BehaviorComponent extends Component {
 // Needs & Health
 // ============================================================================
 
-export interface NeedsComponentWithHealth {
+export interface NeedsComponentWithHealth extends Component {
   type: 'needs';
   health: number;
   maxHealth?: number;
@@ -109,7 +109,7 @@ export interface IllusionData {
 // Environment
 // ============================================================================
 
-export interface EnvironmentComponent {
+export interface EnvironmentComponent extends Component {
   type: 'environment';
   weather?: string;
   weatherIntensity?: number;
@@ -118,7 +118,7 @@ export interface EnvironmentComponent {
   globalZones?: any[];
 }
 
-export interface EnvironmentalZoneComponent {
+export interface EnvironmentalZoneComponent extends Component {
   type: 'environmental_zone';
   effectId: string;
   environmentType: string;
@@ -194,7 +194,7 @@ export interface ExpirationComponent extends Component {
 // Teleportation
 // ============================================================================
 
-export interface TeleportAnchorsComponent {
+export interface TeleportAnchorsComponent extends Component {
   type: 'teleport_anchors';
   anchors: TeleportAnchor[];
 }
@@ -244,13 +244,13 @@ export interface ActiveEffectsComponent extends Component {
 // Stats & Attributes
 // ============================================================================
 
-export interface StatsComponent {
+export interface StatsComponent extends Component {
   type: 'stats';
   willpower?: number;
   [key: string]: any; // Allow other stats
 }
 
-export interface ResistanceComponent {
+export interface ResistanceComponent extends Component {
   type: 'resistance';
   teleport?: number;
   [key: string]: any; // Allow other resistance types

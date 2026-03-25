@@ -12,7 +12,7 @@ import type {
   EffectApplicationResult,
   ActiveEffect,
 } from '../SpellEffect.js';
-import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { EffectApplier, SpellEffectContext } from '../SpellEffectExecutor.js';
 import type { PositionComponentData } from '../types/ComponentTypes.js';
 import { createPositionComponent } from '@ai-village/core';
 import { SpellEffectRegistry } from '../SpellEffectRegistry.js';
@@ -28,7 +28,7 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
     caster: Entity,
     target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const appliedValues: Record<string, number> = {};
 
@@ -144,7 +144,7 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
     _effect: SummonEffect,
     _target: Entity,
     world: World,
-    _context: EffectContext
+    _context: SpellEffectContext
   ): void {
     // For summon effects, we might want to check if summoned entities are still alive
     // and update their behavior based on the effect duration remaining
@@ -216,7 +216,7 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
 
       case 'target': {
         // Spawn at target position
-        const targetPos = target.components.get('position') as { x: number; y: number; z?: number } | undefined;
+        const targetPos = target.components.get('position') as Component & { x: number; y: number; z?: number } | undefined;
         if (targetPos) {
           x = targetPos.x + (summonIndex - totalSummons / 2) * 0.5;
           y = targetPos.y;

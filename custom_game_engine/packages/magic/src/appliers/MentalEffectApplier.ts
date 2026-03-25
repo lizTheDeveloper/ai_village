@@ -21,7 +21,7 @@ import type {
   EffectApplicationResult,
   ActiveEffect,
 } from '../SpellEffect.js';
-import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { EffectApplier, SpellEffectContext } from '../SpellEffectExecutor.js';
 import type {
   BehaviorComponent,
   MentalEffectsComponent,
@@ -44,10 +44,11 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     caster: Entity,
     target: Entity,
     _world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     // Check if target is mindless (constructs, undead, etc.)
-    const tags = target.components.get('tags') as string[] | undefined;
+    const tagsRaw = target.components.get('tags');
+    const tags = tagsRaw && Array.isArray(tagsRaw) ? tagsRaw as string[] : undefined;
     if (tags && (tags.includes('mindless') || tags.includes('construct'))) {
       return {
         success: false,
@@ -148,7 +149,7 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     _effect: MentalEffect,
     _target: Entity,
     _world: World,
-    _context: EffectContext
+    _context: SpellEffectContext
   ): void {
     // Mental effects are typically handled by behavior systems
     // No per-tick processing needed
@@ -176,7 +177,7 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     _effect: MentalEffect,
     caster: Entity,
     target: Entity,
-    _context: EffectContext
+    _context: SpellEffectContext
   ): void {
     let behavior = target.components.get('behavior') as BehaviorComponent | undefined;
     if (!behavior) {
@@ -196,7 +197,7 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     effect: MentalEffect,
     caster: Entity,
     target: Entity,
-    _context: EffectContext
+    _context: SpellEffectContext
   ): void {
     const mentalEffects = target.components.get('mental_effects') as MentalEffectsComponent | undefined;
     if (!mentalEffects) {
@@ -215,7 +216,7 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     effect: MentalEffect,
     _caster: Entity,
     target: Entity,
-    context: EffectContext
+    context: SpellEffectContext
   ): void {
     const behavior = target.components.get('behavior') as BehaviorComponent | undefined;
     if (!behavior) {
@@ -234,7 +235,7 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     effect: MentalEffect,
     caster: Entity,
     target: Entity,
-    context: EffectContext
+    context: SpellEffectContext
   ): void {
     const mentalEffects = target.components.get('mental_effects') as MentalEffectsComponent | undefined;
     if (!mentalEffects) {
@@ -253,7 +254,7 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     _effect: MentalEffect,
     caster: Entity,
     target: Entity,
-    _context: EffectContext
+    _context: SpellEffectContext
   ): void {
     interface MemoryComponent extends Component {
       type: 'memory';
@@ -279,7 +280,7 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     effect: MentalEffect,
     caster: Entity,
     target: Entity,
-    context: EffectContext
+    context: SpellEffectContext
   ): void {
     // Get scaled strength value
     const strengthValue = context.scaledValues.get('strength');
@@ -308,7 +309,7 @@ class MentalEffectApplierClass implements EffectApplier<MentalEffect> {
     _effect: MentalEffect,
     caster: Entity,
     target: Entity,
-    _context: EffectContext
+    _context: SpellEffectContext
   ): void {
     const mentalEffects = target.components.get('mental_effects') as MentalEffectsComponent | undefined;
     if (!mentalEffects) {

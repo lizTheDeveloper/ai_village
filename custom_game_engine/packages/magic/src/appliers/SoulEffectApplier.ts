@@ -21,7 +21,7 @@ import type {
   EffectApplicationResult,
   ActiveEffect,
 } from '../SpellEffect.js';
-import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import type { EffectApplier, SpellEffectContext } from '../SpellEffectExecutor.js';
 import type { PerceptionEffectsComponent, NeedsComponentWithHealth, StatusEffectsComponent } from '../types/ComponentTypes.js';
 
 // ============================================================================
@@ -32,7 +32,7 @@ import type { PerceptionEffectsComponent, NeedsComponentWithHealth, StatusEffect
  * Soul component structure
  * Stores soul state for entities
  */
-interface SoulComponent {
+interface SoulComponent extends Component {
   type: 'soul';
   /** Soul integrity (0-100, 0 = soul destroyed) */
   integrity: number;
@@ -64,7 +64,7 @@ class SoulEffectApplier implements EffectApplier<SoulEffect> {
     caster: Entity,
     target: Entity,
     world: World,
-    context: EffectContext
+    context: SpellEffectContext
   ): EffectApplicationResult {
     const appliedValues: Record<string, any> = {};
 
@@ -88,7 +88,8 @@ class SoulEffectApplier implements EffectApplier<SoulEffect> {
     const soul = target.components.get('soul') as SoulComponent | undefined;
     if (!soul && effect.soulType !== 'detect') {
       // Check if target is explicitly soulless
-      const tags = target.components.get('tags') as string[] | undefined;
+      const tagsRaw = target.components.get('tags');
+      const tags = tagsRaw && Array.isArray(tagsRaw) ? tagsRaw as string[] : undefined;
       if (tags && (tags.includes('soulless') || tags.includes('construct'))) {
         return {
           success: false,
@@ -120,7 +121,8 @@ class SoulEffectApplier implements EffectApplier<SoulEffect> {
 
     // Check undead restrictions
     if (soul && soul.undead && !effect.affectsUndead) {
-      const tags = target.components.get('tags') as string[] | undefined;
+      const tagsRaw2 = target.components.get('tags');
+      const tags = tagsRaw2 && Array.isArray(tagsRaw2) ? tagsRaw2 as string[] : undefined;
       if (tags && tags.includes('undead')) {
         return {
           success: false,
@@ -179,7 +181,7 @@ class SoulEffectApplier implements EffectApplier<SoulEffect> {
     _effect: SoulEffect,
     _target: Entity,
     _world: World,
-    _context: EffectContext
+    _context: SpellEffectContext
   ): void {
     // Soul effects are typically instant or passive
     // Expiration is handled by the SpellEffectExecutor
@@ -202,7 +204,7 @@ class SoulEffectApplier implements EffectApplier<SoulEffect> {
    */
   private checkParadigmRestrictions(
     _effect: SoulEffect,
-    context: EffectContext
+    context: SpellEffectContext
   ): string | null {
     // Check if paradigm prohibits soul magic
     const paradigmId = context.casterMagic?.activeParadigmId;
@@ -220,7 +222,7 @@ class SoulEffectApplier implements EffectApplier<SoulEffect> {
     caster: Entity,
     target: Entity,
     soul: SoulComponent,
-    context: EffectContext,
+    context: SpellEffectContext,
     appliedValues: Record<string, any>
   ): EffectApplicationResult {
     // Get scaled damage value
@@ -256,7 +258,7 @@ class SoulEffectApplier implements EffectApplier<SoulEffect> {
     caster: Entity,
     target: Entity,
     soul: SoulComponent,
-    context: EffectContext,
+    context: SpellEffectContext,
     appliedValues: Record<string, any>
   ): EffectApplicationResult {
     // Get scaled healing value
@@ -292,7 +294,7 @@ class SoulEffectApplier implements EffectApplier<SoulEffect> {
     caster: Entity,
     target: Entity,
     soul: SoulComponent,
-    context: EffectContext,
+    context: SpellEffectContext,
     appliedValues: Record<string, any>
   ): EffectApplicationResult {
     // Bind soul to caster
@@ -328,7 +330,7 @@ class SoulEffectApplier implements EffectApplier<SoulEffect> {
     caster: Entity,
     target: Entity,
     soul: SoulComponent,
-    context: EffectContext,
+    context: SpellEffectContext,
     appliedValues: Record<string, any>
   ): EffectApplicationResult {
     // Free the soul
@@ -362,7 +364,7 @@ class SoulEffectApplier implements EffectApplier<SoulEffect> {
     source: Entity,
     targetBody: Entity,
     _world: World,
-    context: EffectContext,
+    context: SpellEffectContext,
     appliedValues: Record<string, any>
   ): EffectApplicationResult {
     // Get souls from both entities
@@ -410,7 +412,7 @@ class SoulEffectApplier implements EffectApplier<SoulEffect> {
     effect: SoulEffect,
     caster: Entity,
     target: Entity,
-    context: EffectContext,
+    context: SpellEffectContext,
     appliedValues: Record<string, any>
   ): EffectApplicationResult {
     // Add or enhance perception_effects component on caster
@@ -465,7 +467,7 @@ class SoulEffectApplier implements EffectApplier<SoulEffect> {
     caster: Entity,
     target: Entity,
     soul: SoulComponent,
-    context: EffectContext,
+    context: SpellEffectContext,
     appliedValues: Record<string, any>
   ): EffectApplicationResult {
     // Check if resurrection is allowed
