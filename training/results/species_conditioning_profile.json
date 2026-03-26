@@ -1,0 +1,254 @@
+{
+  "experiment": "Species-Conditioned NN Inference Profiling",
+  "task": "MUL-3538",
+  "date": "2026-03-26",
+  "config": {
+    "n_agents": 50,
+    "feature_dim": 40,
+    "num_species": 16,
+    "num_actions": 19,
+    "target_tps": 20,
+    "nn_budget_pct": 10
+  },
+  "profiles": [
+    {
+      "name": "Baseline (TalkerNN + ExecutorNN)",
+      "memory": {
+        "params": 72966,
+        "param_bytes": 291864,
+        "buffer_bytes": 0,
+        "total_bytes": 291864,
+        "total_kb": 285.0
+      },
+      "latency": {
+        "mean_ms": 36.6701,
+        "p50_ms": 23.5533,
+        "p95_ms": 106.193,
+        "p99_ms": 165.3397,
+        "min_ms": 0.8735,
+        "max_ms": 366.1124
+      },
+      "inference_alloc": {
+        "current_kb": 0.1,
+        "peak_kb": 1.5
+      },
+      "throughput": {
+        "agent_ticks_per_ms": 1.4,
+        "max_agents_at_20tps": 6
+      },
+      "variant": "baseline_talker"
+    },
+    {
+      "name": "Baseline (ExecutorNN only)",
+      "memory": {
+        "params": 278797,
+        "param_bytes": 1115188,
+        "buffer_bytes": 0,
+        "total_bytes": 1115188,
+        "total_kb": 1089.1
+      },
+      "latency": {
+        "mean_ms": 47.2556,
+        "p50_ms": 30.5574,
+        "p95_ms": 138.8185,
+        "p99_ms": 185.5501,
+        "min_ms": 0.737,
+        "max_ms": 267.7722
+      },
+      "inference_alloc": {
+        "current_kb": 0.1,
+        "peak_kb": 1.5
+      },
+      "throughput": {
+        "agent_ticks_per_ms": 1.1,
+        "max_agents_at_20tps": 5
+      },
+      "variant": "baseline_executor"
+    },
+    {
+      "name": "Baseline (TalkerNN + ExecutorNN combined)",
+      "memory": {
+        "params": 351763,
+        "param_bytes": 1407052,
+        "buffer_bytes": 0,
+        "total_bytes": 1407052,
+        "total_kb": 1374.1
+      },
+      "latency": {
+        "mean_ms": 65.8505,
+        "p50_ms": 44.7216,
+        "p95_ms": 181.0798,
+        "p99_ms": 260.162,
+        "min_ms": 2.6801,
+        "max_ms": 350.8862
+      },
+      "inference_alloc": {
+        "current_kb": 0.1,
+        "peak_kb": 1.5
+      },
+      "throughput": {
+        "agent_ticks_per_ms": 0.8,
+        "max_agents_at_20tps": 3
+      },
+      "variant": "baseline_combined"
+    },
+    {
+      "name": "Per-Archetype SpeciesPolicyNN (single)",
+      "memory": {
+        "params": 74643,
+        "param_bytes": 298572,
+        "buffer_bytes": 0,
+        "total_bytes": 298572,
+        "total_kb": 291.6
+      },
+      "latency": {
+        "mean_ms": 25.421,
+        "p50_ms": 11.3972,
+        "p95_ms": 93.6088,
+        "p99_ms": 139.3905,
+        "min_ms": 0.5119,
+        "max_ms": 212.1057
+      },
+      "inference_alloc": {
+        "current_kb": 0.1,
+        "peak_kb": 1.5
+      },
+      "throughput": {
+        "agent_ticks_per_ms": 2.0,
+        "max_agents_at_20tps": 9
+      },
+      "variant": "per_archetype_single",
+      "note": "Multiply memory by N_species for full per-archetype deployment"
+    },
+    {
+      "name": "Per-Archetype (4 species \u00d7 SpeciesPolicyNN)",
+      "memory": {
+        "params": 298572,
+        "param_bytes": 1194288,
+        "buffer_bytes": 0,
+        "total_bytes": 1194288,
+        "total_kb": 1166.3
+      },
+      "latency": {
+        "mean_ms": 73.2082,
+        "p50_ms": 42.6152,
+        "p95_ms": 234.4068,
+        "p99_ms": 325.9264,
+        "min_ms": 0.9749,
+        "max_ms": 524.9939
+      },
+      "inference_alloc": {
+        "current_kb": 0.1,
+        "peak_kb": 1.7
+      },
+      "throughput": {
+        "agent_ticks_per_ms": 0.7,
+        "max_agents_at_20tps": 3
+      },
+      "variant": "per_archetype_4x"
+    },
+    {
+      "name": "Species-Conditioned (one-hot concat)",
+      "memory": {
+        "params": 76691,
+        "param_bytes": 306764,
+        "buffer_bytes": 0,
+        "total_bytes": 306764,
+        "total_kb": 299.6
+      },
+      "latency": {
+        "mean_ms": 17.6604,
+        "p50_ms": 6.3015,
+        "p95_ms": 80.1521,
+        "p99_ms": 121.531,
+        "min_ms": 0.341,
+        "max_ms": 288.592
+      },
+      "inference_alloc": {
+        "current_kb": 0.1,
+        "peak_kb": 1.5
+      },
+      "throughput": {
+        "agent_ticks_per_ms": 2.8,
+        "max_agents_at_20tps": 14
+      },
+      "variant": "conditioned_onehot"
+    },
+    {
+      "name": "Species-Embedding NN (Theme A)",
+      "memory": {
+        "params": 284691,
+        "param_bytes": 1138764,
+        "buffer_bytes": 0,
+        "total_bytes": 1138764,
+        "total_kb": 1112.1
+      },
+      "latency": {
+        "mean_ms": 35.9169,
+        "p50_ms": 19.9359,
+        "p95_ms": 119.6967,
+        "p99_ms": 169.9823,
+        "min_ms": 0.5668,
+        "max_ms": 300.766
+      },
+      "inference_alloc": {
+        "current_kb": 0.1,
+        "peak_kb": 1.7
+      },
+      "throughput": {
+        "agent_ticks_per_ms": 1.4,
+        "max_agents_at_20tps": 6
+      },
+      "variant": "embedding"
+    },
+    {
+      "name": "Species-FiLM NN (Theme A)",
+      "memory": {
+        "params": 174867,
+        "param_bytes": 699468,
+        "buffer_bytes": 0,
+        "total_bytes": 699468,
+        "total_kb": 683.1
+      },
+      "latency": {
+        "mean_ms": 38.6444,
+        "p50_ms": 22.864,
+        "p95_ms": 124.0703,
+        "p99_ms": 188.5436,
+        "min_ms": 0.3333,
+        "max_ms": 572.557
+      },
+      "inference_alloc": {
+        "current_kb": 0.1,
+        "peak_kb": 1.2
+      },
+      "throughput": {
+        "agent_ticks_per_ms": 1.3,
+        "max_agents_at_20tps": 6
+      },
+      "variant": "film"
+    }
+  ],
+  "behavioral_metrics_v2": {
+    "arm_a_species_agnostic": {
+      "d_cc": 0.325537,
+      "h_b_overall": 0.5321,
+      "h_b_per_species": {
+        "dvergar": 0.5415,
+        "grendel": 0.2284,
+        "norn": 0.5298,
+        "valkyr": 0.4337
+      }
+    },
+    "arm_c_species_conditioned_onehot": {
+      "d_cc": 0.688865,
+      "h_b_overall": 0.3636,
+      "h_b_per_species": {
+        "dvergar": 0.2235,
+        "grendel": 0.0558,
+        "norn": 0.3801,
+        "valkyr": 0.1454
+      }
+    }
+  }
+}
