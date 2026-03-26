@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc --build > /dev/null 2>&1 || tsc --build",
     "build:stable": "npx tsx scripts/create-stable-build.ts",
-    "build:prod": "rm -rf demo/public/assets/sprites/pixellab && cp -r packages/renderer/assets/sprites/pixellab demo/public/assets/sprites/pixellab && cd demo && npx vite build --config vite.config.prod.ts",
+    "build:prod": "mkdir -p demo/public/assets/sprites && rm -rf demo/public/assets/sprites/pixellab && cp -r packages/renderer/assets/sprites/pixellab demo/public/assets/sprites/pixellab && cd demo && npx vite build --config vite.config.prod.ts",
     "dev": "tsc --build --watch",
     "test": "npm run validate-data && vitest run",
     "test:perf": "vitest run --config vitest.config.perf.ts",
