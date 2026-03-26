@@ -395,6 +395,13 @@ function createMockCanvasContext(): CanvasRenderingContext2D {
     fill: vi.fn(),
     closePath: vi.fn(),
     arc: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
+    rect: vi.fn(),
+    clip: vi.fn(),
+    createLinearGradient: vi.fn(() => ({
+      addColorStop: vi.fn(),
+    })),
     measureText: vi.fn((text: string) => ({ width: text.length * 8 })),
     font: '12px sans-serif',
     textAlign: 'left' as CanvasTextAlign,

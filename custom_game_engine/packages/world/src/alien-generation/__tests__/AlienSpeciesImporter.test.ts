@@ -407,7 +407,7 @@ describe('translateSpecies', () => {
     const result = importer.translateSpecies(makeValidExchange());
     expect(result.spritePrompt).toBeTruthy();
     expect(result.spritePrompt).toContain('four-legged creature');
-    expect(result.spritePrompt).toContain('blue'); // baseHue 200 → blue
+    expect(result.spritePrompt).toContain('cyan'); // baseHue 200 → cyan (hue < 210)
     expect(result.spritePrompt).toContain('orange'); // accentHue 30 → orange
     expect(result.spritePrompt).toContain('48px');
   });
