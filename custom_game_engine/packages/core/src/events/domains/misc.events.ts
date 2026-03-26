@@ -945,6 +945,19 @@ export interface MiscEvents {
     alienness: number;
   };
 
+  // === Lore Discovery Events ===
+  /**
+   * Emitted by LoreDiscoverySystem when a notable discovery is made.
+   * Forwarded by game initialization code to the LoreDiscoveryEmitter
+   * (browser-only) to keep the ECS system decoupled from the browser layer.
+   */
+  'lore:discovery': {
+    category: string; // 'species' | 'item' | 'biome' | 'event' | 'civilization'
+    subject: string;  // e.g. 'norn', 'crystal_cavern'
+    aspect: string;   // e.g. 'encountered', 'entered'
+    detail: string | null;
+  };
+
   // === Test Events ===
   'test:event': {
     [key: string]: unknown;

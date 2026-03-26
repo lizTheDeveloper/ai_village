@@ -87,6 +87,7 @@ import {
   getMaxNPCs,
   // Universe Postcards (Drive 5: Social)
   WorldSnapshotService,
+  initShipPowerState,
 } from '@ai-village/core';
 import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus, planetClient, multiverseClient, creationStateManager, EntityPersistenceStream, type PlanetMetadata, type CreationState, type SettlementData } from '@ai-village/persistence';
 import { LiveEntityAPI } from '@ai-village/metrics';
@@ -106,6 +107,7 @@ import {
   createRenderer,
   InputHandler,
   KeyboardRegistry,
+  VirtualTouchControls,
   BuildingPlacementUI,
   AgentInfoPanel,
   AgentRosterPanel,
@@ -250,6 +252,8 @@ import {
   TalkerPromptBuilder,
   ExecutorPromptBuilder,
   promptLogger,
+  BrowserLLMProvider,
+  detectCapabilities,
   type LLMProvider,
 } from '@ai-village/llm';
 import { TerrainGenerator, ChunkManager, ServerBackedChunkManager, createBerryBush, getPlantSpecies, ChunkSpatialQuery, initializePlanet, generateRandomPlanetConfig, chunkSerializer, ChunkNameRegistry } from '@ai-village/world';
@@ -1461,7 +1465,7 @@ function setupWindowManager(
     showNotification(`Closed "${event.windowTitle}" to make space`, '#FFA500');
   });
 
-  window.addEventListener('mouseup', () => {
+  window.addEventListener('pointerup', () => {
     windowManager.handleDragEnd();
   });
 
@@ -3374,6 +3378,9 @@ async function main() {
     isSharedWorkerMode = false;
   }
 
+  // Initialize ship power state (BASIC scanner by default; DevMode will unlock all)
+  initShipPowerState();
+
   // Create agent debug manager for deep logging
   const agentDebugManager = new AgentDebugManager('logs/agent-debug');
 
@@ -3483,6 +3490,35 @@ async function main() {
 
     // Wire up checkpoint naming service with LLM
     checkpointNamingService.setProvider(llmProvider);
+
+    // Browser LLM: detect device capabilities and register browser tier provider
+    // This enables local inference for creatures in the Slow Zone (Zones of Thought)
+    detectCapabilities().then(async (caps) => {
+      if (!caps.recommendedModel || !caps.recommendedBackend) {
+        console.log(`[BrowserLLM] Local inference not available: ${caps.fallbackReason ?? 'unknown'}`);
+        return;
+      }
+      console.log(`[BrowserLLM] Device supports ${caps.recommendedBackend} with ${caps.estimatedMemoryGB}GB RAM`);
+      console.log(`[BrowserLLM] Recommended model: ${caps.recommendedModel.modelName}`);
+
+      const browserProvider = new BrowserLLMProvider(caps.recommendedModel);
+
+      // Wrap with FallbackProvider so cloud LLM handles failures gracefully
+      const browserWithFallback = new FallbackProvider(
+        [browserProvider, llmProvider],
+        { retryAfterMs: 30000, maxConsecutiveFailures: 2, logFallbacks: true }
+      );
+
+      llmQueue!.setTierProvider('browser', browserWithFallback);
+      console.log('[BrowserLLM] Browser tier registered (model will download on first Slow Zone creature think)');
+
+      // Lazy initialization: model downloads only when first browser-tier request arrives.
+      // BrowserLLMProvider.generate() throws if not initialized — FallbackProvider catches
+      // this and falls back to cloud. The UI can trigger explicit initialization via
+      // browserProvider.initialize() when the player opts in.
+    }).catch((err) => {
+      console.warn('[BrowserLLM] Capability detection failed:', err);
+    });
   } else {
     console.warn(`[DEMO] LLM not available at ${settings.llm.baseUrl}`);
     console.warn('[DEMO] Press ESC to open settings and configure LLM provider');
@@ -4655,6 +4691,51 @@ async function main() {
   setupVisualEventHandlers(gameContext, uiContext);
   setupInputHandlers(gameContext, uiContext, inputHandler);
 
+  // Virtual touch controls for mobile devices
+  const playerInputSystem = gameLoop.systemRegistry.get('player_input') as PlayerInputSystem | undefined;
+  const touchControls = new VirtualTouchControls({
+    onMenuToggle: () => windowManager.toggleWindow('settings'),
+    onZoomIn: () => renderer.getCamera().setZoom(renderer.getCamera().zoom * 1.3),
+    onZoomOut: () => renderer.getCamera().setZoom(renderer.getCamera().zoom * 0.7),
+    onInteract: () => playerInputSystem?.simulateAction('interact'),
+    onJackOut: () => playerInputSystem?.simulateAction('jack_out'),
+    onPauseToggle: () => {
+      const timeEntities = gameLoop.world.query().with('time').executeEntities();
+      const timeEntity = timeEntities[0];
+      if (!timeEntity || !('updateComponent' in timeEntity)) return;
+      const tc = timeEntity.getComponent('time') as any;
+      if (!tc) return;
+      if (tc.speedMultiplier === 0) {
+        (timeEntity as any).updateComponent('time', (c: any) => ({ ...c, speedMultiplier: c._savedSpeed || 1 }));
+        touchControls.paused = false;
+      } else {
+        (timeEntity as any).updateComponent('time', (c: any) => ({ ...c, _savedSpeed: c.speedMultiplier, speedMultiplier: 0 }));
+        touchControls.paused = true;
+      }
+    },
+    onSpeedChange: (speed: number) => {
+      const timeEntities = gameLoop.world.query().with('time').executeEntities();
+      const timeEntity = timeEntities[0];
+      if (!timeEntity || !('updateComponent' in timeEntity)) return;
+      (timeEntity as any).updateComponent('time', (c: any) => ({ ...c, speedMultiplier: speed }));
+      touchControls.currentSpeed = speed;
+    },
+    onViewToggle: () => {
+      renderer.getCamera().toggleViewMode();
+    },
+    onBuildMode: () => {
+      placementUI?.handleKeyDown('b', false);
+    },
+    onSoundToggle: () => {
+      const currentSettings = settingsPanel.getSettings();
+      currentSettings.sound.masterMuted = !currentSettings.sound.masterMuted;
+      touchControls.soundMuted = currentSettings.sound.masterMuted;
+    },
+  });
+
+  // Set initial sound muted state on touch controls
+  touchControls.soundMuted = settingsPanel.getSettings().sound.masterMuted;
+
   // Render loop with error handling to prevent silent failures
   let renderLoopStarted = false;
   // PERF: Frame counter for throttling expensive render-loop operations
@@ -4664,6 +4745,28 @@ async function main() {
     renderFrameCount++;
     try {
       inputHandler.update();
+
+      // Virtual joystick: apply direction to camera pan or player movement
+      if (touchControls.isTouchDevice) {
+        const dir = touchControls.getDirection();
+        if (dir.x !== 0 || dir.y !== 0) {
+          const panSpeed = 5;
+          renderer.getCamera().pan(dir.x * panSpeed, dir.y * panSpeed);
+          // Also inject WASD keys for possessed player movement
+          if (playerInputSystem) {
+            playerInputSystem.simulateKeyState('a', dir.x < -0.3);
+            playerInputSystem.simulateKeyState('d', dir.x > 0.3);
+            playerInputSystem.simulateKeyState('w', dir.y < -0.3);
+            playerInputSystem.simulateKeyState('s', dir.y > 0.3);
+          }
+        } else if (playerInputSystem) {
+          // Clear simulated keys when joystick is released
+          playerInputSystem.simulateKeyState('w', false);
+          playerInputSystem.simulateKeyState('a', false);
+          playerInputSystem.simulateKeyState('s', false);
+          playerInputSystem.simulateKeyState('d', false);
+        }
+      }
 
       // MVEE Sprint 1: Camera follow for possessed player avatar
       // PERF: Check every 3 frames (~20x/s at 60fps) to match simulation rate
@@ -4684,6 +4787,18 @@ async function main() {
               }
             }
           }
+          // Update mobile action button visibility based on possession state
+          touchControls.showPossessionControls = !!(pc?.isPossessed);
+        }
+      }
+
+      // Update time display on mobile
+      if (renderFrameCount % 60 === 0) { // Every ~1 second
+        const timeEntities2 = gameLoop.world.query().with('time').executeEntities();
+        const tc2 = timeEntities2[0]?.getComponent('time') as any;
+        if (tc2) {
+          touchControls.paused = tc2.speedMultiplier === 0;
+          touchControls.currentSpeed = tc2.speedMultiplier === 0 ? (tc2._savedSpeed || 1) : tc2.speedMultiplier;
         }
       }
 

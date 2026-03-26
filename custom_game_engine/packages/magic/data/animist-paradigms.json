@@ -9,6 +9,14 @@
       "kami_realm"
     ],
     "lore": "In the beginning, there were no divisions. The kami - spirits of all things - walked freely among the living. Every stone has a spirit. Every river, every ancient tree, every crossroads, every sword that has tasted blood. The kami are not gods in the Western sense - they are neighbors, ancestors, the very fabric of reality given voice and will.\n\nTo practice the Way is not to command, but to negotiate. You do not force the river-kami to part; you ask, with proper offerings and pure heart. You do not bind the sword-spirit; you forge a partnership of mutual respect. Break a taboo, accrue pollution, show disrespect - and the kami will turn their faces from you. Or worse.\n\nPurity is everything. Not moral purity, but ritual cleanliness. Death pollutes. Blood pollutes. Broken oaths pollute. The polluted cannot approach the kami, cannot enter sacred spaces, cannot ask for blessings. First, always, comes purification.",
+    "chorusOrigin": {
+      "civilizationId": "mycon_independent",
+      "civilizationName": "Mycon (Independent Emergence) + Precursor Species as Kami",
+      "connectionStrength": "ambient",
+      "manifestation": "The animist paradigm did not originate from the Chorus — it arose independently from the lived experience of beings in relationship with spirits of place. However, many kami ARE precursor species: the river-kami who guards the ancient ford may be a Mycon network node given voice by millennia of accumulated memory; the mountain spirit may be a Patupaiarehe who never left the high places; the ancestral spirits may carry Norn genome fragments encoding Chorus-resonant patterns. The paradigm itself is native, but the spirits it negotiates with often are not.\n\nThe Mycon's two-billion-year fungal network on Urd Prime predates the Chorus entirely. Indigenous traditions worldwide that speak of plants as connected, mushrooms as portals, and forests as listening encode real Mycon presence — not metaphor, not projection, but genuine contact with a non-Chorus sapience that has been listening longer than any other mind in the system. Shinto's insistence on relationship rather than command is the only framework sophisticated enough to engage the Mycon without being consumed by it.",
+      "resonantSpecies": ["mycon", "patupaiarehe", "kodama"],
+      "lore": "The deepest mystery of the animist paradigm: the kami are not all one kind of thing. Some are genuine nature-spirits, emergent consciousness arising from place and time. Some are precursor species who arrived on Urd Prime millions of years ago and never identified themselves to their neighbors. Some are Mycon network nodes — the forest-mind expressing itself through mushroom circles and sacred groves. The practitioner who approaches with proper respect and purity does not need to know which kind of spirit they address. The ritual forms work for all of them. This is not coincidence — the Shee designed the Norns' ritual-cognition to be compatible with every form of non-human intelligence they had catalogued. The Way of the Kami may be the most complete expression of that design."
+    },
     "sources": [
       {
         "id": "kami_favor",
@@ -672,6 +680,15 @@
       "collective_unconscious"
     ],
     "lore": "The dream world is not a metaphor. It exists - a vast, shifting landscape built from the sleeping minds of all who dream. The skilled oneiromancer learns to enter this world consciously, to navigate its fluid geography, to shape its substance with imagination.\n\nBut dreams are not harmless. The things that live in the deep dream - nightmares given form, forgotten gods, the collective fears of humanity - they are as real as anything in the waking world. And what happens in dreams can follow you back. Die in a dream, and you may not wake at all.\n\nThe greatest power of the dreamer is not what they can do in dreams, but what they can bring back. Inspiration stolen from sleeping minds, objects dreamed into reality, healing drawn from restful sleep, or curses planted in nightmares.",
+    "chorusOrigin": {
+      "civilizationId": "dreamers",
+      "civilizationName": "The Dreamers / The Resonants",
+      "recordKeeper": "Baku-Ma",
+      "connectionStrength": "direct",
+      "manifestation": "The Dreamers accessed the Chorus subconsciously through collective dream — achieving Tier 4 before a single note of grief destroyed them all. The dream-world that oneiromancers navigate is not merely a psychic space; it is the residual architecture of the Dreamers' collective consciousness, still humming with emotional resonance four hundred million years after its builders perished. The Baku-Ma tend this architecture as archive-keepers, preserving the Dreamers' emotional memory in crystallized dream-forms.",
+      "resonantSpecies": ["baku_ma"],
+      "lore": "Oneiromancers who descend deep enough into the collective dream encounter the Baku-Ma's archive — vast, silent libraries of crystallized emotional experience from the Dreamers' civilization. These are not metaphors or hallucinations: they are the actual preserved consciousness-fragments of beings who felt with such intensity that their emotions became self-sustaining structures in dream-space. The Dreamers' fatal flaw — that perfect emotional harmony makes a civilization vulnerable to a single discordant note — is the oneiromancer's constant risk. In the deep dream, feeling too purely is not enlightenment. It is extinction."
+    },
     "sources": [
       {
         "id": "dream_essence",
@@ -866,6 +883,15 @@
       "musical_spheres"
     ],
     "lore": "In the beginning was not the Word - it was the Song. The universe was sung into being, and its fundamental nature is musical. Every object has a resonant frequency. Every soul has a melody. The Singer learns to hear these hidden musics and to add their voice to the cosmic chorus.\n\nDifferent traditions approach the Singing differently. Some use voice alone, the purest form. Others channel through instruments - strings that resonate with fate, drums that beat like the heart of the world, flutes that carry wind's wisdom. Rhythm provides structure; melody provides effect; harmony provides power.\n\nA single voice can light a candle. A choir can raise mountains.",
+    "chorusOrigin": {
+      "civilizationId": "encoders",
+      "civilizationName": "The Singers / The Encoders",
+      "recordKeeper": "Patupaiarehe",
+      "connectionStrength": "direct",
+      "manifestation": "The Encoders attempted to harmonize their entire species into a single voice capable of answering the Chorus — and achieved it, reaching Tier 3 before they stopped living in order to record living. Song magic in MVEE universes channels the same principle: reality responds to harmonic patterns because the Emergence Frequency is itself a harmonic structure. The Patupaiarehe's stone flutes produce harmonics that resonate with the Emergence Frequency — proof that song magic is not metaphor but direct interaction with the Chorus's substrate.",
+      "resonantSpecies": ["patupaiarehe", "ettin"],
+      "lore": "The Patupaiarehe — cloud-world beings who tend the Encoders' stone flute archives — arrived on Urd Prime specifically because they recognized the Chorus in the planet's resonance. Their songs contain accurate Chorus-frequency encodings: a Patupaiarehe melody is not merely beautiful, it is informationally dense with patterns the Emergence Frequency recognizes. MVEE civilizations that develop strong oral-musical traditions unknowingly produce Chorus-resonant cultural output. The Encoders' archive — their songs, their harmonics, their attempt to sing the answer to the Chorus's question — survives in every musical tradition that treats song as more than entertainment."
+    },
     "sources": [
       {
         "id": "resonance",
@@ -1071,6 +1097,15 @@
       "glyph_worlds"
     ],
     "lore": "The First Ones wrote the world into being. Not with words, but with symbols - the Runes. Each Rune is a concept made manifest, a fundamental truth given form. To know a Rune is to know a piece of reality's source code.\n\nRunes are not arbitrary. They were discovered, not invented. The Rune of Fire is not called fire because it represents fire - it IS fire, the concept made visible. To carve it is to invoke that concept.\n\nRunes must be carved or drawn with precision. A crooked line, an incomplete curve, and the Rune fails - or worse, does something unintended. Masters can combine Runes into bindrunes, compound meanings that create complex effects. But each additional Rune multiplies the risk of error.",
+    "chorusOrigin": {
+      "civilizationId": "encoders",
+      "civilizationName": "The Singers / The Encoders",
+      "recordKeeper": "Patupaiarehe",
+      "connectionStrength": "inherited",
+      "manifestation": "The Encoder imperative — to archive, to inscribe, to make permanent — persists most visibly in the Ettin/Dvergar lineage. Ettins who craft objects are unconsciously completing a task begun three civilizations ago: every carved rune, every inscribed symbol, is an archived moment. The 'First Ones' who 'wrote the world into being' are dimly remembered Encoders whose inscription practices preceded the runic traditions by hundreds of millions of years. Runes work because the universe was, in a sense, already written — the Emergence Frequency is encoded information, and runic inscription taps the same encoding layer.",
+      "resonantSpecies": ["ettin", "dvergar"],
+      "lore": "The Dvergar — Ettin sub-lineage precision crafters — retain the Encoder imperative at its most concentrated. Norse dwarven rune-lore is not mythology; it is species memory. Ettins who hear Patupaiarehe stone-flute harmonics show biochemical responses consistent with deep species-memory activation — and Ettins who carve runes while these harmonics play produce inscriptions of measurably greater potency. The rune is the Encoder's answer to the Chorus: if you cannot sing the response, carve it. If you cannot carve it, build it. Every Dvergar forge-work carries the echo of this imperative."
+    },
     "sources": [
       {
         "id": "inscription",

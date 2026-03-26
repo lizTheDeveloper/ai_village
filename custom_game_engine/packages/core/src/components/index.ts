@@ -63,6 +63,8 @@ export { BuildingType, type BuildingComponent, createBuildingComponent, canAcces
 export * from './InventoryComponent.js';
 export { calculateInventoryWeight, createInventoryComponent } from './InventoryComponent.js';
 export type { InventoryComponent } from './InventoryComponent.js';
+export { createContainerComponent } from './ContainerComponent.js';
+export type { ContainerComponent } from './ContainerComponent.js';
 // Equipment system (Phase 36)
 export * from './EquipmentComponent.js';
 export * from './TemperatureComponent.js';
@@ -374,6 +376,9 @@ export * from './BodyPlanRegistry.js';
 // Species and genetics system
 export * from './SpeciesComponent.js';
 export * from './GeneticComponent.js';
+// Biochemistry (neurotransmitters, nurture/trauma)
+export * from './BiochemistryComponent.js';
+export { BiochemistryComponent } from './BiochemistryComponent.js';
 // Plant knowledge system (agent learning about plants)
 export * from './PlantKnowledgeComponent.js';
 export { PlantKnowledgeComponent } from './PlantKnowledgeComponent.js';

@@ -938,7 +938,7 @@ export class Renderer {
     // Render patron binding UI (Drive 4) — after all world rendering, before UI panels
     this.patronWidget.render(cssWidth, cssHeight);
     this.patronToast.render(cssWidth);
-    this.eternalReturnGlyph.render(cssWidth, cssHeight);
+    this.eternalReturnGlyph.render(cssWidth, cssHeight, performance.now());
   }
 
   /**

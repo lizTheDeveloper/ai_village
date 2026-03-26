@@ -166,24 +166,25 @@ export class CityBuildingGenerationSystem extends BaseSystem {
       return; // No buildings unlocked yet
     }
 
-    // Get existing buildings in this city
-    const existingBuildings = this.getExistingBuildingsInCity(world, cityDirector);
+    // Get existing buildings in this city (type -> count)
+    const existingBuildingCounts = this.countExistingBuildingsInCity(world, cityDirector);
+
+    // Per-type caps for repeatable buildings to prevent unbounded entity growth
+    const REPEATABLE_CAPS: Record<string, number> = {
+      'tent': 10, 'bed': 15, 'bedroll': 10,
+      'storage-chest': 5, 'storage-box': 5, 'warehouse': 3,
+    };
 
     // Filter out buildings the city already has
-    // (Allow multiples of some types: tents, storage, etc.)
+    // (Allow multiples of some types up to caps)
     const candidateBuildings = availableBuildings.filter(buildingType => {
-      // Always allow more housing
-      if (['tent', 'bed', 'bedroll'].includes(buildingType)) {
-        return true;
-      }
-
-      // Always allow more storage
-      if (['storage-chest', 'storage-box', 'warehouse'].includes(buildingType)) {
-        return true;
+      const cap = REPEATABLE_CAPS[buildingType];
+      if (cap !== undefined) {
+        return (existingBuildingCounts.get(buildingType) ?? 0) < cap;
       }
 
       // Only one of each other building type
-      return !existingBuildings.has(buildingType);
+      return !existingBuildingCounts.has(buildingType);
     });
 
     if (candidateBuildings.length === 0) {
@@ -223,7 +224,15 @@ export class CityBuildingGenerationSystem extends BaseSystem {
     world: World,
     cityDirector: CityDirectorComponent
   ): Set<string> {
-    const buildingTypes = new Set<string>();
+    const counts = this.countExistingBuildingsInCity(world, cityDirector);
+    return new Set(counts.keys());
+  }
+
+  private countExistingBuildingsInCity(
+    world: World,
+    cityDirector: CityDirectorComponent
+  ): Map<string, number> {
+    const buildingCounts = new Map<string, number>();
 
     const buildings = world.query().with(CT.Building, CT.Position).executeEntities();
 
@@ -236,13 +245,12 @@ export class CityBuildingGenerationSystem extends BaseSystem {
         continue;
       }
 
-      // Check if building is in this city
       if (isAgentInCity(pos.x, pos.y, cityDirector.bounds)) {
-        buildingTypes.add(building.buildingType);
+        buildingCounts.set(building.buildingType, (buildingCounts.get(building.buildingType) ?? 0) + 1);
       }
     }
 
-    return buildingTypes;
+    return buildingCounts;
   }
 
   /**

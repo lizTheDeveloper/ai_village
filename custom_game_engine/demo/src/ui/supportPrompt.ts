@@ -13,8 +13,6 @@ const STORAGE_KEY = 'mvee.supportPrompt.dismissedAt';
 const SESSION_KEY = 'mvee.supportPrompt.shown';
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 const TRIGGER_PLAYTIME_MS = 10 * 60 * 1000;
-const CHECKOUT_API_URL = 'https://pay.multiversestudios.xyz/create-checkout-session';
-
 let _shown = false;
 let _activeMs = 0;
 let _lastActiveTime: number | null = null;
@@ -120,29 +118,12 @@ function _render(): void {
 
   const ctaLink = banner.querySelector<HTMLAnchorElement>('#support-cta')!;
   ctaLink.addEventListener('click', () => {
-    ctaLink.textContent = 'Connecting...';
-    fetch(CHECKOUT_API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ game: 'mvee', amount: 1500 }),
-    })
-      .then((res): Promise<{ url: string }> => {
-        if (!res.ok) {
-          return res.text().then((response) => {
-            console.error('PWYC: checkout session failed', { status: res.status, response, game: 'mvee' });
-            return Promise.reject(new Error(`HTTP ${res.status}`));
-          });
-        }
-        return res.json() as Promise<{ url: string }>;
-      })
-      .then((data) => {
-        window.open(data.url, '_blank');
-        ctaLink.textContent = 'pay what you can';
-      })
-      .catch((err: unknown) => {
-        const message = err instanceof Error ? err.message : 'unknown error';
-        ctaLink.textContent = `Error: ${message}`;
-      });
+    // Open the PWYC tier picker modal via the heart button
+    const pwycTrigger = document.getElementById('pwyc-trigger');
+    if (pwycTrigger) {
+      pwycTrigger.click();
+      _dismiss();
+    }
   });
 
   const dismissBtn = banner.querySelector<HTMLButtonElement>('#support-dismiss')!;

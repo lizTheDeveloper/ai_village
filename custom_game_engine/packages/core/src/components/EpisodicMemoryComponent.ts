@@ -45,6 +45,8 @@ interface MemoryFormationInput {
   dialogueText?: string;
   conversationId?: string;
   timesRecalled?: number;
+  epistemicInjectionId?: string;
+  injectionAlienness?: number;
 }
 
 interface RetrievalContext {

@@ -13,10 +13,16 @@ import type {
   AgentComponentData,
 } from './types.js';
 import type { EpisodicMemory } from '@ai-village/core';
-import { renderSeparator } from './renderUtils.js';
+import { ScannerTier } from '@ai-village/core';
+import { renderSeparator, renderLockedSection } from './renderUtils.js';
 
 export class MemoriesSection {
   private scrollOffset = 0;
+  private scannerTier: ScannerTier = ScannerTier.GENOME;
+
+  setScannerTier(tier: ScannerTier): void {
+    this.scannerTier = tier;
+  }
 
   getScrollOffset(): number {
     return this.scrollOffset;
@@ -45,6 +51,7 @@ export class MemoriesSection {
     journal: JournalComponent | undefined
   ): void {
     const { ctx, x, y, width, height, padding, lineHeight } = context;
+    const hasGenomeTier = this.scannerTier === ScannerTier.GENOME;
 
     // Calculate scroll offset
     const scrollY = this.scrollOffset * lineHeight;
@@ -110,56 +117,64 @@ export class MemoriesSection {
     }
 
     // Episodic Memories
-    if (episodicMemory) {
-      renderSeparator(ctx, x, currentY, width, padding);
-      currentY += 8;
+    if (hasGenomeTier) {
+      if (episodicMemory) {
+        renderSeparator(ctx, x, currentY, width, padding);
+        currentY += 8;
 
-      ctx.fillStyle = '#88CCFF';
-      ctx.font = 'bold 12px monospace';
-      ctx.fillText('Episodic Memories', x + padding, currentY);
-      currentY += lineHeight;
+        ctx.fillStyle = '#88CCFF';
+        ctx.font = 'bold 12px monospace';
+        ctx.fillText('Episodic Memories', x + padding, currentY);
+        currentY += lineHeight;
 
-      const memories = episodicMemory.episodicMemories || [];
-      ctx.fillStyle = '#AAAAAA';
-      ctx.font = '10px monospace';
-      ctx.fillText(`Total: ${memories.length}`, x + padding, currentY);
-      currentY += lineHeight + 3;
+        const memories = episodicMemory.episodicMemories || [];
+        ctx.fillStyle = '#AAAAAA';
+        ctx.font = '10px monospace';
+        ctx.fillText(`Total: ${memories.length}`, x + padding, currentY);
+        currentY += lineHeight + 3;
 
-      // Show last 5 memories
-      const recentMemories = memories.slice(-5).reverse();
-      for (const memory of recentMemories) {
-        currentY = this.renderMemoryItem(ctx, x, currentY, width, padding, lineHeight, memory);
-        if (currentY > y + height + scrollY) break;
+        // Show last 5 memories
+        const recentMemories = memories.slice(-5).reverse();
+        for (const memory of recentMemories) {
+          currentY = this.renderMemoryItem(ctx, x, currentY, width, padding, lineHeight, memory);
+          if (currentY > y + height + scrollY) break;
+        }
+      } else {
+        ctx.fillStyle = '#666666';
+        ctx.font = '11px monospace';
+        ctx.fillText('No episodic memory', x + padding, currentY);
+        currentY += lineHeight;
       }
     } else {
-      ctx.fillStyle = '#666666';
-      ctx.font = '11px monospace';
-      ctx.fillText('No episodic memory', x + padding, currentY);
-      currentY += lineHeight;
+      currentY = renderLockedSection(ctx, 'Episodic Memories', x, currentY, padding, lineHeight);
     }
 
-    // Semantic Memory (Beliefs)
-    if (semanticMemory && currentY < y + height + scrollY) {
-      renderSeparator(ctx, x, currentY, width, padding);
-      currentY += 8;
+    // Beliefs & Knowledge
+    if (hasGenomeTier) {
+      if (semanticMemory && currentY < y + height + scrollY) {
+        renderSeparator(ctx, x, currentY, width, padding);
+        currentY += 8;
 
-      ctx.fillStyle = '#FFCC88';
-      ctx.font = 'bold 12px monospace';
-      ctx.fillText('Beliefs & Knowledge', x + padding, currentY);
-      currentY += lineHeight;
+        ctx.fillStyle = '#FFCC88';
+        ctx.font = 'bold 12px monospace';
+        ctx.fillText('Beliefs & Knowledge', x + padding, currentY);
+        currentY += lineHeight;
 
-      const beliefs = semanticMemory.beliefs || [];
-      ctx.fillStyle = '#AAAAAA';
-      ctx.font = '10px monospace';
-      ctx.fillText(`Beliefs: ${beliefs.length}`, x + padding, currentY);
-      currentY += lineHeight + 3;
-
-      for (const belief of beliefs.slice(0, 3)) {
-        ctx.fillStyle = '#FFEEAA';
+        const beliefs = semanticMemory.beliefs || [];
+        ctx.fillStyle = '#AAAAAA';
         ctx.font = '10px monospace';
-        const text = `- ${belief.content} (${Math.round(belief.confidence * 100)}%)`;
-        currentY = this.renderWrappedText(ctx, text, x, currentY, width, padding, 2);
+        ctx.fillText(`Beliefs: ${beliefs.length}`, x + padding, currentY);
+        currentY += lineHeight + 3;
+
+        for (const belief of beliefs.slice(0, 3)) {
+          ctx.fillStyle = '#FFEEAA';
+          ctx.font = '10px monospace';
+          const text = `- ${belief.content} (${Math.round(belief.confidence * 100)}%)`;
+          currentY = this.renderWrappedText(ctx, text, x, currentY, width, padding, 2);
+        }
       }
+    } else {
+      currentY = renderLockedSection(ctx, 'Beliefs & Knowledge', x, currentY, padding, lineHeight);
     }
 
     // Social Memory
@@ -193,29 +208,33 @@ export class MemoriesSection {
     }
 
     // Reflections
-    if (reflection && currentY < y + height + scrollY) {
-      renderSeparator(ctx, x, currentY, width, padding);
-      currentY += 8;
+    if (hasGenomeTier) {
+      if (reflection && currentY < y + height + scrollY) {
+        renderSeparator(ctx, x, currentY, width, padding);
+        currentY += 8;
 
-      ctx.fillStyle = '#CC88FF';
-      ctx.font = 'bold 12px monospace';
-      ctx.fillText('Reflections', x + padding, currentY);
-      currentY += lineHeight;
+        ctx.fillStyle = '#CC88FF';
+        ctx.font = 'bold 12px monospace';
+        ctx.fillText('Reflections', x + padding, currentY);
+        currentY += lineHeight;
 
-      const reflections = reflection.reflections || [];
-      ctx.fillStyle = '#AAAAAA';
-      ctx.font = '10px monospace';
-      ctx.fillText(`Total: ${reflections.length}`, x + padding, currentY);
-      currentY += lineHeight + 3;
+        const reflections = reflection.reflections || [];
+        ctx.fillStyle = '#AAAAAA';
+        ctx.font = '10px monospace';
+        ctx.fillText(`Total: ${reflections.length}`, x + padding, currentY);
+        currentY += lineHeight + 3;
 
-      if (reflections.length > 0) {
-        const latest = reflections[reflections.length - 1];
-        if (latest) {
-          ctx.fillStyle = '#DDAAFF';
-          ctx.font = '10px monospace';
-          currentY = this.renderWrappedText(ctx, latest.text || 'No text', x, currentY, width, padding, 3);
+        if (reflections.length > 0) {
+          const latest = reflections[reflections.length - 1];
+          if (latest) {
+            ctx.fillStyle = '#DDAAFF';
+            ctx.font = '10px monospace';
+            currentY = this.renderWrappedText(ctx, latest.text || 'No text', x, currentY, width, padding, 3);
+          }
         }
       }
+    } else {
+      currentY = renderLockedSection(ctx, 'Reflections', x, currentY, padding, lineHeight);
     }
 
     // Journal

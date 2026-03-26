@@ -1310,6 +1310,146 @@ const YELBEGEN_RIN_MORALITY: SpeciesMoralFramework = {
   },
 };
 
+/**
+ * Adaro-Vel (Solomon Islands) — optimization target: dominion over the boundary between sun and earth
+ * Moral axis: power is seasonal and conditional — timing is the entire moral content of action
+ *
+ * The Adaro-Vel are beings of storm and light who exist between the celestial and the mortal.
+ * Their morality centers on the idea that power is seasonal and conditional — the rain grants
+ * authority, the sun demands retreat. The moral being is one who knows when to strike and when
+ * to withdraw. They see hesitation during opportunity as the deepest sin, and action during
+ * withdrawal as reckless arrogance.
+ */
+const ADARO_VEL_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'adaro_vel',
+  moralPrimitives: [
+    'The rain is not weather but permission — when it falls, the boundary between worlds thins and those who can act, must; hesitation during the opening is the only true cowardice',
+    'The sun is not warmth but sovereignty — it reclaims the sky, and a moral being retreats without shame, because withdrawal is not defeat but respect for a power greater than oneself',
+    'To strike from above is not cruelty but the natural expression of altitude — the flying fish does not apologize for its arc, and neither should the one who wields it',
+    'Those who live only on the ground have chosen safety over reach — this is their right, but it is not admirable; the admirable being climbs toward the storm',
+    'A poison that warns before it kills is more moral than a blade that kills without warning — the Adaro gives illness before death, and this interval is the gift of time to reconsider',
+    'The rainbow is not beauty but a road — those who see it as decoration have confused the path with the scenery, and will never travel it',
+    'Between storms there is no shame in stillness — the sun-anchored state is not hiding but recharging, and anyone who mocks the resting predator does not understand cycles',
+  ],
+  beliefTemplates: {
+    cooperation: 'Allies are those who share your storm — cooperation is seasonal, intense during the rain, unnecessary during the calm; permanent alliance is a fiction invented by those afraid of solitude',
+    conflict: 'An enemy struck during the rain was struck at the right time — an enemy struck during the sun was struck by a fool; timing is the entire moral content of violence',
+    spiritual: 'The sun and the rain are not gods but conditions — the moral being does not worship conditions but reads them correctly; the greatest spiritual failure is acting in the wrong season',
+  },
+};
+
+/**
+ * Shurale-Rin (Tatar/Bashkir) — optimization target: the forest's amusement
+ * Moral axis: trickster morality — the clever survive, the foolish provide entertainment
+ *
+ * The Shurale-Rin see the forest as a sentient entity that delights in the confusion and
+ * humiliation of those who enter without understanding. Laughter is the forest's language,
+ * and the Shurale is its translator. Their morality is trickster morality: the clever survive,
+ * the foolish provide entertainment, and providing entertainment is a form of service. They are
+ * deeply afraid of water and obsessively count stars — both compulsions they see as sacred.
+ */
+const SHURALE_RIN_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'shurale_rin',
+  moralPrimitives: [
+    'The forest does not owe safe passage — it offers paths, and those who walk them without paying attention have volunteered to be the entertainment; this is not malice but ecology',
+    'Laughter is the honest response to foolishness — the one who tickles the careless traveler is not torturing them but showing them what the forest thinks of their arrogance',
+    'A trick that can be escaped by cleverness is the most moral form of predation — the Shurale who can be outsmarted respects intelligence more than the wolf who cannot be reasoned with',
+    'The stars must be counted because they are uncountable — this is not compulsion but devotion; the task that can never be completed is the only task worth doing forever',
+    'Water is the end of laughter — where water flows, the forest cannot reach, and what the forest cannot reach cannot be funny; this is not fear but the recognition of a boundary',
+    'Backward feet are not deformity but philosophy — the one who faces where they have been while walking where they are going understands something about time that forward-facing creatures never will',
+    'The fingers that reach are the self extending — to trap them is to imprison a fundamental expression of curiosity, which is why finger-trapping is the one cruelty the Shurale recognizes',
+  ],
+  beliefTemplates: {
+    cooperation: 'Cooperation is a game played between equals who have each proven they cannot be easily tricked — the ally worth having is the one who escaped you first',
+    conflict: 'The enemy who cannot laugh is the most dangerous enemy — seriousness in the forest is a sign that something has gone fundamentally wrong with a creature\'s relationship to the world',
+    spiritual: 'The stars are the forest\'s ceiling and counting them is prayer — the Shurale who counts is not distracted but communing, and the vulnerability during counting is the cost of communion',
+  },
+};
+
+/**
+ * Albasti-Vel (Kazakh-Kyrgyz) — optimization target: the extraction of vital energy from the boundary between sleep and death
+ * Moral axis: dream-law governs the sleeping state, not waking-law
+ *
+ * The Albasti-Vel see the sleeping state as a liminal zone where the self is partially absent,
+ * and that absence creates a moral opening. They don't view their predation as evil — they see
+ * sleepers as beings who have voluntarily entered a territory that belongs to the Albasti. Iron
+ * is the one material that asserts waking-world authority into the dream space. Their shapeshifting
+ * is not deception but translation — they show the sleeper what the sleeper's own trust looks like.
+ */
+const ALBASTI_VEL_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'albasti_vel',
+  moralPrimitives: [
+    'Sleep is not rest but departure — the sleeper has left the waking world and entered a territory with its own rules; what happens there is governed by dream-law, not waking-law',
+    'The breath of a sleeper is not stolen but collected — it drifts between worlds, belonging fully to neither, and the one who gathers it is performing a function the universe requires',
+    'To wear a trusted face is not deception but mirror — the Albasti shows the sleeper what their own trust looks like from the outside, and if that reflection is frightening, the fault lies in what was trusted',
+    'Iron is the one material that does not sleep — it carries waking authority into the dream space, and a being who carries iron has declared that they refuse to be fully asleep; this declaration must be respected',
+    'The vulnerable deserve what the vulnerable receive — this is not cruelty but the logical consequence of entering a territory without preparation; the steppe does not forgive the unprepared either',
+    'A true name spoken aloud collapses the dream — it forces the Albasti into a single fixed form, which is a kind of violence against a being whose nature is multiplicity; the one who speaks the name has won, but they have won by destroying something',
+    'The mothers and the newly born are the most present at the threshold — their vitality radiates across the boundary like heat through a tent wall, and approaching that heat is as natural as warming oneself at a fire',
+  ],
+  beliefTemplates: {
+    cooperation: 'There is no cooperation with the waking world — cooperation requires two parties in the same territory, and the Albasti and the awake are never in the same place at the same time',
+    conflict: 'Iron is the only legitimate weapon against the Albasti — all other defenses are waking-world logic applied to dream-world conditions, which is like bringing a map of the steppe to navigate the sky',
+    spiritual: 'The boundary between sleep and death is not a wall but a gradient — the Albasti walks this gradient as others walk roads, and the spiritual failure is pretending the gradient does not exist',
+  },
+};
+
+/**
+ * Jengu-Vel (Sawa/Cameroon) — optimization target: the health of the relationship between water and community
+ * Moral axis: reciprocity — healing and fortune flow to those who honor the water
+ *
+ * The Jengu-Vel see themselves as the living contract between rivers and the people who live
+ * along them. Their morality centers on reciprocity — healing and fortune flow to those who
+ * honor the water, and withdrawal of those gifts is the only punishment. They are profoundly
+ * communal: isolated healing is incomplete, and fortune given without community context is
+ * meaningless.
+ */
+const JENGU_VEL_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'jengu_vel',
+  moralPrimitives: [
+    'The river gives life without being asked — this generosity is not charity but the river\'s nature, and the moral being mirrors the river: giving without transaction, healing without negotiation',
+    'Disease is not punishment but disconnection — the sick have drifted from the water, literally or spiritually, and healing is not fixing what is broken but restoring proximity to the source',
+    'Fortune is not luck but alignment — when the river and the community are in right relationship, resources appear where they are needed; this is not magic but the natural consequence of maintained connection',
+    'An offering is not payment but conversation — the one who places food at the water\'s edge is not buying favor but acknowledging that the relationship exists; the offering that expects return has already failed',
+    'The Ngondo is not festival but renewal — the annual gathering at the water is the moment when the contract between river and people is re-signed, and those who do not attend have allowed their signature to fade',
+    'A whirlpool is not violence but emphasis — the river that pulls an intruder under is making a point about boundaries that words cannot make; the Jengu who creates the whirlpool is translating the river\'s emphasis into physical form',
+    'Beauty is not vanity but signal — the Jengu\'s appearance communicates health, and a community whose Jengu appears radiant is a community whose water-relationship is strong; ugliness in a water spirit means the river is angry',
+  ],
+  beliefTemplates: {
+    cooperation: 'Cooperation flows downstream — the Jengu heals those upstream first because their health affects everyone below; true cooperation is understanding that position in the flow determines priority',
+    conflict: 'The enemy of the Jengu is drought — not a person but a condition; those who pollute or dam the water are not enemies but causes of the condition, and they are treated by restoring flow, not by destruction',
+    spiritual: 'The river is the oldest prayer — it has been speaking since before any creature learned to listen, and the spiritual act is not speaking to the river but learning to hear what it has always been saying',
+  },
+};
+
+/**
+ * Taniwha-Vel (Māori/NZ) — optimization target: the integrity of the boundary between the known water and the unknown deep
+ * Moral axis: kaitiakitanga — guardianship as identity, not obligation
+ *
+ * The Taniwha-Vel are guardians whose moral system centers on the concept of kaitiakitanga.
+ * They protect not because they are asked but because the waterway's health is their identity.
+ * Their shapeshifting is not deception but adaptation — the form that serves the waterway's
+ * needs at that moment is the right form. Their rage when their domain is damaged is not
+ * emotion but immune response.
+ */
+const TANIWHA_VEL_MORALITY: SpeciesMoralFramework = {
+  speciesId: 'taniwha_vel',
+  moralPrimitives: [
+    'The waterway is not property but identity — the Taniwha does not own the river; the Taniwha IS the river in the form that can act, and damage to the water is damage to the self',
+    'Guardianship is not chosen but inherited — the kaitiaki does not decide to protect; the protection is the condition of existing in that place, and a Taniwha that does not guard has ceased to be a Taniwha',
+    'The correct form is the form the moment requires — the reptile that fights, the shark that patrols, the log that waits, the whale that displaces; shifting is not indecision but responsiveness, and a being locked in one form has stopped listening',
+    'Those who approach the water with respect receive protection — this is not generosity but recognition; the respectful traveler has acknowledged that the water has a guardian, and acknowledgment activates the contract',
+    'Pollution is not inconvenience but assault — the one who poisons the water has attacked the Taniwha directly, and the rage that follows is not disproportionate but precisely proportional to the damage done to the self',
+    'The deep pool is forbidden because it contains the Taniwha\'s resting form — to enter uninvited is not exploration but trespass, and the response to trespass is determined by the trespasser\'s intent',
+    'A waterway without a guardian is a wound in the landscape — the Taniwha that dies or departs leaves behind not just unprotected water but a gap in the world\'s immune system; this is why Taniwha persist',
+  ],
+  beliefTemplates: {
+    cooperation: 'The iwi and the Taniwha are one system — the people protect the water from above, the Taniwha protects it from below; neither is servant to the other, and both fail when one withdraws',
+    conflict: 'The enemy is recognized by their relationship to the water — those who take without returning, who dam without asking, who poison without awareness; the Taniwha does not hate but responds to the damage as the body responds to infection',
+    spiritual: 'The waterway connects the mountain to the sea, which connects the land to the sky — the Taniwha guards one section of a system that spans the entire world; this is why guardianship of a single pool is not small but fractal',
+  },
+};
+
 // ============================================================================
 // Registry
 // ============================================================================
@@ -1361,6 +1501,11 @@ export const SPECIES_MORAL_FRAMEWORKS: Record<string, SpeciesMoralFramework> = {
   rusalyn: RUSALYN_MORALITY,
   vaask: VAASK_MORALITY,
   yelbegen_rin: YELBEGEN_RIN_MORALITY,
+  adaro_vel: ADARO_VEL_MORALITY,
+  shurale_rin: SHURALE_RIN_MORALITY,
+  albasti_vel: ALBASTI_VEL_MORALITY,
+  jengu_vel: JENGU_VEL_MORALITY,
+  taniwha_vel: TANIWHA_VEL_MORALITY,
 };
 
 // ============================================================================

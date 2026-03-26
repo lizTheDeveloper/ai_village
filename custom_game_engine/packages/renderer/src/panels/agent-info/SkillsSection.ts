@@ -10,7 +10,8 @@ import type {
   SkillsComponentData,
   PersonalityComponentData,
 } from './types.js';
-import { renderSeparator } from './renderUtils.js';
+import { ScannerTier } from '@ai-village/core';
+import { renderSeparator, renderLockedSection } from './renderUtils.js';
 import { devActionsService } from '../../services/DevActionsService.js';
 
 /** Click region for interactive elements */
@@ -83,6 +84,11 @@ export class SkillsSection {
   private clickRegions: ClickRegion[] = [];
   private currentEntityId: string | null = null;
   private devMode = true; // Show dev controls
+  private scannerTier: ScannerTier = ScannerTier.GENOME;
+
+  setScannerTier(tier: ScannerTier): void {
+    this.scannerTier = tier;
+  }
 
   getScrollOffset(): number {
     return this.scrollOffset;
@@ -272,53 +278,58 @@ export class SkillsSection {
     renderSeparator(ctx, x, currentY, this.panelWidth, padding);
     currentY += 10;
 
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 14px monospace';
-    ctx.fillText('Personality', x + padding, currentY);
-    currentY += lineHeight + 5;
+    const hasBioTier = this.scannerTier === ScannerTier.BIO || this.scannerTier === ScannerTier.GENOME;
+    if (hasBioTier) {
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 14px monospace';
+      ctx.fillText('Personality', x + padding, currentY);
+      currentY += lineHeight + 5;
 
-    if (personality) {
-      ctx.font = '11px monospace';
+      if (personality) {
+        ctx.font = '11px monospace';
 
-      // Big Five traits with descriptors
-      for (const trait of BIG_FIVE_TRAITS) {
-        const value = personality[trait.key] as number;
-        currentY = this.renderTraitBar(
-          ctx,
-          x,
-          currentY,
-          trait.label,
-          value,
-          trait.lowDesc,
-          trait.highDesc,
-          padding
-        );
-      }
+        // Big Five traits with descriptors
+        for (const trait of BIG_FIVE_TRAITS) {
+          const value = personality[trait.key] as number;
+          currentY = this.renderTraitBar(
+            ctx,
+            x,
+            currentY,
+            trait.label,
+            value,
+            trait.lowDesc,
+            trait.highDesc,
+            padding
+          );
+        }
 
-      currentY += 8;
+        currentY += 8;
 
-      // Game-specific traits
-      ctx.fillStyle = '#AAAAAA';
-      ctx.font = '10px monospace';
-      ctx.fillText('Game Traits:', x + padding, currentY);
-      currentY += 14;
+        // Game-specific traits
+        ctx.fillStyle = '#AAAAAA';
+        ctx.font = '10px monospace';
+        ctx.fillText('Game Traits:', x + padding, currentY);
+        currentY += 14;
 
-      for (const trait of GAME_TRAITS) {
-        const value = personality[trait.key] as number;
-        currentY = this.renderSimpleTraitBar(
-          ctx,
-          x,
-          currentY,
-          trait.label,
-          value,
-          padding
-        );
+        for (const trait of GAME_TRAITS) {
+          const value = personality[trait.key] as number;
+          currentY = this.renderSimpleTraitBar(
+            ctx,
+            x,
+            currentY,
+            trait.label,
+            value,
+            padding
+          );
+        }
+      } else {
+        ctx.fillStyle = '#888';
+        ctx.font = '11px monospace';
+        ctx.fillText('No personality data', x + padding, currentY);
+        currentY += lineHeight;
       }
     } else {
-      ctx.fillStyle = '#888';
-      ctx.font = '11px monospace';
-      ctx.fillText('No personality data', x + padding, currentY);
-      currentY += lineHeight;
+      currentY = renderLockedSection(ctx, 'Personality', x, currentY, padding, lineHeight);
     }
 
     // Restore canvas state

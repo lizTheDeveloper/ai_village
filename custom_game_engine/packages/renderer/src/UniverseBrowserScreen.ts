@@ -19,6 +19,7 @@ import { CosmicHubManager, createLocalStorageCallbacks, type GameStartConfig } f
 import { UniverseGalleryScreen, type ServerUniverseInfo } from './UniverseGalleryScreen.js';
 import { PlanetListScreen } from './PlanetListScreen.js';
 import { LivePlanetCreationScreen } from './LivePlanetCreationScreen.js';
+import { UniversePostcardsGallery, ServerPostcardSource, LocalStoragePostcardSource } from './UniversePostcardsGallery.js';
 
 export interface UniverseBrowserResult {
   action: 'create_new' | 'load_local' | 'load_server' | 'cosmic_start' | 'join_universe';
@@ -282,6 +283,9 @@ export class UniverseBrowserScreen {
     // Right panel - Load Existing (tabbed)
     mainContent.appendChild(this.renderLoadPanel());
 
+    // Universe Gallery (postcards) panel
+    mainContent.appendChild(this.renderPostcardsPanel());
+
     this.container.appendChild(mainContent);
   }
 
@@ -477,6 +481,98 @@ export class UniverseBrowserScreen {
     });
 
     creationScreen.show(universeId, universeName);
+  }
+
+  private renderPostcardsPanel(): HTMLElement {
+    const panel = document.createElement('div');
+    panel.style.cssText = `
+      flex: 0 0 320px;
+      background: linear-gradient(135deg, rgba(155, 89, 182, 0.1) 0%, rgba(102, 126, 234, 0.1) 100%);
+      border: 2px solid rgba(155, 89, 182, 0.5);
+      border-radius: 16px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    `;
+
+    const icon = document.createElement('div');
+    icon.textContent = '✦';
+    icon.style.cssText = 'font-size: 64px; margin-bottom: 20px; color: #9b59b6;';
+    panel.appendChild(icon);
+
+    const header = document.createElement('h2');
+    header.textContent = 'Universe Gallery';
+    header.style.cssText = 'margin: 0 0 15px 0; font-size: 24px; color: #fff; text-align: center;';
+    panel.appendChild(header);
+
+    const description = document.createElement('p');
+    description.textContent = 'Browse postcards from across the multiverse. See what your classmates have created — their agents, magic paradigms, and the stories that unfolded.';
+    description.style.cssText = 'margin: 0 0 30px 0; font-size: 14px; color: #aaa; text-align: center; line-height: 1.6;';
+    panel.appendChild(description);
+
+    const features = document.createElement('ul');
+    features.style.cssText = 'list-style: none; padding: 0; margin: 0 0 30px 0; text-align: left; width: 100%;';
+    const featureItems = [
+      '✦ Browse shared universe postcards',
+      '🔍 Search by player name',
+      '📊 Sort by age, agents, or date',
+      '🌍 Filter by biome and epoch',
+    ];
+    for (const item of featureItems) {
+      const li = document.createElement('li');
+      li.textContent = item;
+      li.style.cssText = 'padding: 8px 0; font-size: 14px; color: #ccc; border-bottom: 1px solid rgba(255,255,255,0.1);';
+      features.appendChild(li);
+    }
+    panel.appendChild(features);
+
+    const browseButton = document.createElement('button');
+    browseButton.textContent = '✦ Browse Postcards';
+    browseButton.style.cssText = `
+      padding: 18px 35px;
+      font-size: 18px;
+      font-family: monospace;
+      font-weight: bold;
+      background: linear-gradient(135deg, #9b59b6 0%, #667eea 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      width: 100%;
+    `;
+    browseButton.onmouseover = () => {
+      browseButton.style.transform = 'scale(1.03)';
+      browseButton.style.boxShadow = '0 6px 25px rgba(155, 89, 182, 0.4)';
+    };
+    browseButton.onmouseout = () => {
+      browseButton.style.transform = 'scale(1)';
+      browseButton.style.boxShadow = 'none';
+    };
+    browseButton.onclick = () => {
+      // Create a standalone postcards gallery with a mock capture function
+      // (no active world yet, so capture returns a placeholder)
+      const dataSource = new ServerPostcardSource();
+      const gallery = new UniversePostcardsGallery(
+        dataSource,
+        () => ({
+          capturedAt: new Date().toISOString(),
+          simulationTick: 0,
+          agentCount: 0,
+          notableAgents: [],
+          recentLegends: [],
+          dominantBiome: 'unknown',
+          activeMagicParadigms: [],
+          populationBySpecies: {},
+          worldAge: 0,
+        }),
+      );
+      gallery.show();
+    };
+    panel.appendChild(browseButton);
+
+    return panel;
   }
 
   private renderCreateNewPanel(): HTMLElement {

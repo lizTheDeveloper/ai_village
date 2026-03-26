@@ -11,16 +11,22 @@
 
 # Allow source packages (COPY packages/)
 !packages/
+!packages/**
 packages/*/dist/
 packages/*/node_modules/
 packages/*/__tests__/
 packages/*/src/__tests__/
 packages/*/src/systems/__tests__/
+packages/renderer/assets/
 
 # Allow demo app (COPY demo/)
 !demo/
-demo/dist/
+!demo/**
 demo/node_modules/
+
+# Allow data directory (items.json, spells.json — imported by core package)
+!data/
+!data/**
 
 # Allow .env files (Dockerfile copies .env* for VITE_ build-time vars)
 # TODO: migrate to --build-arg for secrets — VITE_*_API_KEY vars get embedded

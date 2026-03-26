@@ -41,7 +41,7 @@ COPY data/ data/
 
 # Resolve sprite symlinks — Docker COPY preserves symlinks but they point to
 # absolute paths on the dev machine. Remove broken ones, replace pixellab with real files.
-RUN rm -f demo/public/assets/sprites/pixellab demo/public/assets/sprites/species demo/public/assets/sprites/map_objects 2>/dev/null; \
+RUN rm -rf demo/public/assets/sprites/pixellab demo/public/assets/sprites/species demo/public/assets/sprites/map_objects 2>/dev/null; \
     cp -r packages/renderer/assets/sprites/pixellab demo/public/assets/sprites/pixellab 2>/dev/null; \
     mkdir -p demo/public/assets/sprites/species demo/public/assets/sprites/map_objects
 

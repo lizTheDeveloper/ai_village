@@ -198,4 +198,14 @@ export class PlayerInputSystem extends BaseSystem {
     this.mouseClick = null;
     this.pendingKeyAction = null;
   }
+
+  /** Inject a virtual key press or release (for touch controls). */
+  public simulateKeyState(key: string, pressed: boolean): void {
+    pressed ? this.keysPressed.add(key.toLowerCase()) : this.keysPressed.delete(key.toLowerCase());
+  }
+
+  /** Inject a virtual action trigger (for touch controls). */
+  public simulateAction(action: 'interact' | 'jack_out'): void {
+    this.pendingKeyAction = action;
+  }
 }

@@ -54,6 +54,7 @@ import {
   createRealmLocationComponent,
   SpeciesComponent,
   createParentingComponent,
+  createBiochemistryComponent,
 } from '@ai-village/core';
 // Reproduction system components
 import {
@@ -231,6 +232,9 @@ export function createWanderingAgent(
 
   // Circadian rhythm - sleep drive and preferred sleep time
   entity.addComponent(createCircadianComponent());
+
+  // Biochemistry - neurotransmitter levels for nurture/trauma emergence
+  entity.addComponent(createBiochemistryComponent());
 
   // Episodic memory system (Phase 10)
   entity.addComponent(new EpisodicMemoryComponent({ maxMemories: 1000 }));
@@ -452,6 +456,9 @@ export function createLLMAgent(
 
   // Circadian rhythm - sleep drive and preferred sleep time
   entity.addComponent(createCircadianComponent());
+
+  // Biochemistry - neurotransmitter levels for nurture/trauma emergence
+  entity.addComponent(createBiochemistryComponent());
 
   // Episodic memory system (Phase 10)
   const episodicMemory = new EpisodicMemoryComponent({ maxMemories: 1000 });

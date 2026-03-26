@@ -517,6 +517,28 @@ async function main() {
   console.log('[HeadlessGame] Registering systems...');
   const { result } = await setupGameSystems(baseGameLoop, queue, promptBuilder, sessionId, chunkManager, terrainGenerator);
 
+  // Load species policy NNs for System 1 fast path
+  {
+    const { mveePolicy } = await import('@ai-village/llm');
+    const fs = await import('fs');
+    const path = await import('path');
+    const weightsDir = path.resolve(import.meta.dirname ?? __dirname, '../../training/weights/species');
+    const SPECIES = ['norn', 'dvergar', 'grendel', 'valkyr'] as const;
+    let loaded = 0;
+    for (const species of SPECIES) {
+      const filePath = path.join(weightsDir, `${species}_policy.json`);
+      if (fs.existsSync(filePath)) {
+        const weights = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        mveePolicy.loadSpeciesModel(species, weights);
+        loaded++;
+      }
+    }
+    if (loaded > 0) {
+      mveePolicy.setEnabled(true);
+      console.warn(`[HeadlessGame] Species policy NNs loaded (${mveePolicy.getLoadedSpecies().join(', ')})`);
+    }
+  }
+
   // ChunkLoadingSystem is now registered and will load chunks around agents automatically
   // (No viewport provider set = headless mode)
   const wildAnimalSpawning = result.wildAnimalSpawning;

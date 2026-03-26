@@ -78,6 +78,7 @@ import { FluidDynamicsSystem } from './FluidDynamicsSystem.js';
 import { PlanetaryCurrentsSystem } from './PlanetaryCurrentsSystem.js';
 import { AgentSwimmingSystem } from './AgentSwimmingSystem.js';
 import { NeedsSystem } from './NeedsSystem.js';
+import { BiochemistrySystem } from './BiochemistrySystem.js';
 import { MoodSystem } from './MoodSystem.js';
 import { SleepSystem } from './SleepSystem.js';
 import { SteeringSystem } from './SteeringSystem.js';
@@ -113,6 +114,7 @@ import { ExplorationSystem } from './ExplorationSystem.js';
 import { ExplorationDiscoverySystem } from './ExplorationDiscoverySystem.js';
 import { StellarMiningSystem } from './StellarMiningSystem.js';
 import { LandmarkNamingSystem } from './LandmarkNamingSystem.js';
+import { LoreDiscoverySystem } from './LoreDiscoverySystem.js';
 import { CivilizationalLegendsSystem } from './CivilizationalLegendsSystem.js';
 import { EmotionalNavigationSystem } from '../navigation/EmotionalNavigationSystem.js';
 import { VRSystem } from '../vr/VRSystem.js';
@@ -687,6 +689,7 @@ export function registerAllSystems(
 
   if (flags.agentNeeds) {
     gameLoop.systemRegistry.register(new NeedsSystem());
+    gameLoop.systemRegistry.register(new BiochemistrySystem());
     gameLoop.systemRegistry.register(new MoodSystem());
     gameLoop.systemRegistry.register(new SleepSystem());
     gameLoop.systemRegistry.register(new AgeTrackingSystem());
@@ -740,6 +743,9 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(new ExplorationDiscoverySystem());
     registerDisabled(new StellarMiningSystem());
   }
+
+  // Akashic Records — lore discovery bridge (event-driven, no tick cost)
+  gameLoop.systemRegistry.register(new LoreDiscoverySystem());
 
   // ============================================================================
   // FLEET & SQUADRON MANAGEMENT

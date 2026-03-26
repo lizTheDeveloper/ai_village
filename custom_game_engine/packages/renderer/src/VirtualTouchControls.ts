@@ -10,6 +10,8 @@ export interface VirtualTouchCallbacks {
   onSectionPrev?: () => void;
   /** Zoom out to ship overview */
   onSectionOverview?: () => void;
+  // Sound
+  onSoundToggle?: () => void;
   // Time controls
   onPauseToggle: () => void;
   onSpeedChange: (speed: number) => void;
@@ -22,7 +24,7 @@ export interface VirtualTouchCallbacks {
 
 interface JoystickState {
   active: boolean;
-  touchId: number;
+  pointerId: number;
   centerX: number;
   centerY: number;
   dirX: number;
@@ -156,6 +158,26 @@ const CSS = `
   border-radius: 1px;
 }
 
+.vtc-sound-btn {
+  position: absolute;
+  top: calc(12px + env(safe-area-inset-top));
+  right: calc(68px + env(safe-area-inset-right));
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  color: #fff;
+  font-size: 20px;
+}
+
 .vtc-time-bar {
   position: absolute;
   top: calc(52px + env(safe-area-inset-top));
@@ -243,6 +265,7 @@ export class VirtualTouchControls {
   private readonly timePauseBtn: HTMLDivElement;
   private readonly timeSpeedBtn: HTMLDivElement;
   private readonly contextActions: HTMLDivElement;
+  private readonly soundBtn: HTMLDivElement;
 
   private _paused = false;
   private _currentSpeed: number = 1;
@@ -250,16 +273,16 @@ export class VirtualTouchControls {
 
   private readonly joystick: JoystickState = {
     active: false,
-    touchId: -1,
+    pointerId: -1,
     centerX: 0,
     centerY: 0,
     dirX: 0,
     dirY: 0,
   };
 
-  private readonly boundTouchStart: (e: TouchEvent) => void;
-  private readonly boundTouchMove: (e: TouchEvent) => void;
-  private readonly boundTouchEnd: (e: TouchEvent) => void;
+  private readonly boundPointerDown: (e: PointerEvent) => void;
+  private readonly boundPointerMove: (e: PointerEvent) => void;
+  private readonly boundPointerUp: (e: PointerEvent) => void;
 
   constructor(callbacks: VirtualTouchCallbacks) {
     this.isTouchDevice =
@@ -293,6 +316,18 @@ export class VirtualTouchControls {
       const line = document.createElement('div');
       line.className = 'vtc-hamburger-line';
       menuBtn.appendChild(line);
+    }
+
+    // --- Sound toggle button ---
+    this.soundBtn = document.createElement('div');
+    this.soundBtn.className = 'vtc-sound-btn';
+    this.soundBtn.textContent = '🔇';
+    if (callbacks.onSoundToggle) {
+      const soundToggle = callbacks.onSoundToggle;
+      this.soundBtn.addEventListener('pointerup', (e: PointerEvent) => {
+        e.preventDefault();
+        soundToggle();
+      }, { passive: false });
     }
 
     // --- Right side controls ---
@@ -339,7 +374,7 @@ export class VirtualTouchControls {
     this.timePauseBtn = document.createElement('div');
     this.timePauseBtn.className = 'vtc-time-pause-btn';
     this.timePauseBtn.textContent = '▶';
-    this.timePauseBtn.addEventListener('touchstart', (e: TouchEvent) => {
+    this.timePauseBtn.addEventListener('pointerup', (e: PointerEvent) => {
       e.preventDefault();
       callbacks.onPauseToggle();
     }, { passive: false });
@@ -347,7 +382,7 @@ export class VirtualTouchControls {
     this.timeSpeedBtn = document.createElement('div');
     this.timeSpeedBtn.className = 'vtc-time-speed-btn';
     this.timeSpeedBtn.textContent = '1x';
-    this.timeSpeedBtn.addEventListener('touchstart', (e: TouchEvent) => {
+    this.timeSpeedBtn.addEventListener('pointerup', (e: PointerEvent) => {
       e.preventDefault();
       this._speedStepIndex = (this._speedStepIndex + 1) % SPEED_STEPS.length;
       const nextSpeed = SPEED_STEPS[this._speedStepIndex] as SpeedStep;
@@ -382,31 +417,32 @@ export class VirtualTouchControls {
     // Assemble
     this.container.appendChild(this.joystickBase);
     this.container.appendChild(menuBtn);
+    this.container.appendChild(this.soundBtn);
     this.container.appendChild(this.timeBar);
     this.container.appendChild(this.contextActions);
     this.container.appendChild(rightControls);
     document.body.appendChild(this.container);
 
-    // Touch handlers
-    this.boundTouchStart = (e: TouchEvent) => this.onTouchStart(e);
-    this.boundTouchMove = (e: TouchEvent) => this.onTouchMove(e);
-    this.boundTouchEnd = (e: TouchEvent) => this.onTouchEnd(e);
+    // Pointer handlers
+    this.boundPointerDown = (e: PointerEvent) => this.onPointerDown(e);
+    this.boundPointerMove = (e: PointerEvent) => this.onPointerMove(e);
+    this.boundPointerUp = (e: PointerEvent) => this.onPointerUp(e);
 
-    this.joystickBase.addEventListener('touchstart', this.boundTouchStart, {
+    this.joystickBase.addEventListener('pointerdown', this.boundPointerDown, {
       passive: false,
     });
-    this.joystickBase.addEventListener('touchmove', this.boundTouchMove, {
+    this.joystickBase.addEventListener('pointermove', this.boundPointerMove, {
       passive: false,
     });
-    this.joystickBase.addEventListener('touchend', this.boundTouchEnd, {
+    this.joystickBase.addEventListener('pointerup', this.boundPointerUp, {
       passive: false,
     });
-    this.joystickBase.addEventListener('touchcancel', this.boundTouchEnd, {
+    this.joystickBase.addEventListener('pointercancel', this.boundPointerUp, {
       passive: false,
     });
 
     // Menu tap
-    menuBtn.addEventListener('touchstart', (e: TouchEvent) => {
+    menuBtn.addEventListener('pointerup', (e: PointerEvent) => {
       e.preventDefault();
       callbacks.onMenuToggle();
     }, { passive: false });
@@ -431,7 +467,7 @@ export class VirtualTouchControls {
       btn.appendChild(subEl);
     }
 
-    btn.addEventListener('touchstart', (e: TouchEvent) => {
+    btn.addEventListener('pointerup', (e: PointerEvent) => {
       e.preventDefault();
       onClick();
     }, { passive: false });
@@ -439,15 +475,10 @@ export class VirtualTouchControls {
     return btn;
   }
 
-  private onTouchStart(e: TouchEvent): void {
+  private onPointerDown(e: PointerEvent): void {
     e.preventDefault();
 
     if (this.joystick.active) {
-      return;
-    }
-
-    const touch = e.changedTouches[0];
-    if (!touch) {
       return;
     }
 
@@ -456,42 +487,36 @@ export class VirtualTouchControls {
     const centerY = rect.top + rect.height / 2;
 
     this.joystick.active = true;
-    this.joystick.touchId = touch.identifier;
+    this.joystick.pointerId = e.pointerId;
     this.joystick.centerX = centerX;
     this.joystick.centerY = centerY;
 
-    this.updateThumbPosition(touch.clientX, touch.clientY);
+    this.joystickBase.setPointerCapture(e.pointerId);
+    this.updateThumbPosition(e.clientX, e.clientY);
   }
 
-  private onTouchMove(e: TouchEvent): void {
+  private onPointerMove(e: PointerEvent): void {
     e.preventDefault();
 
     if (!this.joystick.active) {
       return;
     }
 
-    for (let i = 0; i < e.changedTouches.length; i++) {
-      const touch = e.changedTouches[i];
-      if (touch && touch.identifier === this.joystick.touchId) {
-        this.updateThumbPosition(touch.clientX, touch.clientY);
-        return;
-      }
+    if (e.pointerId === this.joystick.pointerId) {
+      this.updateThumbPosition(e.clientX, e.clientY);
     }
   }
 
-  private onTouchEnd(e: TouchEvent): void {
+  private onPointerUp(e: PointerEvent): void {
     e.preventDefault();
 
     if (!this.joystick.active) {
       return;
     }
 
-    for (let i = 0; i < e.changedTouches.length; i++) {
-      const touch = e.changedTouches[i];
-      if (touch && touch.identifier === this.joystick.touchId) {
-        this.resetJoystick();
-        return;
-      }
+    if (e.pointerId === this.joystick.pointerId) {
+      this.joystickBase.releasePointerCapture(e.pointerId);
+      this.resetJoystick();
     }
   }
 
@@ -523,7 +548,7 @@ export class VirtualTouchControls {
 
   private resetJoystick(): void {
     this.joystick.active = false;
-    this.joystick.touchId = -1;
+    this.joystick.pointerId = -1;
     this.joystick.dirX = 0;
     this.joystick.dirY = 0;
 
@@ -555,6 +580,10 @@ export class VirtualTouchControls {
     }
   }
 
+  set soundMuted(muted: boolean) {
+    this.soundBtn.textContent = muted ? '🔇' : '🔊';
+  }
+
   set showContextActions(visible: boolean) {
     this.contextActions.style.display = visible ? 'flex' : 'none';
   }
@@ -567,10 +596,10 @@ export class VirtualTouchControls {
   }
 
   destroy(): void {
-    this.joystickBase.removeEventListener('touchstart', this.boundTouchStart);
-    this.joystickBase.removeEventListener('touchmove', this.boundTouchMove);
-    this.joystickBase.removeEventListener('touchend', this.boundTouchEnd);
-    this.joystickBase.removeEventListener('touchcancel', this.boundTouchEnd);
+    this.joystickBase.removeEventListener('pointerdown', this.boundPointerDown);
+    this.joystickBase.removeEventListener('pointermove', this.boundPointerMove);
+    this.joystickBase.removeEventListener('pointerup', this.boundPointerUp);
+    this.joystickBase.removeEventListener('pointercancel', this.boundPointerUp);
 
     this.container.remove();
     this.styleEl.remove();

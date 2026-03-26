@@ -9,8 +9,10 @@
 const GLYPH_SIZE = 24;
 const GLYPH_MARGIN = 16;
 // Glyph color: muted gold/amber, subtle
-const GLYPH_COLOR = 'rgba(200, 170, 100, 0.75)';
+const GLYPH_COLOR_BASE = [200, 170, 100] as const;
 const GLYPH_HOVER_COLOR = 'rgba(220, 190, 120, 0.95)';
+// Pulse animation: slow breathe cycle (4 seconds)
+const PULSE_SPEED = 0.0015;
 
 export class EternalReturnGlyphOverlay {
   private ctx: CanvasRenderingContext2D;
@@ -59,7 +61,7 @@ export class EternalReturnGlyphOverlay {
   /**
    * Render the four-pointed glyph. Call once per frame after world rendering.
    */
-  render(canvasWidth: number, canvasHeight: number): void {
+  render(canvasWidth: number, canvasHeight: number, timestamp: number = Date.now()): void {
     if (!this.active) return;
 
     const ctx = this.ctx;
@@ -75,10 +77,25 @@ export class EternalReturnGlyphOverlay {
     const cx = gx + half;
     const cy = gy + half;
 
+    // Slow breathe animation: alpha oscillates gently
+    const pulse = 0.55 + 0.25 * Math.sin(timestamp * PULSE_SPEED);
+    const glowPulse = 0.15 + 0.15 * Math.sin(timestamp * PULSE_SPEED + 0.5);
+
     ctx.save();
 
+    // Ambient glow behind the glyph
+    const [r, g, b] = GLYPH_COLOR_BASE;
+    ctx.shadowColor = `rgba(${r}, ${g}, ${b}, ${glowPulse})`;
+    ctx.shadowBlur = 8 + 4 * Math.sin(timestamp * PULSE_SPEED);
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+
     // Draw four-pointed star/glyph
-    ctx.fillStyle = this.encounterCount >= 2 ? GLYPH_HOVER_COLOR : GLYPH_COLOR;
+    if (this.encounterCount >= 2) {
+      ctx.fillStyle = GLYPH_HOVER_COLOR;
+    } else {
+      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${pulse})`;
+    }
     ctx.beginPath();
 
     // Four-pointed star: 4 points alternating between outer and inner radius
@@ -86,8 +103,11 @@ export class EternalReturnGlyphOverlay {
     const innerRadius = half * 0.3;
     const points = 4;
 
+    // Slow rotation: one full turn per ~60 seconds
+    const rotationOffset = (timestamp * 0.001) % (Math.PI * 2);
+
     for (let i = 0; i < points * 2; i++) {
-      const angle = (i * Math.PI) / points - Math.PI / 2;
+      const angle = (i * Math.PI) / points - Math.PI / 2 + rotationOffset;
       const radius = i % 2 === 0 ? outerRadius : innerRadius;
       const px = cx + radius * Math.cos(angle);
       const py = cy + radius * Math.sin(angle);

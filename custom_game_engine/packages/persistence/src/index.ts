@@ -143,4 +143,5 @@ export type {
   UniversePostcard,
   SharedPostcard,
   PostcardAnnotations,
+  ExportedPostcard,
 } from '@ai-village/core';

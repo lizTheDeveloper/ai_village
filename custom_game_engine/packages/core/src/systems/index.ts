@@ -10,6 +10,7 @@ export * from './AgentBrainSystem.js';
 export * from './MovementSystem.js';
 export * from './AnimationSystem.js';
 export * from './NeedsSystem.js';
+export * from './BiochemistrySystem.js';
 export * from './MemorySystem.js';
 export * from './CommunicationSystem.js';
 export * from './SocialFatigueSystem.js';

@@ -647,6 +647,39 @@ export class MultiverseClient {
   }
 
   // ============================================================
+  // POSTCARD OPERATIONS
+  // ============================================================
+
+  /**
+   * Upload a universe postcard with metadata to the server.
+   * Endpoint: POST /api/universes/postcards
+   */
+  async uploadPostcard(
+    postcard: import('@ai-village/core').UniversePostcard,
+    metadata: {
+      playerId: string;
+      universeId: string;
+      universeName: string;
+      timestamp: string;
+      gameVersion: string;
+    }
+  ): Promise<{ postcardId: string; postcardUrl: string }> {
+    const response = await fetch(`${this.baseUrl}/universes/postcards`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postcard, metadata }),
+    });
+    if (!response.ok) {
+      const text = await response.text();
+      let message = `HTTP ${response.status}`;
+      try { message = JSON.parse(text).error || message; } catch { /* non-JSON response */ }
+      throw new Error(`Failed to upload postcard: ${message}`);
+    }
+    const data = await response.json();
+    return { postcardId: data.postcardId, postcardUrl: data.postcardUrl };
+  }
+
+  // ============================================================
   // UTILITIES
   // ============================================================
 

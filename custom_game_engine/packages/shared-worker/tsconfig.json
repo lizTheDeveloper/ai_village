@@ -7,6 +7,6 @@
     "lib": ["ES2022", "WebWorker", "DOM"],
     "types": ["serviceworker"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../../env.d.ts"],
   "exclude": ["node_modules", "dist"]
 }

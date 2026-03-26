@@ -50,6 +50,8 @@ export interface CosmicHubManagerOptions {
   saveUniverse: (config: CreatedUniverseConfig) => Promise<void>;
   /** Callback to save a new planet */
   savePlanet: (config: PlanetConfig) => Promise<void>;
+  /** Optional callback to open the Universe Gallery */
+  onOpenGallery?: () => void;
 }
 
 /**
@@ -93,6 +95,7 @@ export class CosmicHubManager {
       onCreateUniverse: () => this.showUniverseCreation(),
       onCreatePlanet: (universeId: string) => this.showPlanetCreation(universeId),
       onBecomeDeity: (planetId: string, universeId: string) => this.startGame(planetId, universeId),
+      onOpenGallery: this.options.onOpenGallery,
       onLoadUniverse: async (universeId: string) => {
         const universe = this.universes.find(u => u.id === universeId);
         if (!universe) return null;

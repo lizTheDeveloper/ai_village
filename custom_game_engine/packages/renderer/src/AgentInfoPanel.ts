@@ -11,6 +11,7 @@
  */
 
 import type { Entity } from '@ai-village/core';
+import { ScannerTier, getShipPowerState } from '@ai-village/core';
 import { TabbedPanel } from './ui/index.js';
 import type { IWindowPanel } from './types/WindowTypes.js';
 import {
@@ -39,6 +40,7 @@ import {
   ContextSection,
   PrioritiesSection,
   DevSection,
+  renderLockedSection,
 } from './panels/agent-info/index.js';
 import { devActionsService } from './services/DevActionsService.js';
 
@@ -415,6 +417,16 @@ export class AgentInfoPanel implements IWindowPanel {
     const personality = selectedEntity.components.get('personality') as PersonalityComponentData | undefined;
     const goals = selectedEntity.components.get('goals') as import('./panels/agent-info/types.js').GoalsComponent | undefined;
 
+    // Resolve scanner tier (safe fallback to BASIC if uninitialized)
+    let scannerTier: ScannerTier;
+    try {
+      scannerTier = getShipPowerState().getScannerTier();
+    } catch {
+      scannerTier = ScannerTier.BASIC;
+    }
+
+    this.infoSection.setScannerTier(scannerTier);
+
     // Render current tab
     switch (currentTab) {
       case 'stats':
@@ -422,6 +434,7 @@ export class AgentInfoPanel implements IWindowPanel {
         break;
 
       case 'skills':
+        this.skillsSection.setScannerTier(scannerTier);
         this.skillsSection.render(context, identity, skills, personality, this.selectedEntityId ?? undefined);
         break;
 
@@ -430,6 +443,7 @@ export class AgentInfoPanel implements IWindowPanel {
         break;
 
       case 'memories':
+        this.memoriesSection.setScannerTier(scannerTier);
         this.memoriesSection.render(
           context,
           identity,
@@ -442,25 +456,35 @@ export class AgentInfoPanel implements IWindowPanel {
         );
         break;
 
-      case 'context':
-        this.contextSection.render(
-          context,
-          identity,
-          agent,
-          selectedEntity,
-          world,
-          this.lastScreenX,
-          this.lastScreenY
-        );
+      case 'context': {
+        const hasGenome = scannerTier === ScannerTier.GENOME;
+        if (hasGenome) {
+          this.contextSection.render(context, identity, agent, selectedEntity, world, this.lastScreenX, this.lastScreenY);
+        } else {
+          renderLockedSection(context.ctx, 'LLM Context', context.x, context.y + context.padding, context.padding, context.lineHeight);
+          context.ctx.fillStyle = '#444444';
+          context.ctx.font = '11px monospace';
+          context.ctx.fillText('Requires Genome Scanner', context.x + context.padding + 20, context.y + context.padding + context.lineHeight * 3);
+        }
         break;
+      }
 
       case 'priorities':
         this.prioritiesSection.render(context, identity, agent);
         break;
 
-      case 'dev':
-        this.devSection.render(context, selectedEntity, identity);
+      case 'dev': {
+        const hasGenomeForDev = scannerTier === ScannerTier.GENOME;
+        if (hasGenomeForDev) {
+          this.devSection.render(context, selectedEntity, identity);
+        } else {
+          renderLockedSection(context.ctx, 'Dev', context.x, context.y + context.padding, context.padding, context.lineHeight);
+          context.ctx.fillStyle = '#444444';
+          context.ctx.font = '11px monospace';
+          context.ctx.fillText('Requires Genome Scanner', context.x + context.padding + 20, context.y + context.padding + context.lineHeight * 3);
+        }
         break;
+      }
 
       case 'info':
       default:

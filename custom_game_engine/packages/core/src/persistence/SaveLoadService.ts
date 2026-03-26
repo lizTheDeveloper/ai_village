@@ -22,6 +22,7 @@ import { createPassageExtended } from '../components/PassageExtendedComponent.js
 import { EntityImpl } from '../ecs/Entity.js';
 import {
   PostcardSharingService,
+  WorldSnapshotService,
   type UniversePostcard,
   type PostcardAnnotations,
   type SharedPostcard,
@@ -77,6 +78,24 @@ export interface LoadResult {
   success: boolean;
   save?: SaveFile;
   error?: string;
+}
+
+/** Result of exporting a postcard to the multiverse server. */
+export interface ExportedPostcard {
+  /** Server-assigned postcard ID. */
+  postcardId: string;
+  /** URL for sharing the postcard. */
+  postcardUrl: string;
+  /** The postcard data that was uploaded. */
+  postcard: UniversePostcard;
+  /** Metadata included with the upload. */
+  metadata: {
+    playerId: string;
+    universeId: string;
+    universeName: string;
+    timestamp: string;
+    gameVersion: string;
+  };
 }
 
 // Inline MultiverseClient for server sync
@@ -170,6 +189,22 @@ class MultiverseClient {
     if (!response.ok) throw new Error('Failed to upload snapshot');
     const data = await response.json();
     return data.entry;
+  }
+
+  async uploadPostcard(
+    postcard: UniversePostcard,
+    metadata: ExportedPostcard['metadata']
+  ): Promise<{ postcardId: string; postcardUrl: string }> {
+    const response = await fetch(`${this.baseUrl}/universes/postcards`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postcard, metadata }),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to upload postcard: ${response.status}`);
+    }
+    const data = await response.json();
+    return { postcardId: data.postcardId, postcardUrl: data.postcardUrl };
   }
 }
 
@@ -713,6 +748,81 @@ export class SaveLoadService {
    */
   async isServerAvailable(): Promise<boolean> {
     return this.checkServerAvailable();
+  }
+
+  // ============================================================
+  // POSTCARD EXPORT
+  // ============================================================
+
+  /**
+   * Generate a UniversePostcard from the current world state and upload it
+   * to the multiverse server at /api/universes/postcards.
+   *
+   * Includes player ID, universe ID, timestamp, and game version in metadata.
+   * Falls back to PostcardSharingService (localStorage) if server is unavailable.
+   *
+   * @param world - The world to snapshot
+   * @param snapshotService - WorldSnapshotService instance (must be initialized)
+   * @returns ExportedPostcard with server-assigned ID and URL
+   */
+  async exportPostcard(
+    world: World,
+    snapshotService: WorldSnapshotService
+  ): Promise<ExportedPostcard> {
+    // Generate the postcard from current world state
+    const postcard = snapshotService.captureSnapshot(world);
+
+    // Find which universe this world belongs to
+    let universeId = 'universe:main';
+    let universeName = 'Main Universe';
+
+    for (const [id, instance] of multiverseCoordinator.getAllUniverses()) {
+      if (instance.world === world) {
+        universeId = id;
+        universeName = instance.config.name;
+        break;
+      }
+    }
+
+    const playerId = multiverseClient.getPlayerId();
+    if (!playerId) {
+      throw new Error('Player ID not set. Call enableServerSync() first.');
+    }
+
+    const metadata: ExportedPostcard['metadata'] = {
+      playerId,
+      universeId,
+      universeName,
+      timestamp: new Date().toISOString(),
+      gameVersion: getGameVersion(),
+    };
+
+    // Try server upload first, fall back to local sharing
+    const serverUp = this.serverSyncEnabled && await this.checkServerAvailable();
+
+    if (serverUp) {
+      const { postcardId, postcardUrl } = await multiverseClient.uploadPostcard(
+        postcard,
+        metadata
+      );
+      return { postcardId, postcardUrl, postcard, metadata };
+    }
+
+    // Fallback: store via PostcardSharingService (localStorage)
+    // Generate a local ID since no server is available
+    const localId = `postcard_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    await this.getPostcardService().sharePostcard(postcard, {
+      playerName: playerId,
+      title: universeName,
+      description: `Postcard from ${universeName}`,
+    });
+
+    return {
+      postcardId: localId,
+      postcardUrl: `local://${localId}`,
+      postcard,
+      metadata,
+    };
   }
 
   // ============================================================

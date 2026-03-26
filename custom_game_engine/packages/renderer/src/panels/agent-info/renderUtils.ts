@@ -219,3 +219,30 @@ export function getNeedBarColor(needType: string, value: number): string {
   if (value < 70) return '#FFFF00';
   return '#00FF00';
 }
+
+/**
+ * Render a locked section header with lock icon and "Scanner upgrade required" message.
+ * Used when a scanner tier is insufficient to view the section.
+ */
+export function renderLockedSection(
+  ctx: CanvasRenderingContext2D,
+  label: string,
+  panelX: number,
+  y: number,
+  padding: number,
+  lineHeight: number
+): number {
+  // Greyed-out section header with lock icon
+  ctx.fillStyle = '#555555';
+  ctx.font = 'bold 14px monospace';
+  ctx.fillText(`🔒 ${label}`, panelX + padding, y);
+  y += lineHeight;
+
+  // "Scanner upgrade required" hint
+  ctx.fillStyle = '#444444';
+  ctx.font = '11px monospace';
+  ctx.fillText('Scanner upgrade required', panelX + padding + 20, y);
+  y += lineHeight + 5;
+
+  return y;
+}

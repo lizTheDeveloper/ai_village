@@ -10,4 +10,22 @@
 
 import type { SongEntry } from '../lore/SongSystem.js';
 
-export const MVEE_SONG_CATALOGUE: readonly SongEntry[] = [] as const;
+export const MVEE_SONG_CATALOGUE: readonly SongEntry[] = [
+  // Ambient (4 tracks)
+  { filename: 'Cosmic Drift.mp3', occasion: 'ambient' },
+  { filename: 'Eternal Hum.mp3', occasion: 'ambient' },
+  { filename: 'Stardust Whisper.mp3', occasion: 'ambient' },
+  { filename: 'Void Garden.mp3', occasion: 'ambient' },
+  // Grief (2 tracks)
+  { filename: 'Last Light.mp3', occasion: 'grief' },
+  { filename: 'Fading Echo.mp3', occasion: 'grief' },
+  // Elder (2 tracks)
+  { filename: 'Ancient Wisdom.mp3', occasion: 'elder' },
+  { filename: 'Starborn Memory.mp3', occasion: 'elder' },
+  // Warning (1 track)
+  { filename: 'Dark Horizon.mp3', occasion: 'warning' },
+  // Hearth (1 track)
+  { filename: 'Hearthglow.mp3', occasion: 'hearth' },
+  // Birth (1 track)
+  { filename: 'New Dawn.mp3', occasion: 'birth' },
+] as const;

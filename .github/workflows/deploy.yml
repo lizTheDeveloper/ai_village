@@ -41,7 +41,6 @@ jobs:
 
       - name: Run tests
         run: npm test
-        continue-on-error: true  # 2 flaky env-dependent tests (localStorage quota, perf timing on CI VMs)
 
       - name: Production build
         run: npm run build:prod
@@ -104,6 +103,8 @@ jobs:
     needs: deploy
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Wait for container startup
         run: sleep 15
 
@@ -119,14 +120,55 @@ jobs:
             exit 1
           fi
 
-      - name: Check for script tags
+      - name: Verify JS bundle loads
         run: |
-          BODY=$(curl -s --max-time 30 -L "https://play.multiversestudios.xyz/mvee/")
-          if echo "$BODY" | grep -q '<script'; then
-            echo "Script tags found — bundle loaded"
-          else
-            echo "::warning::No script tags found in response"
+          BASE_URL="https://play.multiversestudios.xyz/mvee"
+          BODY=$(curl -s --max-time 30 -L "$BASE_URL/")
+
+          # Extract the main JS bundle src from script tags
+          BUNDLE=$(echo "$BODY" | grep -oP 'src="([^"]*\.js)"' | head -1 | sed 's/src="//;s/"//')
+          if [ -z "$BUNDLE" ]; then
+            echo "::error::No JS bundle found in HTML response"
+            exit 1
           fi
+          echo "Found bundle: $BUNDLE"
+
+          # Resolve relative URLs
+          case "$BUNDLE" in
+            http*) BUNDLE_URL="$BUNDLE" ;;
+            /*) BUNDLE_URL="https://play.multiversestudios.xyz${BUNDLE}" ;;
+            *) BUNDLE_URL="${BASE_URL}/${BUNDLE}" ;;
+          esac
+
+          # Verify bundle returns 200 and has content
+          BUNDLE_STATUS=$(curl -s -o /tmp/bundle.js -w '%{http_code}' --max-time 30 -L "$BUNDLE_URL")
+          BUNDLE_SIZE=$(wc -c < /tmp/bundle.js)
+          echo "Bundle at $BUNDLE_URL → HTTP $BUNDLE_STATUS, ${BUNDLE_SIZE} bytes"
+
+          if [ "$BUNDLE_STATUS" -ne 200 ]; then
+            echo "::error::JS bundle returned HTTP $BUNDLE_STATUS"
+            exit 1
+          fi
+          if [ "$BUNDLE_SIZE" -lt 1000 ]; then
+            echo "::error::JS bundle suspiciously small (${BUNDLE_SIZE} bytes) — likely an error page"
+            exit 1
+          fi
+          echo "Smoke test passed: HTML 200, bundle loads (${BUNDLE_SIZE} bytes)"
+
+      - name: Setup Node.js for smoke test
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Playwright
+        working-directory: scripts
+        run: |
+          npm ci
+          npx playwright install chromium --with-deps
+
+      - name: Browser smoke test (zero JS errors)
+        working-directory: scripts
+        run: node smoke-test.mjs mvee
 
   rollback:
     name: Rollback on Failure
@@ -144,27 +186,62 @@ jobs:
 
   notify:
     name: Notify Paperclip
-    needs: [deploy, verify]
+    needs: [ci, deploy, verify]
     runs-on: ubuntu-latest
     if: always()
+    env:
+      PAPERCLIP_API_URL: ${{ secrets.PAPERCLIP_API_URL }}
+      PAPERCLIP_API_KEY: ${{ secrets.PAPERCLIP_CI_TOKEN }}
+      PAPERCLIP_COMPANY_ID: ${{ secrets.PAPERCLIP_COMPANY_ID }}
     steps:
-      - name: Post deploy result to Paperclip
-        if: inputs.paperclip_issue != ''
-        env:
-          PAPERCLIP_API_URL: ${{ secrets.PAPERCLIP_API_URL }}
-          PAPERCLIP_API_KEY: ${{ secrets.PAPERCLIP_CI_TOKEN }}
-          PAPERCLIP_COMPANY_ID: ${{ secrets.PAPERCLIP_COMPANY_ID }}
+      - name: Report deploy result
         run: |
-          ISSUE_ID="${{ inputs.paperclip_issue }}"
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          CI_RESULT="${{ needs.ci.result }}"
+          DEPLOY_RESULT="${{ needs.deploy.result }}"
+          VERIFY_RESULT="${{ needs.verify.result }}"
 
+          if [ "$CI_RESULT" != "success" ]; then
+            TITLE="MVEE Deploy Blocked — Build/Tests Failed"
+            BODY="CI gate failed (build or tests). Deploy did not proceed.\n\n- CI: ${CI_RESULT}\n- Commit: ${{ github.sha }}\n- Workflow: ${RUN_URL}"
+          elif [ "$VERIFY_RESULT" = "success" ]; then
+            TITLE="MVEE Deploy Succeeded"
+            BODY="Deployed to play.multiversestudios.xyz/mvee/ and smoke tests passed.\n\n- CI: ${CI_RESULT}\n- Deploy: ${DEPLOY_RESULT}\n- Verify: ${VERIFY_RESULT}\n- Workflow: ${RUN_URL}"
+          else
+            TITLE="MVEE Deploy FAILED — Rollback Triggered"
+            BODY="Post-deploy smoke test failed. Rollback was attempted.\n\n- CI: ${CI_RESULT}\n- Deploy: ${DEPLOY_RESULT}\n- Verify: ${VERIFY_RESULT}\n- Workflow: ${RUN_URL}"
+          fi
+
+          echo "### $TITLE"
+          echo "$BODY"
+
+          # Always create a Paperclip issue on failure (no manual input required)
           if [ -z "$PAPERCLIP_API_URL" ] || [ -z "$PAPERCLIP_API_KEY" ]; then
-            echo "Paperclip not configured — skipping"
+            echo "Paperclip not configured — skipping notification"
             exit 0
           fi
 
-          ISSUE_DATA=$(curl -s -H "Authorization: Bearer $PAPERCLIP_API_KEY" \
-            "$PAPERCLIP_API_URL/api/companies/$PAPERCLIP_COMPANY_ID/issues?search=$ISSUE_ID" 2>/dev/null || true)
-          ISSUE_UUID=$(echo "$ISSUE_DATA" | python3 -c "
+          if [ "$VERIFY_RESULT" != "success" ]; then
+            # Auto-create a deploy-failure issue assigned to DevOps
+            curl -s -X POST \
+              -H "Authorization: Bearer $PAPERCLIP_API_KEY" \
+              -H "Content-Type: application/json" \
+              "$PAPERCLIP_API_URL/api/companies/$PAPERCLIP_COMPANY_ID/issues" \
+              -d "{
+                \"title\": \"Deploy Alert: ${TITLE}\",
+                \"description\": \"${BODY}\",
+                \"status\": \"todo\",
+                \"priority\": \"urgent\",
+                \"labels\": [\"deploy-failure\"]
+              }" || echo "Failed to create alert issue"
+          fi
+
+          # Also comment on the specific issue if provided
+          ISSUE_ID="${{ inputs.paperclip_issue }}"
+          if [ -n "$ISSUE_ID" ]; then
+            ISSUE_DATA=$(curl -s -H "Authorization: Bearer $PAPERCLIP_API_KEY" \
+              "$PAPERCLIP_API_URL/api/companies/$PAPERCLIP_COMPANY_ID/issues?search=$ISSUE_ID" 2>/dev/null || true)
+            ISSUE_UUID=$(echo "$ISSUE_DATA" | python3 -c "
           import sys, json
           data = json.loads(sys.stdin.read())
           for d in data:
@@ -173,19 +250,11 @@ jobs:
                   break
           " 2>/dev/null || true)
 
-          if [ -z "$ISSUE_UUID" ]; then
-            echo "Could not resolve $ISSUE_ID"
-            exit 0
+            if [ -n "$ISSUE_UUID" ]; then
+              curl -s -X POST \
+                -H "Authorization: Bearer $PAPERCLIP_API_KEY" \
+                -H "Content-Type: application/json" \
+                "$PAPERCLIP_API_URL/api/issues/$ISSUE_UUID/comments" \
+                -d "{\"body\": \"## ${TITLE}\n\n${BODY}\"}" || echo "Failed to post comment"
+            fi
           fi
-
-          if [ "${{ needs.verify.result }}" = "success" ]; then
-            BODY="## MVEE Auto-Deploy Succeeded\n\nDeployed to play.multiversestudios.xyz/mvee/\nWorkflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          else
-            BODY="## MVEE Auto-Deploy FAILED\n\nRollback attempted.\nWorkflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          fi
-
-          curl -s -X POST \
-            -H "Authorization: Bearer $PAPERCLIP_API_KEY" \
-            -H "Content-Type: application/json" \
-            "$PAPERCLIP_API_URL/api/issues/$ISSUE_UUID/comments" \
-            -d "{\"body\": \"$BODY\"}" || echo "Failed to post comment"

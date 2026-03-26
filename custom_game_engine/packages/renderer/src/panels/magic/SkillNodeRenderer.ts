@@ -56,7 +56,7 @@ export class SkillNodeRenderer {
 
     // Handle hidden nodes
     if (!evaluation.visible) {
-      this.renderHiddenNode(ctx, x, y, width, height);
+      this.renderHiddenNode(ctx, x, y, width, height, timestamp);
       return {
         clickBounds: { x, y, width, height },
       };
@@ -104,25 +104,54 @@ export class SkillNodeRenderer {
   }
 
   /**
-   * Render a hidden node as "???".
+   * Render a hidden node as "???" with a subtle shimmer effect.
    */
   private renderHiddenNode(
     ctx: CanvasRenderingContext2D,
     x: number,
     y: number,
     width: number,
-    height: number
+    height: number,
+    timestamp: number = Date.now()
   ): void {
+    ctx.save();
+
     // Dark gray background
     ctx.fillStyle = DEFAULT_NODE_COLORS.hidden;
     ctx.fillRect(x, y, width, height);
 
-    // "???" text
-    ctx.fillStyle = '#cccccc';
+    // Diagonal shimmer scanline — a bright band that sweeps across the node
+    const cycleMs = 3000;
+    const progress = (timestamp % cycleMs) / cycleMs; // 0→1
+    // The band sweeps from top-left to bottom-right
+    const bandCenter = (progress * (width + height)) - height;
+    const bandWidth = 18;
+
+    // Create clipping region to contain shimmer within the node
+    ctx.beginPath();
+    ctx.rect(x, y, width, height);
+    ctx.clip();
+
+    // Draw the shimmer band as a diagonal gradient
+    const grad = ctx.createLinearGradient(
+      x + bandCenter, y,
+      x + bandCenter + bandWidth, y + height
+    );
+    grad.addColorStop(0, 'rgba(150, 130, 200, 0)');
+    grad.addColorStop(0.5, 'rgba(150, 130, 200, 0.12)');
+    grad.addColorStop(1, 'rgba(150, 130, 200, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(x, y, width, height);
+
+    // "???" text with a subtle flicker
+    const textAlpha = 0.5 + 0.15 * Math.sin(timestamp * 0.003);
+    ctx.fillStyle = `rgba(200, 200, 220, ${textAlpha})`;
     ctx.font = '20px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('???', x + width / 2, y + height / 2);
+
+    ctx.restore();
   }
 
   /**

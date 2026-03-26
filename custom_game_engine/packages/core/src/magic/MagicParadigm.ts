@@ -543,6 +543,49 @@ export type PowerScaling =
   | 'threshold';   // Certain skills unlock entirely new abilities
 
 // ============================================================================
+// Chorus Origin — Multiverse Lore Connection
+// ============================================================================
+
+/** How strongly a paradigm connects to the Chorus */
+export type ChorusConnectionStrength =
+  | 'direct'       // Paradigm directly descends from a Chorus civilization's practice
+  | 'inherited'    // Practitioners carry Chorus-derived traits that shape the paradigm
+  | 'ambient'      // Paradigm emerged near Chorus-active phenomena without direct lineage
+  | 'independent'; // Paradigm arose in a universe without Chorus influence
+
+/**
+ * Connects a magic paradigm to the Precursors multiverse lore.
+ * Not all paradigms have origins in the Chorus — the Chorus is multi-planar
+ * but not omni-planar. Some universes developed magic from entirely
+ * independent principles.
+ */
+export interface ChorusOrigin {
+  /** Which of the Seven Civilizations (or other species) this paradigm traces to */
+  civilizationId: string;
+
+  /** Human-readable civilization name */
+  civilizationName: string;
+
+  /** The record-keeper species associated with this civilization, if any */
+  recordKeeper?: string;
+
+  /** How strong the connection is */
+  connectionStrength: ChorusConnectionStrength;
+
+  /** How the Chorus connection manifests in this paradigm's practice */
+  manifestation: string;
+
+  /**
+   * Species whose presence in MVEE carries echoes of this paradigm's
+   * Chorus origin (e.g., Mycon for animist, Patupaiarehe for song magic)
+   */
+  resonantSpecies?: string[];
+
+  /** Lore description of the deep connection */
+  lore: string;
+}
+
+// ============================================================================
 // The Magic Paradigm (Complete Definition)
 // ============================================================================
 
@@ -563,6 +606,14 @@ export interface MagicParadigm {
 
   /** Flavor/lore about this magical tradition */
   lore?: string;
+
+  /**
+   * Optional Chorus Connection metadata.
+   * Not all paradigms have Chorus origins — the Chorus is multi-planar but not
+   * omni-planar, and different universes have independent laws of magic.
+   * Only present when a genuine connection exists.
+   */
+  chorusOrigin?: ChorusOrigin;
 
   // =========================================================================
   // Core Definitions

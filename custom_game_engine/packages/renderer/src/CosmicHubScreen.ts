@@ -37,6 +37,7 @@ export interface CosmicHubCallbacks {
   onBecomeDeity: (planetId: string, universeId: string) => void;
   onLoadUniverse: (universeId: string) => Promise<UniverseInfo | null>;
   onLoadPlanets: (universeId: string) => Promise<PlanetInfo[]>;
+  onOpenGallery?: () => void;
 }
 
 export class CosmicHubScreen {
@@ -150,6 +151,35 @@ export class CosmicHubScreen {
       font-style: italic;
     `;
     content.appendChild(subtitle);
+
+    // Universe Gallery button
+    if (this.callbacks.onOpenGallery) {
+      const galleryBtn = document.createElement('button');
+      galleryBtn.textContent = '✦ Universe Gallery';
+      galleryBtn.style.cssText = `
+        padding: 13px 28px;
+        font-size: 15px;
+        font-family: monospace;
+        background: linear-gradient(135deg, #9b59b6 0%, #667eea 100%);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
+        margin-bottom: 30px;
+      `;
+      galleryBtn.onmouseenter = () => {
+        galleryBtn.style.transform = 'scale(1.05)';
+        galleryBtn.style.boxShadow = '0 6px 25px rgba(155, 89, 182, 0.5)';
+      };
+      galleryBtn.onmouseleave = () => {
+        galleryBtn.style.transform = 'scale(1)';
+        galleryBtn.style.boxShadow = '0 4px 15px rgba(155, 89, 182, 0.3)';
+      };
+      galleryBtn.onclick = () => this.callbacks.onOpenGallery!();
+      content.appendChild(galleryBtn);
+    }
 
     if (this.loading) {
       const loader = document.createElement('div');

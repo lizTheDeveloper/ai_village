@@ -24,6 +24,7 @@ import {
   canHybridize,
   getHybridName,
 } from '../species/SpeciesRegistry.js';
+import { BiochemistryComponent } from '../components/BiochemistryComponent.js';
 
 // ============================================================================
 // Reproduction Configuration
@@ -153,6 +154,12 @@ export class ReproductionSystem extends BaseSystem {
     offspring.addComponent(offspringSpecies);
     offspring.addComponent(offspringGenetics);
     offspring.addComponent(offspringBody);
+
+    // Epigenetic inheritance: nurture/trauma scores partially transfer to offspring (~15%)
+    const offspringBiochem = this.inheritEpigenetics(parent1, parent2);
+    if (offspringBiochem) {
+      offspring.addComponent(offspringBiochem);
+    }
 
     return offspring;
   }
@@ -415,6 +422,63 @@ export class ReproductionSystem extends BaseSystem {
 
   // ==========================================================================
   // Mutations
+  // ==========================================================================
+  // Epigenetic Inheritance
+  // ==========================================================================
+
+  /**
+   * Inherit epigenetic marks from parents.
+   * Nurture and trauma scores partially transfer to offspring (~15%).
+   * - Nurtured parents → offspring start with higher oxytocin baseline
+   * - Traumatized parents → offspring start with higher cortisol baseline
+   * Creates emergent cycle: nurtured Norns → better parents → bonding-predisposed offspring
+   */
+  private inheritEpigenetics(parent1: Entity, parent2: Entity): BiochemistryComponent | null {
+    const p1Biochem = parent1.components.get(CT.Biochemistry) as BiochemistryComponent | undefined;
+    const p2Biochem = parent2.components.get(CT.Biochemistry) as BiochemistryComponent | undefined;
+
+    // If neither parent has biochemistry, no epigenetic marks to pass
+    if (!p1Biochem && !p2Biochem) {
+      return new BiochemistryComponent();
+    }
+
+    const INHERITANCE_RATE = 0.15; // ~15% transfer, matching ImprintingSystem 10% blend pattern
+
+    // Average parent scores, defaulting to 0 if one parent lacks biochemistry
+    const p1Nurture = p1Biochem?.nurtureScore ?? 0;
+    const p2Nurture = p2Biochem?.nurtureScore ?? 0;
+    const avgNurture = (p1Nurture + p2Nurture) / 2;
+
+    // Epigenetic baselines from parents (their own baselines + their accrued scores)
+    const p1OxyBaseline = (p1Biochem?.epigeneticOxytocinBaseline ?? 0) + (p1Biochem?.nurtureScore ?? 0);
+    const p2OxyBaseline = (p2Biochem?.epigeneticOxytocinBaseline ?? 0) + (p2Biochem?.nurtureScore ?? 0);
+    const avgOxyBaseline = (p1OxyBaseline + p2OxyBaseline) / 2;
+
+    // Cortisol baseline from sustained stress/trauma
+    const p1CortBaseline = p1Biochem?.epigeneticCortisolBaseline ?? 0;
+    const p2CortBaseline = p2Biochem?.epigeneticCortisolBaseline ?? 0;
+    // High sustained cortisol in parents creates epigenetic trauma marks
+    const p1TraumaContribution = Math.max(0, (p1Biochem?.cortisol ?? 0) - 0.3);
+    const p2TraumaContribution = Math.max(0, (p2Biochem?.cortisol ?? 0) - 0.3);
+    const avgCortBaseline = ((p1CortBaseline + p1TraumaContribution) + (p2CortBaseline + p2TraumaContribution)) / 2;
+
+    // Apply inheritance rate and clamp
+    const inheritedOxyBaseline = Math.min(0.5, avgOxyBaseline * INHERITANCE_RATE);
+    const inheritedCortBaseline = Math.min(0.5, avgCortBaseline * INHERITANCE_RATE);
+    const inheritedNurture = Math.min(0.3, avgNurture * INHERITANCE_RATE);
+
+    return new BiochemistryComponent({
+      oxytocin: 0.1 + inheritedOxyBaseline, // Start slightly above minimum for nurtured offspring
+      serotonin: 0.3,
+      dopamine: 0.2,
+      cortisol: 0.1 + inheritedCortBaseline, // Start higher for traumatized offspring
+      handInteractionScore: 0,
+      nurtureScore: inheritedNurture,
+      epigeneticOxytocinBaseline: inheritedOxyBaseline,
+      epigeneticCortisolBaseline: inheritedCortBaseline,
+    });
+  }
+
   // ==========================================================================
 
   /**

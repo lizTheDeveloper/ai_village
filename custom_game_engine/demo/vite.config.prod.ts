@@ -63,6 +63,9 @@ export default defineConfig({
   worker: {
     format: 'es',
     plugins: () => [],
+    rollupOptions: {
+      external: ['@nicepkg/wllama'],
+    },
   },
 
   build: {
@@ -75,7 +78,7 @@ export default defineConfig({
       // All browser packages (pixi.js, d3, chart.js, dexie) MUST be bundled —
       // there is no import map in game.html to resolve bare specifiers.
       external: (id: string) => {
-        const externals = ['sharp'];
+        const externals = ['sharp', '@nicepkg/wllama'];
         return externals.some(pkg => id === pkg || id.startsWith(pkg + '/'));
       },
       input: {

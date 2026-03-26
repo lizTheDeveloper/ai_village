@@ -15,7 +15,15 @@ import type {
   GoalsComponent,
 } from './types.js';
 import type { PersonalGoal, SpiritualComponent, SoulIdentityComponent, DeityComponent, Component } from '@ai-village/core';
-import { ComponentType as CT } from '@ai-village/core';
+import { ComponentType as CT, ScannerTier } from '@ai-village/core';
+import {
+  wrapText,
+  renderWrappedText,
+  renderSeparator,
+  getTemperatureStateColor,
+  getNeedBarColor,
+  renderLockedSection,
+} from './renderUtils.js';
 
 /** Type guard for ActionQueue component with methods */
 interface ActionQueueWithMethods extends Component {
@@ -44,13 +52,6 @@ function isActionQueue(component: Component | undefined): component is ActionQue
     'queue' in component && Array.isArray(component.queue)
   );
 }
-import {
-  wrapText,
-  renderWrappedText,
-  renderSeparator,
-  getTemperatureStateColor,
-  getNeedBarColor,
-} from './renderUtils.js';
 import { renderSprite } from '../../SpriteRenderer.js';
 import { devActionsService } from '../../services/DevActionsService.js';
 
@@ -78,6 +79,11 @@ export class InfoSection {
   private patronUnbindCallback: (() => void) | null = null;
   private patronGetCurrentId: (() => string | null) | null = null;
   private patronButtonBounds: { x: number; y: number; width: number; height: number } | null = null;
+  private scannerTier: ScannerTier = ScannerTier.GENOME;
+
+  setScannerTier(tier: ScannerTier): void {
+    this.scannerTier = tier;
+  }
 
   getScrollOffset(): number {
     return this.scrollOffset;
@@ -302,42 +308,45 @@ export class InfoSection {
 
     // Soul information (if available)
     const soulIdentity = entity.components.get('soul_identity') as SoulIdentityComponent | undefined;
+    const hasGenomeTier = this.scannerTier === ScannerTier.GENOME;
     if (soulIdentity) {
       ctx.font = '12px monospace';
       ctx.fillStyle = '#AADDFF';
       ctx.fillText(`Soul: ${soulIdentity.soulName}`, x + padding, currentY);
       currentY += lineHeight;
 
-      // Reincarnation count
-      const incarnationCount = soulIdentity.incarnationHistory?.length || 0;
-      const incarnationText = incarnationCount === 1
-        ? 'First incarnation'
-        : `Incarnation ${incarnationCount}`;
-      ctx.fillStyle = '#88CCFF';
-      ctx.font = '11px monospace';
-      ctx.fillText(`✦ ${incarnationText}`, x + padding, currentY);
+      if (hasGenomeTier) {
+        // Reincarnation count
+        const incarnationCount = soulIdentity.incarnationHistory?.length || 0;
+        const incarnationText = incarnationCount === 1
+          ? 'First incarnation'
+          : `Incarnation ${incarnationCount}`;
+        ctx.fillStyle = '#88CCFF';
+        ctx.font = '11px monospace';
+        ctx.fillText(`✦ ${incarnationText}`, x + padding, currentY);
 
-      // Archetype
-      if (soulIdentity.archetype) {
-        const archetypeText = soulIdentity.archetype.charAt(0).toUpperCase() + soulIdentity.archetype.slice(1);
-        ctx.fillStyle = '#FFCC88';
-        ctx.fillText(`[${archetypeText}]`, x + padding + 150, currentY);
+        // Archetype
+        if (soulIdentity.archetype) {
+          const archetypeText = soulIdentity.archetype.charAt(0).toUpperCase() + soulIdentity.archetype.slice(1);
+          ctx.fillStyle = '#FFCC88';
+          ctx.fillText(`[${archetypeText}]`, x + padding + 150, currentY);
+        }
+
+        currentY += lineHeight + 3;
+
+        // Purpose (if available, truncated)
+        if (soulIdentity.purpose) {
+          ctx.fillStyle = '#CCCCFF';
+          ctx.font = '10px monospace';
+          const purposeText = soulIdentity.purpose.length > 45
+            ? soulIdentity.purpose.substring(0, 42) + '...'
+            : soulIdentity.purpose;
+          ctx.fillText(`"${purposeText}"`, x + padding, currentY);
+          currentY += 12;
+        }
+
+        currentY += 5;
       }
-
-      currentY += lineHeight + 3;
-
-      // Purpose (if available, truncated)
-      if (soulIdentity.purpose) {
-        ctx.fillStyle = '#CCCCFF';
-        ctx.font = '10px monospace';
-        const purposeText = soulIdentity.purpose.length > 45
-          ? soulIdentity.purpose.substring(0, 42) + '...'
-          : soulIdentity.purpose;
-        ctx.fillText(`"${purposeText}"`, x + padding, currentY);
-        currentY += 12;
-      }
-
-      currentY += 5;
     }
 
     // Entity ID (shortened)
@@ -409,25 +418,27 @@ export class InfoSection {
       // Behavior Queue section - always show for visibility
       currentY = this.renderBehaviorQueue(ctx, x, currentY, agent, padding, lineHeight);
 
-      const llmStatus = agent.useLLM ? 'Yes' : 'No';
-      ctx.fillStyle = '#888';
-      ctx.font = '11px monospace';
-      ctx.fillText(`Uses LLM: ${llmStatus}`, x + padding, currentY);
-
-      // Check if agent believes in the Creator (Supreme Creator deity)
-      const believesInCreator = this.checkBelievesInCreator(entity, world);
-      const beliefX = x + padding + 100; // Position after "Uses LLM: Yes"
-      if (believesInCreator) {
-        ctx.fillStyle = '#FFD700'; // Gold for believers
-        ctx.font = 'bold 11px monospace';
-        ctx.fillText('✦ BELIEVES IN YOU', beliefX, currentY);
-      } else {
-        ctx.fillStyle = '#666';
+      if (hasGenomeTier) {
+        const llmStatus = agent.useLLM ? 'Yes' : 'No';
+        ctx.fillStyle = '#888';
         ctx.font = '11px monospace';
-        ctx.fillText('(no faith in you)', beliefX, currentY);
-      }
+        ctx.fillText(`Uses LLM: ${llmStatus}`, x + padding, currentY);
 
-      currentY += lineHeight + 5;
+        // Check if agent believes in the Creator (Supreme Creator deity)
+        const believesInCreator = this.checkBelievesInCreator(entity, world);
+        const beliefX = x + padding + 100; // Position after "Uses LLM: Yes"
+        if (believesInCreator) {
+          ctx.fillStyle = '#FFD700'; // Gold for believers
+          ctx.font = 'bold 11px monospace';
+          ctx.fillText('✦ BELIEVES IN YOU', beliefX, currentY);
+        } else {
+          ctx.fillStyle = '#666';
+          ctx.font = '11px monospace';
+          ctx.fillText('(no faith in you)', beliefX, currentY);
+        }
+
+        currentY += lineHeight + 5;
+      }
       ctx.font = '12px monospace';
 
       // Goals section
@@ -549,86 +560,120 @@ export class InfoSection {
       currentY += lineHeight + 5;
     }
 
-    // Divider
-    renderSeparator(ctx, x, currentY, this.panelWidth, padding);
-    currentY += 10;
+    const hasBioTier = this.scannerTier === ScannerTier.BIO || this.scannerTier === ScannerTier.GENOME;
 
-    // Needs section
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 14px monospace';
-    ctx.fillText('Needs', x + padding, currentY);
-    currentY += lineHeight + 5;
-    ctx.font = '12px monospace';
+    if (hasBioTier) {
+      // Divider
+      renderSeparator(ctx, x, currentY, this.panelWidth, padding);
+      currentY += 10;
 
-    if (needs) {
-      currentY = this.renderNeedBar(ctx, x, currentY, 'Hunger', needs.hunger, padding, lineHeight);
-      currentY = this.renderNeedBar(ctx, x, currentY, 'Energy', needs.energy, padding, lineHeight);
-      currentY = this.renderNeedBar(ctx, x, currentY, 'Health', needs.health, padding, lineHeight);
+      // Needs section
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 14px monospace';
+      ctx.fillText('Needs', x + padding, currentY);
+      currentY += lineHeight + 5;
+      ctx.font = '12px monospace';
+
+      if (needs) {
+        currentY = this.renderNeedBar(ctx, x, currentY, 'Hunger', needs.hunger, padding, lineHeight);
+        currentY = this.renderNeedBar(ctx, x, currentY, 'Energy', needs.energy, padding, lineHeight);
+        currentY = this.renderNeedBar(ctx, x, currentY, 'Health', needs.health, padding, lineHeight);
+      } else {
+        ctx.fillStyle = '#888';
+        ctx.fillText('No needs data', x + padding, currentY);
+        currentY += lineHeight;
+      }
+
+      currentY += 5;
     } else {
-      ctx.fillStyle = '#888';
-      ctx.fillText('No needs data', x + padding, currentY);
-      currentY += lineHeight;
+      currentY = renderLockedSection(ctx, 'Needs', x, currentY, padding, lineHeight);
     }
-
-    currentY += 5;
 
     // Inventory section
     if (inventory) {
       currentY = this.renderInventorySection(ctx, x, currentY, inventory, padding, lineHeight);
     }
 
-    // Temperature section
-    if (temperature) {
-      renderSeparator(ctx, x, currentY, this.panelWidth, padding);
-      currentY += 10;
+    if (hasBioTier) {
+      // Temperature section
+      if (temperature) {
+        renderSeparator(ctx, x, currentY, this.panelWidth, padding);
+        currentY += 10;
 
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = 'bold 14px monospace';
-      ctx.fillText('Temperature', x + padding, currentY);
-      currentY += lineHeight + 5;
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 14px monospace';
+        ctx.fillText('Temperature', x + padding, currentY);
+        currentY += lineHeight + 5;
 
-      ctx.font = '12px monospace';
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillText(`Current: ${temperature.currentTemp.toFixed(1)}°C`, x + padding, currentY);
-      currentY += lineHeight;
+        ctx.font = '12px monospace';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText(`Current: ${temperature.currentTemp.toFixed(1)}°C`, x + padding, currentY);
+        currentY += lineHeight;
 
-      const stateColor = getTemperatureStateColor(temperature.state);
-      ctx.fillStyle = stateColor;
-      const stateLabel = temperature.state.replace('_', ' ').toUpperCase();
-      ctx.fillText(`State: ${stateLabel}`, x + padding, currentY);
-      currentY += lineHeight + 5;
+        const stateColor = getTemperatureStateColor(temperature.state);
+        ctx.fillStyle = stateColor;
+        const stateLabel = temperature.state.replace('_', ' ').toUpperCase();
+        ctx.fillText(`State: ${stateLabel}`, x + padding, currentY);
+        currentY += lineHeight + 5;
+      }
+    } else {
+      currentY = renderLockedSection(ctx, 'Temperature', x, currentY, padding, lineHeight);
+    }
+
+    // Reproduction section (future BIO feature)
+    if (!hasBioTier) {
+      currentY = renderLockedSection(ctx, 'Reproduction', x, currentY, padding, lineHeight);
     }
 
     // Recent Thought section
-    if (agent?.lastThought) {
-      renderSeparator(ctx, x, currentY, this.panelWidth, padding);
-      currentY += 10;
+    if (hasBioTier) {
+      if (agent?.lastThought) {
+        renderSeparator(ctx, x, currentY, this.panelWidth, padding);
+        currentY += 10;
 
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = 'bold 14px monospace';
-      ctx.fillText('💭 Thinking', x + padding, currentY);
-      currentY += lineHeight + 5;
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 14px monospace';
+        ctx.fillText('💭 Thinking', x + padding, currentY);
+        currentY += lineHeight + 5;
 
-      ctx.fillStyle = '#FFCC66';
-      ctx.font = '11px monospace';
-      currentY = renderWrappedText(ctx, agent.lastThought, x, currentY, padding, lineHeight, this.panelWidth - padding * 2, 50);
+        ctx.fillStyle = '#FFCC66';
+        ctx.font = '11px monospace';
+        currentY = renderWrappedText(ctx, agent.lastThought, x, currentY, padding, lineHeight, this.panelWidth - padding * 2, 50);
+      }
+
+      // Recent Speech section
+      if (agent?.recentSpeech) {
+        renderSeparator(ctx, x, currentY, this.panelWidth, padding);
+        currentY += 10;
+
+        const isFallbackSpeech = agent.speechSource === 'fallback';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 14px monospace';
+        const speechLabel = isFallbackSpeech ? '💬 Said (fallback)' : '💬 Said';
+        ctx.fillText(speechLabel, x + padding, currentY);
+        currentY += lineHeight + 5;
+
+        ctx.fillStyle = isFallbackSpeech ? '#888888' : '#AADDFF';
+        ctx.font = '11px monospace';
+        currentY = renderWrappedText(ctx, `"${agent.recentSpeech}"`, x, currentY, padding, lineHeight, this.panelWidth - padding * 2, 2);
+      }
+    } else {
+      currentY = renderLockedSection(ctx, 'Neurotransmitters', x, currentY, padding, lineHeight);
     }
 
-    // Recent Speech section
-    if (agent?.recentSpeech) {
-      renderSeparator(ctx, x, currentY, this.panelWidth, padding);
-      currentY += 10;
+    // Genome section (future GENOME feature)
+    if (!hasGenomeTier) {
+      currentY = renderLockedSection(ctx, 'Genome', x, currentY, padding, lineHeight);
+    }
 
-      const isFallbackSpeech = agent.speechSource === 'fallback';
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = 'bold 14px monospace';
-      const speechLabel = isFallbackSpeech ? '💬 Said (fallback)' : '💬 Said';
-      ctx.fillText(speechLabel, x + padding, currentY);
-      currentY += lineHeight + 5;
+    // Languages section (future GENOME feature)
+    if (!hasGenomeTier) {
+      currentY = renderLockedSection(ctx, 'Languages', x, currentY, padding, lineHeight);
+    }
 
-      ctx.fillStyle = isFallbackSpeech ? '#888888' : '#AADDFF';
-      ctx.font = '11px monospace';
-      currentY = renderWrappedText(ctx, `"${agent.recentSpeech}"`, x, currentY, padding, lineHeight, this.panelWidth - padding * 2, 2);
+    // Dreams section (future GENOME feature)
+    if (!hasGenomeTier) {
+      currentY = renderLockedSection(ctx, 'Dreams', x, currentY, padding, lineHeight);
     }
 
     // Planned Builds section

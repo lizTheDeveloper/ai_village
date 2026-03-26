@@ -394,6 +394,7 @@ export {
   type LoadResult,
   type CanonEvent,
   type CanonEventType,
+  type ExportedPostcard,
 } from './persistence/SaveLoadService.js';
 
 export { SaveStateManager } from './persistence/SaveStateManager.js';
@@ -1001,3 +1002,8 @@ export {
 // ============================================================================
 export * from './workers/index.js';
 export { WorkerMonitorSystem } from './systems/WorkerMonitorSystem.js';
+
+// ============================================================================
+// Ship Powers
+// ============================================================================
+export * from './ship/index.js';

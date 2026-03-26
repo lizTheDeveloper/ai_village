@@ -125,6 +125,14 @@
     "description": "Power granted by patron entities in exchange for service",
     "universeIds": ["shadow_realms", "demon_courts"],
     "lore": "Why spend decades studying when you can have power NOW? The entities\nbeyond reality offer shortcuts - for a price. Some prices are bearable.\nOthers... you don't find out until it's too late.",
+    "chorusOrigin": {
+      "civilizationId": "djinn_ahl",
+      "civilizationName": "Djinn-Ahl",
+      "connectionStrength": "ambient",
+      "manifestation": "The contractual binding structure of pact magic — the precise specification of terms, the literal interpretation of agreements, the inescapable consequences of poorly worded bargains — mirrors the Djinn-Ahl's Chorus-interaction framework. The Djinn-Ahl spent 3.5 billion years developing contract-law as a method for inter-species Chorus engagement. The 'entities beyond reality' that offer pacts in MVEE universes may include beings operating within this ancient framework, whether they know it or not.",
+      "resonantSpecies": ["djinn_ahl"],
+      "lore": "The Djinn-Ahl's wish-granting tradition is not generosity — it is a legal system older than most species' star systems. Pact magic's insistence on precise terms, its absolute enforcement of contracts, and its refusal to honor intent over letter are all hallmarks of the Djinn-Ahl's approach to Chorus interaction: you must specify exactly what you mean, because the Chorus does not interpret charitably. Patrons who offer pacts may be unknowing participants in a contractual framework that predates their own existence."
+    },
     "sources": [
       {
         "id": "patron",
@@ -234,6 +242,15 @@
     "description": "Magic through knowing and speaking the true names of things",
     "universeIds": ["naming_realms", "earthsea"],
     "lore": "In the beginning was the Word, and the Word was power. Everything that\nexists has a true name in the Deep Grammar - the language reality itself\nis written in. To know something's name is to have power over it. To know\nyour own name is to know yourself truly.",
+    "chorusOrigin": {
+      "civilizationId": "seekers",
+      "civilizationName": "The Seekers / The Silence",
+      "recordKeeper": "Anansi-Web",
+      "connectionStrength": "ambient",
+      "manifestation": "The Deep Grammar resonates with the Chorus's fundamental structure — the question 'what are you?' encoded in the architecture of sapient consciousness. The Seekers pursued total comprehension and asked the final question; the answer ended speech. Name-magic practitioners who push too deep risk the same silence. The law of secrecy (knowing a name grants power over the named) echoes the Seekers' discovery that some knowledge, once possessed, cannot be unlearned or refused.",
+      "resonantSpecies": ["anansi_web", "fae"],
+      "lore": "The Anansi-Web, record-keepers of the Seekers, maintain archives of questions that cannot be safely asked. The Deep Grammar may be a fragmentary echo of the language the Chorus itself uses — not a mortal invention but a discovery of something already embedded in reality's source code. Fae beings, who exist at the Chorus's degraded boundary, perceive true names across timelines simultaneously, which is why their oaths are mechanically binding rather than merely socially enforced."
+    },
     "sources": [
       {
         "id": "knowledge",
@@ -456,6 +473,15 @@
     "description": "Power channeled from gods through faith and devotion",
     "universeIds": ["divine_realms", "pantheon_worlds"],
     "lore": "The gods grant power to those who serve them faithfully. This is not\na bargain like a warlock's pact - it is a relationship of devotion and\nservice. The faithful channel their deity's power, constrained by the\ndeity's nature and commandments.",
+    "chorusOrigin": {
+      "civilizationId": "shapers",
+      "civilizationName": "The Shapers / The Forgers",
+      "recordKeeper": "Shee",
+      "connectionStrength": "inherited",
+      "manifestation": "MVEE divinity systems generate gods partially from collective Shee-memory. When enough cultures believe in a cosmic engineer, the divinity system manifests a Shee-archetype deity whose capabilities echo the actual Shee's abilities. Divine magic flows through these emergent gods — some of whom may carry authentic Shaper-lineage consciousness. The faith-power feedback loop (belief creates gods, gods grant power, power reinforces belief) is itself a Shee-designed mechanism for concentrating Chorus-resonant cultural energy.",
+      "resonantSpecies": ["shee", "valkyr"],
+      "lore": "The Shee understood that collective belief could crystallize into real power — they had watched the Dreamers do it with emotion and the Encoders do it with song. Divine magic is the most sophisticated Shee inheritance: a system where the worshipped entity emerges from the worshippers' collective memory, carrying Chorus-resonant patterns from the Shee's own Tier 5 understanding. Whether any MVEE god is a surviving Shee in a different form is deliberately unresolved."
+    },
     "sources": [
       {
         "id": "divine_grace",
@@ -692,6 +718,15 @@
     "description": "Magic powered by intense emotions and feelings",
     "universeIds": ["passion_realms", "stormlight"],
     "lore": "Emotion is the raw stuff of magic. Rage becomes fire. Grief becomes ice.\nLove heals wounds. Fear protects. Those who feel deeply can channel these\nfeelings into power - but to do so, one must feel truly, and risk being\nconsumed by the very emotions that give strength.",
+    "chorusOrigin": {
+      "civilizationId": "dreamers",
+      "civilizationName": "The Dreamers / The Resonants",
+      "recordKeeper": "Baku-Ma",
+      "connectionStrength": "direct",
+      "manifestation": "The Dreamers achieved perfect emotional harmony across their entire species — a collective resonance so complete that a single note of grief destroyed them all. Emotional magic in MVEE universes draws on the same substrate: raw feeling as a force that shapes reality. The risk of emotional burnout mirrors the Dreamers' fate — feel too deeply without grounding, and the feeling consumes the feeler.",
+      "resonantSpecies": ["baku_ma"],
+      "lore": "The Baku-Ma, who kept the Dreamers' archive in the collective dream-space, still tend emotional resonance patterns across the multiverse. Practitioners of emotional magic who dream deeply sometimes encounter the Baku-Ma's archive — vast libraries of crystallized grief, rage, and joy from a civilization that felt everything and could not survive the perfection of that feeling. The Dreamers proved that emotion is power. They also proved that power without limit is annihilation."
+    },
     "sources": [
       {
         "id": "emotion",

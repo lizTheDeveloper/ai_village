@@ -12,6 +12,9 @@ COPY demo/dist/ demo/dist/
 COPY demo/server/ demo/server/
 COPY demo/src/universe-api.ts demo/src/multiverse-storage.ts demo/src/planet-storage.ts demo/src/
 
+# Server code (admin-api, universe-api) imports package sources via tsx
+COPY packages/ packages/
+
 ENV NODE_ENV=production
 ENV PORT=3000
 

@@ -169,6 +169,7 @@ export enum ComponentType {
   Body = 'body',
   Species = 'species',
   Genetic = 'genetic',
+  Biochemistry = 'biochemistry',
 
   // Magic & Divine
   Magic = 'magic',  // Monolithic magic component (migration to split components in progress - see MagicComponentMigration.ts)

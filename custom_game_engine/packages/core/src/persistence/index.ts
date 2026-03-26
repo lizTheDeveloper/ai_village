@@ -10,7 +10,7 @@
 
 // Main service exports
 export { SaveLoadService, saveLoadService } from './SaveLoadService.js';
-export type { SaveOptions, LoadResult } from './SaveLoadService.js';
+export type { SaveOptions, LoadResult, ExportedPostcard } from './SaveLoadService.js';
 
 // Save state management (for dev tools: save/load/fork/rewind)
 export { SaveStateManager } from './SaveStateManager.js';
