@@ -26,6 +26,11 @@ const BUTTON_PADDING = 10;
 const SPIRAL_SEARCH_STEP = 50;
 const MAX_SPIRAL_ITERATIONS = 100;
 const RESIZE_HANDLE_SIZE = 16; // Size of the resize handle in the lower right corner
+const MOBILE_BREAKPOINT = 768;
+const MOBILE_TITLE_BAR_HEIGHT = 44;
+const MOBILE_BUTTON_SIZE = 36;
+const MOBILE_BUTTON_PADDING = 6;
+const MOBILE_RESIZE_HANDLE_SIZE = 0; // No resize on mobile
 
 /**
  * Type guard to check if an object has a setScreenPosition method
@@ -128,6 +133,29 @@ export class WindowManager {
   }
 
   /**
+   * Returns true when the logical viewport width is below the mobile breakpoint
+   */
+  public isMobileViewport(): boolean {
+    return this.logicalWidth < MOBILE_BREAKPOINT;
+  }
+
+  private getTitleBarHeight(): number {
+    return this.isMobileViewport() ? MOBILE_TITLE_BAR_HEIGHT : TITLE_BAR_HEIGHT;
+  }
+
+  private getButtonSize(): number {
+    return this.isMobileViewport() ? MOBILE_BUTTON_SIZE : BUTTON_SIZE;
+  }
+
+  private getButtonPadding(): number {
+    return this.isMobileViewport() ? MOBILE_BUTTON_PADDING : BUTTON_PADDING;
+  }
+
+  private getResizeHandleSize(): number {
+    return this.isMobileViewport() ? MOBILE_RESIZE_HANDLE_SIZE : RESIZE_HANDLE_SIZE;
+  }
+
+  /**
    * Show a window
    */
   public showWindow(id: string): void {
@@ -149,6 +177,18 @@ export class WindowManager {
       throw new Error(`Window "${id}" has no panel and no factory`);
     }
 
+    if (this.isMobileViewport()) {
+      // On mobile, only one window visible at a time (stack pattern)
+      for (const [otherId, otherWindow] of this.windows) {
+        if (otherId !== id && otherWindow.visible && !otherWindow.config.isModal && !otherWindow.pinned) {
+          otherWindow.visible = false;
+          if (otherWindow.panel) {
+            otherWindow.panel.setVisible(false);
+          }
+        }
+      }
+    }
+
     // Track if this is the first time showing (openedTime will be 0)
     const wasNeverShown = window.openedTime === 0;
 
@@ -167,46 +207,54 @@ export class WindowManager {
       window.height = this.logicalHeight;
     }
 
-    // Try to use the window's current position first (may have been restored from localStorage)
-    // Only find a new position if the current spot is occupied by another visible window
-    let position: { x: number; y: number } | null = null;
-    if (this.isPositionAvailable(window.x, window.y, window.width, window.height, window.id)) {
-      position = { x: window.x, y: window.y };
+    if (this.isMobileViewport()) {
+      // On mobile, windows always fill the viewport — skip position search
+      window.width = this.logicalWidth;
+      window.height = this.logicalHeight - MENU_BAR_HEIGHT;
+      window.x = 0;
+      window.y = MENU_BAR_HEIGHT;
     } else {
-      // Current position is occupied, find a new one
-      position = this.findAvailablePosition(window);
-    }
-
-    // Keep closing LRU windows until we find space
-    while (!position) {
-      // No space found - try LRU eviction
-      const lruWindowId = this.findLeastRecentlyUsedWindow();
-
-      if (lruWindowId === null) {
-        // All windows are pinned or modal
-        throw new Error('Cannot open window - unpin a window to make space');
-      }
-
-      // Close the LRU window
-      const lruWindow = this.windows.get(lruWindowId);
-      if (lruWindow) {
-
-        this.hideWindow(lruWindowId);
-
-        // Emit notification
-        this.emit('window:auto-closed', {
-          windowId: lruWindowId,
-          windowTitle: lruWindow.panel?.getTitle() || lruWindowId,
-          reason: 'out-of-space',
-        } as WindowAutoCloseEvent);
-
-        // Try to find position again
+      // Try to use the window's current position first (may have been restored from localStorage)
+      // Only find a new position if the current spot is occupied by another visible window
+      let position: { x: number; y: number } | null = null;
+      if (this.isPositionAvailable(window.x, window.y, window.width, window.height, window.id)) {
+        position = { x: window.x, y: window.y };
+      } else {
+        // Current position is occupied, find a new one
         position = this.findAvailablePosition(window);
       }
-    }
 
-    window.x = position.x;
-    window.y = position.y;
+      // Keep closing LRU windows until we find space
+      while (!position) {
+        // No space found - try LRU eviction
+        const lruWindowId = this.findLeastRecentlyUsedWindow();
+
+        if (lruWindowId === null) {
+          // All windows are pinned or modal
+          throw new Error('Cannot open window - unpin a window to make space');
+        }
+
+        // Close the LRU window
+        const lruWindow = this.windows.get(lruWindowId);
+        if (lruWindow) {
+
+          this.hideWindow(lruWindowId);
+
+          // Emit notification
+          this.emit('window:auto-closed', {
+            windowId: lruWindowId,
+            windowTitle: lruWindow.panel?.getTitle() || lruWindowId,
+            reason: 'out-of-space',
+          } as WindowAutoCloseEvent);
+
+          // Try to find position again
+          position = this.findAvailablePosition(window);
+        }
+      }
+
+      window.x = position.x;
+      window.y = position.y;
+    }
 
     window.visible = true;
     window.panel.setVisible(true);
@@ -237,6 +285,47 @@ export class WindowManager {
       window.panel.setVisible(false);
     }
     this.saveLayout();
+  }
+
+  /**
+   * Close the current mobile window and show the previously opened one.
+   * Returns the ID of the window that was re-shown, or null if no window was restored.
+   */
+  public mobileBack(): string | null {
+    if (!this.isMobileViewport()) {
+      return null;
+    }
+
+    // Find the currently visible non-modal window
+    let currentId: string | null = null;
+    for (const [id, window] of this.windows) {
+      if (window.visible && !window.config.isModal) {
+        currentId = id;
+        break;
+      }
+    }
+
+    if (currentId) {
+      this.hideWindow(currentId);
+    }
+
+    // Find the most recently interacted hidden window to restore
+    let mostRecent: ManagedWindow | null = null;
+    let mostRecentId: string | null = null;
+    for (const [id, window] of this.windows) {
+      if (!window.visible && window.openedTime > 0 && !window.config.isModal) {
+        if (!mostRecent || window.lastInteractionTime > mostRecent.lastInteractionTime) {
+          mostRecent = window;
+          mostRecentId = id;
+        }
+      }
+    }
+
+    if (mostRecentId) {
+      this.showWindow(mostRecentId);
+    }
+
+    return mostRecentId;
   }
 
   /**
@@ -350,7 +439,7 @@ export class WindowManager {
       return false;
     }
 
-    const inTitleBar = y >= window.y && y < window.y + TITLE_BAR_HEIGHT;
+    const inTitleBar = y >= window.y && y < window.y + this.getTitleBarHeight();
 
     if (!inTitleBar) {
       return false;
@@ -458,7 +547,7 @@ export class WindowManager {
     }
 
     // Check if click is on a title bar button
-    const inTitleBar = y >= window.y && y < window.y + TITLE_BAR_HEIGHT;
+    const inTitleBar = y >= window.y && y < window.y + this.getTitleBarHeight();
 
     if (inTitleBar) {
       const button = this.detectTitleBarButton(window, x, y);
@@ -477,8 +566,8 @@ export class WindowManager {
       }
     } else if (!window.minimized) {
       // Click is in content area - forward to panel if it handles clicks
-      const contentY = window.y + TITLE_BAR_HEIGHT;
-      const contentHeight = window.height - TITLE_BAR_HEIGHT;
+      const contentY = window.y + this.getTitleBarHeight();
+      const contentHeight = window.height - this.getTitleBarHeight();
 
       if (window.panel?.handleContentClick) {
         const relativeX = x - window.x;
@@ -509,26 +598,28 @@ export class WindowManager {
    * Internal method to detect title bar button
    */
   private detectTitleBarButton(window: ManagedWindow, x: number, y: number): TitleBarButton {
-    const closeButtonX = window.x + window.width - BUTTON_SIZE - BUTTON_PADDING;
-    const minButtonX = closeButtonX - BUTTON_SIZE - 10;
-    const pinButtonX = minButtonX - BUTTON_SIZE - 10;
-    const buttonY = window.y + (TITLE_BAR_HEIGHT - BUTTON_SIZE) / 2;
+    const buttonSize = this.getButtonSize();
+    const buttonPadding = this.getButtonPadding();
+    const closeButtonX = window.x + window.width - buttonSize - buttonPadding;
+    const minButtonX = closeButtonX - buttonSize - 10;
+    const pinButtonX = minButtonX - buttonSize - 10;
+    const buttonY = window.y + (this.getTitleBarHeight() - buttonSize) / 2;
 
     // Check close button
-    if (x >= closeButtonX && x <= closeButtonX + BUTTON_SIZE &&
-        y >= buttonY && y <= buttonY + BUTTON_SIZE) {
+    if (x >= closeButtonX && x <= closeButtonX + buttonSize &&
+        y >= buttonY && y <= buttonY + buttonSize) {
       return 'close';
     }
 
     // Check minimize button
-    if (x >= minButtonX && x <= minButtonX + BUTTON_SIZE &&
-        y >= buttonY && y <= buttonY + BUTTON_SIZE) {
+    if (x >= minButtonX && x <= minButtonX + buttonSize &&
+        y >= buttonY && y <= buttonY + buttonSize) {
       return 'minimize';
     }
 
     // Check pin button
-    if (x >= pinButtonX && x <= pinButtonX + BUTTON_SIZE &&
-        y >= buttonY && y <= buttonY + BUTTON_SIZE) {
+    if (x >= pinButtonX && x <= pinButtonX + buttonSize &&
+        y >= buttonY && y <= buttonY + buttonSize) {
       return 'pin';
     }
 
@@ -543,8 +634,9 @@ export class WindowManager {
       return false;
     }
 
-    const handleX = window.x + window.width - RESIZE_HANDLE_SIZE;
-    const handleY = window.y + window.height - RESIZE_HANDLE_SIZE;
+    const resizeHandleSize = this.getResizeHandleSize();
+    const handleX = window.x + window.width - resizeHandleSize;
+    const handleY = window.y + window.height - resizeHandleSize;
 
     return x >= handleX && x < window.x + window.width &&
            y >= handleY && y < window.y + window.height;
@@ -566,14 +658,14 @@ export class WindowManager {
     }
 
     // Check if mouse is in content area (not title bar)
-    const inTitleBar = y >= window.y && y < window.y + TITLE_BAR_HEIGHT;
+    const inTitleBar = y >= window.y && y < window.y + this.getTitleBarHeight();
     if (inTitleBar) {
       return false;
     }
 
     // Forward to panel's handleScroll if implemented
     if (window.panel?.handleScroll) {
-      const contentHeight = window.height - TITLE_BAR_HEIGHT;
+      const contentHeight = window.height - this.getTitleBarHeight();
       return window.panel.handleScroll(deltaY, contentHeight);
     }
 
@@ -799,6 +891,13 @@ export class WindowManager {
         window.height = height;
       }
 
+      if (this.isMobileViewport() && window.visible) {
+        window.width = this.logicalWidth;
+        window.height = this.logicalHeight - MENU_BAR_HEIGHT;
+        window.x = 0;
+        window.y = MENU_BAR_HEIGHT;
+      }
+
       // Maintain relative position for right-aligned windows
       if (wasRightAligned) {
         const newX = width - window.width - oldOffsetFromRight;
@@ -995,27 +1094,30 @@ export class WindowManager {
       return;
     }
 
+    const titleBarHeight = this.getTitleBarHeight();
+    const resizeHandleSize = this.getResizeHandleSize();
+
     // Draw window background (only title bar height when minimized)
     ctx.fillStyle = '#2a2a2a';
-    ctx.fillRect(window.x, window.y, window.width, window.minimized ? TITLE_BAR_HEIGHT : window.height);
+    ctx.fillRect(window.x, window.y, window.width, window.minimized ? titleBarHeight : window.height);
 
     // Draw title bar
     ctx.fillStyle = '#1e1e1e';
-    ctx.fillRect(window.x, window.y, window.width, TITLE_BAR_HEIGHT);
+    ctx.fillRect(window.x, window.y, window.width, titleBarHeight);
 
     // Draw title text
     ctx.fillStyle = '#ffffff';
-    ctx.font = '14px sans-serif';
+    ctx.font = this.isMobileViewport() ? '16px sans-serif' : '14px sans-serif';
     ctx.textBaseline = 'middle';
-    ctx.fillText(window.panel.getTitle(), window.x + 10, window.y + TITLE_BAR_HEIGHT / 2);
+    ctx.fillText(window.panel.getTitle(), window.x + 10, window.y + titleBarHeight / 2);
 
     // Draw title bar buttons
     this.renderTitleBarButtons(ctx, window);
 
     // Draw window content (if not minimized)
     if (!window.minimized) {
-      const contentY = window.y + TITLE_BAR_HEIGHT;
-      const contentHeight = window.height - TITLE_BAR_HEIGHT;
+      const contentY = window.y + titleBarHeight;
+      const contentHeight = window.height - titleBarHeight;
 
       ctx.save();
       ctx.beginPath();
@@ -1039,16 +1141,16 @@ export class WindowManager {
     // Draw border
     ctx.strokeStyle = window.isDragging || window.isResizing ? '#0078d4' : '#3a3a3a';
     ctx.lineWidth = 2;
-    ctx.strokeRect(window.x, window.y, window.width, window.minimized ? TITLE_BAR_HEIGHT : window.height);
+    ctx.strokeRect(window.x, window.y, window.width, window.minimized ? titleBarHeight : window.height);
 
     // Draw resize handle if window is resizable and not minimized
-    if (window.config.isResizable && !window.minimized) {
-      const handleX = window.x + window.width - RESIZE_HANDLE_SIZE;
-      const handleY = window.y + window.height - RESIZE_HANDLE_SIZE;
+    if (window.config.isResizable && !window.minimized && resizeHandleSize > 0) {
+      const handleX = window.x + window.width - resizeHandleSize;
+      const handleY = window.y + window.height - resizeHandleSize;
 
       // Draw resize handle background
       ctx.fillStyle = window.isResizing ? '#0078d4' : '#555555';
-      ctx.fillRect(handleX, handleY, RESIZE_HANDLE_SIZE, RESIZE_HANDLE_SIZE);
+      ctx.fillRect(handleX, handleY, resizeHandleSize, resizeHandleSize);
 
       // Draw resize grip lines (three diagonal lines)
       ctx.strokeStyle = '#ffffff';
@@ -1056,8 +1158,8 @@ export class WindowManager {
       for (let i = 0; i < 3; i++) {
         const offset = i * 4 + 4;
         ctx.beginPath();
-        ctx.moveTo(handleX + offset, handleY + RESIZE_HANDLE_SIZE);
-        ctx.lineTo(handleX + RESIZE_HANDLE_SIZE, handleY + offset);
+        ctx.moveTo(handleX + offset, handleY + resizeHandleSize);
+        ctx.lineTo(handleX + resizeHandleSize, handleY + offset);
         ctx.stroke();
       }
     }
@@ -1067,31 +1169,33 @@ export class WindowManager {
    * Render title bar buttons
    */
   private renderTitleBarButtons(ctx: CanvasRenderingContext2D, window: ManagedWindow): void {
-    const buttonY = window.y + (TITLE_BAR_HEIGHT - BUTTON_SIZE) / 2;
+    const buttonSize = this.getButtonSize();
+    const buttonPadding = this.getButtonPadding();
+    const buttonY = window.y + (this.getTitleBarHeight() - buttonSize) / 2;
 
     // Close button (X)
-    const closeX = window.x + window.width - BUTTON_SIZE - BUTTON_PADDING;
+    const closeX = window.x + window.width - buttonSize - buttonPadding;
     ctx.fillStyle = '#ff5555';
-    ctx.fillRect(closeX, buttonY, BUTTON_SIZE, BUTTON_SIZE);
+    ctx.fillRect(closeX, buttonY, buttonSize, buttonSize);
     ctx.fillStyle = '#ffffff';
     ctx.font = '12px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('×', closeX + BUTTON_SIZE / 2, buttonY + BUTTON_SIZE / 2);
+    ctx.fillText('×', closeX + buttonSize / 2, buttonY + buttonSize / 2);
 
     // Minimize button (-)
-    const minX = closeX - BUTTON_SIZE - 10;
+    const minX = closeX - buttonSize - 10;
     ctx.fillStyle = '#555555';
-    ctx.fillRect(minX, buttonY, BUTTON_SIZE, BUTTON_SIZE);
+    ctx.fillRect(minX, buttonY, buttonSize, buttonSize);
     ctx.fillStyle = '#ffffff';
-    ctx.fillText('−', minX + BUTTON_SIZE / 2, buttonY + BUTTON_SIZE / 2);
+    ctx.fillText('−', minX + buttonSize / 2, buttonY + buttonSize / 2);
 
     // Pin button
-    const pinX = minX - BUTTON_SIZE - 10;
+    const pinX = minX - buttonSize - 10;
     ctx.fillStyle = window.pinned ? '#ffaa00' : '#555555';
-    ctx.fillRect(pinX, buttonY, BUTTON_SIZE, BUTTON_SIZE);
+    ctx.fillRect(pinX, buttonY, buttonSize, buttonSize);
     ctx.fillStyle = '#ffffff';
-    ctx.fillText('📌', pinX + BUTTON_SIZE / 2, buttonY + BUTTON_SIZE / 2);
+    ctx.fillText('📌', pinX + buttonSize / 2, buttonY + buttonSize / 2);
 
     // Reset text alignment to default for subsequent rendering
     ctx.textAlign = 'left';

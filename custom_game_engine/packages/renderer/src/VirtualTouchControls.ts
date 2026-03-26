@@ -20,6 +20,12 @@ export interface VirtualTouchCallbacks {
   onFertilizeTile?: () => void;
   onBuildMode?: () => void;
   onViewToggle?: () => void;
+  /** Toggle the panel drawer (bottom sheet showing available panels) */
+  onPanelDrawerToggle?: () => void;
+  /** Open a specific panel by ID */
+  onPanelOpen?: (panelId: string) => void;
+  /** Go back to previous panel (mobile stack navigation) */
+  onMobileBack?: () => void;
 }
 
 interface JoystickState {
@@ -247,6 +253,93 @@ const CSS = `
   gap: 8px;
   pointer-events: none;
 }
+
+.vtc-panels-btn {
+  position: absolute;
+  top: calc(12px + env(safe-area-inset-top));
+  right: calc(124px + env(safe-area-inset-right));
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  color: #fff;
+  font-size: 20px;
+}
+
+.vtc-back-btn {
+  position: absolute;
+  top: calc(12px + env(safe-area-inset-top));
+  left: calc(12px + env(safe-area-inset-left));
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  color: #fff;
+  font-size: 22px;
+}
+
+.vtc-panel-drawer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 60vh;
+  background: rgba(20, 20, 20, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px 16px 0 0;
+  padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
+  pointer-events: auto;
+  touch-action: pan-y;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transform: translateY(100%);
+  transition: transform 0.25s ease-out;
+  z-index: 1;
+}
+
+.vtc-panel-drawer.vtc-panel-drawer--open {
+  transform: translateY(0);
+}
+
+.vtc-panel-drawer-handle {
+  width: 40px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  margin: 0 auto 12px;
+}
+
+.vtc-panel-drawer-item {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  color: #fff;
+  font-size: 16px;
+  font-family: system-ui, sans-serif;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.vtc-panel-drawer-item:active {
+  background: rgba(255, 255, 255, 0.1);
+}
 `;
 
 const SPEED_STEPS = [1, 2, 4, 8] as const;
@@ -266,6 +359,10 @@ export class VirtualTouchControls {
   private readonly timeSpeedBtn: HTMLDivElement;
   private readonly contextActions: HTMLDivElement;
   private readonly soundBtn: HTMLDivElement;
+  private readonly backBtn: HTMLDivElement;
+  private readonly panelDrawer: HTMLDivElement;
+  private _drawerOpen = false;
+  private _onPanelOpen?: (id: string) => void;
 
   private _paused = false;
   private _currentSpeed: number = 1;
@@ -329,6 +426,44 @@ export class VirtualTouchControls {
         soundToggle();
       }, { passive: false });
     }
+
+    // --- Panels button ---
+    const panelsBtn = document.createElement('div');
+    panelsBtn.className = 'vtc-panels-btn';
+    panelsBtn.textContent = '⊞';
+    if (callbacks.onPanelDrawerToggle) {
+      panelsBtn.addEventListener('pointerup', (e: PointerEvent) => {
+        e.preventDefault();
+        this.toggleDrawer();
+        callbacks.onPanelDrawerToggle!();
+      }, { passive: false });
+    } else {
+      panelsBtn.addEventListener('pointerup', (e: PointerEvent) => {
+        e.preventDefault();
+        this.toggleDrawer();
+      }, { passive: false });
+    }
+
+    // --- Back button ---
+    this.backBtn = document.createElement('div');
+    this.backBtn.className = 'vtc-back-btn';
+    this.backBtn.textContent = '←';
+    this.backBtn.style.display = 'none';
+    if (callbacks.onMobileBack) {
+      const mobileBack = callbacks.onMobileBack;
+      this.backBtn.addEventListener('pointerup', (e: PointerEvent) => {
+        e.preventDefault();
+        mobileBack();
+      }, { passive: false });
+    }
+
+    // --- Panel drawer ---
+    this._onPanelOpen = callbacks.onPanelOpen;
+    this.panelDrawer = document.createElement('div');
+    this.panelDrawer.className = 'vtc-panel-drawer';
+    const drawerHandle = document.createElement('div');
+    drawerHandle.className = 'vtc-panel-drawer-handle';
+    this.panelDrawer.appendChild(drawerHandle);
 
     // --- Right side controls ---
     const rightControls = document.createElement('div');
@@ -418,6 +553,9 @@ export class VirtualTouchControls {
     this.container.appendChild(this.joystickBase);
     this.container.appendChild(menuBtn);
     this.container.appendChild(this.soundBtn);
+    this.container.appendChild(panelsBtn);
+    this.container.appendChild(this.backBtn);
+    this.container.appendChild(this.panelDrawer);
     this.container.appendChild(this.timeBar);
     this.container.appendChild(this.contextActions);
     this.container.appendChild(rightControls);
@@ -588,10 +726,45 @@ export class VirtualTouchControls {
     this.contextActions.style.display = visible ? 'flex' : 'none';
   }
 
+  set showBackButton(visible: boolean) {
+    this.backBtn.style.display = visible ? 'flex' : 'none';
+  }
+
   set contextActionSet(actions: 'tile' | 'none') {
     const btns = this.contextActions.querySelectorAll<HTMLDivElement>('.vtc-btn');
     for (const btn of Array.from(btns)) {
       btn.style.display = actions === 'tile' ? 'flex' : 'none';
+    }
+  }
+
+  /**
+   * Set the list of panels available in the drawer.
+   */
+  setPanelList(panels: Array<{ id: string; title: string }>): void {
+    // Clear existing items (keep the handle)
+    while (this.panelDrawer.children.length > 1) {
+      this.panelDrawer.removeChild(this.panelDrawer.lastChild!);
+    }
+
+    for (const panel of panels) {
+      const item = document.createElement('div');
+      item.className = 'vtc-panel-drawer-item';
+      item.textContent = panel.title;
+      item.addEventListener('pointerup', (e: PointerEvent) => {
+        e.preventDefault();
+        this._onPanelOpen?.(panel.id);
+        this.toggleDrawer(false);
+      }, { passive: false });
+      this.panelDrawer.appendChild(item);
+    }
+  }
+
+  toggleDrawer(open?: boolean): void {
+    this._drawerOpen = open ?? !this._drawerOpen;
+    if (this._drawerOpen) {
+      this.panelDrawer.classList.add('vtc-panel-drawer--open');
+    } else {
+      this.panelDrawer.classList.remove('vtc-panel-drawer--open');
     }
   }
 
