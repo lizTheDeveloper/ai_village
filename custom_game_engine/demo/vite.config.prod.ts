@@ -88,15 +88,23 @@ export default defineConfig({
         entryFileNames: 'assets/[name].[hash].js',
         chunkFileNames: 'assets/[name].[hash].js',
         assetFileNames: 'assets/[name].[hash].[ext]',
-        // All engine packages in ONE chunk to avoid TDZ errors from circular deps
-        // (core <-> world <-> botany have 30+ circular import cycles that cause
-        // ReferenceError: Cannot access 'X' before initialization when split)
+        // Split engine into groups that respect circular-dep boundaries.
+        // core <-> world <-> botany etc. stay together; renderer is a leaf
+        // (nothing imports it) so it gets its own chunk for parallel loading.
         manualChunks(id) {
-          // Browser stubs for fs/path MUST be in vendor chunk — node_modules
-          // code imports these, and putting them in engine causes TDZ errors
-          // when vendor initializes before engine
           if (id.includes('browser-stubs/')) return 'vendor';
-          if (id.includes('/packages/') && id.includes('/src/')) return 'engine';
+
+          if (id.includes('/packages/') && id.includes('/src/')) {
+            // Renderer: leaf node — nothing imports it, safe to split
+            if (id.includes('/renderer/')) return 'engine-renderer';
+            // Packages only imported by renderer / main.ts, no circular deps back to core
+            if (id.includes('/persistence/') || id.includes('/shared-worker/')) return 'engine-infra';
+            // Everything else: core + its bidirectional deps (world, botany, agents,
+            // magic, llm, metrics, reproduction, divinity, introspection, language, etc.)
+            return 'engine-core';
+          }
+
+          if (id.includes('node_modules/three')) return 'vendor-three';
           if (id.includes('node_modules/')) return 'vendor';
         },
       },
