@@ -77,6 +77,40 @@ ${sceneDescriptions[sceneIndex]}
 Keep it under 120 words. No headers. Just the prose.`;
 }
 
+/**
+ * Extract usable narrative text from raw LLM output.
+ * Handles: <think> tags (Qwen3-style reasoning), JSON responses with narrative fields.
+ * Returns null if no narrative text can be extracted.
+ */
+function extractNarrativeText(raw: string): string | null {
+  // Strip <think>...</think> blocks (Qwen3-style reasoning tags)
+  let text = raw.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+
+  if (!text) return null;
+
+  // Try to parse as JSON — LLM sometimes returns structured responses
+  try {
+    const parsed = JSON.parse(text);
+    if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+      // Look for common narrative fields
+      for (const key of ['speaking', 'text', 'content', 'narrative', 'body']) {
+        if (typeof parsed[key] === 'string' && parsed[key].trim()) {
+          return parsed[key].trim();
+        }
+      }
+      // JSON object but no recognizable narrative field — discard
+      return null;
+    }
+    // If it parsed as a plain string, use it
+    if (typeof parsed === 'string') return parsed.trim() || null;
+    // Arrays or other types — discard
+    return null;
+  } catch {
+    // Not JSON — use as-is (normal prose response)
+    return text;
+  }
+}
+
 // Storage key to prevent showing twice for the same universe
 function genesisShownKey(universeId: string): string {
   return `mvee_genesis_shown_${universeId}`;
@@ -153,7 +187,7 @@ class GenesisCinematicPanel {
         temperature: 0.85,
         maxTokens: 200,
       }).then(resp => {
-        this.llmScenes[i] = resp.text.trim();
+        this.llmScenes[i] = extractNarrativeText(resp.text.trim());
         // If we're still on this scene, update live
         if (this.currentScene === i) {
           this.renderCurrentScene();
