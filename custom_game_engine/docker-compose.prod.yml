@@ -16,8 +16,10 @@ services:
     environment:
       - PORT=3000
       - NODE_ENV=production
+      - CONTENT_DATABASE_URL=postgresql://folkfork:${FOLKFORK_DB_PASSWORD}@folkfork-db:5432/folkfork_lore_admin
     volumes:
       - mvee-data:/app/demo/multiverse-data
+      - mvee-sprites:/app/demo/runtime-sprites
     networks:
       - coolify
     labels:
@@ -25,6 +27,7 @@ services:
       - traefik.http.routers.mvee.rule=Host(`play.multiversestudios.xyz`) && PathPrefix(`/mvee`)
       - traefik.http.routers.mvee.entrypoints=https
       - traefik.http.routers.mvee.tls.certresolver=letsencrypt
+      - traefik.http.routers.mvee.middlewares=studio-auth-optional@file
       - traefik.http.routers.mvee.priority=300
       - traefik.http.routers.mvee-http.rule=Host(`play.multiversestudios.xyz`) && PathPrefix(`/mvee`)
       - traefik.http.routers.mvee-http.entrypoints=http
@@ -36,6 +39,7 @@ services:
 
 volumes:
   mvee-data:
+  mvee-sprites:
 
 networks:
   coolify:
