@@ -287,11 +287,11 @@ export class NotificationModal {
     let html = `
       <div style="text-align: center; margin-bottom: 25px;">
         <h1 ${titleClass} style="${titleStyle}">
-          ${notif.icon || theme.icon} ${notif.title} ${notif.icon || theme.icon}
+          ${notif.icon || theme.icon} ${this.escapeHtml(notif.title)} ${notif.icon || theme.icon}
         </h1>
         ${notif.subtitle ? `
           <p style="color: ${theme.subtitleColor}; font-size: 14px; margin-top: 10px;">
-            ${notif.subtitle}
+            ${this.escapeHtml(notif.subtitle)}
           </p>
         ` : ''}
       </div>
@@ -336,7 +336,7 @@ export class NotificationModal {
         const btnStyle = this.getButtonStyle(btn.style || 'secondary', theme);
         html += `
           <button id="notif-btn-${idx}" style="${btnStyle}">
-            ${btn.text}
+            ${this.escapeHtml(btn.text)}
           </button>
         `;
       });
@@ -378,13 +378,13 @@ export class NotificationModal {
     if (typeof section.content === 'string') {
       contentHtml = `
         <div style="color: #e0e0e0; font-size: 13px; line-height: 1.6;">
-          ${section.content}
+          ${this.escapeHtml(section.content)}
         </div>
       `;
     } else if (Array.isArray(section.content)) {
       contentHtml = `
         <div style="color: #e0e0e0; font-size: 13px; line-height: 1.5;">
-          ${section.content.map(item => `<div style="margin: 4px 0;">• ${item}</div>`).join('')}
+          ${section.content.map(item => `<div style="margin: 4px 0;">• ${this.escapeHtml(item)}</div>`).join('')}
         </div>
       `;
     } else {
@@ -393,8 +393,8 @@ export class NotificationModal {
         <div style="color: #e0e0e0; font-size: 13px;">
           ${Object.entries(section.content).map(([key, value]) => `
             <div style="margin: 6px 0;">
-              <span style="color: ${sectionTheme.labelColor}; font-weight: bold;">${key}:</span>
-              <span style="margin-left: 8px;">${value}</span>
+              <span style="color: ${sectionTheme.labelColor}; font-weight: bold;">${this.escapeHtml(key)}:</span>
+              <span style="margin-left: 8px;">${this.escapeHtml(value)}</span>
             </div>
           `).join('')}
         </div>
@@ -405,7 +405,7 @@ export class NotificationModal {
       <div style="margin-bottom: 18px; padding: 16px; background: ${sectionTheme.bg}; border-radius: 8px; border-left: 4px solid ${sectionTheme.borderColor};">
         ${section.title ? `
           <div style="color: ${sectionTheme.titleColor}; font-size: 14px; font-weight: bold; margin-bottom: 10px;">
-            ${section.icon || ''} ${section.title}
+            ${section.icon || ''} ${this.escapeHtml(section.title)}
           </div>
         ` : ''}
         ${contentHtml}
@@ -584,6 +584,12 @@ export class NotificationModal {
           border: 2px solid #666;
         `;
     }
+  }
+
+  private escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 }
 

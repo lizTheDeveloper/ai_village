@@ -185,23 +185,23 @@ export class SoulCeremonyModal {
       <div style="margin-bottom: 18px; padding: 12px; background: rgba(255, 215, 0, 0.1); border-left: 3px solid #ffd700;">
         ${this.currentContext.soulName ? `
         <p style="color: #ddd; margin: 4px 0; font-size: 13px;">
-          <strong>Soul:</strong> ${this.currentContext.soulName}
+          <strong>Soul:</strong> ${this.escapeHtml(this.currentContext.soulName)}
         </p>
         ` : ''}
         <p style="color: #ddd; margin: 4px 0; font-size: 13px;">
-          <strong>Culture:</strong> ${this.currentContext.culture || 'Unknown'}
+          <strong>Culture:</strong> ${this.escapeHtml(this.currentContext.culture || 'Unknown')}
         </p>
         <p style="color: #ddd; margin: 4px 0; font-size: 13px;">
           <strong>Cosmic Alignment:</strong> ${this.formatAlignment(this.currentContext.cosmicAlignment)}
         </p>
         ${this.currentContext.parentSouls && this.currentContext.parentSouls.length > 0 ? `
         <p style="color: #ddd; margin: 4px 0; font-size: 13px;">
-          <strong>Parents:</strong> ${this.currentContext.parentSouls.join(' and ')}
+          <strong>Parents:</strong> ${this.currentContext.parentSouls.map(s => this.escapeHtml(s)).join(' and ')}
         </p>
         ` : ''}
         ${this.currentContext.observers && this.currentContext.observers.length > 0 ? `
         <p style="color: #ddd; margin: 4px 0; font-size: 13px;">
-          <strong>Observers:</strong> ${this.currentContext.observers.join(', ')}
+          <strong>Observers:</strong> ${this.currentContext.observers.map(s => this.escapeHtml(s)).join(', ')}
         </p>
         ` : ''}
       </div>
@@ -218,7 +218,7 @@ export class SoulCeremonyModal {
             ${symbol} ${name}
           </div>
           <div style="color: #e0e0e0; font-size: 13px; line-height: 1.5; font-style: italic;">
-            "${exchange.text}"
+            "${this.escapeHtml(exchange.text)}"
           </div>
         </div>
       `;
@@ -272,7 +272,7 @@ export class SoulCeremonyModal {
       spriteHtml = `
         <div style="text-align: center; margin-bottom: 20px;">
           <img src="${spritePath}"
-               alt="${soulName} sprite"
+               alt="${this.escapeHtml(soulName)} sprite"
                style="
                  width: 96px;
                  height: 96px;
@@ -296,7 +296,7 @@ export class SoulCeremonyModal {
     let html = `
       <div style="text-align: center; margin-bottom: 25px;">
         <h1 style="color: #ffd700; font-size: 24px; margin: 0; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);">
-          ✨ ${soulName}'s Soul Is Born ✨
+          ✨ ${this.escapeHtml(soulName)}'s Soul Is Born ✨
         </h1>
       </div>
 
@@ -306,28 +306,28 @@ export class SoulCeremonyModal {
         ${firstMemory ? `
         <div style="margin-bottom: 20px; padding: 15px; background: rgba(0, 0, 0, 0.3); border-radius: 5px; border-left: 4px solid #DDA0DD;">
           <div style="color: #DDA0DD; font-size: 14px; font-weight: bold; margin-bottom: 8px;">First Memory</div>
-          <div style="color: #e0e0e0; font-size: 13px; line-height: 1.6; font-style: italic;">"${firstMemory}"</div>
+          <div style="color: #e0e0e0; font-size: 13px; line-height: 1.6; font-style: italic;">"${this.escapeHtml(firstMemory)}"</div>
         </div>
         ` : ''}
 
         <div style="margin-bottom: 16px;">
           <div style="color: #ffd700; font-size: 14px; font-weight: bold; margin-bottom: 6px;">Purpose</div>
-          <div style="color: #e0e0e0; font-size: 13px; line-height: 1.5;">${purpose}</div>
+          <div style="color: #e0e0e0; font-size: 13px; line-height: 1.5;">${this.escapeHtml(purpose)}</div>
         </div>
 
         <div style="margin-bottom: 16px;">
           <div style="color: #ffd700; font-size: 14px; font-weight: bold; margin-bottom: 6px;">Core Interests</div>
-          <div style="color: #e0e0e0; font-size: 13px;">${interests.join(', ')}</div>
+          <div style="color: #e0e0e0; font-size: 13px;">${interests.map(i => this.escapeHtml(i)).join(', ')}</div>
         </div>
 
         <div style="margin-bottom: 16px;">
           <div style="color: #ffd700; font-size: 14px; font-weight: bold; margin-bottom: 6px;">Destiny</div>
-          <div style="color: #e0e0e0; font-size: 13px; line-height: 1.5; font-style: italic;">${destiny}</div>
+          <div style="color: #e0e0e0; font-size: 13px; line-height: 1.5; font-style: italic;">${this.escapeHtml(destiny)}</div>
         </div>
 
         <div>
           <div style="color: #ffd700; font-size: 14px; font-weight: bold; margin-bottom: 6px;">Archetype</div>
-          <div style="color: #e0e0e0; font-size: 13px;">${archetype}</div>
+          <div style="color: #e0e0e0; font-size: 13px;">${this.escapeHtml(archetype)}</div>
         </div>
       </div>
 
@@ -446,6 +446,12 @@ export class SoulCeremonyModal {
     if (alignment > -0.3) return '⚖️ Neutral';
     if (alignment > -0.7) return '🌑 Cursed';
     return '💀 Highly Cursed';
+  }
+
+  private escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   private formatWisdom(wisdom: number): string {
