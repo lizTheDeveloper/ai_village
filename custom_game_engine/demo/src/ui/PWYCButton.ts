@@ -312,6 +312,10 @@ export class PWYCButton {
           <input id="pwyc-custom-input" type="number" min="1" max="9999"
             placeholder="Enter amount" aria-label="Custom amount in dollars">
         </div>
+        <div id="pwyc-trust-msg" style="display:none; opacity:0; text-align:center; padding:0.6rem 0.75rem; margin-bottom:0.75rem; background:rgba(0,220,0,0.04); border:1px solid rgba(0,220,0,0.1); border-radius:5px; font-family:'Courier New',Courier,monospace; font-size:0.6rem; color:rgba(134,239,172,0.65); line-height:1.5; transition:opacity 0.3s ease;">
+          You are supporting an indie game built by artists.<br>100% of your payment funds development.
+          <div style="margin-top:0.35rem; opacity:0.5; font-size:0.5rem;">Secure checkout via Stripe</div>
+        </div>
         <button id="pwyc-cta">Continue — $5 →</button>
         <div id="pwyc-note">All games are free. Payments support development and keep the servers running.</div>
       </div>
@@ -337,6 +341,7 @@ export class PWYCButton {
     }
     this.selectedTierIdx = TIERS.findIndex(t => t.isDefault);
     this._selectTier(this.selectedTierIdx);
+    this._hideTrustMsg();
     requestAnimationFrame(() => {
       this.overlayEl!.classList.add('pwyc-open');
     });
@@ -416,8 +421,18 @@ export class PWYCButton {
     const cta = this.overlayEl!.querySelector('#pwyc-cta') as HTMLButtonElement;
     const originalText = cta.textContent ?? '';
     cta.disabled = true;
-    cta.textContent = 'Connecting…';
+
+    // Show trust signal before redirect
+    const trustMsg = this.overlayEl!.querySelector('#pwyc-trust-msg') as HTMLElement | null;
+    if (trustMsg) {
+      trustMsg.style.display = 'block';
+      trustMsg.style.opacity = '1';
+    }
+    cta.textContent = 'Connecting to Stripe…';
     cta.style.opacity = '0.5';
+
+    // Brief pause so the trust message is visible
+    await new Promise(r => setTimeout(r, 1200));
 
     try {
       const response = await fetch(CHECKOUT_API_URL, {
@@ -437,6 +452,7 @@ export class PWYCButton {
           cta.style.opacity = '';
           cta.textContent = originalText;
           this._updateCTA();
+          this._hideTrustMsg();
         }, 2000);
         return;
       }
@@ -458,8 +474,14 @@ export class PWYCButton {
         cta.style.opacity = '';
         cta.textContent = originalText;
         this._updateCTA();
+        this._hideTrustMsg();
       }, 2000);
     }
+  }
+
+  private _hideTrustMsg(): void {
+    const msg = this.overlayEl?.querySelector('#pwyc-trust-msg') as HTMLElement | null;
+    if (msg) { msg.style.display = 'none'; msg.style.opacity = '0'; }
   }
 
   private _trackClick(): void {
