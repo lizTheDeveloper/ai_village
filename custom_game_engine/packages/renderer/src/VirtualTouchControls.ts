@@ -561,7 +561,7 @@ export class VirtualTouchControls {
 
   set contextActionSet(actions: 'tile' | 'none') {
     const btns = this.contextActions.querySelectorAll<HTMLDivElement>('.vtc-btn');
-    for (const btn of btns) {
+    for (const btn of Array.from(btns)) {
       btn.style.display = actions === 'tile' ? 'flex' : 'none';
     }
   }
