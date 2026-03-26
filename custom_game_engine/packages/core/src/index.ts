@@ -353,6 +353,7 @@ export {
 export {
   WorldSnapshotService,
   PostcardSharingService,
+  sanitizeText,
   type UniversePostcard,
   type PostcardAnnotations,
   type SharedPostcard,

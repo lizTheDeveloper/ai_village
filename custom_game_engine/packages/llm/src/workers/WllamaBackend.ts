@@ -17,8 +17,10 @@ export class WllamaBackend implements InferenceBackend {
   private wllama: any = null;
 
   async init(config: BrowserLLMConfig, onProgress: (p: DownloadProgress) => void): Promise<void> {
-    // Dynamic import — wllama may not be installed yet (Phase 3 dep)
-    const { Wllama } = await import('@nicepkg/wllama');
+    // Dynamic import — wllama is an optional runtime dep (null shim in CI).
+    // Non-literal specifier prevents TS from resolving the module at compile time.
+    const wllamaPath = '@nicepkg/wllama';
+    const { Wllama } = await import(/* @vite-ignore */ wllamaPath);
 
     this.wllama = new Wllama({
       'single-thread/wllama.wasm': '/wasm/wllama-single.wasm',

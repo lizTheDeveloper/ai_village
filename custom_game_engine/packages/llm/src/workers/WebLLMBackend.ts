@@ -42,6 +42,7 @@ export class WebLLMBackend implements InferenceBackend {
     this.engine = await webllm.CreateMLCEngine(config.modelId, {
       initProgressCallback,
       appConfig: {
+        ...webllm.prebuiltAppConfig,
         useIndexedDBCache: true,
       },
     });

@@ -20,6 +20,7 @@ import { EntityImpl, createEntityId } from '../ecs/Entity.js';
 import {
   WorldSnapshotService,
   PostcardSharingService,
+  sanitizeText,
   type UniversePostcard,
   type PostcardAnnotations,
   type SharedPostcard,
@@ -377,6 +378,119 @@ describe('WorldSnapshotService', () => {
       expect(snapshot.recentLegends.filter(l => l === 'Once told.')).toHaveLength(1);
     });
   });
+
+  // -------------------------------------------------------------------------
+  // 8. Notable moments
+  // -------------------------------------------------------------------------
+
+  describe('notable moments', () => {
+    it('returns empty array when no CanonEventRecorder is set', () => {
+      const snapshot = service.captureSnapshot(world);
+      expect(snapshot.notableMoments).toEqual([]);
+    });
+
+    it('returns empty array when recorder has no events', () => {
+      const mockRecorder = { getEvents: () => [] } as any;
+      service.setCanonEventRecorder(mockRecorder);
+
+      const snapshot = service.captureSnapshot(world);
+      expect(snapshot.notableMoments).toEqual([]);
+    });
+
+    it('returns up to 3 notable moments from canon events', () => {
+      const mockRecorder = {
+        getEvents: () => [
+          { type: 'agent:born', tick: 100, description: 'A child was born in the valley.' },
+          { type: 'culture:emerged', tick: 200, description: 'First sacred site discovered.' },
+          { type: 'crisis:occurred', tick: 300, description: 'A rebellion erupted in the north.' },
+          { type: 'agent:died', tick: 400, description: 'The elder passed away.' },
+          { type: 'soul:created', tick: 500, description: 'A soul was ensouled.' },
+        ],
+      } as any;
+      service.setCanonEventRecorder(mockRecorder);
+
+      const snapshot = service.captureSnapshot(world);
+      expect(snapshot.notableMoments).toHaveLength(3);
+    });
+
+    it('prioritises significant event types over recency', () => {
+      const mockRecorder = {
+        getEvents: () => [
+          { type: 'agent:born', tick: 900, description: 'Recent birth' },
+          { type: 'culture:emerged', tick: 100, description: 'Old culture event' },
+          { type: 'crisis:occurred', tick: 50, description: 'Old crisis' },
+        ],
+      } as any;
+      service.setCanonEventRecorder(mockRecorder);
+
+      const snapshot = service.captureSnapshot(world);
+      // culture:emerged and crisis:occurred should come first despite lower ticks
+      expect(snapshot.notableMoments![0]).toBe('Old culture event');
+    });
+
+    it('truncates long moment descriptions to 80 chars', () => {
+      const longDesc = 'A'.repeat(120);
+      const mockRecorder = {
+        getEvents: () => [
+          { type: 'culture:emerged', tick: 100, description: longDesc },
+        ],
+      } as any;
+      service.setCanonEventRecorder(mockRecorder);
+
+      const snapshot = service.captureSnapshot(world);
+      expect(snapshot.notableMoments![0]!.length).toBe(80);
+    });
+
+    it('strips HTML tags from moment descriptions', () => {
+      const mockRecorder = {
+        getEvents: () => [
+          { type: 'culture:emerged', tick: 100, description: '<b>Sacred</b> site <em>discovered</em>' },
+        ],
+      } as any;
+      service.setCanonEventRecorder(mockRecorder);
+
+      const snapshot = service.captureSnapshot(world);
+      expect(snapshot.notableMoments![0]).toBe('Sacred site discovered');
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // 9. Annotation fields on UniversePostcard
+  // -------------------------------------------------------------------------
+
+  describe('annotation fields', () => {
+    it('postcard includes optional playerTitle and playerDescription (undefined by default)', () => {
+      const snapshot = service.captureSnapshot(world);
+      expect(snapshot.playerTitle).toBeUndefined();
+      expect(snapshot.playerDescription).toBeUndefined();
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// sanitizeText
+// ---------------------------------------------------------------------------
+
+describe('sanitizeText', () => {
+  it('strips HTML tags', () => {
+    expect(sanitizeText('<b>bold</b> text', 100)).toBe('bold text');
+  });
+
+  it('strips script tags (content preserved as text)', () => {
+    expect(sanitizeText('hello<script>alert(1)</script>world', 100)).toBe('helloalert(1)world');
+  });
+
+  it('enforces max length', () => {
+    expect(sanitizeText('abcdefghij', 5)).toBe('abcde');
+  });
+
+  it('trims whitespace', () => {
+    expect(sanitizeText('  hello  ', 100)).toBe('hello');
+  });
+
+  it('handles empty string', () => {
+    expect(sanitizeText('', 100)).toBe('');
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -444,6 +558,42 @@ describe('PostcardSharingService', () => {
       // Original postcard fields preserved
       expect(result.agentCount).toBe(5);
       expect(result.dominantBiome).toBe('forest');
+      // notableMoments defaults to empty
+      expect(result.notableMoments).toEqual([]);
+    });
+
+    it('includes player-provided notableMoments with sanitization', async () => {
+      const result = await sharingService.sharePostcard(makePostcard(), {
+        ...defaultAnnotations,
+        notableMoments: ['<b>First</b> discovery', 'Second event', 'Third event'],
+      });
+
+      expect(result.notableMoments).toHaveLength(3);
+      expect(result.notableMoments[0]).toBe('First discovery');
+    });
+
+    it('falls back to postcard notableMoments when annotations omit them', async () => {
+      const postcard = makePostcard({ notableMoments: ['A star was born.'] });
+      const result = await sharingService.sharePostcard(postcard, defaultAnnotations);
+      expect(result.notableMoments).toEqual(['A star was born.']);
+    });
+
+    it('limits notableMoments to 3 entries', async () => {
+      const result = await sharingService.sharePostcard(makePostcard(), {
+        ...defaultAnnotations,
+        notableMoments: ['One', 'Two', 'Three', 'Four', 'Five'],
+      });
+      expect(result.notableMoments).toHaveLength(3);
+    });
+
+    it('sanitizes HTML tags from title and description', async () => {
+      const result = await sharingService.sharePostcard(makePostcard(), {
+        playerName: 'P',
+        title: '<b>My</b> World',
+        description: '<em>Bold</em> desc',
+      });
+      expect(result.title).toBe('My World');
+      expect(result.description).toBe('Bold desc');
     });
 
     it('truncates title to 50 chars and description to 200 chars', async () => {
