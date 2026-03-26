@@ -144,4 +144,5 @@ export type {
   SharedPostcard,
   PostcardAnnotations,
   ExportedPostcard,
+  GalleryPostcard,
 } from '@ai-village/core';

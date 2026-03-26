@@ -17,12 +17,28 @@ import type { AgentComponent } from '../components/AgentComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
+import type { CanonEventRecorder } from '../metrics/CanonEventRecorder.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { TIME_CONSTANTS } from '../utils/ageUtils.js';
 import { getMagicSystemState } from '../magic/index.js';
 
 /** Max recent legends to retain for snapshots. */
 const MAX_RECENT_LEGENDS = 5;
+/** Max notable moments to include on a postcard. */
+const MAX_NOTABLE_MOMENTS = 3;
+/** Max length for a single notable moment string. */
+const MAX_MOMENT_LENGTH = 80;
+const MAX_TITLE_LENGTH = 50;
+const MAX_DESCRIPTION_LENGTH = 200;
+
+/**
+ * Strip HTML tags and enforce a character length limit.
+ * Used to sanitize player-provided text for postcard annotations.
+ */
+export function sanitizeText(input: string, maxLength: number): string {
+  const stripped = input.replace(/<[^>]*>/g, '').trim();
+  return stripped.slice(0, maxLength);
+}
 
 /**
  * A shareable snapshot of the simulation at a particular moment.
@@ -57,6 +73,12 @@ export interface UniversePostcard {
   worldAge: number;
   /** Optional era title derived from world age milestones. */
   epochTitle?: string;
+  /** Up to 3 human-readable summaries of notable canon events. Auto-populated. */
+  notableMoments?: string[];
+  /** Player-chosen universe title (max 50 chars). Set during share flow. */
+  playerTitle?: string;
+  /** Player-written description (max 200 chars). Set during share flow. */
+  playerDescription?: string;
 }
 
 /**
@@ -69,6 +91,7 @@ export interface UniversePostcard {
 export class WorldSnapshotService {
   private readonly recentLegends: string[] = [];
   private initialized = false;
+  private canonEventRecorder: CanonEventRecorder | null = null;
 
   /**
    * Subscribe to `civilizational_legend:born` events so snapshots always
@@ -93,6 +116,14 @@ export class WorldSnapshotService {
   }
 
   /**
+   * Inject a CanonEventRecorder to auto-populate notableMoments on postcards.
+   * Call once at game startup (optional — postcards work without it).
+   */
+  setCanonEventRecorder(recorder: CanonEventRecorder): void {
+    this.canonEventRecorder = recorder;
+  }
+
+  /**
    * Capture the current simulation state as an UniversePostcard.
    * Safe to call at any tick — reads world state non-destructively.
    */
@@ -110,6 +141,7 @@ export class WorldSnapshotService {
       populationBySpecies: this.countBySpecies(livingAgents),
       worldAge: world.tick / TIME_CONSTANTS.TICKS_PER_YEAR,
       epochTitle: this.deriveEpochTitle(world.tick),
+      notableMoments: this.buildNotableMoments(),
     };
   }
 
@@ -230,6 +262,34 @@ export class WorldSnapshotService {
   }
 
   /**
+   * Build up to 3 notable moments from recorded canon events.
+   * Picks the most recent significant events, returning human-readable summaries.
+   */
+  private buildNotableMoments(): string[] {
+    if (!this.canonEventRecorder) return [];
+
+    const events = this.canonEventRecorder.getEvents();
+    if (events.length === 0) return [];
+
+    // Prioritise significant event types, then fall back to recency
+    const significantTypes = new Set([
+      'culture:emerged', 'crisis:occurred', 'lineage:founded',
+      'soul:created', 'union:formed',
+    ]);
+
+    const sorted = [...events].sort((a, b) => {
+      const aSignificant = significantTypes.has(a.type) ? 1 : 0;
+      const bSignificant = significantTypes.has(b.type) ? 1 : 0;
+      if (aSignificant !== bSignificant) return bSignificant - aSignificant;
+      return b.tick - a.tick;
+    });
+
+    return sorted
+      .slice(0, MAX_NOTABLE_MOMENTS)
+      .map(e => sanitizeText(e.description, MAX_MOMENT_LENGTH));
+  }
+
+  /**
    * Derive an optional epoch title from simulation tick milestones.
    * Returns undefined before the world has aged enough to name an era.
    */
@@ -257,6 +317,8 @@ export interface PostcardAnnotations {
   title: string;
   /** Short description (max 200 chars). */
   description: string;
+  /** Optional player-edited notable moments (up to 3, max 80 chars each). */
+  notableMoments?: string[];
 }
 
 /** A postcard with player annotations, ready for sharing. */
@@ -269,11 +331,25 @@ export interface SharedPostcard extends UniversePostcard {
   description: string;
   /** ISO 8601 timestamp when shared. */
   sharedAt: string;
+  /** Player-edited or auto-populated notable moments (up to 3). */
+  notableMoments: string[];
+}
+
+/** A postcard enriched with player info and share code, stored in the local gallery. */
+export interface GalleryPostcard extends UniversePostcard {
+  /** Player-chosen title for their universe (max 50 chars). */
+  playerTitle: string;
+  /** Player-written description (max 200 chars). */
+  playerDescription: string;
+  /** Display name or ID of the player who created this postcard. */
+  createdBy: string;
+  /** ISO 8601 timestamp when the postcard was created. */
+  createdAt: string;
+  /** 6-character alphanumeric share code for exchanging postcards. */
+  shareCode: string;
 }
 
 const SHARED_POSTCARDS_STORAGE_KEY = 'mvee_shared_postcards';
-const MAX_TITLE_LENGTH = 50;
-const MAX_DESCRIPTION_LENGTH = 200;
 
 /**
  * Handles uploading/downloading universe postcards for the shared gallery.
@@ -300,21 +376,29 @@ export class PostcardSharingService {
     postcard: UniversePostcard,
     annotations: PostcardAnnotations
   ): Promise<SharedPostcard> {
-    const title = annotations.title.slice(0, MAX_TITLE_LENGTH);
-    const description = annotations.description.slice(0, MAX_DESCRIPTION_LENGTH);
+    const title = sanitizeText(annotations.title, MAX_TITLE_LENGTH);
+    const description = sanitizeText(annotations.description, MAX_DESCRIPTION_LENGTH);
 
-    if (!annotations.playerName) {
+    if (!sanitizeText(annotations.playerName, MAX_TITLE_LENGTH)) {
       throw new Error('playerName is required');
     }
     if (!title) {
       throw new Error('title is required');
     }
 
+    // Use player-provided moments if given, otherwise fall back to auto-populated
+    const moments = (annotations.notableMoments ?? postcard.notableMoments ?? [])
+      .slice(0, MAX_NOTABLE_MOMENTS)
+      .map(m => sanitizeText(m, MAX_MOMENT_LENGTH));
+
     const shared: SharedPostcard = {
       ...postcard,
-      playerName: annotations.playerName,
+      playerName: sanitizeText(annotations.playerName, MAX_TITLE_LENGTH),
       title,
       description,
+      notableMoments: moments,
+      playerTitle: title,
+      playerDescription: description,
       sharedAt: new Date().toISOString(),
     };
 

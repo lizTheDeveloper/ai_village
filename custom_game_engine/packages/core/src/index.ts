@@ -356,6 +356,7 @@ export {
   type UniversePostcard,
   type PostcardAnnotations,
   type SharedPostcard,
+  type GalleryPostcard,
 } from './services/WorldSnapshotService.js';
 
 // Note: MovementAPI, TargetingAPI, InteractionAPI are re-exported

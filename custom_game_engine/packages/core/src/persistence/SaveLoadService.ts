@@ -26,6 +26,7 @@ import {
   type UniversePostcard,
   type PostcardAnnotations,
   type SharedPostcard,
+  type GalleryPostcard,
 } from '../services/WorldSnapshotService.js';
 
 // Canon event types for multiverse server sync
@@ -859,6 +860,52 @@ export class SaveLoadService {
    */
   async fetchGallery(): Promise<SharedPostcard[]> {
     return this.getPostcardService().listSharedPostcards();
+  }
+
+  // ============================================================
+  // LOCAL POSTCARD GALLERY (MVP — localStorage only)
+  // ============================================================
+
+  private static readonly GALLERY_STORAGE_KEY = 'mvee-postcards-gallery';
+
+  /**
+   * Generate a 6-character alphanumeric share code.
+   */
+  generateShareCode(): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let code = '';
+    for (let i = 0; i < 6; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  }
+
+  /**
+   * Save a postcard to the local gallery (localStorage).
+   * Used for Phase 1 MVP — server sync is Phase 2.
+   */
+  savePostcardToGallery(postcard: GalleryPostcard): void {
+    const gallery = this.loadGallery();
+    gallery.push(postcard);
+    try {
+      localStorage.setItem(SaveLoadService.GALLERY_STORAGE_KEY, JSON.stringify(gallery));
+    } catch {
+      throw new Error('Failed to save postcard to gallery (localStorage quota exceeded?)');
+    }
+  }
+
+  /**
+   * Load all postcards from the local gallery (localStorage).
+   */
+  loadGallery(): GalleryPostcard[] {
+    try {
+      const raw = localStorage.getItem(SaveLoadService.GALLERY_STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
   }
 }
 
