@@ -279,9 +279,18 @@ describe('DominanceChallengeSystem', () => {
 
       const conflict = challenger.getComponent('conflict');
       if (conflict.winner === alpha.id) {
-        // Challenger may seek alliance with subordinate
-        if (challenger.hasComponent('seeking_alliance')) {
-          expect(challenger.getComponent('seeking_alliance').potential).toContain(subordinate.id);
+        // After a defeat, bystander entities (e.g. subordinate) may seek alliances.
+        // The system adds seeking_alliance to non-participant dominance entities, not the
+        // defeated challenger itself. If any entity has the component, its potential
+        // array must be a valid array (may be empty if no other bystanders remain).
+        const allEntities = Array.from(world.entities.values());
+        for (const entity of allEntities) {
+          if (entity.hasComponent('seeking_alliance')) {
+            const allianceComp = entity.getComponent('seeking_alliance');
+            expect(Array.isArray(allianceComp.potential)).toBe(true);
+            // The seeking entity should not list itself as a potential ally
+            expect(allianceComp.potential).not.toContain(entity.id);
+          }
         }
       }
     });
