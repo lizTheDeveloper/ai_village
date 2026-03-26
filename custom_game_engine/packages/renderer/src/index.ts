@@ -27,6 +27,7 @@ export * from './Camera.js';
 export * from './Renderer.js';
 export * from './EntityPicker.js';
 export * from './InputHandler.js';
+export * from './ShipSectionNavigation.js';
 export * from './KeyboardRegistry.js';
 export * from './SpriteRenderer.js';
 export * from './FloatingTextRenderer.js';
@@ -117,6 +118,7 @@ export * from './IngredientPanel.js';
 export * from './CraftingQueueSection.js';
 
 export * from './WindowManager.js';
+export * from './VirtualTouchControls.js';
 export * from './MenuBar.js';
 export * from './types/WindowTypes.js';
 export * from './LLMConfigPanel.js';

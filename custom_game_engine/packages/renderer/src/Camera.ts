@@ -207,6 +207,23 @@ export class Camera {
     this.setZoom(this.targetZoom * factor);
   }
 
+  /**
+   * Navigate camera to a target position and zoom level (with smoothing).
+   * Convenience method for section-based navigation.
+   */
+  navigateTo(x: number, y: number, zoom: number): void {
+    this.setPosition(x, y);
+    this.setZoom(zoom);
+  }
+
+  /**
+   * Set camera zoom immediately (no smoothing).
+   */
+  setZoomImmediate(zoom: number): void {
+    this.zoom = Math.max(ZoomPreset.Min, Math.min(ZoomPreset.Max, zoom));
+    this.targetZoom = this.zoom;
+  }
+
   // ==========================================================================
   // Z-Depth Control (Side-View Mode)
   // ==========================================================================

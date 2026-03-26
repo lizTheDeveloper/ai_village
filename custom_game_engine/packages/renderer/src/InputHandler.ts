@@ -1,5 +1,6 @@
 import { Camera, ViewMode } from './Camera.js';
 import type { CraftingPanelUI } from './CraftingPanelUI.js';
+import { ShipSectionNavigator } from './ShipSectionNavigation.js';
 
 // ============================================================================
 // Enums
@@ -78,6 +79,13 @@ export class InputHandler {
   private canvas: HTMLCanvasElement | null = null;
   private camera: Camera | null = null;
   private boundHandlers: BoundHandler[] = [];
+  private activePointers: Map<number, { x: number; y: number }> = new Map();
+  private lastPinchDistance: number | null = null;
+  private sectionNavigator: ShipSectionNavigator | null = null;
+  private longPressTimer: ReturnType<typeof setTimeout> | null = null;
+  private longPressFired: boolean = false;
+  private longPressStartX: number = 0;
+  private longPressStartY: number = 0;
 
   constructor(
     canvasOrWorld: HTMLCanvasElement | any,
@@ -112,6 +120,14 @@ export class InputHandler {
    */
   registerCraftingPanel(panel: CraftingPanelUI): void {
     this.craftingPanel = panel;
+  }
+
+  /**
+   * Register section navigator for mobile discrete zoom.
+   * When set, pinch gestures on touch devices snap to sections instead of free-form zoom.
+   */
+  registerSectionNavigator(navigator: ShipSectionNavigator): void {
+    this.sectionNavigator = navigator;
   }
 
   /**
@@ -207,6 +223,9 @@ export class InputHandler {
       return; // Don't setup if canvas not available
     }
 
+    // Prevent browser default touch behaviors (scroll, zoom) on the canvas
+    this.canvas.style.touchAction = 'none';
+
     // Keyboard
     const handleKeyDown = (e: Event) => {
       const ke = e as KeyboardEvent;
@@ -225,35 +244,53 @@ export class InputHandler {
     };
     this.addListener(window, 'keyup', handleKeyUp);
 
-    // Mouse drag and click
-    const handleMouseDown = (e: Event) => {
-      const me = e as MouseEvent;
-      // Check if callback handles this click
+    // Pointer drag and click (replaces mousedown — works for mouse, touch, and stylus)
+    const handlePointerDown = (e: Event) => {
+      const pe = e as PointerEvent;
+      // Track this pointer for multi-touch
+      this.activePointers.set(pe.pointerId, { x: pe.clientX, y: pe.clientY });
+      // Capture so pointermove/pointerup fire even if pointer leaves canvas (important for drag)
+      this.canvas!.setPointerCapture(pe.pointerId);
+
       const rect = this.canvas!.getBoundingClientRect();
-      const x = me.clientX - rect.left;
-      const y = me.clientY - rect.top;
+      const x = pe.clientX - rect.left;
+      const y = pe.clientY - rect.top;
 
       // Handle right-click (button 2) for context menu
-      if (me.button === 2 && this.callbacks.onRightClick) {
-        me.preventDefault();
+      if (pe.button === 2 && this.callbacks.onRightClick) {
+        pe.preventDefault();
         this.callbacks.onRightClick(x, y);
         return;
       }
 
-      const handled = this.callbacks.onMouseClick?.(x, y, me.button);
+      // Long-press: start timer for primary button / touch (single pointer only)
+      if (pe.button === 0 && this.activePointers.size <= 1) {
+        this.longPressFired = false;
+        this.longPressStartX = x;
+        this.longPressStartY = y;
+        this.longPressTimer = setTimeout(() => {
+          this.longPressTimer = null;
+          if (this.activePointers.size <= 1) {
+            this.longPressFired = true;
+            this.callbacks.onRightClick?.(this.longPressStartX, this.longPressStartY);
+          }
+        }, 500);
+      }
+
+      const handled = this.callbacks.onMouseClick?.(x, y, pe.button);
 
       if (handled) {
-        me.preventDefault();
-        me.stopPropagation();
-        me.stopImmediatePropagation();
+        pe.preventDefault();
+        pe.stopPropagation();
+        pe.stopImmediatePropagation();
         return;
       }
 
       this.mouseDown = true;
-      this.lastMouseX = me.clientX;
-      this.lastMouseY = me.clientY;
+      this.lastMouseX = pe.clientX;
+      this.lastMouseY = pe.clientY;
     };
-    this.addListener(this.canvas, 'mousedown', handleMouseDown);
+    this.addListener(this.canvas, 'pointerdown', handlePointerDown);
 
     // Handle right-click for context menu
     const handleContextMenu = (e: Event) => {
@@ -270,29 +307,118 @@ export class InputHandler {
     };
     this.addListener(this.canvas, 'contextmenu', handleContextMenu);
 
-    const handleMouseUp = () => {
+    const cancelLongPress = () => {
+      if (this.longPressTimer !== null) {
+        clearTimeout(this.longPressTimer);
+        this.longPressTimer = null;
+      }
+    };
+
+    const handlePointerUp = (e: Event) => {
+      const pe = e as PointerEvent;
+
+      // Cancel long-press timer on pointer up
+      cancelLongPress();
+
+      // If long-press already fired, suppress the click and reset the flag
+      if (this.longPressFired) {
+        this.longPressFired = false;
+        this.activePointers.delete(pe.pointerId);
+        try { this.canvas!.releasePointerCapture(pe.pointerId); } catch { /* pointer not captured */ }
+        this.mouseDown = false;
+        return;
+      }
+
+      const wasPinching = this.activePointers.size === 2;
+      this.activePointers.delete(pe.pointerId);
+      if (this.activePointers.size < 2) {
+        // Pinch ended — snap to nearest section on mobile
+        if (wasPinching && this.sectionNavigator && this.camera) {
+          const pinchCenter = this.camera.screenToWorld(
+            this.camera.viewportWidth / 2,
+            this.camera.viewportHeight / 2
+          );
+          if (this.sectionNavigator.isOverview()) {
+            // If currently in overview, zoom into nearest section
+            const nearest = this.sectionNavigator.findNearestSection(pinchCenter.x, pinchCenter.y);
+            this.sectionNavigator.navigateToSection(this.camera, nearest);
+          } else {
+            // If already in a section, zoom out to overview
+            this.sectionNavigator.navigateToOverview(this.camera);
+          }
+        }
+        this.lastPinchDistance = null;
+      }
+      try { this.canvas!.releasePointerCapture(pe.pointerId); } catch { /* pointer not captured */ }
       this.mouseDown = false;
     };
-    this.addListener(window, 'mouseup', handleMouseUp);
+    this.addListener(window, 'pointerup', handlePointerUp);
 
-    const handleMouseMove = (e: Event) => {
-      const me = e as MouseEvent;
+    const handlePointerCancel = (e: Event) => {
+      const pe = e as PointerEvent;
+      cancelLongPress();
+      this.longPressFired = false;
+      this.activePointers.delete(pe.pointerId);
+      this.lastPinchDistance = null;
+      try { this.canvas!.releasePointerCapture(pe.pointerId); } catch { /* pointer not captured */ }
+      this.mouseDown = false;
+    };
+    this.addListener(window, 'pointercancel', handlePointerCancel);
+
+    const handlePointerMove = (e: Event) => {
+      const pe = e as PointerEvent;
+
+      // Update tracked position for this pointer
+      this.activePointers.set(pe.pointerId, { x: pe.clientX, y: pe.clientY });
+
+      // Pinch-to-zoom: handle two-finger gestures before pan logic
+      if (this.activePointers.size === 2) {
+        const pointers = Array.from(this.activePointers.values());
+        const p0 = pointers[0]!;
+        const p1 = pointers[1]!;
+        const dx = p1.x - p0.x;
+        const dy = p1.y - p0.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (this.lastPinchDistance !== null && this.camera) {
+          // On mobile with section navigator: track pinch direction for snap on release
+          // On desktop or without navigator: free-form zoom
+          if (!this.sectionNavigator) {
+            const scale = distance / this.lastPinchDistance;
+            this.camera.setZoom(this.camera.zoom * scale);
+          }
+          // When section navigator is active, we don't apply free-form zoom during pinch.
+          // The snap happens on pointer up (pinch end).
+        }
+        this.lastPinchDistance = distance;
+        return; // Don't process as pan while pinching
+      }
+
       const rect = this.canvas!.getBoundingClientRect();
-      this.mouseMoveX = me.clientX - rect.left;
-      this.mouseMoveY = me.clientY - rect.top;
+      this.mouseMoveX = pe.clientX - rect.left;
+      this.mouseMoveY = pe.clientY - rect.top;
 
-      // Notify callback of mouse move
+      // Cancel long-press if pointer moved more than 10px from start position
+      if (this.longPressTimer !== null) {
+        const dx = this.mouseMoveX - this.longPressStartX;
+        const dy = this.mouseMoveY - this.longPressStartY;
+        if (dx * dx + dy * dy > 100) {
+          clearTimeout(this.longPressTimer);
+          this.longPressTimer = null;
+        }
+      }
+
+      // Notify callback of pointer move
       this.callbacks.onMouseMove?.(this.mouseMoveX, this.mouseMoveY);
 
       if (this.mouseDown) {
-        const dx = me.clientX - this.lastMouseX;
-        const dy = me.clientY - this.lastMouseY;
+        const dx = pe.clientX - this.lastMouseX;
+        const dy = pe.clientY - this.lastMouseY;
         this.camera?.pan(-dx, -dy);
-        this.lastMouseX = me.clientX;
-        this.lastMouseY = me.clientY;
+        this.lastMouseX = pe.clientX;
+        this.lastMouseY = pe.clientY;
       }
     };
-    this.addListener(window, 'mousemove', handleMouseMove);
+    this.addListener(window, 'pointermove', handlePointerMove);
 
     // Mouse wheel - zoom or depth change
     const handleWheel = (e: Event) => {
@@ -372,6 +498,10 @@ export class InputHandler {
    * Call this when the InputHandler is no longer needed.
    */
   destroy(): void {
+    if (this.longPressTimer !== null) {
+      clearTimeout(this.longPressTimer);
+      this.longPressTimer = null;
+    }
     for (const { element, event, handler } of this.boundHandlers) {
       element.removeEventListener(event, handler);
     }
@@ -379,6 +509,7 @@ export class InputHandler {
     this.keys.clear();
     this.callbacks = {};
     this.craftingPanel = null;
+    this.sectionNavigator = null;
   }
 
   /**
