@@ -21,7 +21,12 @@
   },
   "dependencies": {
     "@ai-village/core": "*",
+    "@ai-village/magic": "*",
     "@ai-village/reproduction": "*"
+  },
+  "optionalDependencies": {
+    "@mlc-ai/web-llm": "^0.2.x",
+    "@nicepkg/wllama": "^1.x"
   },
   "devDependencies": {
     "typescript": "^5.3.3"

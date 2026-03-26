@@ -152,6 +152,19 @@ export * from './ProxyLLMProvider';
 export * from './LoadBalancingProvider';
 export * from './FallbackProvider';
 export * from './SameOriginChatProxy';
+export * from './BrowserLLMProvider';
+export * from './BrowserLLMCapabilityDetector';
+
+// ============================================================================
+// Browser LLM Worker Protocol (types only — worker runs in isolation)
+// ============================================================================
+
+export type {
+  BrowserLLMBackend,
+  BrowserLLMStatus,
+  BrowserLLMConfig,
+  DownloadProgress,
+} from './workers/InferenceWorkerProtocol';
 
 // ============================================================================
 // Prompt Builders
@@ -159,6 +172,7 @@ export * from './SameOriginChatProxy';
 
 export * from './StructuredPromptBuilder';
 export * from './TalkerPromptBuilder';
+export * from './MobileTalkerPromptBuilder';
 export * from './ExecutorPromptBuilder';
 export * from './GovernorPromptBuilder';
 export * from './TrajectoryPromptBuilder';
@@ -236,6 +250,7 @@ export * from './PersonalityVariationsLibrary';
 
 export * from './SpellSandboxPromptBuilder';
 export * from './SpellSandboxService';
+export * from './LLMEffectSandbox';
 
 // Opus Generator (Eternal Return — cycle synthesis pipeline)
 // ============================================================================

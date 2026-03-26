@@ -49,6 +49,7 @@ export class ProviderQueue {
   private processing: boolean = false;
   private maxRequestAgeMs: number;
   private expiredCount: number = 0;
+  private maxRetries: number = 5;
 
   /**
    * @param provider - LLM provider instance
@@ -179,11 +180,15 @@ export class ProviderQueue {
 
           // Extract retry-after header if available
           const retryAfter = this.extractRetryAfter(error);
-          this.handleRateLimit(retryAfter);
+          queuedRequest.retryCount++;
+          this.handleRateLimit(retryAfter, queuedRequest.retryCount);
 
           // Re-queue the request (will be retried after rate limit expires)
-          queuedRequest.retryCount++;
-          this.queue.unshift(queuedRequest);
+          if (queuedRequest.retryCount >= this.maxRetries) {
+            queuedRequest.reject(new Error(`LLM request failed after ${this.maxRetries} rate limit retries`));
+          } else {
+            this.queue.unshift(queuedRequest);
+          }
         } else {
           // Non-rate-limit error, reject
           const rejectionError = error instanceof Error ? error : new Error(String(error));
@@ -269,14 +274,21 @@ export class ProviderQueue {
   /**
    * Handle rate limit by setting rate limit flag and expiration time
    *
-   * @param retryAfterMs - How long to wait (from header), or null to use default
+   * @param retryAfterMs - How long to wait (from header), or null to use exponential backoff
+   * @param retryCount - Number of retries so far, used to compute exponential backoff
    */
-  handleRateLimit(retryAfterMs: number | null): void {
+  handleRateLimit(retryAfterMs: number | null, retryCount: number = 0): void {
     this.rateLimited = true;
-
-    // Use provided retry-after, or default to 1 second
-    const waitMs = retryAfterMs ?? 1000;
-    this.rateLimitUntil = Date.now() + waitMs;
+    if (retryAfterMs !== null) {
+      this.rateLimitUntil = Date.now() + retryAfterMs;
+    } else {
+      // Exponential backoff with jitter: base * 2^retry + random jitter
+      const baseDelay = 1000;
+      const maxDelay = 30000;
+      const exponentialDelay = Math.min(baseDelay * Math.pow(2, retryCount), maxDelay);
+      const jitter = Math.random() * 1000; // 0-1s jitter to prevent thundering herd
+      this.rateLimitUntil = Date.now() + exponentialDelay + jitter;
+    }
   }
 
   /**

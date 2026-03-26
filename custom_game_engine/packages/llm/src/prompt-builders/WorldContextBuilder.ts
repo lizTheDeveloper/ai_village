@@ -54,6 +54,9 @@ export class WorldContextBuilder {
 
     let context = 'Current Situation:\n';
 
+    // Universe context — fork awareness for agents in branched timelines
+    context += this.buildUniverseContext(world);
+
     // PRIORITY: Show active conversation history first
     context += this.buildConversationContext(conversation, world);
 
@@ -123,6 +126,49 @@ export class WorldContextBuilder {
     }
 
     return context;
+  }
+
+  /**
+   * Build universe identity and fork context for agents in branched timelines.
+   * Only emits content when universe/fork metadata is present.
+   * Enhanced for MUL-37: includes fork purpose, divergence hints, and experimentation context.
+   */
+  private buildUniverseContext(world: World): string {
+    const cfg = world.divineConfig;
+    if (!cfg?.universeId) return '';
+
+    let ctx = '';
+    if (cfg.name) {
+      ctx += `\n- Universe: ${cfg.name}`;
+    }
+
+    const timeIds = world.query().with('time').execute();
+    if (timeIds.length > 0) {
+      const timeEnt = world.getEntity(timeIds[0]!);
+      const timeComp = timeEnt?.getComponent('time') as
+        | {
+            forkPoint?: { parentUniverseId: string; parentUniverseTick: string };
+            universeTick?: number;
+          }
+        | undefined;
+      if (timeComp?.forkPoint) {
+        ctx += `\n- Timeline: This is a branched timeline, forked from the primary world.`;
+        ctx += ` Actions here do not affect the parent timeline — you may act freely without permanent consequence.`;
+
+        // Divergence estimate: how far this fork has progressed
+        if (timeComp.universeTick != null) {
+          const forkTick = Number(timeComp.forkPoint.parentUniverseTick);
+          const currentTick = Number(timeComp.universeTick);
+          const divergedTicks = currentTick - forkTick;
+          if (divergedTicks > 0) {
+            const divergedSeconds = Math.round(divergedTicks / 20);
+            ctx += ` This branch has diverged for ~${divergedSeconds}s of simulation time.`;
+          }
+        }
+      }
+    }
+
+    return ctx;
   }
 
   /**

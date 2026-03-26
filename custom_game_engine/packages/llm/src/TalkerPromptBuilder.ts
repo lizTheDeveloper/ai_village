@@ -399,6 +399,27 @@ export class TalkerPromptBuilder {
   ): string {
     let context = '--- Environment ---\n';
 
+    // Fork/timeline awareness (MUL-37 Phase B)
+    const cfg = world.divineConfig;
+    if (cfg?.universeId) {
+      const timeIds = world.query().with('time').execute();
+      if (timeIds.length > 0) {
+        const timeEnt = world.getEntity(timeIds[0]!);
+        const timeComp = timeEnt?.getComponent('time') as
+          | { forkPoint?: { parentUniverseId: string; parentUniverseTick: string }; universeTick?: number }
+          | undefined;
+        if (timeComp?.forkPoint) {
+          context += `[TIMELINE] You are in a branched timeline. Actions here do not affect the parent world — you may speak and act freely.\n`;
+          if (timeComp.universeTick != null) {
+            const divergedTicks = Number(timeComp.universeTick) - Number(timeComp.forkPoint.parentUniverseTick);
+            if (divergedTicks > 0) {
+              context += `This branch diverged ~${Math.round(divergedTicks / 20)}s ago.\n`;
+            }
+          }
+        }
+      }
+    }
+
     // Check if current chunk has been visited frequently but lacks a name
     const position = agent.components.get('position') as PositionComponent | undefined;
     const spatialMemory = agent.components.get('spatial_memory') as SpatialMemoryComponent | undefined;

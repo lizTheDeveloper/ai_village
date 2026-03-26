@@ -32,6 +32,7 @@ import type {
 import { StructuredPromptBuilder } from './StructuredPromptBuilder.js';
 import { TalkerPromptBuilder } from './TalkerPromptBuilder.js';
 import { ExecutorPromptBuilder } from './ExecutorPromptBuilder.js';
+import { MobileTalkerPromptBuilder } from './MobileTalkerPromptBuilder.js';
 import type { LLMDecisionQueue } from './LLMDecisionQueue.js';
 import { mveePolicy, IDENTITY_TO_POLICY_SPECIES } from './MVEEPolicyInference.js';
 
@@ -82,6 +83,47 @@ export const DEFAULT_LAYER_CONFIG: Record<DecisionLayer, LayerConfig> = {
 };
 
 /**
+ * Cognition zone — Vernor Vinge Zones of Thought mechanic.
+ * Creatures farther from the galactic core think slower and simpler (local inference).
+ * Creatures near the core access the "galactic network" (cloud LLM) for faster, richer cognition.
+ */
+export type CognitionZone = 'unthinking_depths' | 'slow_zone' | 'beyond' | 'transcend';
+
+/**
+ * Zone-aware layer overrides.
+ * Applied on top of DEFAULT_LAYER_CONFIG when a creature is in a specific zone.
+ */
+export const ZONE_LAYER_OVERRIDES: Record<CognitionZone, Partial<Record<DecisionLayer, Partial<LayerConfig>>>> = {
+  unthinking_depths: {
+    talker: { enabled: false },
+    executor: { enabled: false },
+    autonomic: { cooldownMs: 500 },
+  },
+  slow_zone: {
+    talker: { cooldownMs: 10000 },
+    executor: { enabled: false },
+    autonomic: { cooldownMs: 1000 },
+  },
+  transcend: {
+    talker: { cooldownMs: 2000 },
+    executor: { cooldownMs: 1000 },
+    autonomic: { cooldownMs: 500 },
+  },
+  beyond: {
+    // Default behavior — no overrides
+  },
+};
+
+/**
+ * Cognition tier returned by zone-aware tier selection.
+ * Used by LLMDecisionQueue to route to the correct provider.
+ */
+export interface CognitionTierConfig {
+  tier: 'nn-only' | 'browser' | 'default' | 'high';
+  chatOnly?: boolean;
+}
+
+/**
  * Layer selection result
  */
 export interface LayerSelection {
@@ -127,6 +169,7 @@ export interface SchedulerMetrics {
 export class LLMScheduler {
   private autonomicBuilder: StructuredPromptBuilder;
   private talkerBuilder: TalkerPromptBuilder;
+  private mobileTalkerBuilder: MobileTalkerPromptBuilder;
   private executorBuilder: ExecutorPromptBuilder;
   private queue: LLMDecisionQueue;
 
@@ -141,6 +184,7 @@ export class LLMScheduler {
     this.queue = queue;
     this.autonomicBuilder = new StructuredPromptBuilder();
     this.talkerBuilder = new TalkerPromptBuilder();
+    this.mobileTalkerBuilder = new MobileTalkerPromptBuilder();
     this.executorBuilder = new ExecutorPromptBuilder();
 
     // Merge custom config with defaults
@@ -311,8 +355,11 @@ export class LLMScheduler {
    * Check if a layer is ready to run for this agent (cooldown elapsed)
    * Adjusts cooldowns based on conversation state and personality (extroversion) for more natural engagement
    */
-  isLayerReady(agentId: string, layer: DecisionLayer, agent?: Entity): boolean {
-    const config = this.layerConfig[layer];
+  isLayerReady(agentId: string, layer: DecisionLayer, agent?: Entity, world?: World): boolean {
+    // Use zone-aware config if world is available
+    const config = (agent && world)
+      ? this.getZoneLayerConfig(layer, agent, world)
+      : this.layerConfig[layer];
     if (!config.enabled) return false;
 
     const state = this.getAgentState(agentId);
@@ -401,8 +448,8 @@ export class LLMScheduler {
     this.metrics.layerSelections[selection.layer]++;
     this.metrics.totalUrgency[selection.layer] += selection.urgency;
 
-    // Check if selected layer is ready (pass agent for conversation-aware cooldowns)
-    if (!this.isLayerReady(agent.id, selection.layer, agent)) {
+    // Check if selected layer is ready (pass agent + world for zone-aware cooldowns)
+    if (!this.isLayerReady(agent.id, selection.layer, agent, world)) {
       const waitMs = this.getTimeUntilReady(agent.id, selection.layer);
 
       // Track metrics: cooldown hit
@@ -456,9 +503,13 @@ export class LLMScheduler {
       ? () => cachedPrompt!
       : () => this.buildPrompt(layer, agent, world);
 
-    // Queue decision with lazy prompt builder
+    // Queue decision with lazy prompt builder + cognition tier routing
+    const cognitionTier = this.getCognitionTier(agent, world);
+    const customConfig = cognitionTier.tier !== 'default'
+      ? { tier: cognitionTier.tier, chatOnly: cognitionTier.chatOnly }
+      : undefined;
     try {
-      const response = await this.queue.requestDecision(agent.id, promptBuilder);
+      const response = await this.queue.requestDecision(agent.id, promptBuilder, customConfig);
 
       // Track metrics: successful call
       this.metrics.successfulCalls++;
@@ -478,14 +529,70 @@ export class LLMScheduler {
   }
 
   /**
-   * Build prompt for specific layer
+   * Get the cognition zone for an agent based on its current region.
+   * Reads the 'cognition_zone' component from the region entity the agent is in.
+   * Defaults to 'beyond' (standard cloud) if no zone is assigned.
+   */
+  getCognitionZone(agent: Entity, world: World): CognitionZone {
+    // Check agent's region for cognition zone
+    const planetLocation = agent.components.get('planet_location') as { regionId?: string } | undefined;
+    if (planetLocation?.regionId) {
+      const region = world.getEntity(planetLocation.regionId);
+      const zoneComp = region?.components.get('cognition_zone') as { zone?: CognitionZone } | undefined;
+      if (zoneComp?.zone) {
+        return zoneComp.zone;
+      }
+    }
+    return 'beyond';
+  }
+
+  /**
+   * Get the cognition tier configuration for an agent based on its zone.
+   * Used by the LLMDecisionQueue to route to the correct provider.
+   */
+  getCognitionTier(agent: Entity, world: World): CognitionTierConfig {
+    const zone = this.getCognitionZone(agent, world);
+
+    switch (zone) {
+      case 'unthinking_depths':
+        return { tier: 'nn-only' };
+      case 'slow_zone':
+        return { tier: 'browser', chatOnly: true };
+      case 'beyond':
+        return { tier: 'default' };
+      case 'transcend':
+        return { tier: 'high' };
+    }
+  }
+
+  /**
+   * Get zone-aware layer config for an agent.
+   * Applies ZONE_LAYER_OVERRIDES on top of the base config.
+   */
+  getZoneLayerConfig(layer: DecisionLayer, agent: Entity, world: World): LayerConfig {
+    const baseConfig = this.layerConfig[layer];
+    const zone = this.getCognitionZone(agent, world);
+    const zoneOverride = ZONE_LAYER_OVERRIDES[zone]?.[layer];
+
+    if (!zoneOverride) return baseConfig;
+    return { ...baseConfig, ...zoneOverride };
+  }
+
+  /**
+   * Build prompt for specific layer.
+   * Uses MobileTalkerPromptBuilder when agent is in the 'browser' cognition tier.
    */
   buildPrompt(layer: DecisionLayer, agent: Entity, world: World): string {
     switch (layer) {
       case 'autonomic':
         return this.autonomicBuilder.buildPrompt(agent, world);
-      case 'talker':
+      case 'talker': {
+        const tier = this.getCognitionTier(agent, world);
+        if (tier.tier === 'browser') {
+          return this.mobileTalkerBuilder.buildPrompt(agent, world);
+        }
         return this.talkerBuilder.buildPrompt(agent, world);
+      }
       case 'executor':
         return this.executorBuilder.buildPrompt(agent, world);
       default:
@@ -545,6 +652,7 @@ export class LLMScheduler {
     return {
       autonomic: this.autonomicBuilder,
       talker: this.talkerBuilder,
+      mobileTalker: this.mobileTalkerBuilder,
       executor: this.executorBuilder,
     };
   }

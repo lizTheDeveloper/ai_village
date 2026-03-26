@@ -201,7 +201,7 @@ describe('ProviderQueue', () => {
       await promise;
     });
 
-    it('should use default 1s wait if no retry-after header', async () => {
+    it('should use exponential backoff if no retry-after header', async () => {
       const rateLimitError: any = new Error('Rate limited');
       rateLimitError.status = 429;
 
@@ -209,12 +209,14 @@ describe('ProviderQueue', () => {
 
       const promise = queue.enqueue({ prompt: 'test' }, 'agent1');
 
-      // Check that rate limit is set with default wait
+      // Check that rate limit is set with exponential backoff
       await new Promise(resolve => setTimeout(resolve, 100));
       expect(queue.isRateLimited()).toBe(true);
 
       const waitTime = queue.getRateLimitWaitTime();
-      expect(waitTime).toBeLessThan(1100); // Should be ~1 second
+      // First retry: 1000 * 2^1 = 2000ms + up to 1000ms jitter = max ~3000ms
+      expect(waitTime).toBeLessThan(3100);
+      expect(waitTime).toBeGreaterThan(1500); // At least 2000ms minus timing slack
 
       provider.queueResponse({
         text: 'success',

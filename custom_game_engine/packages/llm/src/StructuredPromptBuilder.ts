@@ -665,6 +665,31 @@ export class StructuredPromptBuilder {
 
     let context = 'Current Situation:\n';
 
+    // Universe context — fork awareness for agents in branched timelines
+    const cfg = world.divineConfig;
+    if (cfg?.name) {
+      context += `- Universe: ${cfg.name}\n`;
+    }
+    const timeIds = world.query().with('time').execute();
+    if (timeIds.length > 0) {
+      const timeEnt = world.getEntity(timeIds[0]!);
+      const timeComp = timeEnt?.getComponent('time') as
+        | {
+            forkPoint?: { parentUniverseId: string; parentUniverseTick: string };
+            universeTick?: number;
+          }
+        | undefined;
+      if (timeComp?.forkPoint) {
+        context += `- Timeline: This is a branched timeline, forked from the primary world. Actions here do not affect the parent timeline — you may act freely without permanent consequence.\n`;
+        if (timeComp.universeTick != null) {
+          const divergedTicks = Number(timeComp.universeTick) - Number(timeComp.forkPoint.parentUniverseTick);
+          if (divergedTicks > 0) {
+            context += `- Divergence: ~${Math.round(divergedTicks / 20)}s of simulation time since fork.\n`;
+          }
+        }
+      }
+    }
+
     // PRIORITY: Show active conversation with enhanced context
     if (conversation?.isActive && conversation?.partnerId && entity) {
       const partner = world.getEntity(conversation.partnerId);
