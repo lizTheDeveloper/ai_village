@@ -200,6 +200,11 @@ export class SettingsPanel implements IWindowPanel {
    * Get current settings
    */
   getSettings(): GameSettings {
+    // Ensure sound settings always exist — guards against stale localStorage
+    // from before SoundSettings was added (MUL-3897, MUL-4203)
+    if (!this.settings.sound) {
+      this.settings.sound = { masterMuted: _isMobile, masterVolume: 0.7 };
+    }
     return this.settings;
   }
 

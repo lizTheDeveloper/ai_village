@@ -4832,7 +4832,8 @@ async function main() {
   touchControls.setPanelList(drawerPanels);
 
   // Set initial sound muted state on touch controls
-  touchControls.soundMuted = settingsPanel.getSettings().sound.masterMuted;
+  const soundSettings = settingsPanel.getSettings().sound;
+  touchControls.soundMuted = soundSettings ? soundSettings.masterMuted : true;
 
   // Render loop with error handling to prevent silent failures
   let renderLoopStarted = false;
