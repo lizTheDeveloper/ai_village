@@ -282,6 +282,7 @@ import {
   createInitialPlants,
   createInitialAnimals,
 } from './worldInitializer.js';
+import { initLoreDiscoveryBridge, destroyLoreDiscoveryBridge } from './lore-discovery-bridge.js';
 
 // ============================================================================
 // URL CONFIGURATION
@@ -4262,6 +4263,15 @@ async function main() {
   }
 
   // ============================================================================
+  // LORE DISCOVERY BRIDGE (Akashic Records wiki)
+  // ============================================================================
+  // Wire LoreDiscoverySystem ECS events → shared LoreDiscoveryEmitter
+  // (handles POST /api/lore/discover, localStorage dedup, 30s batch flush)
+  if (!isSharedWorkerMode) {
+    initLoreDiscoveryBridge(gameLoop.world.eventBus).catch(() => { /* @akashic-records not available */ });
+  }
+
+  // ============================================================================
   // CHUNK SPATIAL QUERY INJECTION
   // ============================================================================
   // Inject ChunkSpatialQuery for optimized spatial queries
@@ -4296,6 +4306,7 @@ async function main() {
   // Destroy renderer on page unload to release WebGL context before the browser re-uses the slot.
   // This is belt-and-suspenders alongside PixiJSRenderer's own beforeunload handler.
   window.addEventListener('beforeunload', () => {
+    destroyLoreDiscoveryBridge();
     activeRenderer?.destroy();
     activeRenderer = null;
   }, { once: true });
@@ -5278,13 +5289,18 @@ async function main() {
       // Register cognition zone for this planet (Zones of Thought mechanic)
       // Homeworld defaults to 'beyond' (standard cloud LLM).
       // Future planets (crystal, void, etc.) will get different zones.
-      if (scheduler) {
-        const { getDefaultZoneForPlanet } = await import('@ai-village/core');
-        const homeworldPlanetId = `planet:${homeworld.name.toLowerCase().replace(/\s+/g, '-')}`;
-        const zone = getDefaultZoneForPlanet(homeworld.type);
-        scheduler.setPlanetZone(homeworldPlanetId, zone);
-        scheduler.setPlanetZone('planet:homeworld', zone); // Also register the default ID
-        console.log(`[WorldInit] Cognition zone for ${homeworld.name}: ${zone}`);
+      // Isolated try-catch: zone registration failure must not abort biosphere init.
+      if (scheduler && typeof scheduler.setPlanetZone === 'function') {
+        try {
+          const { getDefaultZoneForPlanet } = await import('@ai-village/core');
+          const homeworldPlanetId = `planet:${homeworld.name.toLowerCase().replace(/\s+/g, '-')}`;
+          const zone = getDefaultZoneForPlanet(homeworld.type);
+          scheduler.setPlanetZone(homeworldPlanetId, zone);
+          scheduler.setPlanetZone('planet:homeworld', zone); // Also register the default ID
+          console.log(`[WorldInit] Cognition zone for ${homeworld.name}: ${zone}`);
+        } catch (zoneError) {
+          console.warn('[WorldInit] Failed to register cognition zone (non-fatal):', zoneError);
+        }
       }
 
       console.log(`[WorldInit] Homeworld initialized: ${homeworld.name} (${homeworld.type})`);
