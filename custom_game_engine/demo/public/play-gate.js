@@ -95,23 +95,15 @@
     '#play-gate-note a:hover {',
     '  text-decoration: underline;',
     '}',
-    '#play-gate-guest {',
-    '  display: inline-block;',
-    '  margin-top: 0.75rem;',
-    '  padding: 0.5rem 1.5rem;',
-    '  background: transparent;',
-    '  border: 1px solid var(--dust, #8a8694);',
+    '#play-gate-error {',
+    '  margin-top: 1rem;',
+    '  padding: 0.6rem 1rem;',
+    '  background: rgba(255,107,53,0.1);',
+    '  border: 1px solid rgba(255,107,53,0.3);',
     '  border-radius: 6px;',
-    '  color: var(--dust, #8a8694);',
-    '  font-family: inherit;',
+    '  color: var(--ember, #ff6b35);',
     '  font-size: 0.7rem;',
-    '  letter-spacing: 0.05em;',
-    '  cursor: pointer;',
-    '  transition: background 0.15s, color 0.15s, border-color 0.15s;',
-    '}',
-    '#play-gate-guest:hover {',
-    '  border-color: var(--star-white, #e8e6f0);',
-    '  color: var(--star-white, #e8e6f0);',
+    '  display: none;',
     '}',
   ].join('\n');
   document.head.appendChild(style);
@@ -131,9 +123,7 @@
       '<div>' +
         '<button id="play-gate-btn" type="button">Sign In / Create Account</button>' +
       '</div>' +
-      '<div>' +
-        '<button id="play-gate-guest" type="button">Play as Guest</button>' +
-      '</div>' +
+      '<div id="play-gate-error"></div>' +
       '<p id="play-gate-note">' +
         'Never Ever Land is free &mdash; ' +
         '<a href="/play/neverland/">no account needed</a>.' +
@@ -145,13 +135,6 @@
   function attachGate() {
     document.body.appendChild(gate);
     var btn = document.getElementById('play-gate-btn');
-    var guestBtn = document.getElementById('play-gate-guest');
-    if (guestBtn) {
-      guestBtn.addEventListener('click', function () {
-        window.dispatchEvent(new CustomEvent('playGateGuest'));
-        removeGate();
-      });
-    }
     if (btn) {
       btn.addEventListener('click', function () {
         if (window.matrixAuth && typeof window.matrixAuth.showLoginModal === 'function') {
@@ -213,10 +196,13 @@
   });
 
   // ── Auth Unavailable Listener ───────────────────────────────
-  // If auth service is down (503), auto-dismiss to guest mode.
+  // If auth service is down (503), show error — do NOT fall through.
   window.addEventListener('matrixAuthUnavailable', function () {
-    window.dispatchEvent(new CustomEvent('playGateGuest'));
-    removeGate();
+    var errorEl = document.getElementById('play-gate-error');
+    if (errorEl) {
+      errorEl.textContent = 'Authentication service temporarily unavailable \u2014 please try again later.';
+      errorEl.style.display = 'block';
+    }
   });
 
   // ── Safety Valve ────────────────────────────────────────────

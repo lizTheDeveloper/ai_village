@@ -6092,27 +6092,11 @@ function waitForAuth(): Promise<void> {
     function cleanup() {
       window.removeEventListener('matrixAuthReady', onReady);
       window.removeEventListener('matrixAuthLogin', onLogin);
-      window.removeEventListener('playGateGuest', onGuest);
-      window.removeEventListener('matrixAuthUnavailable', onUnavailable);
       if (fallbackTimer !== null) clearTimeout(fallbackTimer);
     }
 
-    const onGuest = () => {
-      console.warn('[Auth] Guest mode — proceeding without authentication');
-      cleanup();
-      resolve();
-    };
-
-    const onUnavailable = () => {
-      console.warn('[Auth] Auth service unavailable — proceeding as guest');
-      cleanup();
-      resolve();
-    };
-
     window.addEventListener('matrixAuthReady', onReady);
     window.addEventListener('matrixAuthLogin', onLogin);
-    window.addEventListener('playGateGuest', onGuest);
-    window.addEventListener('matrixAuthUnavailable', onUnavailable);
 
     // Fallback: if auth scripts didn't load (local dev, scripts blocked),
     // proceed after 5s so the game isn't permanently stuck
