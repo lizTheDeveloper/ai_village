@@ -341,18 +341,24 @@ class GenesisCinematicPanel {
     if (this.currentScene === 4) {
       content.innerHTML = `
         <div id="genesis-scene-subtitle" style="font-size:15px;letter-spacing:0.12em;color:rgba(255,255,255,0.45);font-style:normal;font-family:monospace;">
-          ${scene.subtitle ?? ''}
+          ${this.escapeHtml(scene.subtitle ?? '')}
         </div>
       `;
     } else {
       content.innerHTML = `
-        ${scene.title ? `<div id="genesis-scene-title">${scene.title}</div>` : ''}
-        <div id="genesis-scene-body">${body}</div>
-        ${scene.subtitle ? `<div id="genesis-scene-subtitle">${scene.subtitle}</div>` : ''}
+        ${scene.title ? `<div id="genesis-scene-title">${this.escapeHtml(scene.title)}</div>` : ''}
+        <div id="genesis-scene-body">${this.escapeHtml(body)}</div>
+        ${scene.subtitle ? `<div id="genesis-scene-subtitle">${this.escapeHtml(scene.subtitle)}</div>` : ''}
       `;
     }
 
     this.renderDots();
+  }
+
+  private escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   private renderDots(): void {
