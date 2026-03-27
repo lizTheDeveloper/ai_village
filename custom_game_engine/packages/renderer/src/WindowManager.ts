@@ -28,7 +28,7 @@ const MAX_SPIRAL_ITERATIONS = 100;
 const RESIZE_HANDLE_SIZE = 16; // Size of the resize handle in the lower right corner
 const MOBILE_BREAKPOINT = 768;
 const MOBILE_TITLE_BAR_HEIGHT = 44;
-const MOBILE_BUTTON_SIZE = 36;
+const MOBILE_BUTTON_SIZE = 44;
 const MOBILE_BUTTON_PADDING = 6;
 const MOBILE_RESIZE_HANDLE_SIZE = 0; // No resize on mobile
 

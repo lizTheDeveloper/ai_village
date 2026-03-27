@@ -324,6 +324,11 @@
   font-size: 20px;
   cursor: pointer;
   padding: 0 4px;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
   transition: color 0.15s;
 }
@@ -344,7 +349,8 @@
   font-family: var(--font-mono, monospace);
   font-size: 12px;
   letter-spacing: 0.05em;
-  padding: 8px 0;
+  padding: 14px 0;
+  min-height: 44px;
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
   text-transform: uppercase;

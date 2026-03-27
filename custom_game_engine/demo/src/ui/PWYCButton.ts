@@ -89,8 +89,8 @@ export class PWYCButton {
       position: fixed;
       bottom: 62px;
       right: 12px;
-      width: 36px;
-      height: 36px;
+      width: 44px;
+      height: 44px;
       padding: 0;
       border-radius: 50%;
       border: 1px solid ${ACCENT} 0.28);
@@ -183,6 +183,8 @@ export class PWYCButton {
         background: transparent; border: none; cursor: pointer;
         color: rgba(134,239,172,0.4); font-size: 1.2rem; line-height: 1;
         padding: 0.25rem 0.4rem; border-radius: 3px;
+        min-width: 44px; min-height: 44px;
+        display: flex; align-items: center; justify-content: center;
         transition: color 0.15s;
       }
       #pwyc-modal-close:hover { color: rgba(134,239,172,0.8); }
