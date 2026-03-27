@@ -36,6 +36,10 @@ export class CourtshipSystem extends BaseSystem {
   protected readonly throttleInterval = 5;
 
   private stateMachine = new CourtshipStateMachine();
+  private romanceDuration = new Map<string, number>();
+
+  private static readonly ROMANCE_TICKS = 200;
+  private static readonly HEART_INTERVAL = 30; // Emit hearts every 30 ticks (~1.5s)
 
   protected onUpdate(ctx: SystemContext): void {
     for (const entity of ctx.activeEntities) {
@@ -284,6 +288,17 @@ export class CourtshipSystem extends BaseSystem {
     courtship.state = 'mating';
     partnerCourtship.state = 'mating';
 
+    // Store romance start tick for both agents
+    this.romanceDuration.set(agent.id, world.tick);
+    this.romanceDuration.set(partner.id, world.tick);
+
+    // Emit romance event (triggers hearts + music)
+    this.events.emit('courtship:romance', {
+      agent1Id: agent.id,
+      agent2Id: partner.id,
+      tick: world.tick,
+    }, agent.id);
+
     // Emit event
     this.events.emit('courtship:consent', {
       agent1: agent.id,
@@ -311,6 +326,22 @@ export class CourtshipSystem extends BaseSystem {
       courtship.state = 'idle';
       courtship.currentCourtshipTarget = null;
       courtship.currentCourtshipInitiator = null;
+      this.romanceDuration.delete(agent.id);
+      return;
+    }
+
+    // Wait until romance duration has elapsed
+    const romanceStartTick = this.romanceDuration.get(agent.id);
+    if (romanceStartTick === undefined || world.tick - romanceStartTick < CourtshipSystem.ROMANCE_TICKS) {
+      // Emit periodic hearts during the romance
+      if (romanceStartTick !== undefined &&
+          (world.tick - romanceStartTick) % CourtshipSystem.HEART_INTERVAL === 0) {
+        this.events.emit('courtship:hearts', {
+          agent1Id: agent.id,
+          agent2Id: partnerId,
+          tick: world.tick,
+        }, agent.id);
+      }
       return;
     }
 
@@ -355,6 +386,10 @@ export class CourtshipSystem extends BaseSystem {
         }
       }
     }
+
+    // Clean up romance duration tracking
+    this.romanceDuration.delete(agent.id);
+    this.romanceDuration.delete(partner.id);
 
     // Return both to idle
     courtship.state = 'idle';

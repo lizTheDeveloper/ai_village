@@ -109,6 +109,18 @@ export interface SocialEvents {
     tick: number;
   };
 
+  'courtship:romance': {
+    agent1Id: string;
+    agent2Id: string;
+    tick: number;
+  };
+
+  'courtship:hearts': {
+    agent1Id: string;
+    agent2Id: string;
+    tick: number;
+  };
+
   'courtship:consent': {
     agent1: string;
     agent2: string;

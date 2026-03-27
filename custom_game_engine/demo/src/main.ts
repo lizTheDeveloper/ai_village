@@ -2144,6 +2144,39 @@ function setupVisualEventHandlers(
     floatingTextRenderer?.add('💀 Died', position.x * 16, position.y * 16, '#888888', 2000);
   });
 
+  // Romance events — heart particles between courting agents
+  gameLoop.world.eventBus.subscribe('courtship:romance', (event: any) => {
+    const { agent1Id, agent2Id } = event.data;
+    const agent1 = gameLoop.world.getEntity(agent1Id);
+    const agent2 = gameLoop.world.getEntity(agent2Id);
+    if (!agent1 || !agent2) return;
+
+    const pos1 = agent1.getComponent('position') as any;
+    const pos2 = agent2.getComponent('position') as any;
+    if (!pos1 || !pos2) return;
+
+    // Spawn hearts at the midpoint between the two agents
+    const midX = ((pos1.x + pos2.x) / 2) * 16 + 8;
+    const midY = ((pos1.y + pos2.y) / 2) * 16 + 8;
+    particleRenderer?.createHearts(midX, midY, 8);
+  });
+
+  // Periodic hearts during romance — gentle, ongoing heart particles
+  gameLoop.world.eventBus.subscribe('courtship:hearts', (event: any) => {
+    const { agent1Id, agent2Id } = event.data;
+    const agent1 = gameLoop.world.getEntity(agent1Id);
+    const agent2 = gameLoop.world.getEntity(agent2Id);
+    if (!agent1 || !agent2) return;
+
+    const pos1 = agent1.getComponent('position') as any;
+    const pos2 = agent2.getComponent('position') as any;
+    if (!pos1 || !pos2) return;
+
+    // Hearts at each agent's position for a gentle, proximity-based feel
+    particleRenderer?.createHearts(pos1.x * 16 + 8, pos1.y * 16 + 8, 4);
+    particleRenderer?.createHearts(pos2.x * 16 + 8, pos2.y * 16 + 8, 4);
+  });
+
   // Startup grace period: suppress non-critical notifications for 10s after load
   const startupTime = performance.now();
   const STARTUP_GRACE_MS = 10000;
