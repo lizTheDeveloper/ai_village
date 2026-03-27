@@ -1166,7 +1166,7 @@ export function registerAllSystems(
   // LORE — AUDIO (browser-only, self-guards against non-browser contexts)
   // ============================================================================
   gameLoop.systemRegistry.register(new SongSystem({
-    audioBasePath: '/audio/mvee/',
+    audioBasePath: '/mvee/audio/',
     songCatalogue: MVEE_SONG_CATALOGUE,
   }));
 
