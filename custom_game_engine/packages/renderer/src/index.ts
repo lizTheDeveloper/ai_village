@@ -47,6 +47,7 @@ export * from './PlantInfoPanel.js';
 export * from './ResourcesPanel.js';
 export * from './SettingsPanel.js';
 export * from './LLMSettingsPanel.js';
+export * from './BrowserLLMStatusPanel.js';
 export * from './CraftingStationPanel.js';
 export * from './MemoryPanel.js';
 export * from './RelationshipsPanel.js';

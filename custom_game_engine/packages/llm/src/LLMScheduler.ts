@@ -176,6 +176,7 @@ export class LLMScheduler {
   private layerConfig: Record<DecisionLayer, LayerConfig>;
   private agentStates: Map<string, AgentLayerState> = new Map();
   private metrics: SchedulerMetrics;
+  private planetZoneRegistry: Map<string, CognitionZone> = new Map();
 
   constructor(
     queue: LLMDecisionQueue,
@@ -529,16 +530,38 @@ export class LLMScheduler {
   }
 
   /**
-   * Get the cognition zone for an agent based on its current region.
-   * Reads the 'cognition_zone' component from the region entity the agent is in.
+   * Register a cognition zone for a planet.
+   * Called during world initialization to map planets to zones.
+   */
+  setPlanetZone(planetId: string, zone: CognitionZone): void {
+    this.planetZoneRegistry.set(planetId, zone);
+  }
+
+  /**
+   * Get the registered zone for a planet, if any.
+   */
+  getPlanetZone(planetId: string): CognitionZone | undefined {
+    return this.planetZoneRegistry.get(planetId);
+  }
+
+  /**
+   * Get the cognition zone for an agent based on its current planet.
+   * Checks the planet zone registry first, then falls back to reading
+   * the 'cognition_zone' component from the planet entity (if it exists).
    * Defaults to 'beyond' (standard cloud) if no zone is assigned.
    */
   getCognitionZone(agent: Entity, world: World): CognitionZone {
-    // Check agent's region for cognition zone
-    const planetLocation = agent.components.get('planet_location') as { regionId?: string } | undefined;
-    if (planetLocation?.regionId) {
-      const region = world.getEntity(planetLocation.regionId);
-      const zoneComp = region?.components.get('cognition_zone') as { zone?: CognitionZone } | undefined;
+    const planetLocation = agent.components.get('planet_location') as { currentPlanetId?: string } | undefined;
+    if (planetLocation?.currentPlanetId) {
+      // Primary: check registry (set during world init)
+      const registeredZone = this.planetZoneRegistry.get(planetLocation.currentPlanetId);
+      if (registeredZone) {
+        return registeredZone;
+      }
+
+      // Fallback: check planet entity component (for dynamic zone changes)
+      const planet = world.getEntity(planetLocation.currentPlanetId);
+      const zoneComp = planet?.components.get('cognition_zone') as { zone?: CognitionZone } | undefined;
       if (zoneComp?.zone) {
         return zoneComp.zone;
       }

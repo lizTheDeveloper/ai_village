@@ -239,6 +239,7 @@ import {
   UniversePostcardsGallery,
   LocalStoragePostcardSource,
   ServerPostcardSource,
+  BrowserLLMStatusPanel,
 } from '@ai-village/renderer';
 import {
   OllamaProvider,
@@ -3526,15 +3527,45 @@ async function main() {
 
     // Browser LLM: detect device capabilities and register browser tier provider
     // This enables local inference for creatures in the Slow Zone (Zones of Thought)
+    const browserLLMPanel = new BrowserLLMStatusPanel();
+
     detectCapabilities().then(async (caps) => {
       if (!caps.recommendedModel || !caps.recommendedBackend) {
         console.log(`[BrowserLLM] Local inference not available: ${caps.fallbackReason ?? 'unknown'}`);
+        browserLLMPanel.setDeviceCapable(false);
+        browserLLMPanel.updateStatus('uninitialized');
         return;
       }
       console.log(`[BrowserLLM] Device supports ${caps.recommendedBackend} with ${caps.estimatedMemoryGB}GB RAM`);
       console.log(`[BrowserLLM] Recommended model: ${caps.recommendedModel.modelName}`);
 
+      browserLLMPanel.setDeviceCapable(true);
+      browserLLMPanel.setModelInfo(
+        caps.recommendedModel.modelName,
+        caps.recommendedModel.downloadSizeMB
+      );
+
       const browserProvider = new BrowserLLMProvider(caps.recommendedModel);
+
+      // Wire panel Enable button to provider initialization
+      browserLLMPanel.setOnEnable(() => {
+        browserLLMPanel.updateStatus('downloading');
+        browserProvider.initialize((progress) => {
+          browserLLMPanel.updateProgress(progress);
+        }).then(() => {
+          browserLLMPanel.updateStatus('ready');
+          console.log('[BrowserLLM] Model loaded and ready');
+        }).catch((err) => {
+          browserLLMPanel.updateStatus('error');
+          console.error('[BrowserLLM] Initialization failed:', err);
+        });
+      });
+
+      // Wire panel Disable button to provider disposal
+      browserLLMPanel.setOnDisable(() => {
+        browserProvider.dispose();
+        browserLLMPanel.updateStatus('disposed');
+      });
 
       // Wrap with FallbackProvider so cloud LLM handles failures gracefully
       const browserWithFallback = new FallbackProvider(
@@ -3543,14 +3574,10 @@ async function main() {
       );
 
       llmQueue!.setTierProvider('browser', browserWithFallback);
-      console.log('[BrowserLLM] Browser tier registered (model will download on first Slow Zone creature think)');
-
-      // Lazy initialization: model downloads only when first browser-tier request arrives.
-      // BrowserLLMProvider.generate() throws if not initialized — FallbackProvider catches
-      // this and falls back to cloud. The UI can trigger explicit initialization via
-      // browserProvider.initialize() when the player opts in.
+      console.log('[BrowserLLM] Browser tier registered (open Local AI panel to download model)');
     }).catch((err) => {
       console.warn('[BrowserLLM] Capability detection failed:', err);
+      browserLLMPanel.setDeviceCapable(false);
     });
   } else {
     console.warn(`[DEMO] LLM not available at ${settings.llm.baseUrl}`);
@@ -5241,6 +5268,18 @@ async function main() {
 
       // Store homeworld reference on world for future access
       (gameLoop.world as any)._homeworld = homeworld;
+
+      // Register cognition zone for this planet (Zones of Thought mechanic)
+      // Homeworld defaults to 'beyond' (standard cloud LLM).
+      // Future planets (crystal, void, etc.) will get different zones.
+      if (scheduler) {
+        const { getDefaultZoneForPlanet } = await import('@ai-village/core');
+        const homeworldPlanetId = `planet:${homeworld.name.toLowerCase().replace(/\s+/g, '-')}`;
+        const zone = getDefaultZoneForPlanet(homeworld.type);
+        scheduler.setPlanetZone(homeworldPlanetId, zone);
+        scheduler.setPlanetZone('planet:homeworld', zone); // Also register the default ID
+        console.log(`[WorldInit] Cognition zone for ${homeworld.name}: ${zone}`);
+      }
 
       console.log(`[WorldInit] Homeworld initialized: ${homeworld.name} (${homeworld.type})`);
       if (homeworld.biosphere) {

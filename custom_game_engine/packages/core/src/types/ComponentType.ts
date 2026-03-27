@@ -338,4 +338,7 @@ export enum ComponentType {
 
   // Chorus State (cross-game Folkfork collective intelligence)
   ChorusState = 'chorus_state',
+
+  // Cognition Zones (Browser LLM — Zones of Thought)
+  CognitionZone = 'cognition_zone',
 }
