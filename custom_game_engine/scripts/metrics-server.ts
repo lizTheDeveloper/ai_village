@@ -7877,7 +7877,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
   }
 
   // Get biosphere for planet
-  if (pathname.match(/^\/api\/planet\/[^\/]+\/biosphere$/) && req.method === 'GET') {
+  if (pathname.match(/^\/api\/planets\/[^\/]+\/biosphere$/) && req.method === 'GET') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -7899,7 +7899,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
   }
 
   // Save biosphere for planet (compressed)
-  if (pathname.match(/^\/api\/planet\/[^\/]+\/biosphere$/) && req.method === 'PUT') {
+  if (pathname.match(/^\/api\/planets\/[^\/]+\/biosphere$/) && req.method === 'PUT') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
