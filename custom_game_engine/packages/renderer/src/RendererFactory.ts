@@ -58,12 +58,53 @@ function getRendererPreference(): 'webgpu' | 'webgl' | 'canvas2d' | 'auto' {
 /**
  * Detect best available renderer backend.
  *
- * Defaults to WebGL for better performance.
- * Canvas2D available via ?renderer=canvas2d if needed.
+ * Tries WebGPU, then WebGL2, then WebGL1, then falls back to Canvas2D.
  */
 async function detectBestBackend(): Promise<'webgpu' | 'webgl' | 'canvas2d'> {
-  // Default to WebGL for better performance
-  return 'webgl';
+  // Try WebGPU — verify both adapter AND canvas context work
+  // PixiJS v8 calls canvas.getContext('webgpu').configure() without a null check,
+  // so we must verify getContext('webgpu') returns non-null before committing.
+  if (typeof navigator !== 'undefined' && 'gpu' in navigator) {
+    try {
+      const adapter = await (navigator as Navigator & { gpu: GPU }).gpu.requestAdapter();
+      if (adapter && typeof document !== 'undefined') {
+        // Verify canvas WebGPU context is obtainable (prevents null.configure() crash in PixiJS)
+        const testCanvas = document.createElement('canvas');
+        const gpuContext = testCanvas.getContext('webgpu');
+        if (gpuContext) {
+          console.warn('[RendererFactory] WebGPU available, using WebGPU backend');
+          return 'webgpu';
+        } else {
+          console.warn('[RendererFactory] WebGPU adapter exists but canvas context unavailable, skipping');
+        }
+      }
+    } catch {
+      // WebGPU not available, continue
+    }
+  }
+
+  // Try WebGL2/WebGL1
+  if (typeof document !== 'undefined') {
+    const testCanvas = document.createElement('canvas');
+    const gl2 = testCanvas.getContext('webgl2');
+    if (gl2) {
+      const loseContext = gl2.getExtension('WEBGL_lose_context');
+      if (loseContext) loseContext.loseContext();
+      console.warn('[RendererFactory] WebGL2 available, using WebGL backend');
+      return 'webgl';
+    }
+    const gl1 = testCanvas.getContext('webgl');
+    if (gl1) {
+      const loseContext = gl1.getExtension('WEBGL_lose_context');
+      if (loseContext) loseContext.loseContext();
+      console.warn('[RendererFactory] WebGL1 available, using WebGL backend');
+      return 'webgl';
+    }
+  }
+
+  // Fallback to Canvas2D
+  console.warn('[RendererFactory] No WebGPU or WebGL available, falling back to Canvas2D');
+  return 'canvas2d';
 }
 
 /**
@@ -94,20 +135,44 @@ export async function createRenderer(
 
   // Create the appropriate renderer
   if (backend === 'canvas2d') {
-    // Use existing Canvas2D renderer
+    console.warn('[RendererFactory] Using Canvas2D renderer');
     const renderer = new Canvas2DRenderer(canvas, chunkManager, terrainGenerator);
-    // Wrap it to implement IRenderer interface
     return wrapCanvas2DRenderer(renderer);
-  } else {
-    // Use PixiJS renderer (WebGPU or WebGL)
-    // DO NOT silently fall back to Canvas2D - expose the actual error
-    // The user explicitly requested WebGL/WebGPU and should see why it fails
+  }
+
+  // Try PixiJS renderer (WebGPU or WebGL) with fallback chain
+  try {
     const renderer = new PixiJSRenderer(canvas, chunkManager, terrainGenerator, {
       ...options,
       preference: backend,
     });
     await renderer.init();
+    console.warn(`[RendererFactory] Renderer initialized with ${backend} backend`);
     return renderer;
+  } catch (primaryError) {
+    console.warn(`[RendererFactory] ${backend} renderer failed, attempting fallback`);
+
+    // If WebGPU failed, try WebGL
+    if (backend === 'webgpu') {
+      try {
+        const renderer = new PixiJSRenderer(canvas, chunkManager, terrainGenerator, {
+          ...options,
+          preference: 'webgl',
+        });
+        await renderer.init();
+        console.warn('[RendererFactory] Fallback to WebGL succeeded');
+        return renderer;
+      } catch (webglError) {
+        console.warn('[RendererFactory] WebGL fallback also failed, using Canvas2D');
+      }
+    } else {
+      console.warn(`[RendererFactory] ${backend} failed, falling back to Canvas2D`);
+    }
+
+    // Final fallback: Canvas2D
+    console.warn('[RendererFactory] Using Canvas2D renderer as final fallback');
+    const renderer = new Canvas2DRenderer(canvas, chunkManager, terrainGenerator);
+    return wrapCanvas2DRenderer(renderer);
   }
 }
 
@@ -198,7 +263,15 @@ export async function isWebGPUAvailable(): Promise<boolean> {
 
   try {
     const adapter = await (navigator as Navigator & { gpu: GPU }).gpu.requestAdapter();
-    return adapter !== null;
+    if (!adapter) return false;
+
+    // Also verify canvas context is obtainable (prevents PixiJS null.configure() crash)
+    if (typeof document !== 'undefined') {
+      const testCanvas = document.createElement('canvas');
+      const gpuContext = testCanvas.getContext('webgpu');
+      return gpuContext !== null;
+    }
+    return false;
   } catch {
     return false;
   }
