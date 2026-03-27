@@ -595,20 +595,23 @@ Return ONLY valid JSON:
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
 
-        // Ensure uniqueness of scientific name
-        let scientificName = parsed.scientificName;
-        let suffix = 1;
-        while (this.usedScientificNames.has(scientificName)) {
-          scientificName = `${parsed.scientificName} ${suffix}`;
-          suffix++;
-        }
+        // Validate required naming fields exist
+        if (parsed.commonName && parsed.scientificName && parsed.description) {
+          // Ensure uniqueness of scientific name
+          let scientificName = parsed.scientificName;
+          let suffix = 1;
+          while (this.usedScientificNames.has(scientificName)) {
+            scientificName = `${parsed.scientificName} ${suffix}`;
+            suffix++;
+          }
 
-        return {
-          scientificName,
-          commonName: parsed.commonName,
-          description: parsed.description,
-          spritePrompt: detailedSpritePrompt, // Use detailed prompt instead of LLM-generated
-        };
+          return {
+            scientificName,
+            commonName: parsed.commonName,
+            description: parsed.description,
+            spritePrompt: detailedSpritePrompt, // Use detailed prompt instead of LLM-generated
+          };
+        }
       }
     } catch (error) {
       console.warn('[AlienSpeciesGenerator] LLM naming failed, using fallback:', error);
