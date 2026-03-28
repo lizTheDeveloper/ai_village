@@ -282,13 +282,46 @@ export class PixelLabSpriteLoader {
       // On mobile, defer animation loading until animations are actually needed
       // This saves 40+ fetch requests per character on initial load
       if (!this.deferAnimations) {
-        // Only probe for animation frames if we actually found directions.
-        // For single-image sprites (sprite.png) or sprites without animation
-        // directories, probing generates unnecessary 404 requests.
-        // Use a single test fetch for the first animation + first direction to
-        // check whether animations exist at all before probing every combination.
-        let hasAnimationDir = false;
-        if (rotations.size > 0) {
+        // Use metadata.animations when available — it declares exact frame paths,
+        // eliminating 404 probes that pollute the network log.
+        const metaAnims = metadata.animations as Record<string, Record<string, string[]>> | undefined;
+        const hasMetadataAnimations = metaAnims && typeof metaAnims === 'object'
+          && Object.keys(metaAnims).length > 0
+          // Verify it's the detailed format (direction → frame paths), not just a list of names
+          && Object.values(metaAnims).some(v => typeof v === 'object' && !Array.isArray(v));
+
+        if (hasMetadataAnimations) {
+          // Load animations from metadata — no blind probing needed
+          for (const [animName, dirMap] of Object.entries(metaAnims!)) {
+            const animMap = new Map<string, HTMLImageElement[]>();
+            let foundAnyFrames = false;
+
+            for (const [dirName, framePaths] of Object.entries(dirMap)) {
+              if (!Array.isArray(framePaths)) continue;
+              const frames: HTMLImageElement[] = [];
+
+              for (const framePath of framePaths) {
+                try {
+                  const img = await this.loadImage(`${folderPath}/${framePath}`, metadata.id);
+                  frames.push(img);
+                  foundAnyFrames = true;
+                } catch {
+                  // Frame listed in metadata but missing on disk — skip it
+                }
+              }
+
+              if (frames.length > 0) {
+                animMap.set(normalizeDirectionName(dirName), frames);
+              }
+            }
+
+            if (foundAnyFrames && animMap.size > 0) {
+              animations.set(animName, animMap);
+            }
+          }
+        } else if (rotations.size > 0) {
+          // Fallback: probe for animations when metadata doesn't declare them
+          let hasAnimationDir = false;
           try {
             const testDir = directionNames[0] || 'south';
             await this.loadImage(
@@ -299,42 +332,39 @@ export class PixelLabSpriteLoader {
           } catch {
             // No animation directory — skip all animation probing
           }
-        }
 
-        // Load animations if they exist (flat format)
-        const commonAnimations = hasAnimationDir
-          ? ['breathing-idle', 'idle', 'walking-8-frames', 'walking-4-frames', 'running']
-          : [];
+          const commonAnimations = hasAnimationDir
+            ? ['breathing-idle', 'idle', 'walking-8-frames', 'walking-4-frames', 'running']
+            : [];
 
-        for (const animName of commonAnimations) {
-          const animMap = new Map<string, HTMLImageElement[]>();
-          let foundAnyFrames = false;
+          for (const animName of commonAnimations) {
+            const animMap = new Map<string, HTMLImageElement[]>();
+            let foundAnyFrames = false;
 
-          for (const dirName of directionNames) {
-            const frames: HTMLImageElement[] = [];
-            let frameIndex = 0;
+            for (const dirName of directionNames) {
+              const frames: HTMLImageElement[] = [];
+              let frameIndex = 0;
 
-            // Try loading frames until we hit a missing one
-            // File paths use original name (may have hyphens), map keys use normalized name
-            while (true) {
-              const framePath = `${folderPath}/animations/${animName}/${dirName}/frame_${frameIndex.toString().padStart(3, '0')}.png`;
-              try {
-                const img = await this.loadImage(framePath, metadata.id);
-                frames.push(img);
-                foundAnyFrames = true;
-                frameIndex++;
-              } catch {
-                break; // No more frames for this direction
+              while (true) {
+                const framePath = `${folderPath}/animations/${animName}/${dirName}/frame_${frameIndex.toString().padStart(3, '0')}.png`;
+                try {
+                  const img = await this.loadImage(framePath, metadata.id);
+                  frames.push(img);
+                  foundAnyFrames = true;
+                  frameIndex++;
+                } catch {
+                  break;
+                }
+              }
+
+              if (frames.length > 0) {
+                animMap.set(normalizeDirectionName(dirName), frames);
               }
             }
 
-            if (frames.length > 0) {
-              animMap.set(normalizeDirectionName(dirName), frames);
+            if (foundAnyFrames && animMap.size > 0) {
+              animations.set(animName, animMap);
             }
-          }
-
-          if (foundAnyFrames && animMap.size > 0) {
-            animations.set(animName, animMap);
           }
         }
       }
@@ -551,20 +581,36 @@ export class PixelLabSpriteLoader {
     const instance = this.instances.get(instanceId);
     if (!instance) return;
 
-    if (instance.animState.animation !== animation) {
-      instance.animState.animation = animation;
+    const character = instance.character;
+    let resolvedAnim = animation;
+
+    // If the requested animation isn't loaded, try fallbacks before network probing.
+    // e.g. walking-8-frames → walking-4-frames → breathing-idle
+    if (!character.animations.has(animation) && animation !== 'idle') {
+      const fallbacks: Record<string, string[]> = {
+        'walking-8-frames': ['walking-4-frames', 'breathing-idle'],
+        'walking-4-frames': ['walking-8-frames', 'breathing-idle'],
+        'running': ['walking-8-frames', 'walking-4-frames', 'breathing-idle'],
+      };
+      const candidates = fallbacks[animation] || ['breathing-idle'];
+      for (const candidate of candidates) {
+        if (character.animations.has(candidate)) {
+          resolvedAnim = candidate;
+          break;
+        }
+      }
+    }
+
+    if (instance.animState.animation !== resolvedAnim) {
+      instance.animState.animation = resolvedAnim;
       instance.animState.frameIndex = 0;
       instance.animState.frameTime = 0;
 
-      // Check if animation exists, if not try to load it (may have been generated after initial load)
-      const character = instance.character;
-      if (!character.animations.has(animation) && animation !== 'idle') {
-        // Try loading the animation from disk first (async, non-blocking)
-        // This catches animations that were generated after the character was first loaded
-        this.tryLoadAnimation(character, animation).then(loaded => {
+      // Only probe network if no local fallback was found and animation isn't loaded
+      if (!character.animations.has(resolvedAnim) && resolvedAnim !== 'idle') {
+        this.tryLoadAnimation(character, resolvedAnim).then(loaded => {
           if (!loaded) {
-            // Animation not on disk, queue generation
-            this.queueAnimationGeneration(character.id, animation);
+            this.queueAnimationGeneration(character.id, resolvedAnim);
           }
         });
       }
