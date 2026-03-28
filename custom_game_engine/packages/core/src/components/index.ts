@@ -1435,8 +1435,27 @@ export {
   type SettlementRole,
 } from './SettlementComponent.js';
 
-export { createExtinctionVortexMonitor } from './ExtinctionVortexMonitorComponent.js';
-export type { ExtinctionVortexMonitorComponent, ExtinctionVortexPhase, ExtinctionMetrics, ExtinctionSurvivorData } from './ExtinctionVortexMonitorComponent.js';
+export { createExtinctionVortexMonitor, createExtinctionSurvivorComponent } from './ExtinctionVortexMonitorComponent.js';
+export type { ExtinctionVortexMonitorComponent, ExtinctionVortexPhase, ExtinctionMetrics, ExtinctionSurvivorData, ExtinctionSurvivorComponent } from './ExtinctionVortexMonitorComponent.js';
 
 export { createCulturalDrift, createCulturalRegionState, regionFromZLevel } from './CulturalDriftComponent.js';
 export type { CulturalDriftComponent, CulturalRegionStateComponent, CulturalRegionId } from './CulturalDriftComponent.js';
+
+// Migration Provenance (cross-game creature import tracking)
+export * from './MigrationProvenanceComponent.js';
+export { MigrationProvenanceComponent } from './MigrationProvenanceComponent.js';
+export type {
+  MigrationType,
+  SourceGame,
+  MigrationHop,
+  MigrationLossDeclaration,
+  MigrationProvenanceData,
+} from './MigrationProvenanceComponent.js';
+
+// Quarantine Status (biome adaptation tracking for migrated creatures)
+export * from './QuarantineStatusComponent.js';
+export { QuarantineStatusComponent, createQuarantineStatus, isQuarantined } from './QuarantineStatusComponent.js';
+export type {
+  QuarantinePhase,
+  QuarantineStatusData,
+} from './QuarantineStatusComponent.js';
