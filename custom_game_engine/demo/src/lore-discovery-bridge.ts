@@ -66,7 +66,7 @@ export async function initLoreDiscoveryBridge(eventBus: EventBus): Promise<void>
     }> = [
       {
         event: 'lore:myth_created',
-        map: (d) => ({ category: 'civilization', subject: d.deityId ?? d.title ?? 'unknown', aspect: 'discovered', detail: d.title ?? null }),
+        map: (d) => ({ category: 'civilization', subject: d.deityId ?? d.title ?? 'unknown', aspect: 'emerged', detail: d.title ?? null }),
       },
       {
         event: 'lore:myth_canonized',
@@ -74,11 +74,11 @@ export async function initLoreDiscoveryBridge(eventBus: EventBus): Promise<void>
       },
       {
         event: 'lore:myth_disputed',
-        map: (d) => ({ category: 'civilization', subject: d.deityId ?? 'unknown', aspect: 'discovered', detail: d.title ?? null }),
+        map: (d) => ({ category: 'civilization', subject: d.mythId ?? 'unknown', aspect: 'discovered', detail: d.reason ?? null }),
       },
       {
         event: 'lore:myth_mutated',
-        map: (d) => ({ category: 'civilization', subject: d.deityId ?? 'unknown', aspect: 'discovered', detail: d.title ?? null }),
+        map: (d) => ({ category: 'civilization', subject: d.mythId ?? 'unknown', aspect: 'discovered', detail: d.mutation?.changeDescription ?? d.mutation?.description ?? null }),
       },
       {
         event: 'lore:schism_occurred',
@@ -86,7 +86,7 @@ export async function initLoreDiscoveryBridge(eventBus: EventBus): Promise<void>
       },
       {
         event: 'lore:syncretism_occurred',
-        map: (d) => ({ category: 'event', subject: d.syncretismId ?? 'syncretism', aspect: 'witnessed', detail: d.outcome ?? null }),
+        map: (d) => ({ category: 'event', subject: d.syncretismId ?? 'syncretism', aspect: 'participated', detail: d.outcome ?? null }),
       },
       {
         event: 'lore:holy_text_written',
