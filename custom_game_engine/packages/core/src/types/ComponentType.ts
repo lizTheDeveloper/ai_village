@@ -175,6 +175,8 @@ export enum ComponentType {
   Biochemistry = 'biochemistry',
   CapabilityProfile = 'capability_profile',
   TimeCapsuleDiscovery = 'time_capsule_discovery',
+  CulturalDrift = 'cultural_drift',
+  CulturalRegionState = 'cultural_region_state',
 
   // Magic & Divine
   Magic = 'magic',  // Monolithic magic component (migration to split components in progress - see MagicComponentMigration.ts)

@@ -408,6 +408,9 @@ import { AnimalBrainSystem } from '../behavior/animal-behaviors/AnimalBrainSyste
 // Creature Import / Quarantine
 import { QuarantineSystem } from './QuarantineSystem.js';
 
+// Cultural Drift
+import { CulturalDriftSystem } from './CulturalDriftSystem.js';
+
 // Chunk Loading System
 import { ChunkLoadingSystem } from './ChunkLoadingSystem.js';
 
@@ -663,6 +666,7 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(new PredatorPreyEcologySystem());
     gameLoop.systemRegistry.register(new QuarantineSystem());
     gameLoop.systemRegistry.register(new ExtinctionVortexSystem());
+    gameLoop.systemRegistry.register(new CulturalDriftSystem());
   }
 
   // ============================================================================

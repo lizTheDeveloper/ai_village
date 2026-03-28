@@ -472,6 +472,19 @@ export interface MiscEvents {
     pregnantAgentId: string;
     otherParentId: string;
     conceptionTick: number;
+    fertilityModifier?: number;
+    gestationLength?: number;
+    gestationModifier?: number;
+    geneticSimilarity?: number;
+    biochemicalAffinity?: number;
+    matePreferenceVector?: {
+      assortativePreference: number;
+      disassortativePreference: number;
+      biochemicalAffinity: number;
+      fertilitySensitivity: number;
+      gestationSensitivity: number;
+      tabooSensitivity: number;
+    };
   };
 
   // === Myth Events ===
@@ -956,6 +969,23 @@ export interface MiscEvents {
     subject: string;  // e.g. 'norn', 'crystal_cavern'
     aspect: string;   // e.g. 'encountered', 'entered'
     detail: string | null;
+  };
+
+  // === Capability Events ===
+  'capability:unlocked': {
+    agentId: EntityId;
+    capabilityId: string;
+    speciesId?: string;
+    score: number;
+    geneticScore: number;
+    biochemicalScore: number;
+    tick: number;
+  };
+
+  // === Cultural Drift Events ===
+  'culture:cross_deck_encounter': {
+    entityId: EntityId;
+    tick: number;
   };
 
   // === Test Events ===

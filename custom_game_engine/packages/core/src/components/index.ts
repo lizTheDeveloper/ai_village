@@ -1437,3 +1437,6 @@ export {
 
 export { createExtinctionVortexMonitor } from './ExtinctionVortexMonitorComponent.js';
 export type { ExtinctionVortexMonitorComponent, ExtinctionVortexPhase, ExtinctionMetrics, ExtinctionSurvivorData } from './ExtinctionVortexMonitorComponent.js';
+
+export { createCulturalDrift, createCulturalRegionState, regionFromZLevel } from './CulturalDriftComponent.js';
+export type { CulturalDriftComponent, CulturalRegionStateComponent, CulturalRegionId } from './CulturalDriftComponent.js';
