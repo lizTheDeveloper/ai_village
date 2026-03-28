@@ -33,7 +33,8 @@ export class ExtinctionVortexSystem extends BaseSystem {
   public readonly activationComponents = [CT.ExtinctionVortexMonitor] as const;
   protected readonly throttleInterval = 200;
 
-  private static readonly GRACE_TICKS = 3;
+  // Three generations — the trinity pattern: three chances before the vortex closes
+  private static readonly GRACE_GENERATIONS = 3;
 
   protected onUpdate(ctx: SystemContext): void {
     // Cache the monitor query once before the loop (CLAUDE.md: cache queries before loops)
@@ -328,7 +329,7 @@ export class ExtinctionVortexSystem extends BaseSystem {
     metrics: ExtinctionMetrics,
   ): void {
     monitor.phase = 'grace';
-    monitor.graceTicksRemaining = ExtinctionVortexSystem.GRACE_TICKS;
+    monitor.graceTicksRemaining = ExtinctionVortexSystem.GRACE_GENERATIONS;
     monitor.graceStartTick = ctx.tick;
     ctx.emit('species:extinction_grace_started', {
       speciesId: monitor.speciesId,
