@@ -85,6 +85,10 @@ export class MythGenerationSystem extends BaseSystem {
   private lastUpdate = 0;
   private readonly UPDATE_INTERVAL = 100; // Every 100 ticks (5 seconds)
 
+  // Per-deity cooldown to prevent belief→myth cascade (60s at 20 TPS)
+  private static readonly DEITY_MYTH_COOLDOWN = 1200;
+  private deityMythCooldowns = new Map<string, number>();
+
   // Cache for deity lookups (entity ID → deity component)
   private deityCache = new Map<string, DeityComponent>();
 
@@ -236,8 +240,16 @@ export class MythGenerationSystem extends BaseSystem {
     // Update deity cache
     this._updateDeityCache(deities);
 
-    // Process pending myths (queue LLM requests)
+    // Process pending myths (queue LLM requests) — with per-deity cooldown
     for (const pending of this.pendingMyths) {
+      const deityId = pending.deityId;
+      if (deityId) {
+        const lastMythTick = this.deityMythCooldowns.get(deityId) ?? 0;
+        if (currentTick - lastMythTick < MythGenerationSystem.DEITY_MYTH_COOLDOWN) {
+          continue; // Skip — deity is on cooldown
+        }
+        this.deityMythCooldowns.set(deityId, currentTick);
+      }
       this._processPendingMyth(pending, entities, currentTick, world);
     }
 
@@ -1387,7 +1399,7 @@ export class MythGenerationSystem extends BaseSystem {
   /**
    * Process LLM responses and create myths from completed requests
    */
-  private _processLLMResponses(_world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
+  private _processLLMResponses(world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
     const completedRequests: string[] = [];
 
     for (const [llmRequestId, pending] of this.pendingLLMMyths.entries()) {
@@ -1427,7 +1439,7 @@ export class MythGenerationSystem extends BaseSystem {
         const updatedMythology = addMyth(mythology, myth);
 
         // Spread to agent (witness) and nearby agents
-        const nearbyAgents = this._findNearbyAgents(agent, entities);
+        const nearbyAgents = this._findNearbyAgents(agent, world);
         for (const nearby of nearbyAgents.slice(0, 3)) {
           tellMyth(updatedMythology, myth.id, nearby.id, currentTick);
         }
@@ -1776,9 +1788,9 @@ export class MythGenerationSystem extends BaseSystem {
   }
 
   /**
-   * Find agents near the given agent (reuses working array to avoid allocations)
+   * Find agents near the given agent using SpatialGrid (O(cells) instead of O(n))
    */
-  private _findNearbyAgents(agent: Entity, entities: ReadonlyArray<Entity>): Entity[] {
+  private _findNearbyAgents(agent: Entity, world: World): Entity[] {
     const position = agent.getComponent<PositionComponent>(CT.Position);
     if (!position) return [];
 
@@ -1788,10 +1800,14 @@ export class MythGenerationSystem extends BaseSystem {
     const SPREAD_RADIUS = 50; // Grid units
     const SPREAD_RADIUS_SQ = SPREAD_RADIUS * SPREAD_RADIUS;
 
-    for (const other of entities) {
+    // Use SpatialGrid for O(cells) lookup instead of O(n) brute force
+    const candidates = world.queryEntitiesNear(position.x, position.y, SPREAD_RADIUS);
+
+    for (const other of candidates) {
       if (other.id === agent.id) continue;
       if (!other.components.has(CT.Agent)) continue;
 
+      // SpatialGrid returns entities in nearby cells, still need exact distance check
       const otherPos = other.getComponent<PositionComponent>(CT.Position);
       if (!otherPos) continue;
 

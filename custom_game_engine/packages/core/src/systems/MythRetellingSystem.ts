@@ -98,7 +98,7 @@ export class MythRetellingSystem extends BaseSystem {
       const mythToRetell = myths[Math.floor(Math.random() * myths.length)]!;
 
       // Find nearby agents to tell it to (reuses working array)
-      const nearby = this._findNearbyAgents(believer, believers);
+      const nearby = this._findNearbyAgents(believer, ctx.world);
       if (nearby.length === 0) continue;
 
       // Retell the myth (with possible mutation)
@@ -168,11 +168,11 @@ export class MythRetellingSystem extends BaseSystem {
   }
 
   /**
-   * Find agents near the speaker (reuses working array to avoid allocations)
+   * Find agents near the speaker using SpatialGrid (O(cells) instead of O(n))
    */
   private _findNearbyAgents(
     agent: Entity,
-    allAgents: ReadonlyArray<Entity>
+    world: World
   ): Entity[] {
     const position = agent.components.get(CT.Position) as PositionComponent | undefined;
     if (!position) return [];
@@ -183,7 +183,10 @@ export class MythRetellingSystem extends BaseSystem {
     const CONVERSATION_RADIUS = 30; // Grid units
     const CONVERSATION_RADIUS_SQ = CONVERSATION_RADIUS * CONVERSATION_RADIUS;
 
-    for (const other of allAgents) {
+    // Use SpatialGrid for O(cells) lookup instead of O(n) brute force
+    const candidates = world.queryEntitiesNear(position.x, position.y, CONVERSATION_RADIUS);
+
+    for (const other of candidates) {
       if (other.id === agent.id) continue;
 
       const otherPos = other.components.get(CT.Position) as PositionComponent | undefined;

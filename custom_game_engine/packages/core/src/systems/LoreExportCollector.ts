@@ -61,6 +61,12 @@ export class LoreExportCollector extends BaseSystem {
   private pendingEvents: Array<{ type: string; data: Record<string, unknown> }> = [];
   private nextEntryIndex = 0;
 
+  // Retention policy
+  private static readonly MAX_AGE_TICKS = 72000; // 1 hour at 20 TPS
+  private static readonly MAX_PER_CATEGORY = 100;
+  private static readonly PRUNE_INTERVAL = 1200; // Prune every 60 seconds at 20 TPS
+  private lastPruneTick = 0;
+
   protected onInitialize(_world: World, _eventBus: EventBus): void {
     // Subscribe to all lore export events
     this.events.onGeneric('lore:myth_created', (data) => this.queueEvent('myth_created', data));
@@ -77,13 +83,19 @@ export class LoreExportCollector extends BaseSystem {
     this.pendingEvents.push({ type, data: data as Record<string, unknown> });
   }
 
-  protected onUpdate(_ctx: SystemContext): void {
-    if (this.pendingEvents.length === 0) return;
-
-    for (const event of this.pendingEvents) {
-      this.processLoreEvent(event.type, event.data);
+  protected onUpdate(ctx: SystemContext): void {
+    if (this.pendingEvents.length > 0) {
+      for (const event of this.pendingEvents) {
+        this.processLoreEvent(event.type, event.data);
+      }
+      this.pendingEvents.length = 0;
     }
-    this.pendingEvents.length = 0;
+
+    // Periodic retention pruning
+    if (ctx.tick - this.lastPruneTick >= LoreExportCollector.PRUNE_INTERVAL) {
+      this.lastPruneTick = ctx.tick;
+      this._pruneEntries(ctx.tick);
+    }
   }
 
   private processLoreEvent(type: string, data: Record<string, unknown>): void {
@@ -297,6 +309,39 @@ export class LoreExportCollector extends BaseSystem {
           relatedEntries: [],
         });
         break;
+      }
+    }
+  }
+
+  /**
+   * Prune old entries and enforce per-category limits
+   */
+  private _pruneEntries(currentTick: number): void {
+    // Pass 1: Remove entries older than MAX_AGE_TICKS
+    for (const [id, entry] of this.entries) {
+      if (currentTick - entry.updatedAtTick > LoreExportCollector.MAX_AGE_TICKS) {
+        this.entries.delete(id);
+      }
+    }
+
+    // Pass 2: Enforce per-category limit (keep most recent by updatedAtTick)
+    const byCategory = new Map<string, WikiLoreEntry[]>();
+    for (const entry of this.entries.values()) {
+      let arr = byCategory.get(entry.category);
+      if (!arr) {
+        arr = [];
+        byCategory.set(entry.category, arr);
+      }
+      arr.push(entry);
+    }
+
+    for (const [, entries] of byCategory) {
+      if (entries.length > LoreExportCollector.MAX_PER_CATEGORY) {
+        // Sort by updatedAtTick descending, remove oldest
+        entries.sort((a, b) => b.updatedAtTick - a.updatedAtTick);
+        for (let i = LoreExportCollector.MAX_PER_CATEGORY; i < entries.length; i++) {
+          this.entries.delete(entries[i]!.id);
+        }
       }
     }
   }
