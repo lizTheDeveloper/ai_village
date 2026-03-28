@@ -33,10 +33,19 @@ export class ExtinctionVortexSystem extends BaseSystem {
   public readonly activationComponents = [CT.ExtinctionVortexMonitor] as const;
   protected readonly throttleInterval = 200;
 
+  private static readonly GRACE_TICKS = 3;
+
   protected onUpdate(ctx: SystemContext): void {
     // Cache the monitor query once before the loop (CLAUDE.md: cache queries before loops)
     const monitorEntities = ctx.world.query()
       .with(CT.ExtinctionVortexMonitor)
+      .executeEntities() as EntityImpl[];
+
+    // Hoist Species+Genetic query above monitor loop — 1 query + N filters
+    // instead of N queries + N filters (Sylvia review MUL-4460)
+    const allSpeciesEntities = ctx.world.query()
+      .with(CT.Species)
+      .with(CT.Genetic)
       .executeEntities() as EntityImpl[];
 
     for (const monitorEntity of monitorEntities) {
@@ -49,8 +58,11 @@ export class ExtinctionVortexSystem extends BaseSystem {
 
       const { speciesId } = monitor;
 
-      // Cache species member query once and reuse for both F and D_cc computations
-      const speciesMembers = this.querySpeciesMembers(ctx, speciesId);
+      // Filter from cached query instead of re-querying per monitor
+      const speciesMembers = allSpeciesEntities.filter(entity => {
+        const speciesComp = entity.getComponent<SpeciesComponent>(CT.Species);
+        return speciesComp?.speciesId === speciesId;
+      });
       const populationSize = speciesMembers.length;
 
       const fPopulation = this.computeFPopulation(speciesMembers);
@@ -62,22 +74,6 @@ export class ExtinctionVortexSystem extends BaseSystem {
 
       this.evaluatePhase(ctx, monitor, metrics);
     }
-  }
-
-  // ============================================================================
-  // Species Member Query (shared between F and D_cc to avoid double-query)
-  // ============================================================================
-
-  private querySpeciesMembers(ctx: SystemContext, speciesId: string): EntityImpl[] {
-    const all = ctx.world.query()
-      .with(CT.Species)
-      .with(CT.Genetic)
-      .executeEntities() as EntityImpl[];
-
-    return all.filter(entity => {
-      const speciesComp = entity.getComponent<SpeciesComponent>(CT.Species);
-      return speciesComp?.speciesId === speciesId;
-    });
   }
 
   // ============================================================================
@@ -332,7 +328,7 @@ export class ExtinctionVortexSystem extends BaseSystem {
     metrics: ExtinctionMetrics,
   ): void {
     monitor.phase = 'grace';
-    monitor.graceTicksRemaining = 3;
+    monitor.graceTicksRemaining = ExtinctionVortexSystem.GRACE_TICKS;
     monitor.graceStartTick = ctx.tick;
     ctx.emit('species:extinction_grace_started', {
       speciesId: monitor.speciesId,
