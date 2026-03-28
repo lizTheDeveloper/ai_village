@@ -95,6 +95,24 @@
     '#play-gate-note a:hover {',
     '  text-decoration: underline;',
     '}',
+    '#play-gate-guest {',
+    '  display: inline-block;',
+    '  margin-top: 0.75rem;',
+    '  padding: 0.5rem 1.5rem;',
+    '  background: transparent;',
+    '  border: 1px solid var(--dust, #8a8694);',
+    '  border-radius: 6px;',
+    '  color: var(--dust, #8a8694);',
+    '  font-family: inherit;',
+    '  font-size: 0.7rem;',
+    '  letter-spacing: 0.05em;',
+    '  cursor: pointer;',
+    '  transition: background 0.15s, color 0.15s, border-color 0.15s;',
+    '}',
+    '#play-gate-guest:hover {',
+    '  border-color: var(--star-white, #e8e6f0);',
+    '  color: var(--star-white, #e8e6f0);',
+    '}',
     '#play-gate-error {',
     '  margin-top: 1rem;',
     '  padding: 0.6rem 1rem;',
@@ -123,6 +141,9 @@
       '<div>' +
         '<button id="play-gate-btn" type="button">Sign In / Create Account</button>' +
       '</div>' +
+      '<div>' +
+        '<button id="play-gate-guest" type="button">Play as Guest</button>' +
+      '</div>' +
       '<div id="play-gate-error"></div>' +
       '<p id="play-gate-note">' +
         'Never Ever Land is free &mdash; ' +
@@ -134,6 +155,12 @@
 
   function attachGate() {
     document.body.appendChild(gate);
+    var guestBtn = document.getElementById('play-gate-guest');
+    if (guestBtn) {
+      guestBtn.addEventListener('click', function () {
+        removeGate();
+      });
+    }
     var btn = document.getElementById('play-gate-btn');
     if (btn) {
       btn.addEventListener('click', function () {
