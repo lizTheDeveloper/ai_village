@@ -137,6 +137,8 @@ import { SquadronCombatSystem } from './SquadronCombatSystem.js';
 import { ShipCombatSystem } from './ShipCombatSystem.js';
 import { ShipExteriorSystem } from '../ship/ShipExteriorSystem.js';
 import { NavyBudgetSystem } from './NavyBudgetSystem.js';
+import { getDialectalDriftSystem } from './DialectalDriftSystem.js';
+import { getCrossShipCommunicationSystem } from './CrossShipCommunicationSystem.js';
 
 // Megastructures (Phase 5: Grand Strategy)
 import { MegastructureConstructionSystem } from './MegastructureConstructionSystem.js';
@@ -784,6 +786,8 @@ export function registerAllSystems(
     registerDisabled(new ShipCombatSystem());
     registerDisabled(new ShipExteriorSystem());
     registerDisabled(new NavyBudgetSystem());
+    registerDisabled(getCrossShipCommunicationSystem());
+    registerDisabled(getDialectalDriftSystem());
   }
 
   // ============================================================================
