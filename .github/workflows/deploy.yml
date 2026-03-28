@@ -36,6 +36,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Stub external file deps (folkfork-bridge lives outside this repo)
+        run: |
+          PKG=node_modules/@multiverse-studios/folkfork-bridge
+          mkdir -p "$PKG"
+          cp packages/core/src/typings/folkfork-bridge.d.ts "$PKG/index.d.ts"
+          echo '{"name":"@multiverse-studios/folkfork-bridge","version":"0.0.0","types":"index.d.ts","main":"index.js"}' > "$PKG/package.json"
+          echo 'module.exports = {};' > "$PKG/index.js"
+
       - name: Type check
         run: npm run build
 
@@ -105,6 +113,41 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Playwright
+        run: npx playwright install chromium --with-deps
+
+      - name: Canary - verify container serves directly
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            # Hit container directly, bypass Traefik/CDN
+            for i in $(seq 1 10); do
+              STATUS=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 http://localhost:3000/mvee/)
+              if [ "$STATUS" = "200" ]; then
+                echo "Container serving directly: HTTP 200"
+                # Verify JS bundle exists in response
+                BODY=$(curl -s --max-time 10 http://localhost:3000/mvee/)
+                if echo "$BODY" | grep -q '<script'; then
+                  echo "HTML contains script tags — canary PASSED"
+                  exit 0
+                else
+                  echo "WARNING: No script tags in response"
+                fi
+              fi
+              echo "Attempt $i: HTTP $STATUS, retrying in 3s..."
+              sleep 3
+            done
+            echo "ERROR: Container not serving after 30s"
+            exit 1
+
       - name: Wait for container startup
         run: sleep 15
 
@@ -155,8 +198,29 @@ jobs:
           fi
           echo "Smoke test passed: HTML 200, bundle loads (${BUNDLE_SIZE} bytes)"
 
-      # TODO: Add Playwright browser smoke test when scripts/smoke-test.mjs is created
-      # For now, HTTP 200 + JS bundle load checks above are the smoke tests
+      - name: Browser smoke test (Playwright)
+        run: |
+          node -e "
+          const { chromium } = require('playwright');
+          (async () => {
+            const errors = [];
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage();
+            page.on('pageerror', e => errors.push(e.message));
+            page.on('console', msg => {
+              if (msg.type() === 'error' && !msg.text().includes('favicon') && !msg.text().includes('sentry'))
+                errors.push(msg.text());
+            });
+            await page.goto('https://play.multiversestudios.xyz/mvee/', { waitUntil: 'domcontentloaded', timeout: 30000 });
+            await page.waitForTimeout(8000);
+            const hasGame = await page.locator('canvas, #game-container, [data-game]').count() > 0;
+            await browser.close();
+            if (errors.length) { console.error('JS errors:', errors); process.exit(1); }
+            if (!hasGame) { console.error('No game elements found'); process.exit(1); }
+            console.log('Browser smoke test PASSED: game loaded, no JS errors');
+          })().catch(e => { console.error(e); process.exit(1); });
+          "
+        continue-on-error: false
 
   rollback:
     name: Rollback on Failure

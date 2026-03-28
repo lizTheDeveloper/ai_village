@@ -23,6 +23,9 @@
     "@ai-village/types": "*",
     "uuid": "^9.0.1"
   },
+  "optionalDependencies": {
+    "@multiverse-studios/folkfork-bridge": "file:../../../../../akashic-records/tools/folkfork-bridge"
+  },
   "devDependencies": {
     "@types/uuid": "^9.0.7"
   },
