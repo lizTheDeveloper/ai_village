@@ -10,3 +10,4 @@ export * from './Sprint15FolkloristSpeciesRegistry.js';
 export * from './Sprint16FolkloristSpeciesRegistry.js';
 export * from './Sprint16GenomeIntegration.js';
 export * from './Sprint17FolkloristSpeciesRegistry.js';
+export * from './Sprint18FolkloristSpeciesRegistry.js';
