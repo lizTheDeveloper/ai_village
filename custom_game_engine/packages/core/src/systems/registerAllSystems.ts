@@ -133,6 +133,7 @@ import { StragglerRecoverySystem } from './StragglerRecoverySystem.js';
 import { FleetCombatSystem } from './FleetCombatSystem.js';
 import { SquadronCombatSystem } from './SquadronCombatSystem.js';
 import { ShipCombatSystem } from './ShipCombatSystem.js';
+import { ShipExteriorSystem } from '../ship/ShipExteriorSystem.js';
 import { NavyBudgetSystem } from './NavyBudgetSystem.js';
 
 // Megastructures (Phase 5: Grand Strategy)
@@ -764,6 +765,7 @@ export function registerAllSystems(
     registerDisabled(new FleetCombatSystem());
     registerDisabled(new SquadronCombatSystem());
     registerDisabled(new ShipCombatSystem());
+    registerDisabled(new ShipExteriorSystem());
     registerDisabled(new NavyBudgetSystem());
   }
 

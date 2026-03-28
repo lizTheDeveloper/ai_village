@@ -63,6 +63,7 @@ export * from './ShopPanel.js';
 export * from './TimelinePanel.js';
 export * from './UniverseConfigScreen.js';
 export * from './CosmicHubScreen.js';
+export * from './ExteriorViewScreen.js';
 export * from './UniverseCreationScreen.js';
 export * from './GenesisCinematicPanel.js';
 export * from './PlanetCreationScreen.js';

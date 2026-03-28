@@ -89,6 +89,8 @@ import {
   WorldSnapshotService,
   initShipPowerState,
   getShipPowerState,
+  getShipExteriorSystem,
+  type ShipExteriorComponent,
 } from '@ai-village/core';
 import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus, planetClient, multiverseClient, creationStateManager, EntityPersistenceStream, type PlanetMetadata, type CreationState, type SettlementData } from '@ai-village/persistence';
 import { LiveEntityAPI } from '@ai-village/metrics';
@@ -242,6 +244,9 @@ import {
   ServerPostcardSource,
   BrowserLLMStatusPanel,
   loadSpriteManifest,
+  ExteriorViewScreen,
+  type ExteriorViewCallbacks,
+  type ExteriorHUDData,
 } from '@ai-village/renderer';
 import {
   OllamaProvider,
@@ -4392,6 +4397,147 @@ async function main() {
     },
   });
 
+  // ========================================================================
+  // Ship Exterior View (E key)
+  // ========================================================================
+  let exteriorViewScreen: ExteriorViewScreen | null = null;
+  let exteriorViewActive = false;
+
+  const exteriorCallbacks: ExteriorViewCallbacks = {
+    onReturnToInterior: () => {
+      if (exteriorViewScreen) {
+        exteriorViewScreen.hide();
+        exteriorViewActive = false;
+        showNotification('Interior View', '#00CED1');
+      }
+    },
+    onFireLaser: (targetX: number, targetY: number) => {
+      const shipExteriorSystem = getShipExteriorSystem();
+      const world = gameLoop.world;
+      // Find the player ship entity
+      const shipEntity = findPlayerShipEntity(world);
+      if (!shipEntity) return;
+      try {
+        shipExteriorSystem.fireLaser(world, shipEntity);
+        if (exteriorViewScreen) {
+          exteriorViewScreen.fireLaser(targetX, targetY);
+          exteriorViewScreen.showImpact(targetX, targetY);
+        }
+      } catch (_e) {
+        // Insufficient charge or no asteroids - silently ignore user click
+      }
+    },
+    onToggleShield: () => {
+      const shipExteriorSystem = getShipExteriorSystem();
+      const world = gameLoop.world;
+      const shipEntity = findPlayerShipEntity(world);
+      if (!shipEntity) return;
+      try {
+        shipExteriorSystem.toggleShield(world, shipEntity);
+        const state = shipExteriorSystem.getExteriorState(world, shipEntity);
+        if (exteriorViewScreen) {
+          exteriorViewScreen.setShieldActive(state.shieldActive);
+        }
+        showNotification(state.shieldActive ? 'Shields UP' : 'Shields DOWN', '#00BFFF');
+      } catch (_e) {
+        showNotification('Shield system offline', '#FF4444');
+      }
+    },
+    onDetachSection: (sectionId: string) => {
+      const shipExteriorSystem = getShipExteriorSystem();
+      const world = gameLoop.world;
+      const shipEntity = findPlayerShipEntity(world);
+      if (!shipEntity) return;
+      try {
+        const state = shipExteriorSystem.getExteriorState(world, shipEntity);
+        const section = state.detachableSections.find(s => s.id === sectionId);
+        shipExteriorSystem.detachSection(world, shipEntity, sectionId);
+        if (exteriorViewScreen && section) {
+          exteriorViewScreen.detachSection(section.name);
+        }
+        showNotification(`Section ${section?.name ?? sectionId} detached`, '#FF8C00');
+      } catch (e) {
+        showNotification(`Cannot detach: ${e instanceof Error ? e.message : 'unknown'}`, '#FF4444');
+      }
+    },
+  };
+
+  /** Find the player's ship entity (first entity with ship_exterior component) */
+  function findPlayerShipEntity(world: any): any {
+    for (const entity of world.entities.values()) {
+      if (entity.hasComponent('ship_exterior')) {
+        return entity;
+      }
+    }
+    // Try to find spaceship entity and auto-initialize
+    for (const entity of world.entities.values()) {
+      if (entity.hasComponent('spaceship')) {
+        const shipExteriorSystem = getShipExteriorSystem();
+        shipExteriorSystem.initializeExterior(world, entity);
+        return entity;
+      }
+    }
+    return null;
+  }
+
+  /** Sync exterior view HUD with current ship state */
+  function updateExteriorHUD(): void {
+    if (!exteriorViewActive || !exteriorViewScreen) return;
+    const world = gameLoop.world;
+    const shipEntity = findPlayerShipEntity(world);
+    if (!shipEntity) return;
+    try {
+      const shipExteriorSystem = getShipExteriorSystem();
+      const state = shipExteriorSystem.getExteriorState(world, shipEntity);
+      const activeSections = state.detachableSections.filter(s => !s.isDetached && !s.isExempt).length;
+      exteriorViewScreen.updateHUD({
+        shieldStrength: state.shieldStrength,
+        hullIntegrity: state.hullIntegrity,
+        asteroidDensity: state.asteroidField.density,
+        laserCharge: state.laserCharge,
+        sectionCount: activeSections,
+      });
+      exteriorViewScreen.updateAsteroids(state.asteroidField.density);
+      exteriorViewScreen.setShieldActive(state.shieldActive);
+    } catch (_e) {
+      // Ship not yet initialized, skip
+    }
+  }
+
+  keyboardRegistry.register('toggle_exterior_view', {
+    key: 'E',
+    description: 'Toggle ship exterior view (space view with shields, lasers, asteroids)',
+    category: 'View',
+    handler: () => {
+      if (!exteriorViewScreen) {
+        exteriorViewScreen = new ExteriorViewScreen('exterior-view-screen', exteriorCallbacks);
+      }
+      if (exteriorViewActive) {
+        exteriorViewScreen.hide();
+        exteriorViewActive = false;
+        showNotification('Interior View', '#00CED1');
+      } else {
+        exteriorViewScreen.show();
+        exteriorViewActive = true;
+        updateExteriorHUD();
+        showNotification('Exterior View — Click to fire lasers, S for shields', '#00CED1');
+      }
+      return true;
+    },
+  });
+
+  // S key for shield toggle while in exterior view
+  keyboardRegistry.register('toggle_shields', {
+    key: 'S',
+    description: 'Toggle deflector shields (exterior view)',
+    category: 'Ship',
+    handler: () => {
+      if (!exteriorViewActive) return false; // Don't capture S when not in exterior
+      exteriorCallbacks.onToggleShield();
+      return true;
+    },
+  });
+
   // Register timeline panel shortcut (Shift+L)
   keyboardRegistry.register('open_timeline', {
     key: 'L',
@@ -5010,6 +5156,11 @@ async function main() {
           });
         }
         agentTestHooksOverlay.updateAgents(agentHookData);
+      }
+
+      // Update exterior view HUD every ~500ms (every 30 frames at 60fps)
+      if (exteriorViewActive && renderFrameCount % 30 === 0) {
+        updateExteriorHUD();
       }
 
       if (!renderLoopStarted) {

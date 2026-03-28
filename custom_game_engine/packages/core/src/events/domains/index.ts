@@ -23,6 +23,7 @@ export * from './plant.events.js';
 export * from './rebellion.events.js';
 export * from './research.events.js';
 export * from './social.events.js';
+export * from './ship-exterior.events.js';
 export * from './space.events.js';
 export * from './ui.events.js';
 export * from './work.events.js';

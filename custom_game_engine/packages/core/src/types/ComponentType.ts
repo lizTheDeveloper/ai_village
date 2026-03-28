@@ -297,6 +297,9 @@ export enum ComponentType {
   MeditationChamber = 'meditation_chamber', // Emotional regulation
   HeartChamber = 'heart_chamber',          // The Heart - crew sync for jumps
   Straggler = 'straggler',                 // Ship left behind during fleet β-jump
+  ShipExterior = 'ship_exterior',          // Ship exterior state (shields, asteroids, position)
+  ShipDefense = 'ship_defense',            // Shield/laser defense state
+  SectionDetach = 'section_detach',        // Section detachment tracking
 
   // Virtual Reality
   VRSystem = 'vr_system',

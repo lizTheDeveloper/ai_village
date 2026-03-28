@@ -40,6 +40,7 @@ import type { PlayerEvents } from './domains/player.events.js';
 import type { CivilizationEvents } from './domains/civilization.events.js';
 import type { ChorusEvents } from './domains/chorus.events.js';
 import type { HandEvents } from './domains/hand.events.js';
+import type { ShipExteriorEvents } from './domains/ship-exterior.events.js';
 
 /**
  * Unified map of all event types to their data payloads.
@@ -85,7 +86,8 @@ export interface GameEventMap extends
   PlayerEvents,
   CivilizationEvents,
   ChorusEvents,
-  HandEvents {}
+  HandEvents,
+  ShipExteriorEvents {}
 
 /**
  * Union type of all valid event type strings.
@@ -121,4 +123,5 @@ export type {
   ActionEvents,
   MiscEvents,
   PatronEvents,
+  ShipExteriorEvents,
 };
