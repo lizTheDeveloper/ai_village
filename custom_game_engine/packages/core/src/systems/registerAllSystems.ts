@@ -79,6 +79,7 @@ import { PlanetaryCurrentsSystem } from './PlanetaryCurrentsSystem.js';
 import { AgentSwimmingSystem } from './AgentSwimmingSystem.js';
 import { NeedsSystem } from './NeedsSystem.js';
 import { BiochemistrySystem } from './BiochemistrySystem.js';
+import { AlienCapabilityProfileSystem } from './AlienCapabilityProfileSystem.js';
 import { MoodSystem } from './MoodSystem.js';
 import { SleepSystem } from './SleepSystem.js';
 import { SteeringSystem } from './SteeringSystem.js';
@@ -98,6 +99,7 @@ import { BeliefGenerationSystem } from './BeliefGenerationSystem.js';
 import { CommunicationSystem } from './CommunicationSystem.js';
 import { SocialFatigueSystem } from './SocialFatigueSystem.js';
 import { SocialGradientSystem } from './SocialGradientSystem.js';
+import { SocialLifecycleSystem } from './SocialLifecycleSystem.js';
 import { VerificationSystem } from './VerificationSystem.js';
 import { InterestsSystem } from './InterestsSystem.js';
 // Phase 6: Emergent Social Dynamics - RE-ENABLED
@@ -691,6 +693,7 @@ export function registerAllSystems(
   if (flags.agentNeeds) {
     gameLoop.systemRegistry.register(new NeedsSystem());
     gameLoop.systemRegistry.register(new BiochemistrySystem());
+    gameLoop.systemRegistry.register(new AlienCapabilityProfileSystem());
     gameLoop.systemRegistry.register(new MoodSystem());
     gameLoop.systemRegistry.register(new SleepSystem());
     gameLoop.systemRegistry.register(new AgeTrackingSystem());
@@ -723,6 +726,7 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(new RelationshipConversationSystem());
     gameLoop.systemRegistry.register(new InterestEvolutionSystem());
     gameLoop.systemRegistry.register(new GreetingSystem());
+    gameLoop.systemRegistry.register(new SocialLifecycleSystem());
   }
 
   if (flags.advancedComms) {
