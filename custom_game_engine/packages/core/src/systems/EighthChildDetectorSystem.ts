@@ -19,6 +19,7 @@ import type { SystemContext } from '../ecs/SystemContext.js';
 import type { WorldMutator } from '../ecs/World.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { EntityImpl } from '../ecs/Entity.js';
 
 // ============================================================================
 // Internal Types
@@ -130,6 +131,9 @@ export class EighthChildDetectorSystem extends BaseSystem {
   protected onUpdate(ctx: SystemContext): void {
     const currentTick = ctx.tick;
 
+    // 0. Expire stale eighth_child_insight components (MUL-4527)
+    this.expireInsights(ctx, currentTick);
+
     // 1. Prune actions older than the rolling window
     const cutoff = currentTick - WINDOW_TICKS;
     this.actionWindow = this.actionWindow.filter((r) => r.tick > cutoff);
@@ -170,6 +174,17 @@ export class EighthChildDetectorSystem extends BaseSystem {
   // ============================================================================
   // Private helpers
   // ============================================================================
+
+  private expireInsights(ctx: SystemContext, currentTick: number): void {
+    const agents = ctx.world.query().with('agent' as ComponentType).executeEntities();
+    for (const agent of agents) {
+      if (!agent.hasComponent('eighth_child_insight' as ComponentType)) continue;
+      const insight = agent.getComponent<any>('eighth_child_insight' as ComponentType);
+      if (insight && typeof insight.expiresAt === 'number' && currentTick >= insight.expiresAt) {
+        (agent as EntityImpl).removeComponent('eighth_child_insight' as ComponentType);
+      }
+    }
+  }
 
   private recordAction(classification: 'presence' | 'power', category: string): void {
     // world.tick is available via this.world (set by BaseSystem.initialize)

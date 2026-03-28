@@ -95,7 +95,7 @@ import {
 import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus, planetClient, multiverseClient, creationStateManager, EntityPersistenceStream, type PlanetMetadata, type CreationState, type SettlementData } from '@ai-village/persistence';
 import { LiveEntityAPI } from '@ai-village/metrics';
 import { SpellRegistry } from '@ai-village/magic';
-import { GameIntrospectionAPI, ComponentRegistry, MutationService } from '@ai-village/introspection';
+import { GameIntrospectionAPI, ComponentRegistry, MutationService, getSelfImplicationPrompt } from '@ai-village/introspection';
 // Injection function removed - use world.spatialQuery instead
 // Plant systems from @ai-village/botany (completes the extraction from core)
 import {
@@ -4408,6 +4408,7 @@ async function main() {
       if (exteriorViewScreen) {
         exteriorViewScreen.hide();
         exteriorViewActive = false;
+        setExteriorViewActiveState(false);
         showNotification('Interior View', '#00CED1');
       }
     },
@@ -4480,6 +4481,18 @@ async function main() {
     return null;
   }
 
+  function setExteriorViewActiveState(active: boolean): void {
+    const world = gameLoop.world;
+    const shipEntity = findPlayerShipEntity(world);
+    if (!shipEntity) return;
+    const exterior = shipEntity.getComponent('ship_exterior') as ShipExteriorComponent | undefined;
+    if (!exterior || exterior.viewActive === active) return;
+    shipEntity.updateComponent('ship_exterior', (current: ShipExteriorComponent) => ({
+      ...current,
+      viewActive: active,
+    }));
+  }
+
   /** Sync exterior view HUD with current ship state */
   function updateExteriorHUD(): void {
     if (!exteriorViewActive || !exteriorViewScreen) return;
@@ -4496,9 +4509,19 @@ async function main() {
         asteroidDensity: state.asteroidField.density,
         laserCharge: state.laserCharge,
         sectionCount: activeSections,
+        awarenessState: (state as any).awareness?.state ?? 'dormant',
+        heartbeatBpm: Math.round((((state as any).heartbeat?.cadenceHz ?? 0.24) * 60)),
       });
       exteriorViewScreen.updateAsteroids(state.asteroidField.density);
       exteriorViewScreen.setShieldActive(state.shieldActive);
+      exteriorViewScreen.setHeartbeat({
+        awarenessState: (state as any).awareness?.state ?? 'dormant',
+        awarenessLevel: (state as any).awareness?.level ?? 0,
+        cadenceHz: (state as any).heartbeat?.cadenceHz ?? 0.24,
+        pulseStrength: (state as any).heartbeat?.pulseStrength ?? 0.3,
+        phase: (state as any).heartbeat?.phase ?? 0,
+        transitionBoost: (state as any).awareness?.transitionBoost ?? 0,
+      });
     } catch (_e) {
       // Ship not yet initialized, skip
     }
@@ -4515,15 +4538,36 @@ async function main() {
       if (exteriorViewActive) {
         exteriorViewScreen.hide();
         exteriorViewActive = false;
+        setExteriorViewActiveState(false);
         showNotification('Interior View', '#00CED1');
       } else {
         exteriorViewScreen.show();
         exteriorViewActive = true;
+        setExteriorViewActiveState(true);
         updateExteriorHUD();
         showNotification('Exterior View — Click to fire lasers, S for shields', '#00CED1');
       }
       return true;
     },
+  });
+
+  gameLoop.world.eventBus.subscribe('ship:asteroid_impact' as any, (event: any) => {
+    if (!exteriorViewActive || !exteriorViewScreen) return;
+    const data = event?.data ?? event ?? {};
+    if (data.shielded) {
+      exteriorViewScreen.showShieldHit();
+      return;
+    }
+    const x = window.innerWidth * (0.42 + Math.random() * 0.16);
+    const y = window.innerHeight * (0.4 + Math.random() * 0.2);
+    exteriorViewScreen.showImpact(x, y);
+  });
+
+  gameLoop.world.eventBus.subscribe('ship:hull_damage' as any, (event: any) => {
+    if (!exteriorViewActive || !exteriorViewScreen) return;
+    const data = event?.data ?? event ?? {};
+    const severity = typeof data.severity === 'number' ? Math.max(0, Math.min(1, data.severity / 4)) : 0.25;
+    exteriorViewScreen.showHullDamage(severity);
   });
 
   // S key for shield toggle while in exterior view
@@ -6023,6 +6067,35 @@ async function main() {
     audio.play().catch(() => {
       // Asset missing, autoplay blocked, or decode error — continue silently
     });
+  });
+
+  // === Eighth Child: self-implication injection into agent prompts (MUL-4527) ===
+  // When presence-over-power is detected, inject a self-reflective insight component
+  // into all agent entities so the PromptRenderer includes it in their next LLM call.
+  gameLoop.world.eventBus.subscribe('eighth_child_moment' as any, (event: any) => {
+    const data = event?.data ?? event ?? {};
+    const presenceRatio: number = typeof data.presenceRatio === 'number' ? data.presenceRatio : 0.7;
+    const currentTick: number = gameLoop.world.tick;
+    const INSIGHT_DURATION_TICKS = 120; // ~6s at 20 TPS — persists across 2 LLM decision cycles
+
+    const agents = gameLoop.world.query().with('agent').executeEntities();
+    for (const agent of agents) {
+      // Skip agents that already have an active insight (avoid stacking)
+      if (agent.hasComponent('eighth_child_insight' as any)) continue;
+
+      const seed = currentTick + (agent.id?.charCodeAt?.(0) ?? 0);
+      const insightText = getSelfImplicationPrompt(seed);
+
+      (agent as any).addComponent({
+        type: 'eighth_child_insight',
+        version: 1,
+        presenceRatio,
+        grantedAt: currentTick,
+        expiresAt: currentTick + INSIGHT_DURATION_TICKS,
+        insightText,
+        activeCategories: Array.isArray(data.activeCategories) ? data.activeCategories : [],
+      });
+    }
   });
 
   // === Eternal Return: Glyph trigger (MUL-2543) ===

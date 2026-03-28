@@ -20,6 +20,9 @@ export { DeedLedgerSchema } from './DeedLedgerSchema.js';
 // Note: AfterlifeSchema, AfterlifeMemorySchema, DeathBargainSchema, and DeathJudgmentSchema
 // moved to afterlife/ directory (Tier 9)
 
+// Eighth Child: Self-reflective insight from presence-over-power pattern
+export { EighthChildInsightSchema, getSelfImplicationPrompt, type EighthChildInsightComponent } from './EighthChildInsightSchema.js';
+
 // Batch 9: Automation/Manufacturing + Miscellaneous
 export { RecipeDiscoverySchema, type RecipeDiscoveryComponent } from './RecipeDiscoverySchema.js';
 export { PlantKnowledgeSchema, type PlantKnowledgeComponent } from './PlantKnowledgeSchema.js';
