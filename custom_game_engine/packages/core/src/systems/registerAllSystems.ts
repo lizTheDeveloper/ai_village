@@ -942,7 +942,11 @@ export function registerAllSystems(
     registerDisabled(new TempleSystem());
     registerDisabled(new PriesthoodSystem());
     registerDisabled(new RitualSystem());
-    registerDisabled(new HolyTextSystem());
+    if (llmQueue) {
+      gameLoop.systemRegistry.register(new HolyTextSystem({}, llmQueue));
+    } else {
+      registerDisabled(new HolyTextSystem());
+    }
     registerDisabled(new SacredSiteSystem());
 
     // Avatar & Angels
