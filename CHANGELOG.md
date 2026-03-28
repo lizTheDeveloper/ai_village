@@ -6,6 +6,69 @@ Format: [Semantic Versioning](https://semver.org/). Newest first.
 
 ---
 
+## v0.3.0 — 2026-03-28
+
+### What's New
+- **6 new folkloric species** — Jiangshi-Vel, Sachamama-Vel, Djinnahl, Tengu, Kappa, and Kumiho implemented from Akashic Records with full theological frameworks and unique moral primitives
+- **Cultural Drift system** — deck-scoped customs now evolve organically over time within villages
+- **ExtinctionVortexSystem** — 3-phase species extinction detection with grace period prevents premature die-offs
+- **Cross-game event bus** — PortableMyth, PortableDeity, and PortableRitual exporters enable lore to travel between Multiverse games
+- **CreatureImportFactory** — Precursors Norn → MVEE entity transfer pipeline with genetic reconstruction
+- **Genetic time capsule** — archival, checksums, and discovery mechanics for preserved genomes
+- **Lore discovery bridge** — wired to religion systems with myth propagation, mutation, and event consumers
+- **Ship exterior view** — Phase 4 ship visualization with defense systems and section detach
+- **Ship Powers registry** — creature manipulation powers via ship machines, with persistence and DevPanel integration
+- **EighthChildDetectorSystem** — rolling presence-over-power detection for the Eighth Child event
+- **Social lifecycle reactions** — norns now react socially to lifecycle events (births, deaths, coming-of-age)
+- **Gossip protocol Phase 1a** — star chart data model and gossip storage for inter-village knowledge sharing
+- **Universe Gallery** — import postcards via share code, with localStorage persistence
+- **Zones of Thought** — Browser LLM Phase 4 integration for local creature cognition
+- **Mobile touch controls** — responsive window system, section-based zoom navigation, panel drawer, sound toggle
+- **Parallax starfield** — visible when scrolling above ship boundary
+- **Angel migration service** — graduated Norn import from Precursors
+- **Content service** — Postgres-backed content management
+
+### Performance
+- **MovementSystem** optimized from ~140ms to <20ms per tick
+- MythGeneration and Retelling spatial search replaced with SpatialGrid (was brute-force O(n²))
+- Engine bundle split into parallel-loadable chunks for faster initial load
+- 5 hot-path systems optimized to reduce tick time toward 20 TPS target
+- Mobile sprite lazy-loading with manifest, deferred animations, and priority queue
+- Extinction monitor query hoisted above loop
+
+### Fixes
+- HolyTextSystem replaced — LLM generation instead of Mad Libs templates
+- SchismSystem now wired to species moral frameworks for culturally meaningful splits
+- Myth exporter bridge mappings aligned to actual event shapes
+- TDZ crash in engine-infra bundle resolved
+- Genesis cinematic HTML escaping prevents LLM text leakage
+- Sprite 404s eliminated — metadata-driven animation loading
+- Sound settings crash guard for masterMuted
+- PWYC button redesigned from invisible heart to labeled pill
+- WebGPU canvas context guarded before renderer commit
+- LLM naming response validation prevents undefined species names
+- Audio path corrected for Traefik routing
+- Multiverse API routes mounted in production server
+- GlitchTip DSN migrated from themultiverse.school to multiversestudios.xyz
+- Mobile tap targets increased to 44px minimum for accessibility
+- Biosphere lazy-loading fix for prebuilt Docker containers
+
+---
+
+## v0.2.1 — 2026-03-25
+
+### What's New
+- **Precursors lineage metadata** — species and race templates now carry Precursors origin data
+- **Postcard system** — ServerPostcardSource for classmate galaxy browsing, upload/fetch via SaveLoadService, annotation length limits
+- **Batch 2+3 civilization templates** — 14 voice profiles, 12 moral frameworks, moral primitives for 10 species, 171 new buildings across 37 species
+- **Ship and technology design briefs** — design documentation for all folkloric species
+
+### Fixes
+- 19 TypeScript build errors in magic package effect appliers resolved
+- Species policy NN endpoints use BASE_URL for correct production path routing
+
+---
+
 ## v0.2.0 — 2026-03-24
 
 ### What's New
