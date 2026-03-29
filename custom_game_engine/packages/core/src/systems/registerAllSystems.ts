@@ -962,7 +962,7 @@ export function registerAllSystems(
     // Institutions
     registerDisabled(new TempleSystem());
     registerDisabled(new PriesthoodSystem());
-    registerDisabled(new RitualSystem());
+    gameLoop.systemRegistry.register(new RitualSystem());
     if (llmQueue) {
       gameLoop.systemRegistry.register(new HolyTextSystem({}, llmQueue));
     } else {
@@ -1000,8 +1000,9 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(new DiscoveryNamingSystem());
 
     // Advanced theology
-    registerDisabled(new SchismSystem());
-    registerDisabled(new SyncretismSystem());
+    // Syncretism depends on schisms feeding theological divergence.
+    gameLoop.systemRegistry.register(new SchismSystem());
+    gameLoop.systemRegistry.register(new SyncretismSystem());
     registerDisabled(new ReligiousCompetitionSystem());
     registerDisabled(new ConversionWarfareSystem());
 
