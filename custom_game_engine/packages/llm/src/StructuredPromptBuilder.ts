@@ -59,6 +59,7 @@ export interface AgentPrompt {
   memories: string;            // Relevant memories
   jealousy?: string;           // Romantic jealousy context (optional)
   hunting?: string;            // Nearby animals and hunting opportunities (optional)
+  dragonLongWatch?: string;    // Dragon temporal perception: civilizational-scale awareness (optional)
   worldContext: string;        // Current situation
   villageStatus?: string;      // Village coordination context (optional)
   buildings: string;           // Buildings they can construct
@@ -99,6 +100,9 @@ export class StructuredPromptBuilder {
     const conversation = agent.components.get('conversation') as ConversationComponent | undefined;
     const skills = agent.components.get('skills') as SkillsComponent | undefined;
     const jealousy = agent.components.get('jealousy') as JealousyComponent | undefined;
+    const dragonPerception = agent.components.get('dragon_temporal_perception') as
+      | { longWatchContext?: string }
+      | undefined;
 
     // Phase 3: Schema-driven component rendering
     // Generate prompts for all schema'd components automatically
@@ -213,6 +217,7 @@ export class StructuredPromptBuilder {
       memories: memoriesText,
       jealousy: jealousyText,
       hunting: huntingText,
+      dragonLongWatch: dragonPerception?.longWatchContext,
       worldContext,
       villageStatus,
       buildings: buildingsText,
@@ -2470,6 +2475,12 @@ export class StructuredPromptBuilder {
     // Hunting - nearby animals and hunting opportunities
     if (prompt.hunting && prompt.hunting.trim()) {
       sections.push(prompt.hunting);
+    }
+
+    // Dragon Long Watch - civilizational-scale temporal perception
+    // Injected before worldContext so the dragon sees time before seeing the present
+    if (prompt.dragonLongWatch && prompt.dragonLongWatch.trim()) {
+      sections.push(prompt.dragonLongWatch);
     }
 
     // Current situation - what's happening right now

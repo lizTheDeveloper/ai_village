@@ -1,9 +1,9 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-echo "🔍 Running data validators..."
-
 cd custom_game_engine
+
+echo "🔍 Running data validators..."
 
 # Install glob if not already installed (needed for validators)
 if ! npm list glob > /dev/null 2>&1; then
@@ -20,4 +20,26 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-echo "✅ All validations passed!"
+echo "✅ Data validation passed!"
+
+# --- MUL-4531: Mandatory build gate ---
+echo "🔨 Running TypeScript build check..."
+npm run build --silent 2>&1
+
+if [ $? -ne 0 ]; then
+  echo "❌ TypeScript build failed. Fix type errors before committing."
+  exit 1
+fi
+
+echo "✅ Build check passed!"
+
+# --- MUL-4531: Stale .js check ---
+STALE_JS=$(find packages -path "*/src/*.js" -type f 2>/dev/null)
+if [ -n "$STALE_JS" ]; then
+  echo "❌ Stale .js files found in src/:"
+  echo "$STALE_JS"
+  echo "Run: find packages -path '*/src/*.js' -type f -delete"
+  exit 1
+fi
+
+echo "✅ All pre-commit checks passed!"

@@ -81,6 +81,7 @@ import { NeedsSystem } from './NeedsSystem.js';
 import { BiochemistrySystem } from './BiochemistrySystem.js';
 import { AlienCapabilityProfileSystem } from './AlienCapabilityProfileSystem.js';
 import { MoodSystem } from './MoodSystem.js';
+import { EmotionalContagionSystem } from './EmotionalContagionSystem.js';
 import { SleepSystem } from './SleepSystem.js';
 import { SteeringSystem } from './SteeringSystem.js';
 import { AgeTrackingSystem } from './AgeTrackingSystem.js';
@@ -157,6 +158,7 @@ import { RoofRepairSystem } from './RoofRepairSystem.js';
 import { TreeFellingSystem } from './TreeFellingSystem.js';
 import { getTileConstructionSystem } from './TileConstructionSystem.js';
 import { DoorSystem } from './DoorSystem.js';
+import { RuneGateSystem } from './RuneGateSystem.js';
 
 // Automation & Production (Phase 38)
 import { PowerGridSystem } from './PowerGridSystem.js';
@@ -228,6 +230,7 @@ import { FatesCouncilSystem } from '../plot/FatesCouncilSystem.js';
 // Consciousness
 import { HiveMindSystem } from '../consciousness/HiveMindSystem.js';
 import { PackMindSystem } from '../consciousness/PackMindSystem.js';
+import { DragonLongWatchSystem } from '../consciousness/DragonLongWatchSystem.js';
 
 // Magic
 import { MagicSystem } from './MagicSystem.js';
@@ -710,6 +713,7 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(new BiochemistrySystem());
     gameLoop.systemRegistry.register(new AlienCapabilityProfileSystem());
     gameLoop.systemRegistry.register(new MoodSystem());
+    gameLoop.systemRegistry.register(new EmotionalContagionSystem());
     gameLoop.systemRegistry.register(new SleepSystem());
     gameLoop.systemRegistry.register(new AgeTrackingSystem());
   }
@@ -786,8 +790,8 @@ export function registerAllSystems(
     registerDisabled(new ShipCombatSystem());
     registerDisabled(new ShipExteriorSystem());
     registerDisabled(new NavyBudgetSystem());
-    registerDisabled(getCrossShipCommunicationSystem());
-    registerDisabled(getDialectalDriftSystem());
+    gameLoop.systemRegistry.register(getCrossShipCommunicationSystem());
+    gameLoop.systemRegistry.register(getDialectalDriftSystem());
   }
 
   // ============================================================================
@@ -819,6 +823,7 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(new ResourceGatheringSystem());
     gameLoop.systemRegistry.register(new TreeFellingSystem());
     gameLoop.systemRegistry.register(getTileConstructionSystem());
+    gameLoop.systemRegistry.register(new RuneGateSystem());
     gameLoop.systemRegistry.register(new DoorSystem());
   }
 
@@ -1112,6 +1117,7 @@ export function registerAllSystems(
   if (flags.collectiveConsciousness) {
     registerDisabled(new HiveMindSystem());
     registerDisabled(new PackMindSystem());
+    registerDisabled(new DragonLongWatchSystem());
   }
 
   // ============================================================================

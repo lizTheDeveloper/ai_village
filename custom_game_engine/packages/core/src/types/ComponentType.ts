@@ -187,6 +187,7 @@ export enum ComponentType {
   CastingStateComponent = 'casting_state',        // Magic: Active casting state
   SkillProgressComponent = 'skill_progress',      // Magic: Skill tree progression
   ParadigmStateComponent = 'paradigm_state',      // Magic: Paradigm-specific state
+  RuneComprehension = 'rune_comprehension',       // Magic: Rune comprehension for gate traversal
 
   // World & Time
   Time = 'time',
@@ -352,4 +353,7 @@ export enum ComponentType {
 
   // Cognition Zones (Browser LLM — Zones of Thought)
   CognitionZone = 'cognition_zone',
+
+  // Dragon Consciousness (Civilizational-Scale Temporal Perception)
+  DragonTemporalPerception = 'dragon_temporal_perception',
 }

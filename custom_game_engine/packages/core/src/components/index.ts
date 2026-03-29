@@ -461,6 +461,8 @@ export type {
   MilitaryComponent,
 } from './MilitaryComponent.js';
 export * from './PassageComponent.js';
+// Rune Comprehension (gate traversal)
+export * from './RuneComprehensionComponent.js';
 // Invasion (Multiverse warfare)
 export * from './InvasionComponent.js';
 export { createInvasionComponent } from './InvasionComponent.js';
@@ -1459,3 +1461,12 @@ export type {
   QuarantinePhase,
   QuarantineStatusData,
 } from './QuarantineStatusComponent.js';
+
+// Dragon Temporal Perception (Civilizational-scale Long Watch)
+export * from './DragonTemporalPerceptionComponent.js';
+export { DragonTemporalPerceptionComponent, createDragonTemporalPerceptionComponent } from './DragonTemporalPerceptionComponent.js';
+export type {
+  DragonTemporalPerceptionData,
+  PerceivedEpoch,
+  ConsequenceThread,
+} from './DragonTemporalPerceptionComponent.js';

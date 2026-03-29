@@ -293,40 +293,56 @@ Task({ subagent_type: "general-purpose", model: "sonnet", description: "Implemen
 
 **Benefits**: Preserves context, cost effective, parallel work, focused subagent context.
 
-## Verification Before Completion
+## Mandatory Closure Gate (MUL-4531)
 
-**CRITICAL: Always verify before marking complete.**
+**No MVEE ticket moves to `done` without passing ALL gates below.** This is enforced, not advisory.
 
-### 1. Tests
+### Quick Verification (run this)
 ```bash
-cd custom_game_engine && npm test
+cd custom_game_engine && bash scripts/verify-before-done.sh
 ```
-Fix failures. Never commit broken tests.
+This script runs build, tests, checks for untracked source files, and stale .js. It must exit 0 before you mark any ticket done.
 
-### 2. Build
+### Gate 1: Build + Tests
 ```bash
-cd custom_game_engine && npm run build  # Must pass - failures = type errors
+cd custom_game_engine && npm run build  # Must pass — type errors = build failure
+cd custom_game_engine && npm test       # Must pass — no broken tests
 ```
 
-### 3. Browser Validation
-```bash
-cd custom_game_engine && ./start.sh
-```
-DevTools (F12) → Console → no red errors. Test your changes. Check: no errors, UI renders, TPS stable.
+### Gate 2: Browser Verification (game-facing changes)
+For any change that affects gameplay, UI, or rendering:
+1. Start dev server: `npm run dev`
+2. Open `http://localhost:5173` in Playwright
+3. Check browser console for errors
+4. Take screenshot as evidence
+5. Include evidence in your ticket comment
 
-### 4. Error Paths
+### Gate 3: Dual Sign-off (feature tickets)
+Feature tickets require sign-off from both:
+- **Scheherazade** (lore consistency)
+- **Sylvia** (performance impact)
+
+Request reviews before marking done. Do not self-approve feature work.
+
+### Gate 4: Error Paths
 ```typescript
 // BAD: const data = getData() || defaultValue;
 // GOOD: const data = getData(); if (!data) throw new Error('Failed to get required data');
 ```
 
-### Checklist
-- [ ] `npm test` passes
-- [ ] `npm run build` passes
-- [ ] No browser console errors
-- [ ] Changes work as expected
-- [ ] Error paths throw exceptions
+### Pre-commit Hook
+The pre-commit hook automatically runs data validation, TypeScript build, and stale .js detection. Commits that break the build are blocked.
+
+### CI/CD
+The CI pipeline (`ci.yml`) runs typecheck + test regression on every push/PR to main. The CI Gate job blocks merges when either fails.
+
+### Closure Checklist
+- [ ] `bash scripts/verify-before-done.sh` exits 0
+- [ ] Browser evidence provided (if game-facing)
+- [ ] Dual sign-off obtained (if feature ticket)
+- [ ] Error paths throw exceptions (no silent fallbacks)
 - [ ] No performance regression (TPS/FPS)
+- [ ] All new source files committed (no untracked .ts in src/)
 
 ## Debug Actions API
 
