@@ -6,6 +6,7 @@ import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
+import type { SpeciesComponent } from '../components/SpeciesComponent.js';
 import { DeityComponent, type BeliefActivity } from '../components/DeityComponent.js';
 import type { BeliefEconomyConfig } from '../divinity/UniverseConfig.js';
 
@@ -24,6 +25,8 @@ const BELIEF_RATES_PER_HOUR: Record<BeliefActivity, number> = {
   creation: 0.5,
   miracle_witness: 5.0,
 };
+
+type BeliefSpeciesArchetype = 'raksha' | 'norn' | 'quetzali' | 'other';
 
 /**
  * BeliefGenerationSystem - Phase 1 of divinity system
@@ -204,13 +207,78 @@ export class BeliefGenerationSystem extends BaseSystem {
     // Modifiers
     const faithMultiplier = spiritual.faith; // 0-1
     const spiritualityMultiplier = personality.spirituality ?? 0.5; // 0-1
+    const speciesMultiplier = this._getSpeciesBeliefMultiplier(entity, spiritual, personality);
 
     // Calculate belief generated this tick
     // Convert per-hour rate to per-second rate (divide by 3600)
     // Then adjust for update interval (20 ticks = 1 second)
     const beliefPerSecond = baseRate / 3600;
-    const beliefThisUpdate = beliefPerSecond * faithMultiplier * spiritualityMultiplier * activityMultiplier * globalMultiplier;
+    const beliefThisUpdate =
+      beliefPerSecond *
+      faithMultiplier *
+      spiritualityMultiplier *
+      activityMultiplier *
+      globalMultiplier *
+      speciesMultiplier;
 
     return beliefThisUpdate;
+  }
+
+  private _getSpeciesBeliefMultiplier(
+    entity: Entity,
+    spiritual: SpiritualComponent,
+    personality: PersonalityComponent
+  ): number {
+    const species = entity.components.get(CT.Species) as SpeciesComponent | undefined;
+    const archetype = this._resolveSpeciesArchetype(species?.speciesId);
+
+    switch (archetype) {
+      case 'raksha': {
+        // Raksha belief tracks observed divine power (answered signs/visions), not baseline faith alone.
+        const observedPowerScore = Math.min(
+          1,
+          (spiritual.answeredPrayers ?? 0) / 8 + (spiritual.hasReceivedVision ? 0.4 : 0)
+        );
+        return 0.9 + observedPowerScore * 0.5;
+      }
+      case 'norn': {
+        // Norns form faith through questioning and reflective synthesis.
+        const questioningScore = Math.min(
+          1,
+          personality.openness * 0.7 + (1 - personality.neuroticism) * 0.3
+        );
+        return 0.85 + questioningScore * 0.45;
+      }
+      case 'quetzali': {
+        // Quetzali belief spreads through teaching and social leadership.
+        const teachingScore = Math.min(
+          1,
+          personality.leadership * 0.5 +
+            personality.generosity * 0.3 +
+            (spiritual.religiousLeader ? 0.2 : 0)
+        );
+        return 0.9 + teachingScore * 0.4;
+      }
+      default:
+        return 1.0;
+    }
+  }
+
+  private _resolveSpeciesArchetype(speciesId?: string): BeliefSpeciesArchetype {
+    if (!speciesId) return 'other';
+
+    const normalized = speciesId.toLowerCase().replace(/[\s-]+/g, '_');
+
+    if (normalized.includes('raksha') || normalized.includes('rakshasa')) {
+      return 'raksha';
+    }
+    if (normalized.includes('norn')) {
+      return 'norn';
+    }
+    if (normalized.includes('quetzali')) {
+      return 'quetzali';
+    }
+
+    return 'other';
   }
 }
