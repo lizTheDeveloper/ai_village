@@ -14,7 +14,7 @@ import type {
 } from './types.js';
 import type { EpisodicMemory } from '@ai-village/core';
 import { ScannerTier } from '@ai-village/core';
-import { renderSeparator, renderLockedSection } from './renderUtils.js';
+import { renderSeparator, renderLockedSectionCompact } from './renderUtils.js';
 
 export class MemoriesSection {
   private scrollOffset = 0;
@@ -146,7 +146,7 @@ export class MemoriesSection {
         currentY += lineHeight;
       }
     } else {
-      currentY = renderLockedSection(ctx, 'Episodic Memories', x, currentY, padding, lineHeight);
+      currentY = renderLockedSectionCompact(ctx, 'Episodic Memories', x, currentY, padding, lineHeight);
     }
 
     // Beliefs & Knowledge
@@ -174,7 +174,7 @@ export class MemoriesSection {
         }
       }
     } else {
-      currentY = renderLockedSection(ctx, 'Beliefs & Knowledge', x, currentY, padding, lineHeight);
+      currentY = renderLockedSectionCompact(ctx, 'Beliefs & Knowledge', x, currentY, padding, lineHeight);
     }
 
     // Social Memory
@@ -234,7 +234,7 @@ export class MemoriesSection {
         }
       }
     } else {
-      currentY = renderLockedSection(ctx, 'Reflections', x, currentY, padding, lineHeight);
+      currentY = renderLockedSectionCompact(ctx, 'Reflections', x, currentY, padding, lineHeight);
     }
 
     // Journal

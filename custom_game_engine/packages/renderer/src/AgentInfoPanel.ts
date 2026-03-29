@@ -40,7 +40,7 @@ import {
   ContextSection,
   PrioritiesSection,
   DevSection,
-  renderLockedSection,
+  renderLockedSectionCompact,
 } from './panels/agent-info/index.js';
 import { devActionsService } from './services/DevActionsService.js';
 
@@ -62,7 +62,7 @@ export class AgentInfoPanel implements IWindowPanel {
   private visible: boolean = false;
   private selectedEntityId: string | null = null;
   private panelWidth = 360;
-  private panelHeight = 530;
+  private panelHeight = Math.min(530, Math.max(400, window.innerHeight - 120));
   private padding = 12;
   private lineHeight = 16;
 
@@ -107,7 +107,7 @@ export class AgentInfoPanel implements IWindowPanel {
   }
 
   getDefaultHeight(): number {
-    return 530;
+    return Math.min(530, Math.max(400, window.innerHeight - 120));
   }
 
   isVisible(): boolean {
@@ -461,10 +461,7 @@ export class AgentInfoPanel implements IWindowPanel {
         if (hasGenome) {
           this.contextSection.render(context, identity, agent, selectedEntity, world, this.lastScreenX, this.lastScreenY);
         } else {
-          renderLockedSection(context.ctx, 'LLM Context', context.x, context.y + context.padding, context.padding, context.lineHeight);
-          context.ctx.fillStyle = '#444444';
-          context.ctx.font = '11px monospace';
-          context.ctx.fillText('Requires Genome Scanner', context.x + context.padding + 20, context.y + context.padding + context.lineHeight * 3);
+          renderLockedSectionCompact(context.ctx, 'LLM Context', context.x, context.y + context.padding, context.padding, context.lineHeight);
         }
         break;
       }
@@ -478,10 +475,7 @@ export class AgentInfoPanel implements IWindowPanel {
         if (hasGenomeForDev) {
           this.devSection.render(context, selectedEntity, identity);
         } else {
-          renderLockedSection(context.ctx, 'Dev', context.x, context.y + context.padding, context.padding, context.lineHeight);
-          context.ctx.fillStyle = '#444444';
-          context.ctx.font = '11px monospace';
-          context.ctx.fillText('Requires Genome Scanner', context.x + context.padding + 20, context.y + context.padding + context.lineHeight * 3);
+          renderLockedSectionCompact(context.ctx, 'Dev', context.x, context.y + context.padding, context.padding, context.lineHeight);
         }
         break;
       }

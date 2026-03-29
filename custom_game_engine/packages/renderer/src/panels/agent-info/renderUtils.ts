@@ -246,3 +246,22 @@ export function renderLockedSection(
 
   return y;
 }
+
+/**
+ * Render a compact single-line locked section indicator.
+ * Saves ~1 lineHeight + 5px vs renderLockedSection.
+ */
+export function renderLockedSectionCompact(
+  ctx: CanvasRenderingContext2D,
+  label: string,
+  panelX: number,
+  y: number,
+  padding: number,
+  lineHeight: number
+): number {
+  ctx.fillStyle = '#555555';
+  ctx.font = '11px monospace';
+  ctx.fillText(`🔒 ${label} — Scanner upgrade required`, panelX + padding, y);
+  y += lineHeight;
+  return y;
+}

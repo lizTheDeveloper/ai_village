@@ -11,7 +11,7 @@ import type {
   PersonalityComponentData,
 } from './types.js';
 import { ScannerTier } from '@ai-village/core';
-import { renderSeparator, renderLockedSection } from './renderUtils.js';
+import { renderSeparator, renderLockedSectionCompact } from './renderUtils.js';
 import { devActionsService } from '../../services/DevActionsService.js';
 
 /** Click region for interactive elements */
@@ -329,7 +329,7 @@ export class SkillsSection {
         currentY += lineHeight;
       }
     } else {
-      currentY = renderLockedSection(ctx, 'Personality', x, currentY, padding, lineHeight);
+      currentY = renderLockedSectionCompact(ctx, 'Personality', x, currentY, padding, lineHeight);
     }
 
     // Restore canvas state
