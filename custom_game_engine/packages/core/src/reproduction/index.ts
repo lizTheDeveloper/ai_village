@@ -2,7 +2,7 @@
  * Reproduction System Module
  *
  * A comprehensive system for simulating diverse mating paradigms,
- * from human-style romance to kemmer cycles to hive reproduction
+ * from human-style romance to flux cycles to hive reproduction
  * to union magic.
  */
 
@@ -56,9 +56,9 @@ export {
   createSexualityComponent,
   createAsexualAromantic,
   createDemisexual,
-  createKemmerSexuality,
+  createFluxSexuality,
   createHiveSexuality,
-  createMystifSexuality,
+  createVelariSexuality,
 } from './SexualityComponent.js';
 export type {
   SexualTarget,
@@ -78,7 +78,7 @@ export {
   createFemaleMorph,
   createMaleMorph,
   createHermaphroditicMorph,
-  createKemmerMorph,
+  createFluxMorph,
   createSequentialMorph,
   createMultiSexMorph,
   createHiveCasteMorph,
@@ -98,7 +98,7 @@ export type {
 export * from './MatingParadigmRegistry.js';
 export {
   HUMAN_PARADIGM,
-  KEMMER_PARADIGM,
+  FLUX_PARADIGM,
   HIVE_PARADIGM,
   HIVEMIND_PARADIGM,
   PARASITIC_HIVEMIND_PARADIGM,
@@ -106,7 +106,7 @@ export {
   POLYAMOROUS_PARADIGM,
   THREE_SEX_PARADIGM,
   OPPORTUNISTIC_PARADIGM,
-  MYSTIF_PARADIGM,
+  VELARI_PARADIGM,
   QUANTUM_PARADIGM,
   TEMPORAL_PARADIGM,
   ASEXUAL_PARADIGM,
@@ -226,7 +226,7 @@ export {
   UNIVERSAL_TACTICS,
   DWARF_TACTICS,
   BIRD_FOLK_TACTICS,
-  MYSTIF_TACTICS,
+  VELARI_TACTICS,
   NEGATIVE_TACTICS,
   ALL_TACTICS,
   TACTICS_BY_ID,
@@ -237,7 +237,7 @@ export {
   HUMAN_COURTSHIP_PARADIGM,
   DWARF_COURTSHIP_PARADIGM,
   BIRD_FOLK_COURTSHIP_PARADIGM,
-  MYSTIF_COURTSHIP_PARADIGM,
+  VELARI_COURTSHIP_PARADIGM,
   ELF_COURTSHIP_PARADIGM,
   DEFAULT_COURTSHIP_PARADIGM,
   PARADIGMS_BY_SPECIES,

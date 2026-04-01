@@ -74,12 +74,12 @@ export interface FertilityState {
 
   /** Why fertile or infertile */
   reason?: 'mature' | 'immature' | 'too_old' | 'injured' | 'exhausted' |
-           'not_in_season' | 'not_in_kemmer' | 'sterile' | 'recovering' |
+           'not_in_season' | 'stable_phase' | 'sterile' | 'recovering' |
            'magical_block' | 'resource_starved';
 
   /** For cyclical fertility, current cycle phase */
   cyclePhase?: 'follicular' | 'ovulation' | 'luteal' | 'menstruation' |
-               'estrus' | 'anestrus' | 'kemmer' | 'somer' | 'refractory';
+               'estrus' | 'anestrus' | 'flux' | 'somer' | 'refractory';
 
   /** Days until fertile (if known) */
   daysUntilFertile?: number;
@@ -146,7 +146,7 @@ export interface ReproductiveHistory {
  *
  * For binary species: morphs might be ['male', 'female']
  * For multi-sex species: morphs might be ['alpha', 'beta', 'gamma', 'neuter']
- * For kemmer species: morphs might be ['somer', 'kemmer_spawner', 'kemmer_fertilizer']
+ * For phaseborn species: morphs might be ['somer', 'flux_gestator', 'flux_catalyst']
  */
 export class ReproductiveMorphComponent extends ComponentBase {
   public readonly type = 'reproductive_morph';
@@ -497,33 +497,33 @@ export class ReproductiveMorphComponent extends ComponentBase {
   }
 
   /**
-   * Enter kemmer (for kemmer-type species).
+   * Enter flux (for phaseborn-type species).
    */
-  public enterKemmer(morphId: string, _currentTick: Tick): void {
-    const kemmerMorph = this.possibleMorphs.find(m => m.id === morphId);
-    if (!kemmerMorph) {
-      throw new Error(`Unknown kemmer morph: ${morphId}`);
+  public enterFlux(morphId: string, _currentTick: Tick): void {
+    const fluxMorph = this.possibleMorphs.find(m => m.id === morphId);
+    if (!fluxMorph) {
+      throw new Error(`Unknown flux morph: ${morphId}`);
     }
 
-    this.currentMorph = kemmerMorph;
+    this.currentMorph = fluxMorph;
     this.fertility = {
       fertile: true,
       reason: 'mature',
-      cyclePhase: 'kemmer',
+      cyclePhase: 'flux',
     };
   }
 
   /**
-   * Exit kemmer (return to somer).
+   * Exit flux (return to somer).
    */
-  public exitKemmer(): void {
+  public exitFlux(): void {
     const somerMorph = this.possibleMorphs.find(m => m.id === 'somer');
     if (somerMorph) {
       this.currentMorph = somerMorph;
     }
     this.fertility = {
       fertile: false,
-      reason: 'not_in_kemmer',
+      reason: 'stable_phase',
       cyclePhase: 'somer',
     };
   }
@@ -625,11 +625,11 @@ export function createHermaphroditicMorph(): ReproductiveMorphComponent {
 }
 
 /**
- * Create a kemmer morph (Le Guin's Gethenians).
+ * Create a flux morph (Phaseborn species).
  */
-export function createKemmerMorph(): ReproductiveMorphComponent {
+export function createFluxMorph(): ReproductiveMorphComponent {
   return createReproductiveMorphComponent({
-    sexSystem: 'kemmer',
+    sexSystem: 'flux',
     canChangeMorph: true,
     possibleMorphs: [
       {
@@ -639,16 +639,16 @@ export function createKemmerMorph(): ReproductiveMorphComponent {
         characteristics: ['sexually latent', 'androgynous'],
       },
       {
-        id: 'kemmer_spawner',
-        name: 'Kemmer (Spawner)',
+        id: 'flux_gestator',
+        name: 'Flux (Gestator)',
         reproductiveRole: 'spawner',
-        characteristics: ['in kemmer', 'can bear children'],
+        characteristics: ['in flux', 'can bear children'],
       },
       {
-        id: 'kemmer_fertilizer',
-        name: 'Kemmer (Fertilizer)',
+        id: 'flux_catalyst',
+        name: 'Flux (Catalyst)',
         reproductiveRole: 'fertilizer',
-        characteristics: ['in kemmer', 'can sire children'],
+        characteristics: ['in flux', 'can sire children'],
       },
     ],
     currentMorphId: 'somer',

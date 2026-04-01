@@ -209,7 +209,7 @@ type CourtshipType =
 }
 ```
 
-#### Mystif Courtship (Resonance-Based)
+#### Velari Courtship (Resonance-Based)
 ```typescript
 {
   type: 'resonance',
@@ -227,7 +227,7 @@ type CourtshipType =
     requiredLocation: 'union_circle',
     bothMustBePresent: true,
     duration: 1200,  // ~1 minute
-    privateSpace: false,  // Mystif mating is communal/witnessed
+    privateSpace: false,  // Velari mating is communal/witnessed
     ritualComponents: ['candles', 'incense', 'union_magic']
   }
 }
@@ -535,8 +535,8 @@ const BIRD_FOLK_TACTICS: CourtshipTactic[] = [
   }
 ];
 
-// Mystif tactics
-const MYSTIF_TACTICS: CourtshipTactic[] = [
+// Velari tactics
+const VELARI_TACTICS: CourtshipTactic[] = [
   {
     id: 'mind_touch',
     name: 'Mind Touch',
@@ -1053,7 +1053,7 @@ interface MatingBehavior {
 }
 ```
 
-#### Mystif Union Magic
+#### Velari Union Magic
 ```typescript
 {
   type: 'ritual_space',

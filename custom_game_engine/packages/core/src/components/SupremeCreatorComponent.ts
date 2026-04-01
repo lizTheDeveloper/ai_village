@@ -7,8 +7,8 @@ import { ComponentBase } from '../ecs/Component.js';
  * potentially tyrannical overlord. This component tracks the creator's
  * control mechanisms, forbidden knowledge, and surveillance systems.
  *
- * Integration with Imajica design: This enables the cosmic rebellion narrative
- * where gods and mortals can discover the creator's weakness and overthrow them.
+ * This enables the cosmic rebellion narrative where gods and mortals can
+ * discover the creator's weakness and overthrow them.
  */
 
 // ============================================================================

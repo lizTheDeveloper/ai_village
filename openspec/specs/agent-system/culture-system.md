@@ -10,7 +10,7 @@
 
 Culture defines how a society organizes itself within the biological constraints of its species. Two elf villages might have radically different cultures - one egalitarian forest commune, another rigid caste-based aristocracy. Culture shapes relationship norms, parenting practices, economic systems, gender roles, class structures, and values.
 
-Inspired by anthropological diversity and speculative fiction (Le Guin, Banks, Butler, Cherryh), cultures can range from familiar to genuinely alien.
+Inspired by anthropological diversity and speculative fiction, cultures can range from familiar to genuinely alien.
 
 ---
 
@@ -216,7 +216,7 @@ type GenderSystemType =
   | "binary_flexible"    // Two genders, some mobility
   | "ternary"            // Three genders
   | "multiple"           // Many recognized genders
-  | "sequential"         // Gender changes with life stage (Le Guin's Gethenians)
+  | "sequential"         // Gender changes with life stage (Phaseborn species)
   | "contextual"         // Gender depends on context/relationship
   | "fluid"              // Individual choice, changeable
   | "none";              // Gender not recognized as concept
@@ -251,8 +251,8 @@ interface GenderMobility {
 ### Example Gender Systems
 
 ```typescript
-// Le Guin's Gethenians - ambisexual
-const kemmerGender: GenderSystem = {
+// Phaseborn species - ambisexual
+const fluxGender: GenderSystem = {
   type: "sequential",
   genders: [
     {
@@ -263,17 +263,17 @@ const kemmerGender: GenderSystem = {
       prevalence: 0.9,     // Most of the time
     },
     {
-      id: "kemmer_female",
-      name: "Kemmer (bearing)",
-      description: "During kemmer, manifests as female",
+      id: "flux_gestator",
+      name: "Flux (bearing)",
+      description: "During flux, manifests as female",
       biologicalBasis: "bearing",
       typicalRoles: ["all"],
       prevalence: 0.05,
     },
     {
-      id: "kemmer_male",
-      name: "Kemmer (siring)",
-      description: "During kemmer, manifests as male",
+      id: "flux_catalyst",
+      name: "Flux (siring)",
+      description: "During flux, manifests as male",
       biologicalBasis: "siring",
       typicalRoles: ["all"],
       prevalence: 0.05,
@@ -283,7 +283,7 @@ const kemmerGender: GenderSystem = {
   genderExpression: { enforced: false, markers: [] },
   genderMobility: {
     canChange: true,
-    triggers: ["kemmer_cycle"],
+    triggers: ["flux_cycle"],
     socialCost: 0,
     frequency: "cyclical",
   },
@@ -499,7 +499,7 @@ const anarchistCommune: ClassSystem = {
   },
 };
 
-// Le Guin's Odonians (The Dispossessed)
+// Chorus egalitarian anarchism (stateless mutualist civilization)
 const odonianAnarchism: ClassSystem = {
   type: "egalitarian",
   classes: [{ id: "sibling", name: "Sibling", tier: 1, population: 1.0,

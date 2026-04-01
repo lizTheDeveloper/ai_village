@@ -654,7 +654,7 @@ describe('CourtshipSystem', () => {
       expect(mating.type).toBe('nest_location');
     });
 
-    it('should allow public mating for mystif union magic', () => {
+    it('should allow public mating for velari union magic', () => {
       const mating: MatingBehavior = {
         type: 'ritual_space',
         requiredLocation: 'union_circle',

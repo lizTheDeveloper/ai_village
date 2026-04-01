@@ -362,7 +362,7 @@
 - Union magic spells:
   - `merge_forms` - Temporary fusion
   - `create_offspring` - Magical offspring
-  - `become_desire` - Mystif shapeshifting
+  - `resonant_shift` - Velari shapeshifting
   - `swap_traits` - Attribute exchange
   - `soul_bond` - Permanent connection
 - New magic costs:

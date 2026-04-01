@@ -552,11 +552,11 @@ The system supports diverse reproductive strategies via pluggable paradigms:
 - **Courtship:** Displays, gift-giving
 - **Gestation:** 9 months (~1200 ticks)
 
-#### 2. Kemmer Paradigm (Ursula K. Le Guin's _The Left Hand of Darkness_)
+#### 2. Flux Paradigm
 - **Default:** Androgynous (no sex)
-- **Kemmer:** Periodic fertility cycle
-- **Role Selection:** During kemmer, become male or female based on partner
-- **Gestation:** Kemmer-female carries offspring
+- **Flux:** Periodic fertility cycle
+- **Role Selection:** During flux, become male or female based on partner
+- **Gestation:** Flux-gestator carries offspring
 
 #### 3. Hive Paradigm
 - **Castes:** Queen, drone, worker (sterile)
@@ -583,7 +583,7 @@ The system supports diverse reproductive strategies via pluggable paradigms:
 - **No Partner:** Self-reproduction
 - **Genetic Diversity:** Mutations only
 
-**... and 5 more paradigms (Symbiotic, Polyamorous, Opportunistic, Mystif, Temporal)**
+**... and 5 more paradigms (Symbiotic, Polyamorous, Opportunistic, Velari, Temporal)**
 
 **Location:** `packages/core/src/reproduction/MatingParadigm.ts`
 

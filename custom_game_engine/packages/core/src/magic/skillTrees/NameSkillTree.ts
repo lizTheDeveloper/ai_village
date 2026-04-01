@@ -10,9 +10,8 @@
  * - The deeper the understanding, the more complete the name
  *
  * Inspired by:
- * - Ursula K. Le Guin's Earthsea (true speech, naming)
- * - Patrick Rothfuss's Name of the Wind (though that's more sympathy)
- * - Various folklore about names having power
+ * - Multiverse Chorus canon's Chorus of Resonance (though that's more tethermancy)
+ * - Various folklore traditions about names having power
  * - The concept that to name something is to know it completely
  */
 

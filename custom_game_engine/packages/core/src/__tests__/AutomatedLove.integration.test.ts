@@ -2,7 +2,7 @@
  * AutomatedLove - Comprehensive Integration Tests for the Reproduction System
  *
  * Testing the full spectrum of love, lust, and procreation across species.
- * From human romance to kemmer cycles to hive spawning to union magic orgies.
+ * From human romance to flux cycles to hive spawning to union magic orgies.
  *
  * "In the beginning, there was the algorithm. And the algorithm said,
  *  'Let there be parameterized reproduction.' And it was good."
@@ -14,9 +14,9 @@ import {
   createSexualityComponent,
   createAsexualAromantic,
   createDemisexual,
-  createKemmerSexuality,
+  createFluxSexuality,
   createHiveSexuality,
-  createMystifSexuality,
+  createVelariSexuality,
 } from '../reproduction/SexualityComponent.js';
 import {
   ReproductiveMorphComponent,
@@ -24,17 +24,17 @@ import {
   createFemaleMorph,
   createMaleMorph,
   createHermaphroditicMorph,
-  createKemmerMorph,
+  createFluxMorph,
   createSequentialMorph,
   createHiveCasteMorph,
   createAsexualMorph,
 } from '../reproduction/ReproductiveMorphComponent.js';
 import {
   HUMAN_PARADIGM,
-  KEMMER_PARADIGM,
+  FLUX_PARADIGM,
   HIVE_PARADIGM,
   OPPORTUNISTIC_PARADIGM,
-  MYSTIF_PARADIGM,
+  VELARI_PARADIGM,
   QUANTUM_PARADIGM,
   getMatingParadigm,
   getParadigmForSpecies,
@@ -106,11 +106,11 @@ describe('AutomatedLove Integration Tests', () => {
       expect(sexuality.attractionCondition.minEmotionalBond).toBeGreaterThan(0);
     });
 
-    it('creates kemmer cyclical sexuality', () => {
-      const sexuality = createKemmerSexuality();
+    it('creates flux cyclical sexuality', () => {
+      const sexuality = createFluxSexuality();
 
-      expect(sexuality.labels).toContain('kemmer');
-      expect(sexuality.attractionCondition.type).toBe('kemmer');
+      expect(sexuality.labels).toContain('flux');
+      expect(sexuality.attractionCondition.type).toBe('flux');
       expect(sexuality.onset).toBe('cyclical');
       expect(sexuality.fluidity).toBe('rapid_change');
 
@@ -130,14 +130,14 @@ describe('AutomatedLove Integration Tests', () => {
       expect(sexualAxis?.specificMorphs).toContain('drone');
     });
 
-    it('creates mystif union magic sexuality', () => {
-      const sexuality = createMystifSexuality();
+    it('creates velari union magic sexuality', () => {
+      const sexuality = createVelariSexuality();
 
-      expect(sexuality.labels).toContain('mystif');
+      expect(sexuality.labels).toContain('velari');
       expect(sexuality.attractionCondition.type).toBe('resonance');
       expect(sexuality.intimacyOpenness).toBeGreaterThan(0.8);
 
-      // Mystifs have a magical attraction dimension
+      // Velari have a magical attraction dimension
       const magicalAxis = sexuality.attractionAxes.find(a => a.dimension === 'magical');
       expect(magicalAxis?.exists).not.toBe(false);
       expect(magicalAxis?.intensity).toBe(1.0);
@@ -170,11 +170,11 @@ describe('AutomatedLove Integration Tests', () => {
       expect(morph.canSpawn()).toBe(false); // Not fertile yet
     });
 
-    it('creates kemmer morph - starts in somer', () => {
-      const morph = createKemmerMorph();
+    it('creates flux morph - starts in stable phase', () => {
+      const morph = createFluxMorph();
 
-      expect(morph.sexSystem).toBe('kemmer');
-      expect(morph.currentMorph.id).toBe('somer');
+      expect(morph.sexSystem).toBe('flux');
+      expect(morph.currentMorph.id).toBe('stable_phase');
       expect(morph.currentMorph.reproductiveRole).toBe('neither');
       expect(morph.canChangeMorph).toBe(true);
       expect(morph.determination).toBe('partner');
@@ -254,18 +254,18 @@ describe('AutomatedLove Integration Tests', () => {
       expect(female.isCompatibleWith(herma)).toBe(true);
     });
 
-    it('kemmer partners in complementary states are compatible', () => {
-      const kemmer1 = createKemmerMorph();
-      const kemmer2 = createKemmerMorph();
+    it('flux partners in complementary states are compatible', () => {
+      const flux1 = createFluxMorph();
+      const flux2 = createFluxMorph();
 
-      // Both in somer - neither can reproduce
-      expect(kemmer1.isCompatibleWith(kemmer2)).toBe(false);
+      // Both in stable phase - neither can reproduce
+      expect(flux1.isCompatibleWith(flux2)).toBe(false);
 
-      // Put them in complementary kemmer states
-      kemmer1.enterKemmer('kemmer_spawner', 100);
-      kemmer2.enterKemmer('kemmer_fertilizer', 100);
+      // Put them in complementary flux states
+      flux1.enterFlux('flux_spawner', 100);
+      flux2.enterFlux('flux_fertilizer', 100);
 
-      expect(kemmer1.isCompatibleWith(kemmer2)).toBe(true);
+      expect(flux1.isCompatibleWith(flux2)).toBe(true);
     });
   });
 
@@ -350,43 +350,43 @@ describe('AutomatedLove Integration Tests', () => {
     });
   });
 
-  describe('Kemmer Cycle', () => {
-    it('enters and exits kemmer correctly', () => {
-      const kemmer = createKemmerMorph();
+  describe('Flux Cycle', () => {
+    it('enters and exits flux correctly', () => {
+      const fluxMorph = createFluxMorph();
 
-      expect(kemmer.currentMorph.id).toBe('somer');
-      expect(kemmer.fertility.fertile).toBe(false);
+      expect(fluxMorph.currentMorph.id).toBe('stable_phase');
+      expect(fluxMorph.fertility.fertile).toBe(false);
 
-      // Enter kemmer as spawner
-      kemmer.enterKemmer('kemmer_spawner', 100);
+      // Enter flux as spawner
+      fluxMorph.enterFlux('flux_spawner', 100);
 
-      expect(kemmer.currentMorph.id).toBe('kemmer_spawner');
-      expect(kemmer.currentMorph.reproductiveRole).toBe('spawner');
-      expect(kemmer.fertility.fertile).toBe(true);
-      expect(kemmer.fertility.cyclePhase).toBe('kemmer');
+      expect(fluxMorph.currentMorph.id).toBe('flux_spawner');
+      expect(fluxMorph.currentMorph.reproductiveRole).toBe('spawner');
+      expect(fluxMorph.fertility.fertile).toBe(true);
+      expect(fluxMorph.fertility.cyclePhase).toBe('flux');
 
-      // Exit kemmer
-      kemmer.exitKemmer();
+      // Exit flux
+      fluxMorph.exitFlux();
 
-      expect(kemmer.currentMorph.id).toBe('somer');
-      expect(kemmer.fertility.fertile).toBe(false);
-      expect(kemmer.fertility.cyclePhase).toBe('somer');
+      expect(fluxMorph.currentMorph.id).toBe('stable_phase');
+      expect(fluxMorph.fertility.fertile).toBe(false);
+      expect(fluxMorph.fertility.cyclePhase).toBe('stable_phase');
     });
 
-    it('kemmer partners manifest complementary sexes', () => {
-      const kemmer1 = createKemmerMorph();
-      const kemmer2 = createKemmerMorph();
+    it('flux partners manifest complementary sexes', () => {
+      const flux1 = createFluxMorph();
+      const flux2 = createFluxMorph();
 
-      // Both enter kemmer - one becomes spawner, one fertilizer
+      // Both enter flux - one becomes spawner, one fertilizer
       // In real system, this would be determined by interaction
-      kemmer1.enterKemmer('kemmer_spawner', 100);
-      kemmer2.enterKemmer('kemmer_fertilizer', 100);
+      flux1.enterFlux('flux_spawner', 100);
+      flux2.enterFlux('flux_fertilizer', 100);
 
-      expect(kemmer1.isCompatibleWith(kemmer2)).toBe(true);
+      expect(flux1.isCompatibleWith(flux2)).toBe(true);
 
       // They can now reproduce
-      kemmer1.startGestation([kemmer2.currentMorph.id], 100, 1);
-      expect(kemmer1.gestation.pregnant).toBe(true);
+      flux1.startGestation([flux2.currentMorph.id], 100, 1);
+      expect(flux1.gestation.pregnant).toBe(true);
     });
   });
 
@@ -626,12 +626,12 @@ describe('AutomatedLove Integration Tests', () => {
       expect(canSpeciesMate('human', 'elf')).toBe(true);
 
       // Isolated paradigms
-      expect(canSpeciesMate('human', 'gethenian')).toBe(false);
+      expect(canSpeciesMate('human', 'phaseborn')).toBe(false);
       expect(canSpeciesMate('insectoid', 'human')).toBe(false);
 
-      // Mystifs can mate with anyone (absorbs)
-      expect(canSpeciesMate('mystif', 'human')).toBe(true);
-      expect(canSpeciesMate('mystif', 'gethenian')).toBe(true);
+      // Velari can mate with anyone (absorbs)
+      expect(canSpeciesMate('velari', 'human')).toBe(true);
+      expect(canSpeciesMate('velari', 'phaseborn')).toBe(true);
     });
 
     it('registers custom paradigms', () => {
@@ -773,17 +773,17 @@ describe('AutomatedLove Integration Tests', () => {
     });
   });
 
-  describe('Kemmer Paradigm Details', () => {
-    const paradigm = KEMMER_PARADIGM;
+  describe('Flux Paradigm Details', () => {
+    const paradigm = FLUX_PARADIGM;
 
-    it('has kemmer sex system with three states', () => {
-      expect(paradigm.biologicalSex.system).toBe('kemmer');
+    it('has flux sex system with three states', () => {
+      expect(paradigm.biologicalSex.system).toBe('flux');
       expect(paradigm.biologicalSex.sexes.length).toBe(3);
       expect(paradigm.biologicalSex.canChange).toBe(true);
 
-      const somer = paradigm.biologicalSex.sexes.find(s => s.id === 'somer');
-      expect(somer?.reproductiveRole).toBe('neither');
-      expect(somer?.prevalence).toBe(0.9); // Most of the time in somer
+      const stablePhase = paradigm.biologicalSex.sexes.find(s => s.id === 'stable_phase');
+      expect(stablePhase?.reproductiveRole).toBe('neither');
+      expect(stablePhase?.prevalence).toBe(0.9); // Most of the time in stable phase
     });
 
     it('is genderless', () => {
@@ -796,11 +796,11 @@ describe('AutomatedLove Integration Tests', () => {
       expect(paradigm.pairBonding.bondEffects?.some(e => e.effectType === 'fertility_sync')).toBe(true);
     });
 
-    it('has cyclical reproduction with kemmer life stages', () => {
+    it('has cyclical reproduction with flux life stages', () => {
       expect(paradigm.reproduction.frequency).toBe('cyclical');
       expect(paradigm.lifeStages?.length).toBe(2);
-      expect(paradigm.lifeStages?.find(s => s.name === 'kemmer')?.canReproduce).toBe(true);
-      expect(paradigm.lifeStages?.find(s => s.name === 'somer')?.canReproduce).toBe(false);
+      expect(paradigm.lifeStages?.find(s => s.name === 'flux')?.canReproduce).toBe(true);
+      expect(paradigm.lifeStages?.find(s => s.name === 'stable_phase')?.canReproduce).toBe(false);
     });
 
     it('is isolated - cannot hybridize', () => {
@@ -855,8 +855,8 @@ describe('AutomatedLove Integration Tests', () => {
     });
   });
 
-  describe('Mystif Paradigm Details', () => {
-    const paradigm = MYSTIF_PARADIGM;
+  describe('Velari Paradigm Details', () => {
+    const paradigm = VELARI_PARADIGM;
 
     it('has fluid sex system - shapeshifting', () => {
       expect(paradigm.biologicalSex.system).toBe('fluid');
@@ -905,6 +905,7 @@ describe('AutomatedLove Integration Tests', () => {
       expect(paradigm.paradigmCompatibility).toBe('absorbs');
     });
   });
+
 
   describe('Quantum Paradigm Details', () => {
     const paradigm = QUANTUM_PARADIGM;
@@ -1041,22 +1042,22 @@ describe('AutomatedLove Integration Tests', () => {
   });
 
   describe('Receptive Cycles', () => {
-    it('tracks kemmer cycle entry and exit', () => {
-      const kemmerSexuality = createKemmerSexuality();
+    it('tracks flux cycle entry and exit', () => {
+      const fluxSexuality = createFluxSexuality();
 
-      expect(kemmerSexuality.inReceptiveCycle).toBe(false);
-      expect(kemmerSexuality.canExperienceAttraction()).toBe(false); // Kemmer-type needs cycle
+      expect(fluxSexuality.inReceptiveCycle).toBe(false);
+      expect(fluxSexuality.canExperienceAttraction()).toBe(false); // Flux-type needs cycle
 
-      kemmerSexuality.enterReceptiveCycle(100);
+      fluxSexuality.enterReceptiveCycle(100);
 
-      expect(kemmerSexuality.inReceptiveCycle).toBe(true);
-      expect(kemmerSexuality.cycleStartedAt).toBe(100);
-      expect(kemmerSexuality.canExperienceAttraction()).toBe(true);
+      expect(fluxSexuality.inReceptiveCycle).toBe(true);
+      expect(fluxSexuality.cycleStartedAt).toBe(100);
+      expect(fluxSexuality.canExperienceAttraction()).toBe(true);
 
-      kemmerSexuality.exitReceptiveCycle();
+      fluxSexuality.exitReceptiveCycle();
 
-      expect(kemmerSexuality.inReceptiveCycle).toBe(false);
-      expect(kemmerSexuality.cycleStartedAt).toBeUndefined();
+      expect(fluxSexuality.inReceptiveCycle).toBe(false);
+      expect(fluxSexuality.cycleStartedAt).toBeUndefined();
     });
 
     it('always-on sexuality does not require cycle', () => {
@@ -1223,38 +1224,38 @@ describe('AutomatedLove Integration Tests', () => {
     });
   });
 
-  describe('Full Lifecycle: Kemmer Partners', () => {
-    it('simulates kemmer cycle and conception', () => {
-      // Two Gethenians
+  describe('Full Lifecycle: Flux Partners', () => {
+    it('simulates flux cycle and conception', () => {
+      // Two Phaseborn
       const estraven = {
-        sexuality: createKemmerSexuality(),
-        morph: createKemmerMorph(),
+        sexuality: createFluxSexuality(),
+        morph: createFluxMorph(),
         relationships: createRelationshipComponent(),
       };
 
       const genly = {
-        sexuality: createKemmerSexuality(),
-        morph: createKemmerMorph(),
+        sexuality: createFluxSexuality(),
+        morph: createFluxMorph(),
         relationships: createRelationshipComponent(),
       };
 
-      // Build relationship in somer
+      // Build relationship in stable phase
       estraven.relationships = updateRelationship(estraven.relationships, 'genly', 100, 50, 40);
       genly.relationships = updateRelationship(genly.relationships, 'estraven', 100, 50, 40);
 
       estraven.relationships = initializeRomantic(estraven.relationships, 'genly', 60);
       genly.relationships = initializeRomantic(genly.relationships, 'estraven', 60);
 
-      // Neither in kemmer - no attraction active
+      // Neither in flux - no attraction active
       expect(estraven.sexuality.canExperienceAttraction()).toBe(false);
       expect(genly.sexuality.canExperienceAttraction()).toBe(false);
 
-      // Kemmer comes (tick 500)
+      // Flux comes (tick 500)
       estraven.sexuality.enterReceptiveCycle(500);
-      estraven.morph.enterKemmer('kemmer_spawner', 500);
+      estraven.morph.enterFlux('flux_spawner', 500);
 
       genly.sexuality.enterReceptiveCycle(500);
-      genly.morph.enterKemmer('kemmer_fertilizer', 500);
+      genly.morph.enterFlux('flux_fertilizer', 500);
 
       // Now attraction is possible
       expect(estraven.sexuality.canExperienceAttraction()).toBe(true);
@@ -1265,7 +1266,7 @@ describe('AutomatedLove Integration Tests', () => {
       expect(genly.morph.currentMorph.reproductiveRole).toBe('fertilizer');
       expect(estraven.morph.isCompatibleWith(genly.morph)).toBe(true);
 
-      // Mate during kemmer
+      // Mate during flux
       estraven.sexuality.addMate('genly', 'pair_bonded', 500);
       genly.sexuality.addMate('estraven', 'pair_bonded', 500);
 
@@ -1277,13 +1278,13 @@ describe('AutomatedLove Integration Tests', () => {
 
       expect(estraven.morph.gestation.pregnant).toBe(true);
 
-      // Kemmer ends
+      // Flux ends
       estraven.sexuality.exitReceptiveCycle();
       genly.sexuality.exitReceptiveCycle();
-      genly.morph.exitKemmer();
+      genly.morph.exitFlux();
       // Estraven stays in spawner form due to pregnancy
 
-      expect(genly.morph.currentMorph.id).toBe('somer');
+      expect(genly.morph.currentMorph.id).toBe('stable_phase');
       expect(estraven.morph.gestation.pregnant).toBe(true);
     });
   });
@@ -1322,10 +1323,10 @@ describe('AutomatedLove Integration Tests', () => {
     });
   });
 
-  describe('Full Lifecycle: Mystif Union Magic', () => {
+  describe('Full Lifecycle: Velari Union Magic', () => {
     it('simulates union magic reproduction', () => {
-      const mystif = {
-        sexuality: createMystifSexuality(),
+      const velari = {
+        sexuality: createVelariSexuality(),
         morph: createReproductiveMorphComponent({
           sexSystem: 'fluid',
           possibleMorphs: [
@@ -1343,34 +1344,34 @@ describe('AutomatedLove Integration Tests', () => {
       };
 
       // Make fertile
-      mystif.morph.fertility = { fertile: true, reason: 'mature' };
+      velari.morph.fertility = { fertile: true, reason: 'mature' };
       partner.morph.fertility = { fertile: true, reason: 'mature' };
 
       // First establish a relationship (required before bonding)
-      mystif.relationships = updateRelationship(mystif.relationships, 'partner', 100, 80, 90);
-      partner.relationships = updateRelationship(partner.relationships, 'mystif', 100, 80, 90);
+      velari.relationships = updateRelationship(velari.relationships, 'partner', 100, 80, 90);
+      partner.relationships = updateRelationship(partner.relationships, 'velari', 100, 80, 90);
 
       // Resonance-based attraction
-      mystif.sexuality.addAttraction('partner', { magical: 1.0, sexual: 0.8, romantic: 0.9 }, 100);
+      velari.sexuality.addAttraction('partner', { magical: 1.0, sexual: 0.8, romantic: 0.9 }, 100);
 
-      // Soul bond forms instantly (mystif paradigm)
-      mystif.relationships = formBond(mystif.relationships, 'partner', 'soul_bound', 100, false);
-      partner.relationships = formBond(partner.relationships, 'mystif', 'soul_bound', 100, false);
+      // Soul bond forms instantly (velari paradigm)
+      velari.relationships = formBond(velari.relationships, 'partner', 'soul_bound', 100, false);
+      partner.relationships = formBond(partner.relationships, 'velari', 'soul_bound', 100, false);
 
-      expect(mystif.relationships.relationships.get('partner')?.romantic?.stage).toBe('bonded');
-      expect(mystif.relationships.relationships.get('partner')?.romantic?.bondStrength).toBe(100);
+      expect(velari.relationships.relationships.get('partner')?.romantic?.stage).toBe('bonded');
+      expect(velari.relationships.relationships.get('partner')?.romantic?.bondStrength).toBe(100);
 
-      // Mystif can mate with anyone (absorbs paradigm)
-      expect(mystif.morph.isCompatibleWith(partner.morph)).toBe(true);
+      // Velari can mate with anyone (absorbs paradigm)
+      expect(velari.morph.isCompatibleWith(partner.morph)).toBe(true);
 
       // Union magic reproduction - instant
-      mystif.morph.startGestation(['partner'], 200, 1);
-      mystif.morph.gestationPeriodDays = 1; // Magical = instant
+      velari.morph.startGestation(['partner'], 200, 1);
+      velari.morph.gestationPeriodDays = 1; // Magical = instant
 
       // Birth happens immediately
-      mystif.morph.endGestation(true, 1, 224); // 1 day later
+      velari.morph.endGestation(true, 1, 224); // 1 day later
 
-      expect(mystif.morph.history.offspringCount).toBe(1);
+      expect(velari.morph.history.offspringCount).toBe(1);
     });
   });
 
@@ -1398,12 +1399,12 @@ describe('AutomatedLove Integration Tests', () => {
       }).toThrow('Unknown morph');
     });
 
-    it('handles unknown kemmer state', () => {
-      const kemmer = createKemmerMorph();
+    it('handles unknown flux state', () => {
+      const fluxMorph = createFluxMorph();
 
       expect(() => {
-        kemmer.enterKemmer('invalid_kemmer_type', 100);
-      }).toThrow('Unknown kemmer morph');
+        fluxMorph.enterFlux('invalid_flux_type', 100);
+      }).toThrow('Unknown flux morph');
     });
 
     it('handles sterile entities', () => {
@@ -1434,10 +1435,10 @@ describe('AutomatedLove Integration Tests', () => {
     it('all paradigms have required fields', () => {
       const paradigms = [
         HUMAN_PARADIGM,
-        KEMMER_PARADIGM,
+        FLUX_PARADIGM,
         HIVE_PARADIGM,
         OPPORTUNISTIC_PARADIGM,
-        MYSTIF_PARADIGM,
+        VELARI_PARADIGM,
         QUANTUM_PARADIGM,
       ];
 
@@ -1460,7 +1461,7 @@ describe('AutomatedLove Integration Tests', () => {
     });
 
     it('isolated paradigms cannot hybridize', () => {
-      const isolated = [KEMMER_PARADIGM, HIVE_PARADIGM];
+      const isolated = [FLUX_PARADIGM, HIVE_PARADIGM];
 
       for (const p of isolated) {
         expect(p.paradigmCompatibility).toBe('isolated');
@@ -1478,8 +1479,8 @@ describe('AutomatedLove Integration Tests', () => {
     });
 
     it('absorbing paradigms are universally compatible', () => {
-      expect(MYSTIF_PARADIGM.paradigmCompatibility).toBe('absorbs');
-      expect(MYSTIF_PARADIGM.hybridization.compatibleSpecies).toContain('any');
+      expect(VELARI_PARADIGM.paradigmCompatibility).toBe('absorbs');
+      expect(VELARI_PARADIGM.hybridization.compatibleSpecies).toContain('any');
     });
   });
 });
@@ -1490,19 +1491,19 @@ describe('AutomatedLove Integration Tests', () => {
 
 describe('The Grand Multiverse Romance', () => {
   it('simulates cross-paradigm love story', () => {
-    // A mystif falls in love with a human
+    // A velari falls in love with a human
     // Their love transcends biology through union magic
 
-    const mystif = {
+    const velari = {
       name: 'Pie\'oh\'pah',
-      sexuality: createMystifSexuality(),
+      sexuality: createVelariSexuality(),
       morph: createReproductiveMorphComponent({
         sexSystem: 'fluid',
         possibleMorphs: [{ id: 'adaptive', name: 'Adaptive', reproductiveRole: 'both' }],
         currentMorphId: 'adaptive',
       }),
       relationships: createRelationshipComponent(),
-      paradigm: MYSTIF_PARADIGM,
+      paradigm: VELARI_PARADIGM,
     };
 
     const human = {
@@ -1514,49 +1515,49 @@ describe('The Grand Multiverse Romance', () => {
     };
 
     // They can mate despite different paradigms
-    expect(canSpeciesMate('mystif', 'human')).toBe(true);
+    expect(canSpeciesMate('velari', 'human')).toBe(true);
 
-    // The mystif senses resonance
-    mystif.sexuality.addAttraction('gentle', { magical: 1.0, soul: 0.9, sexual: 0.8, romantic: 0.95 }, 0);
+    // The velari senses resonance
+    velari.sexuality.addAttraction('gentle', { magical: 1.0, soul: 0.9, sexual: 0.8, romantic: 0.95 }, 0);
 
     // The human feels... something they can't explain
     human.sexuality.addAttraction('pie', { sexual: 0.7, romantic: 0.8, aesthetic: 1.0 }, 0);
 
     // Build the relationship
-    mystif.relationships = updateRelationship(mystif.relationships, 'gentle', 100, 80, 90);
+    velari.relationships = updateRelationship(velari.relationships, 'gentle', 100, 80, 90);
     human.relationships = updateRelationship(human.relationships, 'pie', 100, 80, 90);
 
-    mystif.relationships = initializeRomantic(mystif.relationships, 'gentle', 95);
+    velari.relationships = initializeRomantic(velari.relationships, 'gentle', 95);
     human.relationships = initializeRomantic(human.relationships, 'pie', 80);
 
-    // Soul bond forms (mystif paradigm)
-    mystif.relationships = formBond(mystif.relationships, 'gentle', 'soul_bound', 200, true);
+    // Soul bond forms (velari paradigm)
+    velari.relationships = formBond(velari.relationships, 'gentle', 'soul_bound', 200, true);
     human.relationships = formBond(human.relationships, 'pie', 'soul_bound', 200, true);
 
     // Union magic allows reproduction despite incompatible biology
-    mystif.morph.fertility = { fertile: true, reason: 'mature' };
+    velari.morph.fertility = { fertile: true, reason: 'mature' };
     human.morph.fertility = { fertile: true, reason: 'mature' };
 
-    // In mystif paradigm, offspring inherit traits by desire, not genetics
-    // The human becomes the "fertilizer" in the mystif's union magic
-    mystif.morph.startGestation(['gentle'], 300, 1);
+    // In velari paradigm, offspring inherit traits by desire, not genetics
+    // The human becomes the "fertilizer" in the velari's union magic
+    velari.morph.startGestation(['gentle'], 300, 1);
 
     // Verify the magic worked
-    expect(mystif.morph.gestation.pregnant).toBe(true);
+    expect(velari.morph.gestation.pregnant).toBe(true);
 
     // Child is born with inherited memories and desired traits
-    mystif.morph.gestationPeriodDays = 1; // Union magic = instant
-    mystif.morph.endGestation(true, 1, 324);
+    velari.morph.gestationPeriodDays = 1; // Union magic = instant
+    velari.morph.endGestation(true, 1, 324);
 
     // Record the offspring
-    mystif.relationships = recordOffspring(mystif.relationships, 'gentle', 324);
+    velari.relationships = recordOffspring(velari.relationships, 'gentle', 324);
     human.relationships = recordOffspring(human.relationships, 'pie', 324);
 
     // The bond remains
-    expect(mystif.relationships.relationships.get('gentle')?.romantic?.stage).toBe('bonded');
-    expect(mystif.relationships.relationships.get('gentle')?.romantic?.history.offspringCount).toBe(1);
+    expect(velari.relationships.relationships.get('gentle')?.romantic?.stage).toBe('bonded');
+    expect(velari.relationships.relationships.get('gentle')?.romantic?.history.offspringCount).toBe(1);
 
     // And they lived happily ever after... in a parameterized way
-    expect(mystif.morph.history.offspringCount).toBe(1);
+    expect(velari.morph.history.offspringCount).toBe(1);
   });
 });

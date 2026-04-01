@@ -6,7 +6,7 @@
  * its MatingParadigm, which defines the pair bonding type, courtship structure,
  * reproductive mechanism, and social dynamics around reproduction.
  *
- * Inspired by: Ursula K. Le Guin, Clive Barker's Imajica, and real biology.
+ * Inspired by real biology and canonical multiverse species lore.
  */
 
 // ============================================================================
@@ -387,7 +387,7 @@ export type BiologicalSexSystem =
   | 'quantum'              // Sex undefined until reproduction
   | 'temporal'             // Sex varies across timeline
   | 'asexual'              // No biological sex
-  | 'kemmer'               // Ambisexual, sex emerges cyclically
+  | 'flux'                 // Phaseborn: ambisexual, sex emerges cyclically
   | 'fluid';               // Continuous change
 
 /** Definition of a biological sex */
@@ -618,7 +618,7 @@ export interface HybridizationConfig {
 export interface LifeStageConfig {
   name: string;
   canReproduce: boolean;
-  sexExpression?: string; // Which sex if kemmer-like
+  sexExpression?: string; // Which sex if phaseborn-like
   duration: string;
   transitionTrigger?: string;
 }

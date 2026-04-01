@@ -176,7 +176,7 @@ Metasystems are high-level features composed of multiple systems, components, an
 **Purpose:** Species propagation, courtship, birth, parenting
 
 **Subsystems:**
-- **Mating Paradigms:** 12+ paradigms (human, kemmer, hive, quantum, etc.)
+- **Mating Paradigms:** 12+ paradigms (human, flux, hive, quantum, etc.)
 - **Courtship:** State machine, compatibility checks, displays
 - **Pregnancy:** Gestation, health effects, timing
 - **Labor & Birth:** Midwifery, delivery, complications

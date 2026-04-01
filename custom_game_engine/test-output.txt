@@ -199,9 +199,9 @@ Error in event handler for magic:spell_cast: TypeError: Cannot destructure prope
      → initializeRomantic is not a function
    ❯ packages/core/src/__tests__/AutomatedLove.integration.test.ts > AutomatedLove Integration Tests > Full Lifecycle: Human Romance > simulates meeting to marriage to children
      → initializeRomantic is not a function
-   ❯ packages/core/src/__tests__/AutomatedLove.integration.test.ts > AutomatedLove Integration Tests > Full Lifecycle: Kemmer Partners > simulates kemmer cycle and conception
+   ❯ packages/core/src/__tests__/AutomatedLove.integration.test.ts > AutomatedLove Integration Tests > Full Lifecycle: Flux Partners > simulates flux cycle and conception
      → initializeRomantic is not a function
-   ❯ packages/core/src/__tests__/AutomatedLove.integration.test.ts > AutomatedLove Integration Tests > Full Lifecycle: Mystif Union Magic > simulates union magic reproduction
+   ❯ packages/core/src/__tests__/AutomatedLove.integration.test.ts > AutomatedLove Integration Tests > Full Lifecycle: Velari Union Magic > simulates union magic reproduction
      → formBond is not a function
    ❯ packages/core/src/__tests__/AutomatedLove.integration.test.ts > AutomatedLove Integration Tests > Edge Cases > handles empty relationship romantic operations
      → updateAttraction is not a function
@@ -351,7 +351,7 @@ stderr | ComponentRegistry.register (/Users/annhoward/src/ai_village/custom_game
      → World is not a constructor
    ❯ packages/reproduction/src/__tests__/CourtshipSystem.test.ts > CourtshipSystem > Mating behaviors > should require nest location for bird-folk mating
      → World is not a constructor
-   ❯ packages/reproduction/src/__tests__/CourtshipSystem.test.ts > CourtshipSystem > Mating behaviors > should allow public mating for mystif union magic
+   ❯ packages/reproduction/src/__tests__/CourtshipSystem.test.ts > CourtshipSystem > Mating behaviors > should allow public mating for velari union magic
      → World is not a constructor
    ❯ packages/reproduction/src/__tests__/CourtshipSystem.test.ts > CourtshipSystem > Mating behaviors > should define post-mating effects
      → World is not a constructor
@@ -4212,7 +4212,7 @@ TypeError: initializeRomantic is not a function
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[44/746]⎯
 
- FAIL  packages/core/src/__tests__/AutomatedLove.integration.test.ts > AutomatedLove Integration Tests > Full Lifecycle: Kemmer Partners > simulates kemmer cycle and conception
+ FAIL  packages/core/src/__tests__/AutomatedLove.integration.test.ts > AutomatedLove Integration Tests > Full Lifecycle: Flux Partners > simulates flux cycle and conception
 TypeError: initializeRomantic is not a function
  ❯ packages/core/src/__tests__/AutomatedLove.integration.test.ts:1245:32
     1243|       genly.relationships = updateRelationship(genly.relationships, 'e…
@@ -4224,14 +4224,14 @@ TypeError: initializeRomantic is not a function
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[45/746]⎯
 
- FAIL  packages/core/src/__tests__/AutomatedLove.integration.test.ts > AutomatedLove Integration Tests > Full Lifecycle: Mystif Union Magic > simulates union magic reproduction
+ FAIL  packages/core/src/__tests__/AutomatedLove.integration.test.ts > AutomatedLove Integration Tests > Full Lifecycle: Velari Union Magic > simulates union magic reproduction
 TypeError: formBond is not a function
  ❯ packages/core/src/__tests__/AutomatedLove.integration.test.ts:1357:30
     1355| 
-    1356|       // Soul bond forms instantly (mystif paradigm)
-    1357|       mystif.relationships = formBond(mystif.relationships, 'partner',…
+    1356|       // Soul bond forms instantly (velari paradigm)
+    1357|       velari.relationships = formBond(velari.relationships, 'partner',…
        |                              ^
-    1358|       partner.relationships = formBond(partner.relationships, 'mystif'…
+    1358|       partner.relationships = formBond(partner.relationships, 'velari'…
     1359| 
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[46/746]⎯
@@ -4253,7 +4253,7 @@ TypeError: initializeRomantic is not a function
  ❯ packages/core/src/__tests__/AutomatedLove.integration.test.ts:1529:28
     1527|     human.relationships = updateRelationship(human.relationships, 'pie…
     1528| 
-    1529|     mystif.relationships = initializeRomantic(mystif.relationships, 'g…
+    1529|     velari.relationships = initializeRomantic(velari.relationships, 'g…
        |                            ^
     1530|     human.relationships = initializeRomantic(human.relationships, 'pie…
     1531| 
@@ -8331,7 +8331,7 @@ TypeError: World is not a constructor
  FAIL  packages/reproduction/src/__tests__/CourtshipSystem.test.ts > CourtshipSystem > Cooldowns and rejections > should record past courtships
  FAIL  packages/reproduction/src/__tests__/CourtshipSystem.test.ts > CourtshipSystem > Mating behaviors > should require private location for human mating
  FAIL  packages/reproduction/src/__tests__/CourtshipSystem.test.ts > CourtshipSystem > Mating behaviors > should require nest location for bird-folk mating
- FAIL  packages/reproduction/src/__tests__/CourtshipSystem.test.ts > CourtshipSystem > Mating behaviors > should allow public mating for mystif union magic
+ FAIL  packages/reproduction/src/__tests__/CourtshipSystem.test.ts > CourtshipSystem > Mating behaviors > should allow public mating for velari union magic
  FAIL  packages/reproduction/src/__tests__/CourtshipSystem.test.ts > CourtshipSystem > Mating behaviors > should define post-mating effects
  FAIL  packages/reproduction/src/__tests__/CourtshipSystem.test.ts > CourtshipSystem > Error handling > should throw when romantic inclination is out of range
  FAIL  packages/reproduction/src/__tests__/CourtshipSystem.test.ts > CourtshipSystem > Error handling > should throw when paradigm is missing

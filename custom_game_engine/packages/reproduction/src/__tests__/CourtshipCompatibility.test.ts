@@ -95,11 +95,11 @@ describe('Courtship Compatibility Calculations', () => {
 
     it('should return partial score if potential but not active attraction', () => {
       const sex1 = createSexualityComponent({
-        attractionCondition: { type: 'kemmer' }, // Not in cycle
+        attractionCondition: { type: 'flux' }, // Not in cycle
         relationshipStyle: 'polyamorous',
       });
       const sex2 = createSexualityComponent({
-        attractionCondition: { type: 'kemmer' },
+        attractionCondition: { type: 'flux' },
         relationshipStyle: 'monogamous',
       });
 

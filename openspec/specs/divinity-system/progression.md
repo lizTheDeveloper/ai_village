@@ -10,7 +10,7 @@
 
 ## Overview
 
-The Divine Progression System implements the cosmic rebellion narrative inspired by Clive Barker's *Imajica*. In deity-restricted universes, the first god to emerge becomes the **Supreme Creator** - a tyrannical overlord who forbids other gods and mortals from wielding magic.
+The Divine Progression System implements the cosmic rebellion narrative. In deity-restricted universes, the first god to emerge becomes the **Supreme Creator** - a tyrannical overlord who forbids other gods and mortals from wielding magic.
 
 This creates the central tension: magic constantly threatens to burst out, but the Creator crushes it whenever discovered. Eventually, rebels discover the Creator's weakness and overthrow them.
 
@@ -777,6 +777,6 @@ baseChances = {
 
 ## References
 
-- **Inspiration**: Clive Barker's *Imajica* (tyrannical creator god Hapexamendios)
+- **Inspiration**: Chorus lore — the tyrannical Supreme Creator archetype
 - **Related Systems**: DeityEmergenceSystem, MagicSystem, SpellRegistry
 - **Components**: SupremeCreatorComponent, DeityComponent, MagicComponent

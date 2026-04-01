@@ -17,7 +17,7 @@ The **Reproduction Package** (`@ai-village/reproduction`) implements a comprehen
 
 **Key files:**
 - `src/MatingParadigm.ts` - Species-level mating rule definitions
-- `src/MatingParadigmRegistry.ts` - Pre-configured paradigms (human, kemmer, hive, etc.)
+- `src/MatingParadigmRegistry.ts` - Pre-configured paradigms (human, phaseborn, hive, etc.)
 - `src/courtship/CourtshipComponent.ts` - Courtship state tracking
 - `src/courtship/compatibility.ts` - Compatibility calculations
 - `src/midwifery/MidwiferySystem.ts` - Pregnancy and birth (priority 45)
@@ -113,13 +113,13 @@ interface MatingParadigm {
 ```typescript
 import {
   HUMAN_PARADIGM,        // Serial monogamy, long courtship, pair parenting
-  KEMMER_PARADIGM,       // Sequential hermaphroditism (Ursula K. Le Guin)
+  FLUX_PARADIGM,         // Phaseborn ambisexual cycle, flux-based reproduction
   HIVE_PARADIGM,         // Queen-exclusive reproduction
   PARASITIC_HIVEMIND_PARADIGM, // Host colonization and breeding
   SYMBIOTIC_PARADIGM,    // Symbiotic partner bonding
   POLYAMOROUS_PARADIGM,  // Multi-partner bonding
   THREE_SEX_PARADIGM,    // Three sexes required for reproduction
-  MYSTIF_PARADIGM,       // Shapeshifting sexual morphs
+  VELARI_PARADIGM,       // Shapeshifting sexual morphs
   ASEXUAL_PARADIGM,      // No mating required (budding, fission)
 } from '@ai-village/reproduction';
 ```
@@ -150,7 +150,7 @@ interface CourtshipComponent {
 
 **Courtship tactics:**
 - Universal: gift-giving, compliments, shared activities, humor
-- Species-specific: dwarven crafting displays, bird-folk songs, mystif shapeshifting
+- Species-specific: dwarven crafting displays, bird-folk songs, velari shapeshifting
 - Negative: possessiveness, jealousy, aggression (reduce compatibility)
 
 **Compatibility calculation:**
@@ -1067,7 +1067,7 @@ npm test -- CourtshipSystem.test.ts
 - **COMPONENTS_REFERENCE.md** - All component types
 - **METASYSTEMS_GUIDE.md** - Reproduction metasystem deep dive
 - **PERFORMANCE.md** - Performance optimization guide
-- **MatingParadigm.ts** - Framework for species mating rules (Ursula K. Le Guin inspired)
+- **MatingParadigm.ts** - Framework for species mating rules (diverse paradigm system)
 
 ---
 

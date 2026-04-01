@@ -8,7 +8,7 @@
 
 > *Dedicated to:*
 > - **Tarn Adams** and *Dwarf Fortress* - For teaching us that emergence comes from simple rules applied consistently
-> - **Ursula K. Le Guin** - For showing that fantasy botany can be both magical and grounded in real ecology
+> - For showing that fantasy botany can be both magical and grounded in real ecology
 > - **Terry Pratchett** - For plants with personality and ecosystems with opinions
 > - **Every botanist who has stared at a chemotype variation table and wondered "why does soil matter so much?"**
 

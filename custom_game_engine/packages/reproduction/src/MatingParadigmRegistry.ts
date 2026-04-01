@@ -3,7 +3,7 @@
  *
  * Each paradigm fully parameterizes how reproduction, courtship, bonding,
  * and sexuality work for a set of species. The same engine can simulate
- * humans, Gethenians, hive insects, mystifs, and quantum beings.
+ * humans, Phaseborn, hive insects, Velari, and quantum beings.
  *
  * Paradigm data is now loaded from JSON for easier editing and maintenance.
  */
@@ -54,10 +54,10 @@ export const VAIL_TEMPERAMENT: TemperamentDefinition = {
 // ============================================================================
 
 export const HUMAN_PARADIGM: MatingParadigm = paradigmData.human_standard as unknown as MatingParadigm;
-export const KEMMER_PARADIGM: MatingParadigm = paradigmData.kemmer as unknown as MatingParadigm;
+export const FLUX_PARADIGM: MatingParadigm = paradigmData.flux as unknown as MatingParadigm;
 export const HIVE_PARADIGM: MatingParadigm = paradigmData.hive as unknown as MatingParadigm;
 export const OPPORTUNISTIC_PARADIGM: MatingParadigm = paradigmData.opportunistic as unknown as MatingParadigm;
-export const MYSTIF_PARADIGM: MatingParadigm = paradigmData.mystif as unknown as MatingParadigm;
+export const VELARI_PARADIGM: MatingParadigm = paradigmData.velari as unknown as MatingParadigm;
 export const QUANTUM_PARADIGM: MatingParadigm = paradigmData.quantum as unknown as MatingParadigm;
 export const TEMPORAL_PARADIGM: MatingParadigm = paradigmData.temporal as unknown as MatingParadigm;
 export const ASEXUAL_PARADIGM: MatingParadigm = paradigmData.asexual as unknown as MatingParadigm;
@@ -75,7 +75,7 @@ export const UNRAVELING_PARADIGM: MatingParadigm = paradigmData.unraveling as un
 /** All registered mating paradigms */
 export const MATING_PARADIGMS: Record<string, MatingParadigm> = {
   human_standard: HUMAN_PARADIGM,
-  kemmer: KEMMER_PARADIGM,
+  flux: FLUX_PARADIGM,
   hive: HIVE_PARADIGM,
   hivemind: HIVEMIND_PARADIGM,
   parasitic_hivemind: PARASITIC_HIVEMIND_PARADIGM,
@@ -83,7 +83,7 @@ export const MATING_PARADIGMS: Record<string, MatingParadigm> = {
   polyamorous: POLYAMOROUS_PARADIGM,
   three_sex: THREE_SEX_PARADIGM,
   opportunistic: OPPORTUNISTIC_PARADIGM,
-  mystif: MYSTIF_PARADIGM,
+  velari: VELARI_PARADIGM,
   quantum: QUANTUM_PARADIGM,
   temporal: TEMPORAL_PARADIGM,
   asexual: ASEXUAL_PARADIGM,

@@ -3,7 +3,7 @@
  *
  * Each paradigm fully parameterizes how reproduction, courtship, bonding,
  * and sexuality work for a set of species. The same engine can simulate
- * humans, Gethenians, hive insects, mystifs, and quantum beings.
+ * humans, Phaseborn, hive insects, union-mages, and quantum beings.
  */
 
 import type { MatingParadigm, TemperamentDefinition } from './MatingParadigm.js';
@@ -176,26 +176,26 @@ export const HUMAN_PARADIGM: MatingParadigm = {
 };
 
 // ============================================================================
-// Gethenian/Kemmer Paradigm (Le Guin)
+// Phaseborn/Flux Paradigm
 // ============================================================================
 
-export const KEMMER_PARADIGM: MatingParadigm = {
-  id: 'kemmer',
-  name: 'Kemmer Cycle',
-  description: 'Ambisexual beings who are sexually latent except during monthly kemmer, when they manifest as either sex based on partner interaction.',
-  speciesIds: ['gethenian', 'kemmer_species'],
-  lore: 'In somer, they are neither. In kemmer, they become what their partner needs them to be. Any individual can mother or father. None are locked to a role.',
+export const FLUX_PARADIGM: MatingParadigm = {
+  id: 'flux',
+  name: 'Flux Cycle',
+  description: 'Ambisexual beings who are sexually latent except during monthly flux, when they manifest as either sex based on partner interaction.',
+  speciesIds: ['phaseborn', 'phaseborn'],
+  lore: 'In somer, they are neither. In flux, they become what their partner needs them to be. Any individual can mother or father. None are locked to a role.',
 
   biologicalSex: {
-    system: 'kemmer',
+    system: 'flux',
     sexes: [
       { id: 'somer', name: 'Somer', reproductiveRole: 'neither', prevalence: 0.9, characteristics: ['sexually latent', 'androgynous'] },
-      { id: 'kemmer_spawner', name: 'Kemmer (Female)', reproductiveRole: 'spawner', prevalence: 0.05, characteristics: ['in kemmer', 'gestator'] },
-      { id: 'kemmer_fertilizer', name: 'Kemmer (Male)', reproductiveRole: 'fertilizer', prevalence: 0.05, characteristics: ['in kemmer', 'sirer'] },
+      { id: 'flux_gestator', name: 'Flux (Gestator)', reproductiveRole: 'spawner', prevalence: 0.05, characteristics: ['in flux', 'gestator'] },
+      { id: 'flux_catalyst', name: 'Flux (Catalyst)', reproductiveRole: 'fertilizer', prevalence: 0.05, characteristics: ['in flux', 'sirer'] },
     ],
     determination: 'social',
     canChange: true,
-    changeConditions: ['entering_kemmer', 'partner_presence', 'exiting_kemmer'],
+    changeConditions: ['entering_flux', 'partner_presence', 'exiting_flux'],
   },
 
   gender: {
@@ -216,7 +216,7 @@ export const KEMMER_PARADIGM: MatingParadigm = {
       { effectType: 'fertility_sync', intensity: 0.9, requiresProximity: true },
       { effectType: 'mood_sync', intensity: 0.5, requiresProximity: false },
     ],
-    description: 'Kemmering partners often sync cycles and preferentially manifest complementary sexes.',
+    description: 'Flux partners often sync cycles and preferentially manifest complementary sexes.',
   },
 
   courtship: {
@@ -227,7 +227,7 @@ export const KEMMER_PARADIGM: MatingParadigm = {
     rejectionConsequence: 'mild_hurt',
     competitive: false,
     multipleCourtships: false,
-    description: 'Courtship happens in somer. Kemmer is for mating.',
+    description: 'Courtship happens in somer. Flux is for mating.',
   },
 
   reproduction: {
@@ -242,7 +242,7 @@ export const KEMMER_PARADIGM: MatingParadigm = {
     },
     offspringCount: { min: 1, max: 2, typical: 1 },
     geneticVariation: 'high',
-    requirements: ['both_partners_in_kemmer', 'complementary_sex_manifestation'],
+    requirements: ['both_partners_in_flux', 'complementary_sex_manifestation'],
   },
 
   parentalCare: {
@@ -264,7 +264,7 @@ export const KEMMER_PARADIGM: MatingParadigm = {
 
   lifeStages: [
     { name: 'somer', canReproduce: false, duration: '~24 days' },
-    { name: 'kemmer', canReproduce: true, sexExpression: 'partner_determined', duration: '~3-5 days', transitionTrigger: 'hormonal_cycle' },
+    { name: 'flux', canReproduce: true, sexExpression: 'partner_determined', duration: '~3-5 days', transitionTrigger: 'hormonal_cycle' },
   ],
 
   attraction: {
@@ -515,15 +515,15 @@ export const OPPORTUNISTIC_PARADIGM: MatingParadigm = {
 };
 
 // ============================================================================
-// Mystif/Union Magic Paradigm (Imajica)
+// Union Magic Paradigm
 // ============================================================================
 
-export const MYSTIF_PARADIGM: MatingParadigm = {
-  id: 'mystif',
+export const VELARI_PARADIGM: MatingParadigm = {
+  id: 'velari',
   name: 'Union Magic',
-  description: 'Shapeshifting beings who become their partner\'s desire. Reproduction is magical, not genetic.',
-  speciesIds: ['mystif', 'union_mage', 'pleasure_spirit'],
-  lore: 'They have no true form. They become what you desire. Their children are born of shared ecstasy, not chromosomes.',
+  description: 'Shapeshifting beings who undergo resonant shift to attune to their partner. Reproduction is magical, not genetic.',
+  speciesIds: ['velari', 'union_mage', 'pleasure_spirit'],
+  lore: 'They have no fixed form. They undergo resonant shift to become what their partner needs. Their children are born of shared magic, not chromosomes.',
 
   biologicalSex: {
     system: 'fluid',
@@ -1609,13 +1609,11 @@ export const SYMBIOTIC_PARADIGM: MatingParadigm = {
 };
 
 // ============================================================================
-// Unraveling Paradigm (Benjamin Rosenbaum - Multi-Body Collective)
+// Collective Multi-Body Paradigm
 // ============================================================================
 
 /**
- * The Unraveling Mating Paradigm
- *
- * Based on Benjamin Rosenbaum's novel "The Unraveling."
+ * Collective Multi-Body Mating Paradigm
  *
  * Key features:
  * - ~30 parents per child (large collective)
@@ -1951,7 +1949,7 @@ export const UNRAVELING_PARADIGM: MatingParadigm = {
 /** All registered mating paradigms */
 export const MATING_PARADIGMS: Record<string, MatingParadigm> = {
   human_standard: HUMAN_PARADIGM,
-  kemmer: KEMMER_PARADIGM,
+  flux: FLUX_PARADIGM,
   hive: HIVE_PARADIGM,
   hivemind: HIVEMIND_PARADIGM,
   parasitic_hivemind: PARASITIC_HIVEMIND_PARADIGM,
@@ -1959,7 +1957,7 @@ export const MATING_PARADIGMS: Record<string, MatingParadigm> = {
   polyamorous: POLYAMOROUS_PARADIGM,
   three_sex: THREE_SEX_PARADIGM,
   opportunistic: OPPORTUNISTIC_PARADIGM,
-  mystif: MYSTIF_PARADIGM,
+  velari: VELARI_PARADIGM,
   quantum: QUANTUM_PARADIGM,
   temporal: TEMPORAL_PARADIGM,
   asexual: ASEXUAL_PARADIGM,

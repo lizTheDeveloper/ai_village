@@ -20,11 +20,11 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "chart.js": "^4.4.1"
+    "chart.js": "4.4.1"
   },
   "devDependencies": {
-    "typescript": "^5.7.2",
-    "vite": "^6.0.7",
-    "vitest": "^4.0.16"
+    "typescript": "5.7.2",
+    "vite": "6.0.7",
+    "vitest": "4.0.16"
   }
 }

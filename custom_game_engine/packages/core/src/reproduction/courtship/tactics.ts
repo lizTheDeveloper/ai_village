@@ -16,7 +16,7 @@ function loadTacticsFromJSON(): {
   universal: CourtshipTactic[];
   dwarf: CourtshipTactic[];
   bird_folk: CourtshipTactic[];
-  mystif: CourtshipTactic[];
+  velari: CourtshipTactic[];
   negative: CourtshipTactic[];
 } {
   // Validate that the JSON has the expected structure
@@ -29,8 +29,8 @@ function loadTacticsFromJSON(): {
   if (!tacticsData.bird_folk || !Array.isArray(tacticsData.bird_folk)) {
     throw new Error('Invalid tactics data: missing or invalid bird_folk tactics');
   }
-  if (!tacticsData.mystif || !Array.isArray(tacticsData.mystif)) {
-    throw new Error('Invalid tactics data: missing or invalid mystif tactics');
+  if (!tacticsData.velari || !Array.isArray(tacticsData.velari)) {
+    throw new Error('Invalid tactics data: missing or invalid velari tactics');
   }
   if (!tacticsData.negative || !Array.isArray(tacticsData.negative)) {
     throw new Error('Invalid tactics data: missing or invalid negative tactics');
@@ -40,7 +40,7 @@ function loadTacticsFromJSON(): {
     universal: tacticsData.universal as unknown as CourtshipTactic[],
     dwarf: tacticsData.dwarf as unknown as CourtshipTactic[],
     bird_folk: tacticsData.bird_folk as unknown as CourtshipTactic[],
-    mystif: tacticsData.mystif as unknown as CourtshipTactic[],
+    velari: tacticsData.velari as unknown as CourtshipTactic[],
     negative: tacticsData.negative as unknown as CourtshipTactic[],
   };
 }
@@ -54,7 +54,7 @@ const loadedTactics = loadTacticsFromJSON();
 export const UNIVERSAL_TACTICS: CourtshipTactic[] = loadedTactics.universal;
 export const DWARF_TACTICS: CourtshipTactic[] = loadedTactics.dwarf;
 export const BIRD_FOLK_TACTICS: CourtshipTactic[] = loadedTactics.bird_folk;
-export const MYSTIF_TACTICS: CourtshipTactic[] = loadedTactics.mystif;
+export const VELARI_TACTICS: CourtshipTactic[] = loadedTactics.velari;
 export const NEGATIVE_TACTICS: CourtshipTactic[] = loadedTactics.negative;
 
 // ============================================================================
@@ -65,7 +65,7 @@ export const ALL_TACTICS: CourtshipTactic[] = [
   ...UNIVERSAL_TACTICS,
   ...DWARF_TACTICS,
   ...BIRD_FOLK_TACTICS,
-  ...MYSTIF_TACTICS,
+  ...VELARI_TACTICS,
   ...NEGATIVE_TACTICS,
 ];
 
@@ -92,8 +92,8 @@ export function getTacticsForSpecies(species: string): CourtshipTactic[] {
     case 'avian':
       tactics.push(...BIRD_FOLK_TACTICS);
       break;
-    case 'mystif':
-      tactics.push(...MYSTIF_TACTICS);
+    case 'velari':
+      tactics.push(...VELARI_TACTICS);
       break;
   }
 

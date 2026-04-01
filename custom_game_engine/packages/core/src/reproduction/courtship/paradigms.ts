@@ -18,7 +18,7 @@ function loadParadigmsFromJSON(): Record<string, CourtshipParadigm> {
     throw new Error('Invalid paradigms data: expected an object');
   }
 
-  const requiredSpecies = ['human', 'dwarf', 'bird_folk', 'mystif', 'elf', 'default'];
+  const requiredSpecies = ['human', 'dwarf', 'bird_folk', 'velari', 'elf', 'default'];
   for (const species of requiredSpecies) {
     if (!(species in paradigmsData)) {
       throw new Error(`Invalid paradigms data: missing paradigm for ${species}`);
@@ -37,7 +37,7 @@ const loadedParadigms = loadParadigmsFromJSON();
 export const HUMAN_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.human!;
 export const DWARF_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.dwarf!;
 export const BIRD_FOLK_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.bird_folk!;
-export const MYSTIF_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.mystif!;
+export const VELARI_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.velari!;
 export const ELF_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.elf!;
 export const DEFAULT_COURTSHIP_PARADIGM: CourtshipParadigm = loadedParadigms.default!;
 
@@ -50,7 +50,7 @@ export const PARADIGMS_BY_SPECIES = new Map<string, CourtshipParadigm>([
   ['dwarf', DWARF_COURTSHIP_PARADIGM],
   ['bird_folk', BIRD_FOLK_COURTSHIP_PARADIGM],
   ['avian', BIRD_FOLK_COURTSHIP_PARADIGM],
-  ['mystif', MYSTIF_COURTSHIP_PARADIGM],
+  ['velari', VELARI_COURTSHIP_PARADIGM],
   ['elf', ELF_COURTSHIP_PARADIGM],
   ['default', DEFAULT_COURTSHIP_PARADIGM],
 ]);

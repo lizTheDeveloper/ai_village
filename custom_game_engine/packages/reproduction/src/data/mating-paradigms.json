@@ -182,14 +182,14 @@
     },
     "paradigmCompatibility": "compatible"
   },
-  "kemmer": {
-    "id": "kemmer",
-    "name": "Kemmer Cycle",
-    "description": "Ambisexual beings who are sexually latent except during monthly kemmer, when they manifest as either sex based on partner interaction.",
-    "speciesIds": ["gethenian", "kemmer_species"],
-    "lore": "In somer, they are neither. In kemmer, they become what their partner needs them to be. Any individual can mother or father. None are locked to a role.",
+  "flux": {
+    "id": "flux",
+    "name": "Flux Cycle",
+    "description": "Ambisexual beings who are sexually latent except during monthly flux, when they manifest as either sex based on partner interaction.",
+    "speciesIds": ["phaseborn", "phaseborn"],
+    "lore": "In somer, they are neither. In flux, they become what their partner needs them to be. Any individual can mother or father. None are locked to a role.",
     "biologicalSex": {
-      "system": "kemmer",
+      "system": "flux",
       "sexes": [
         {
           "id": "somer",
@@ -199,23 +199,23 @@
           "characteristics": ["sexually latent", "androgynous"]
         },
         {
-          "id": "kemmer_spawner",
-          "name": "Kemmer (Female)",
+          "id": "flux_gestator",
+          "name": "Flux (Gestator)",
           "reproductiveRole": "spawner",
           "prevalence": 0.05,
-          "characteristics": ["in kemmer", "gestator"]
+          "characteristics": ["in flux", "gestator"]
         },
         {
-          "id": "kemmer_fertilizer",
-          "name": "Kemmer (Male)",
+          "id": "flux_catalyst",
+          "name": "Flux (Catalyst)",
           "reproductiveRole": "fertilizer",
           "prevalence": 0.05,
-          "characteristics": ["in kemmer", "sirer"]
+          "characteristics": ["in flux", "sirer"]
         }
       ],
       "determination": "social",
       "canChange": true,
-      "changeConditions": ["entering_kemmer", "partner_presence", "exiting_kemmer"]
+      "changeConditions": ["entering_flux", "partner_presence", "exiting_flux"]
     },
     "gender": {
       "system": "genderless",
@@ -246,7 +246,7 @@
           "requiresProximity": false
         }
       ],
-      "description": "Kemmering partners often sync cycles and preferentially manifest complementary sexes."
+      "description": "Flux partners often sync cycles and preferentially manifest complementary sexes."
     },
     "courtship": {
       "type": "gradual_proximity",
@@ -256,7 +256,7 @@
       "rejectionConsequence": "mild_hurt",
       "competitive": false,
       "multipleCourtships": false,
-      "description": "Courtship happens in somer. Kemmer is for mating."
+      "description": "Courtship happens in stillpoint. Flux is for mating."
     },
     "reproduction": {
       "mechanism": "copulation",
@@ -274,7 +274,7 @@
         "typical": 1
       },
       "geneticVariation": "high",
-      "requirements": ["both_partners_in_kemmer", "complementary_sex_manifestation"]
+      "requirements": ["both_partners_in_flux", "complementary_sex_manifestation"]
     },
     "parentalCare": {
       "type": "full_nurturing",
@@ -298,7 +298,7 @@
         "duration": "~24 days"
       },
       {
-        "name": "kemmer",
+        "name": "flux",
         "canReproduce": true,
         "sexExpression": "partner_determined",
         "duration": "~3-5 days",
@@ -607,11 +607,11 @@
     },
     "paradigmCompatibility": "compatible"
   },
-  "mystif": {
-    "id": "mystif",
+  "velari": {
+    "id": "velari",
     "name": "Union Magic",
-    "description": "Shapeshifting beings who become their partner's desire. Reproduction is magical, not genetic.",
-    "speciesIds": ["mystif", "union_mage", "pleasure_spirit"],
+    "description": "Shapeshifting beings who undergo resonant shift to attune to their partner. Reproduction is magical, not genetic.",
+    "speciesIds": ["velari", "union_mage", "pleasure_spirit"],
     "lore": "They have no true form. They become what you desire. Their children are born of shared ecstasy, not chromosomes.",
     "biologicalSex": {
       "system": "fluid",

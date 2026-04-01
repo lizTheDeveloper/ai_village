@@ -3,7 +3,7 @@
 > **Status:** Draft
 > **Last Updated:** 2026-01-02
 
-# Imajica-Inspired Dimensional Ascension System
+# Dimensional Ascension System
 ## Complete Design Document
 
 > *"You started as a player. You end as the architect of the game itself."*
@@ -11,12 +11,12 @@
 **Dedicated to:**
 - **Tarn Adams** and *Dwarf Fortress* - For showing what emergent complexity can create
 - **James P. Carse** and *Finite and Infinite Games* - For the philosophy that guides this design
-- **Ursula K. Le Guin** - For unapologetic fantasy, and teaching us about power, balance, transformation, and true names
+- For unapologetic fantasy, and teaching us about power, balance, transformation, and true names
 - **Douglas Adams** - For absurdist escalation and cosmic humor
 - **Neil Gaiman** - For making gods into characters, and mythology we can touch
 - **Terry Pratchett** - For wisdom hidden in humor, and gods who need believers
 - **Walter Moers** - For whimsical absurdity and infinite creativity
-- **Clive Barker** and *Imajica* - For Union magic, the Five Dominions, and rebels who overthrow gods
+- For Union magic, dimensional dominions, and rebels who overthrow gods
 - **Gary Gygax and Dave Arneson** - For D&D, character progression, and the dream of becoming the Dungeon Master
 
 ---
@@ -36,7 +36,7 @@
 
 ## Overview
 
-This design integrates Clive Barker's *Imajica* concepts with a meta-progression system where:
+This design integrates dimensional ascension concepts with a meta-progression system where:
 - **Player powers become cosmic abilities** (save/load = time travel)
 - **Gods are higher-dimensional beings** (spatial AND temporal dimensions)
 - **Progression = dimensional ascension** (3D → 4D → 5D → ... → ∞)
@@ -341,7 +341,7 @@ The ultimate unlock isn't "winning" - it's **transcending the concept of winning
 
 ## Union Magic
 
-*Transformative magic through intimate union - Mystif-inspired*
+*Transformative magic through intimate union - Velari-inspired*
 
 ### Concept
 Sexual/romantic union as a source of transformative magical power. Bypasses biological reproduction through pure magical creation.
@@ -351,7 +351,7 @@ Sexual/romantic union as a source of transformative magical power. Bypasses biol
 **Union Spells:**
 - `merge_forms` - Temporarily merge two beings into one
 - `create_offspring` - Birth magical offspring (not genetic)
-- `become_desire` - Mystif-style shapeshifting to partner's ideal
+- `resonant_shift` - Velari-style shapeshifting to partner's ideal
 - `swap_traits` - Exchange physical/mental attributes
 - `soul_bond` - Permanent connection between beings
 
@@ -385,7 +385,7 @@ pantheon_god       → Standard gods
 ascended_mortal    → Mortals who achieved divinity
 rebel_god          → Gods opposing Creator
 bound_god          → Imprisoned by Creator
-transformer        → Mystif-style shapeshifters
+transformer        → Velari-style shapeshifters
 divine_servant     → Angels, messengers
 ```
 
@@ -1193,7 +1193,7 @@ These systems build on top of this spec:
 - [ ] Add rebellion detection mechanics (surveillance rolls)
 - [ ] Create rebellion progression stages (discovery, conspiracy, escalation, endgame)
 - [ ] Define `UnionMagicComponent` with type `'union_magic'`
-- [ ] Add union spell definitions (merge_forms, create_offspring, become_desire, etc.)
+- [ ] Add union spell definitions (merge_forms, create_offspring, resonant_shift, etc.)
 - [ ] Integrate union magic with existing MagicSystem
 - [ ] Add intimacy and identity cost types to magic system
 - [ ] Define `AscensionProgressComponent` with type `'ascension_progress'`

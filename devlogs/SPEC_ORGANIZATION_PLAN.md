@@ -305,7 +305,7 @@ mkdir -p openspec/specs/worldgen-system
 | CHUNK_MANAGER_INTEGRATION.md | persistence-system/chunk-manager.md | Move & Convert |
 | GENERATIVE_CITIES_SPEC.md | worldgen-system/generative-cities.md | Move & Convert |
 | PASSAGE_SYSTEM.md | worldgen-system/passage-system.md | Move & Convert |
-| IMAJICA_DIMENSIONAL_DESIGN.md | worldgen-system/imajica-dimensions.md | Move & Convert |
+| IMAJICA_DIMENSIONAL_DESIGN.md | worldgen-system/dimensional-ascension.md | Move & Convert |
 | MAGIC_SKILL_TREE_SPEC.md | magic-system/skill-tree.md | Move & Convert |
 | EQUIPMENT_COMBAT_SPEC.md | equipment-system/ | Merge with existing |
 | DIVINE_PROGRESSION_SPEC.md | divinity-system/ | Merge with existing |

@@ -1,9 +1,9 @@
-> Ok, are you familiar with Clive Barker's "The Imagica"? 
+> Ok, are you familiar with a fantasy novel about dimensional worlds? 
 
 ∴ Thinking…
 
-  The user is asking me if I'm familiar with Clive Barker's "The Imagica". I 
-  believe they're referring to "Imajica" (not "The Imagica") - it's one of Clive 
+  The user is asking me if I'm familiar with a fantasy novel about dimensional worlds. I 
+  believe they're referring to "the Chorus multiverse" (not "The Imagica") - it's one of Clive 
   Barker's most ambitious fantasy novels.
 
   This seems like a conversational question, not directly related to the game 
@@ -14,13 +14,13 @@
   Let me respond without being overly verbose or enthusiastic - just clear and 
   factual.
 
-⏺ Yes, I'm familiar with Clive Barker's Imajica (published 1991). It's an epic
+⏺ Yes, I'm familiar with a multi-realm fantasy (the Chorus lore framework). It's an epic
    fantasy novel about:
 
   - Five Dominions - parallel worlds connected by magic, with Earth (the Fifth
    Dominion) cut off from the others
   - Reconciliation - a powerful ritual to reconnect all five worlds
-  - Mystif - a shapeshifting being who serves as both lover and guide
+  - Velari - a shapeshifting being who serves as both lover and guide
   - Hapexamendios - the tyrannical god who rules the Dominions
   - Themes of transformation, sexuality, identity, and cosmic rebellion
   against divine authority
@@ -43,16 +43,16 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
 
 ∴ Thinking…
 
-  The user wants to incorporate concepts from Imajica into their game:
+  The user wants to incorporate concepts from the Chorus multiverse into their game:
 
-  1. Sex magic - Imajica has sophisticated transformative magic tied to sexuality 
+  1. Sex magic - the Chorus multiverse has sophisticated transformative magic tied to sexuality 
   and physical union
   2. Cosmic rebellion narrative - The rebellion against Hapexamendios (the 
   tyrannical god)
   3. Deity hierarchy - They already have Creator gods and magical beings, want to 
   expand on this
   4. Multi-realm mechanics - They already have realms, want to make them more like
-   Imajica's Five Dominions
+   our Five Dominions
 
   This is a design/architecture task. I should help them think through how to 
   integrate these concepts into their existing systems. Let me explore what they 
@@ -65,7 +65,7 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
 
   I should:
   1. First understand what they currently have
-  2. Propose how to integrate Imajica concepts
+  2. Propose how to integrate union magic concepts
   3. Think about mechanics for sex magic (reproductive magic? transformative 
   magic?)
   4. Design cosmic rebellion narrative hooks
@@ -73,7 +73,7 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
 
   Let me start by exploring their current systems to see what's already there.
 
-⏺ Excellent idea - Imajica's mechanics fit really well with what you've
+⏺ Excellent idea - the Chorus multiverse's mechanics fit really well with what you've
   already built. Let me explore your current systems and then propose how to
   integrate these concepts.
 
@@ -185,14 +185,14 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
   3. Magic Paradigms: Complex system with sources, costs, channels, laws, risks
   4. Reproduction: Genetics, hereditary traits, mutations, hybrids
 
-  Now let me design how to integrate Imajica concepts:
+  Now let me design how to integrate union magic concepts:
 
-  Key Imajica Elements to Integrate:
+  Key the Chorus multiverse Elements to Integrate:
 
   1. Sex Magic (Sexual/Transformative Magic)
 
-  - In Imajica, sex is a powerful transformative force
-  - The Mystif shapeshifts to become the perfect lover
+  - In the Chorus multiverse, sex is a powerful transformative force
+  - The Velari shapeshifts to become the perfect lover
   - Union creates profound magical energy
   - Could integrate with:
     - ReproductionSystem (already has genetics/transformation)
@@ -222,7 +222,7 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
 
   - Hapexamendios (Supreme Creator - tyrannical)
   - Gods of individual dominions
-  - Mystif and other transformative beings
+  - Velari and other transformative beings
 
   - Angels and servants form a complex power structure
   - Integrate hierarchical mechanics to represent divine relationships
@@ -240,10 +240,10 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
 ⏺ Perfect! I've explored your current systems. Here's my integrated design
   proposal:
 
-  Imajica Integration Design
+  Union Magic Integration Design
 
   Your existing systems provide an excellent foundation. Here's how to weave
-  in Imajica's concepts:
+  in these concepts:
 
   ---
   1. SEX MAGIC PARADIGM (Union/Transformation Magic)
@@ -305,7 +305,7 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
   New Spell Effects:
 
   // Transformative Union Spells
-  - 'shapeshift_to_desire' // Mystif-style: become partner's ideal
+  - 'shapeshift_to_desire' // Velari-style: become partner's ideal
   - 'merge_forms'          // Temporarily merge two bodies
   - 'swap_traits'          // Exchange physical/mental attributes
   - 'birth_new_form'       // Create hybrid offspring beyond biology
@@ -315,7 +315,7 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
   - Union magic power scales with trust and intimacy between casters
   - Can create transformations the ReproductionSystem genetics can't explain
   - Risk: Identity bleed - partners begin thinking/feeling as one entity
-  - Mystif variant: One partner can shapeshift based on other's desire
+  - Velari variant: One partner can shapeshift based on other's desire
 
   ---
   2. COSMIC REBELLION NARRATIVE
@@ -329,7 +329,7 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
     | 'dominion_ruler'     // Gods who rule individual realms
     | 'pantheon_god'       // Your existing deities
     | 'rebel_god'          // Gods actively opposing the Creator
-    | 'transformer'        // Mystif-style shapeshifters/tricksters
+    | 'transformer'        // Velari-style shapeshifters/tricksters
     | 'divine_servant'     // Angels, messengers (existing)
     | 'ascended_mortal';   // Beings who achieved divinity
 
@@ -399,7 +399,7 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
 
   export const FirstDominion: RealmProperties = {
     id: 'first_dominion',
-    name: 'Yzordderrex',  // Imajica's First Dominion
+    name: 'Yzordderrex',  // First Dominion
     category: 'material',
     parentUniverseId: 'imajica',
     size: 'continental',
@@ -409,7 +409,7 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
     environment: 'exotic',
     stability: 0.95,
     ruler: 'autarch',  // Tyrannical ruler ID
-    magicParadigm: 'pneuma',  // Imajica's magic system
+    magicParadigm: 'pneuma',  // Chorus pneuma magic
     accessMethods: ['portal', 'reconciliation'],
     accessRestrictions: [
       {
@@ -488,7 +488,7 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
   // custom_game_engine/packages/core/src/divinity/TransformerDeity.ts
 
   /**
-   * Mystif-style transformer deity
+   * Velari-style transformer deity
    * Shapeshifts to become what others desire/need
    */
   export interface TransformerDeity {
@@ -562,7 +562,7 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
   - Explore individual dominions → unique cultures/magic
   - Discover severance → learn Earth is cut off
   - Gather ritual components → prepare reconciliation
-  - Perform great ritual → reconnect the Imajica
+  - Perform great ritual → reconnect the multiverse
   - Deal with consequences → realms colliding, chaos/opportunity
 
   ---
@@ -683,7 +683,7 @@ have.
   as infrastructure but isn't hooked into any active gameplay loops - agents 
   aren't actually reproducing yet.
 
-  This is actually perfect for the Imajica integration. Instead of building on top
+  This is actually perfect for the multiverse integration. Instead of building on top
    of existing reproduction mechanics, we can start fresh with a more 
   magical/transformative approach that fits the Union Magic concept better.
 
@@ -700,7 +700,7 @@ have.
   work.
 
 ⏺ Perfect! So ReproductionSystem is registered (main.ts:517) but not actually
-  triggering in gameplay yet. This is actually ideal for the Imajica approach
+  triggering in gameplay yet. This is actually ideal for the multiverse approach
   - we can make Union Magic be the first working reproduction mechanic!
 
   Let me revise the design to focus on what's actually running:
@@ -710,7 +710,7 @@ have.
   Good. Now let me give them a revised, more practical design that focuses on 
   what's actually running and what can be implemented.
 
-⏺ Revised Practical Design - Imajica Integration
+⏺ Revised Practical Design - Union Magic Integration
 
   Based on what's actually running in your game, here's a more focused
   approach:
@@ -761,8 +761,8 @@ have.
       }
     },
 
-    // Mystif-style transformation
-    become_desire: {
+    // Velari-style transformation
+    resonant_shift: {
       technique: 'transform',
       form: 'self',
       manaCost: 30,
@@ -882,7 +882,7 @@ have.
   ---
   PHASE 3: Minimal Five Dominions
 
-  Don't need full Imajica complexity - just add flavor to existing realms:
+  Don't need full dimensional complexity - just add flavor to existing realms:
 
   // In packages/core/src/realms/RealmDefinitions.ts
 
@@ -947,7 +947,7 @@ have.
 
   Ah okay, so another agent is working on the complex reproduction system. That's 
   good to know - I should stay in design mode and not implement anything yet. The 
-  user wants me to continue designing the Imajica concepts without worrying about 
+  user wants me to continue designing the union magic concepts without worrying about 
   the reproduction implementation details.
 
   Let me continue with design work - fleshing out the cosmic rebellion mechanics, 
@@ -1003,7 +1003,7 @@ have.
     | 'pantheon_god'       // Standard gods (existing system)
     | 'ascended_mortal'    // Mortals who achieved divinity
     | 'rebel_god'          // Gods actively opposing Creator
-    | 'transformer'        // Mystif-style shapeshifters
+    | 'transformer'        // Velari-style shapeshifters
     | 'bound_god'          // Imprisoned/weakened by Creator
     | 'divine_servant';    // Angels, messengers
 
@@ -1999,7 +1999,7 @@ Like you know with Greek mythology.
     /** Political leanings (usually rebel-sympathetic) */
     politics: {
       viewsOnCreator: 'grateful' | 'neutral' | 'suspicious' | 'hostile';
-      sympathyForRebellion: number; // 0-100, usually 70+
+      tethermancyForRebellion: number; // 0-100, usually 70+
       willingSacrificeForMortals: boolean;
     };
 
@@ -5797,7 +5797,7 @@ brilliant! That's the final progression.
         Magic System:
         - Paradigm: [Mana-based ▼] 
           Options: Mana-based, Rune-magic, Song-magic, 
-                   Sympathy, Allomancy, Custom...
+                   Tethermancy, Ferromancy, Custom...
         - Power Level: [Medium ▼]
         - Availability: [Common ▼]
         
@@ -6070,7 +6070,7 @@ brilliant! That's the final progression.
 ⏺ Write(/Users/annhoward/src/ai_village/IMAJICA_DIMENSIONAL_DESIGN.md)
   ⎿  Wrote 1028 lines to                                                     
      /Users/annhoward/src/ai_village/IMAJICA_DIMENSIONAL_DESIGN.md
-     # Imajica-Inspired Dimensional Ascension System
+     # Dimensional Ascension Dimensional Ascension System
      ## Complete Design Document
 
      > *"You started as a player. You end as the architect of the game 
@@ -6093,7 +6093,7 @@ brilliant! That's the final progression.
 
      ## Overview
 
-     This design integrates Clive Barker's *Imajica* concepts with a
+     This design integrates the Chorus lore framework concepts with a
      meta-progression system where:
      - **Player powers become cosmic abilities** (save/load = time travel)
      - **Gods are higher-dimensional beings** (spatial AND temporal
@@ -6110,7 +6110,7 @@ brilliant! That's the final progression.
 
      ## Union Magic
 
-     *Transformative magic through intimate union - Mystif-inspired*
+     *Transformative magic through intimate union - Velari-inspired*
 
      ### Concept
      Sexual/romantic union as a source of transformative magical power.
@@ -6121,7 +6121,7 @@ brilliant! That's the final progression.
      **Union Spells:**
      - `merge_forms` - Temporarily merge two beings into one
      - `create_offspring` - Birth magical offspring (not genetic)
-     - `become_desire` - Mystif-style shapeshifting to partner's ideal
+     - `resonant_shift` - Velari-style shapeshifting to partner's ideal
      - `swap_traits` - Exchange physical/mental attributes
      - `soul_bond` - Permanent connection between beings
 
@@ -6155,7 +6155,7 @@ brilliant! That's the final progression.
      ascended_mortal    → Mortals who achieved divinity
      rebel_god          → Gods opposing Creator
      bound_god          → Imprisoned by Creator
-     transformer        → Mystif-style shapeshifters
+     transformer        → Velari-style shapeshifters
      divine_servant     → Angels, messengers
      ```
 
@@ -7121,7 +7121,7 @@ brilliant! That's the final progression.
 
   What We Created Together:
 
-  ✅ Union Magic - Imajica-inspired transformative sex magic
+  ✅ Union Magic - union-magic-inspired transformative sex magic
   ✅ Cosmic Rebellion - Divine civil war against tyrannical creators
   ✅ Mortal Ascension - Greek mythology-style paths to godhood
   ✅ God Progression - Deep power/domain/personality evolution

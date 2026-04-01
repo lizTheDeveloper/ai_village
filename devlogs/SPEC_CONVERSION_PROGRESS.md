@@ -47,7 +47,7 @@ None currently - ready to continue with remaining systems
 ### Worldgen System (3 specs - Draft)
 - GENERATIVE_CITIES_SPEC.md → worldgen-system/generative-cities.md
 - PASSAGE_SYSTEM.md → worldgen-system/passage-system.md
-- IMAJICA_DIMENSIONAL_DESIGN.md → worldgen-system/imajica-dimensions.md
+- IMAJICA_DIMENSIONAL_DESIGN.md → worldgen-system/dimensional-ascension.md
 
 ### Merge with Existing Openspec (5 specs)
 - EQUIPMENT_COMBAT_SPEC.md → equipment-system/spec.md (merge)

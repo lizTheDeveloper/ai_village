@@ -25,13 +25,13 @@ The magic system features 25+ distinct paradigms, each with unique mechanics and
 - Effects: Fireballs, water summoning, earth walls, wind gusts
 - Good for: Combat, environmental manipulation
 
-**Sympathy** (Inspired by Kingkiller Chronicle)
+**Tethermancy** (Inspired by resonance_realms Chronicle)
 - Magic through connections and true names
 - Link similar objects to affect them at a distance
 - Powerful but requires knowledge of target
 - Good for: Remote effects, binding magic
 
-**Allomancy** (Inspired by Mistborn)
+**Ferromancy** (Inspired by CrucibleBorn)
 - Consume and "burn" metals for specific powers
 - Each metal grants a different ability
 - Resource-limited (need metals)
@@ -312,7 +312,7 @@ Agents can form relationships, mate, have children, and create multi-generationa
 The game supports diverse reproductive strategies:
 
 - **Human** - Standard courtship and pregnancy
-- **Kemmer** (Inspired by Le Guin) - Periodic fertility cycles, gender fluidity
+- **Flux** - Periodic fertility cycles, gender fluidity
 - **Hive** - Queen produces offspring, workers support
 - **Quantum** - Superposition of states until observation
 - **Asexual** - Self-reproduction

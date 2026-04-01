@@ -89,7 +89,7 @@
 |------|--------|--------|----------------|----------|
 | GENERATIVE_CITIES_SPEC.md | worldgen-system/generative-cities.md | 🔴 Draft | TBD | ⏳ |
 | PASSAGE_SYSTEM.md | worldgen-system/passage-system.md | 🔴 Draft | TBD | ⏳ |
-| IMAJICA_DIMENSIONAL_DESIGN.md | worldgen-system/imajica-dimensions.md | 🔴 Draft | TBD | ⏳ |
+| IMAJICA_DIMENSIONAL_DESIGN.md | worldgen-system/dimensional-ascension.md | 🔴 Draft | TBD | ⏳ |
 
 ---
 

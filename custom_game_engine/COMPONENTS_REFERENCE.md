@@ -823,7 +823,7 @@ export class SteeringComponent extends ComponentBase {
 **Fields:**
 ```typescript
 {
-  current: string;           // e.g., 'kemmer-female', 'drone', 'queen'
+  current: string;           // e.g., 'flux-gestator', 'drone', 'queen'
   paradigm: string;          // Mating paradigm ID
   canChange: boolean;        // Can morph change?
   changeConditions?: string[]; // Triggers for change

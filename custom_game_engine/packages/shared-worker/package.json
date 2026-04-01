@@ -29,9 +29,9 @@
     "@ai-village/botany": "*",
     "@ai-village/core": "*",
     "@ai-village/world": "*",
-    "dexie": "^4.0.0"
+    "dexie": "4.0.11"
   },
   "devDependencies": {
-    "@types/serviceworker": "^0.0.95"
+    "@types/serviceworker": "0.0.95"
   }
 }

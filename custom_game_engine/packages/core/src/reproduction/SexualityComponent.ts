@@ -27,7 +27,7 @@ export type SexualTarget =
   | 'any_morph'         // Bisexual/pansexual
   | 'specific_morphs'   // Specific list
   | 'all_except'        // All but specific list
-  | 'contextual'        // Depends on situation (kemmer-like)
+  | 'contextual'        // Depends on situation (phaseborn-like)
   | 'resonance_based'   // Based on psychic/magical compatibility
   | 'unknown';          // Not yet determined
 
@@ -62,7 +62,7 @@ export interface AttractionAxis {
 
 /** When does attraction activate? */
 export interface AttractionCondition {
-  type: 'always' | 'familiar' | 'emotional_bond' | 'kemmer' |
+  type: 'always' | 'familiar' | 'emotional_bond' | 'flux' |
         'season' | 'moon_phase' | 'ritual' | 'resonance' | 'never';
 
   /** Required familiarity level (0-100) for 'familiar' type */
@@ -185,7 +185,7 @@ export class SexualityComponent extends ComponentBase {
   // =========================================================================
 
   /**
-   * Is this entity currently "in heat" / kemmer / receptive?
+   * Is this entity currently "in heat" / in flux / receptive?
    * For species with cyclical sexuality.
    */
   public inReceptiveCycle: boolean = false;
@@ -319,7 +319,7 @@ export class SexualityComponent extends ComponentBase {
         return false;
       case 'always':
         return true;
-      case 'kemmer':
+      case 'flux':
       case 'season':
       case 'moon_phase':
         return this.inReceptiveCycle;
@@ -566,11 +566,11 @@ export function createDemisexual(): SexualityComponent {
 }
 
 /**
- * Create kemmer-style cyclical sexuality (Le Guin's Gethenians).
+ * Create flux-style cyclical sexuality (Phaseborn species).
  */
-export function createKemmerSexuality(): SexualityComponent {
+export function createFluxSexuality(): SexualityComponent {
   return createSexualityComponent({
-    labels: ['kemmer'],
+    labels: ['flux_cycle'],
     attractionAxes: [
       {
         dimension: 'sexual',
@@ -585,7 +585,7 @@ export function createKemmerSexuality(): SexualityComponent {
         genderTarget: 'any_gender',
       },
     ],
-    attractionCondition: { type: 'kemmer' },
+    attractionCondition: { type: 'flux' },
     onset: 'cyclical',
     fluidity: 'rapid_change',
   });
@@ -614,11 +614,11 @@ export function createHiveSexuality(): SexualityComponent {
 }
 
 /**
- * Create mystif-style sexuality (union magic based, resonance attraction).
+ * Create union-mage sexuality (union magic based, resonance attraction).
  */
-export function createMystifSexuality(): SexualityComponent {
+export function createVelariSexuality(): SexualityComponent {
   return createSexualityComponent({
-    labels: ['mystif', 'union_mage'],
+    labels: ['velari', 'union_mage'],
     attractionAxes: [
       {
         dimension: 'sexual',

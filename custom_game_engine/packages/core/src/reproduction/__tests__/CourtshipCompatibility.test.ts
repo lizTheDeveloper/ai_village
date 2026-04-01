@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { World } from '../../ecs/World.js';
 import type { Entity } from '../../ecs/Entity.js';
 import { EntityImpl } from '../../ecs/Entity.js';
@@ -9,6 +9,8 @@ import {
   calculatePersonalityMesh,
   calculateSharedInterests,
   calculateRelationshipStrength,
+  calculateConceptionProbability,
+  attemptConception,
 } from '../courtship/compatibility.js';
 
 import type { SexualityComponent } from '../SexualityComponent.js';
@@ -27,6 +29,10 @@ describe('Courtship Compatibility Calculations', () => {
     eventBus = new EventBusImpl(); world = new World(eventBus);
     agent1 = world.createEntity();
     agent2 = world.createEntity();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   describe('Sexual compatibility', () => {
@@ -95,11 +101,11 @@ describe('Courtship Compatibility Calculations', () => {
 
     it('should return partial score if potential but not active attraction', () => {
       const sex1 = createSexualityComponent({
-        attractionCondition: { type: 'kemmer' }, // Not in cycle
+        attractionCondition: { type: 'flux' }, // Not in cycle
         relationshipStyle: 'polyamorous',
       });
       const sex2 = createSexualityComponent({
-        attractionCondition: { type: 'kemmer' },
+        attractionCondition: { type: 'flux' },
         relationshipStyle: 'monogamous',
       });
 
@@ -145,6 +151,33 @@ describe('Courtship Compatibility Calculations', () => {
       const monoPoly = calculateSexualCompatibility(agent1, agent2);
 
       expect(monoMono).toBeGreaterThan(monoPoly);
+    });
+
+    it('should keep assortative pairs above disassortative pairs', () => {
+      const assortativeSex1 = createSexualityComponent({
+        relationshipStyle: 'serially_monogamous',
+      });
+      const assortativeSex2 = createSexualityComponent({
+        relationshipStyle: 'serially_monogamous',
+      });
+      const disassortativeSex1 = createSexualityComponent({
+        relationshipStyle: 'monogamous',
+      });
+      const disassortativeSex2 = createSexualityComponent({
+        relationshipStyle: 'polyamorous',
+      });
+
+      (agent1 as EntityImpl).addComponent(assortativeSex1);
+      (agent2 as EntityImpl).addComponent(assortativeSex2);
+      const assortativeScore = calculateSexualCompatibility(agent1, agent2);
+
+      const agent3 = world.createEntity();
+      const agent4 = world.createEntity();
+      (agent3 as EntityImpl).addComponent(disassortativeSex1);
+      (agent4 as EntityImpl).addComponent(disassortativeSex2);
+      const disassortativeScore = calculateSexualCompatibility(agent3, agent4);
+
+      expect(assortativeScore).toBeGreaterThan(disassortativeScore);
     });
   });
 
@@ -374,6 +407,48 @@ describe('Courtship Compatibility Calculations', () => {
   });
 
   describe('Overall compatibility', () => {
+    it('should raise conception probability when bond strength is higher', () => {
+      const weakBondScore = calculateConceptionProbability(agent1, agent2);
+
+      const relationship = createRelationshipComponent();
+      const updated = updateRelationship(relationship, agent2.id, world.tick, 90, 90);
+      (agent1 as EntityImpl).addComponent(updated);
+
+      const strongBondScore = calculateConceptionProbability(agent1, agent2);
+
+      expect(strongBondScore).toBeGreaterThan(weakBondScore);
+      expect(strongBondScore).toBeGreaterThan(0);
+      expect(strongBondScore).toBeLessThanOrEqual(1);
+    });
+
+    it('should emit a conception result deterministically when the random roll is below probability', () => {
+      const relationship = createRelationshipComponent();
+      const updated = updateRelationship(relationship, agent2.id, world.tick, 100, 100);
+      (agent1 as EntityImpl).addComponent(updated);
+
+      const conceptionEvents: Array<{ pregnantAgentId: string; otherParentId: string; conceptionTick: number }> = [];
+      eventBus.on('conception', (event) => {
+        conceptionEvents.push(event.data as { pregnantAgentId: string; otherParentId: string; conceptionTick: number });
+      });
+
+      const randomSpy = vi
+        .spyOn(Math, 'random')
+        .mockReturnValueOnce(0.01)
+        .mockReturnValueOnce(0.8);
+
+      const result = attemptConception(agent1, agent2, world);
+      eventBus.flush();
+
+      expect(result).not.toBeNull();
+      expect(result?.pregnantAgentId).toBe(agent2.id);
+      expect(result?.otherParentId).toBe(agent1.id);
+      expect(conceptionEvents).toHaveLength(1);
+      expect(conceptionEvents[0]!.pregnantAgentId).toBe(agent2.id);
+      expect(conceptionEvents[0]!.otherParentId).toBe(agent1.id);
+      expect(conceptionEvents[0]!.conceptionTick).toBe(world.tick);
+      expect(randomSpy).toHaveBeenCalledTimes(2);
+    });
+
     it('should combine all factors with weights', () => {
       // Set up all components for comprehensive test
       const sex1 = createSexualityComponent({

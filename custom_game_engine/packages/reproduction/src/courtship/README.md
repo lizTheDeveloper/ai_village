@@ -31,7 +31,7 @@ Species-specific courtship protocols (`paradigms.ts`):
 - **human/elf**: `gradual_proximity` (conversation, shared activity, proximity). Elves require 6+ tactics, 40k-120k ticks
 - **dwarf**: `construction` (craft gift, demonstrate skill, shared project). High quality workshop, 30k-100k ticks, bond strength 0.95
 - **bird_folk**: `display` (aerial dance, plumage, song). Elevated location, 5k-15k ticks
-- **mystif**: `resonance` (mind touch, aura display, magic sharing). Ley line required, bond strength 1.0
+- **velari**: `resonance` (mind touch, aura display, magic sharing). Ley line required, bond strength 1.0
 - **default**: Generic proximity-based, 10k-30k ticks
 
 Each paradigm defines: required/optional/forbidden tactics, minimum count, duration range, location requirements, mating behavior (location, duration, privacy, post-mating effects).
@@ -47,7 +47,7 @@ Appeal calculation: `baseAppeal + (preferred ? 0.3 : 0) + (disliked ? -0.5 : 0) 
 Examples:
 - `conversation`: Base 0.3, requires proximity 3, time 200
 - `craft_gift` (dwarf): Base 0.9, requires crafting 5, metal/gems, time 2000
-- `mind_touch` (mystif): Base 0.85, requires psionics 4, proximity 5, energy 15, not visible to others
+- `mind_touch` (velari): Base 0.85, requires psionics 4, proximity 5, energy 15, not visible to others
 
 ## Cooldowns
 

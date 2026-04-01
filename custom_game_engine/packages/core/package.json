@@ -21,13 +21,13 @@
   },
   "dependencies": {
     "@ai-village/types": "*",
-    "uuid": "^9.0.1"
+    "uuid": "9.0.1"
   },
   "optionalDependencies": {
     "@multiverse-studios/folkfork-bridge": "file:../../../../../akashic-records/tools/folkfork-bridge"
   },
   "devDependencies": {
-    "@types/uuid": "^9.0.7"
+    "@types/uuid": "9.0.7"
   },
   "description": "> **For Language Models:** This README is optimized for LM understanding. Read this document completely before working with the core package to understand the ECS architecture, system patterns, and integration points.",
   "keywords": [],

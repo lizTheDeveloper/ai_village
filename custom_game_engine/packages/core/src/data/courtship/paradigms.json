@@ -94,7 +94,7 @@
       }
     }
   },
-  "mystif": {
+  "velari": {
     "type": "resonance",
     "requiredTactics": ["mind_touch", "aura_display", "magic_sharing"],
     "optionalTactics": ["dream_meeting", "conversation"],

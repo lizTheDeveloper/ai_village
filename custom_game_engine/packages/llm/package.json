@@ -25,10 +25,10 @@
     "@ai-village/reproduction": "*"
   },
   "optionalDependencies": {
-    "@mlc-ai/web-llm": "^0.2.x",
-    "@nicepkg/wllama": "^1.x"
+    "@mlc-ai/web-llm": "0.2.x",
+    "@nicepkg/wllama": "1.x"
   },
   "devDependencies": {
-    "typescript": "^5.3.3"
+    "typescript": "5.3.3"
   }
 }

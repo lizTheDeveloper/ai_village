@@ -270,13 +270,13 @@ interface TransitionDisplay {
 }
 ```
 
-**Gender Panel (Sequential Gender Example - Gethenian-inspired):**
+**Gender Panel (Sequential Gender Example - Phaseborn-inspired):**
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │  GENDER SYSTEM                                                              │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
-│  TYPE: Sequential (Kemmer Cycle)                                            │
+│  TYPE: Sequential (Flux Cycle)                                              │
 │  ─────────────────────────────────────────────────────────────────────────  │
 │                                                                             │
 │  "Gender changes cyclically - most of the time neither male nor female"    │
@@ -286,7 +286,7 @@ interface TransitionDisplay {
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
 │  │                                                                     │   │
 │  │    ╭───────────╮           ╭───────────╮           ╭───────────╮   │   │
-│  │    │  SOMER    │──kemmer──▶│ BEARING   │           │  SIRING   │   │   │
+│  │    │  SOMER    │──flux──▶  │ BEARING   │           │  SIRING   │   │   │
 │  │    │ (default) │◀──return──│           │◀── OR ───▶│           │   │   │
 │  │    │   90%     │           │    5%     │           │    5%     │   │   │
 │  │    ╰───────────╯           ╰───────────╯           ╰───────────╯   │   │
@@ -298,7 +298,7 @@ interface TransitionDisplay {
 │  • All social roles available                                               │
 │  • No gendered behavior expected                                            │
 │                                                                             │
-│  KEMMER (Fertile Phase)                                                     │
+│  FLUX (Fertile Phase)                                                       │
 │  • Manifests as bearing (female) or siring (male)                          │
 │  • Triggered by partner proximity                                           │
 │  • Role determination: situational                                          │
@@ -309,7 +309,7 @@ interface TransitionDisplay {
 │  • "Anyone can be anything at any time"                                     │
 │                                                                             │
 │  MOBILITY: Cyclical                                                         │
-│  • Changes with kemmer cycle                                                │
+│  • Changes with flux cycle                                                  │
 │  • No social cost                                                           │
 │  • Cannot be controlled                                                     │
 │                                                                             │

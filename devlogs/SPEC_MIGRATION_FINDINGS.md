@@ -60,11 +60,11 @@ The specs in `architecture/` are not design documents for future work - they're 
 
 **6. Magic System (1/1 spec)**
 - ✅ Magic Skill Trees - Multiple skill tree files found:
-  - `AllomancySkillTree.ts`
+  - `FerromancySkillTree.ts`
   - `ShintoSkillTree.ts`
   - `DreamSkillTree.ts`
   - `RuneSkillTree.ts`
-  - `SympathySkillTree.ts`
+  - `TethermancySkillTree.ts`
   - `PactSkillTree.ts`
   - `BreathSkillTree.ts`
   - `BloodSkillTree.ts`
@@ -92,7 +92,7 @@ The specs in `architecture/` are not design documents for future work - they're 
 **9. Worldgen System (3 specs)**
 - ❌ Generative cities
 - ❌ Passage system
-- ❌ Imajica dimensions
+- ❌ Dimensional ascension
 - Status: DRAFT
 
 ---
@@ -172,11 +172,11 @@ packages/core/src/dashboard/views/PlantInfoView.ts
 packages/core/src/magic/MagicSkillTreeRegistry.ts
 packages/core/src/magic/MagicSourceGenerator.ts
 packages/core/src/magic/MagicDetectionSystem.ts
-packages/core/src/magic/skillTrees/AllomancySkillTree.ts
+packages/core/src/magic/skillTrees/FerromancySkillTree.ts
 packages/core/src/magic/skillTrees/ShintoSkillTree.ts
 packages/core/src/magic/skillTrees/DreamSkillTree.ts
 packages/core/src/magic/skillTrees/RuneSkillTree.ts
-packages/core/src/magic/skillTrees/SympathySkillTree.ts
+packages/core/src/magic/skillTrees/TethermancySkillTree.ts
 packages/core/src/magic/skillTrees/PactSkillTree.ts
 packages/core/src/magic/skillTrees/BreathSkillTree.ts
 packages/core/src/magic/skillTrees/BloodSkillTree.ts
