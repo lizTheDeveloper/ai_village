@@ -79,12 +79,12 @@ log "Extracting clean git archive of HEAD to $BUILD_TMPDIR..."
 git archive HEAD | tar -x -C "$BUILD_TMPDIR"
 
 log "Installing dependencies in clean archive..."
-(cd "$BUILD_TMPDIR/custom_game_engine" && npm ci --silent)
+# Note: git archive from ENGINE_DIR strips the custom_game_engine/ prefix,
+# so package.json and packages/ land directly at $BUILD_TMPDIR/
+(cd "$BUILD_TMPDIR" && npm ci --silent)
 
 log "Stubbing folkfork-bridge (file: dep lives outside this repo)..."
-# git archive strips the custom_game_engine/ prefix, so typings are at $BUILD_TMPDIR/packages/
-# but npm ci runs from $BUILD_TMPDIR/custom_game_engine/, so node_modules is there
-FOLKFORK_PKG="$BUILD_TMPDIR/custom_game_engine/node_modules/@multiverse-studios/folkfork-bridge"
+FOLKFORK_PKG="$BUILD_TMPDIR/node_modules/@multiverse-studios/folkfork-bridge"
 mkdir -p "$FOLKFORK_PKG"
 cp "$BUILD_TMPDIR/packages/core/src/typings/folkfork-bridge.d.ts" "$FOLKFORK_PKG/index.d.ts"
 echo '{"name":"@multiverse-studios/folkfork-bridge","version":"0.0.0","types":"index.d.ts","main":"index.js"}' > "$FOLKFORK_PKG/package.json"
@@ -92,7 +92,7 @@ echo 'module.exports = {};' > "$FOLKFORK_PKG/index.js"
 log "folkfork-bridge stubbed."
 
 log "Building production bundle from clean archive..."
-(cd "$BUILD_TMPDIR/custom_game_engine" && npm run build:prod)
+(cd "$BUILD_TMPDIR" && npm run build:prod)
 
 log "Copying demo/dist/ from clean archive back to working tree..."
 rm -rf demo/dist/
