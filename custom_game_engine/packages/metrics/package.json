@@ -26,7 +26,7 @@
     "@ai-village/core": "*",
     "@ai-village/persistence": "*",
     "@ai-village/agents": "*",
-    "@types/node": "20.10.0",
-    "vitest": "4.0.16"
+    "@types/node": "^20.10.0",
+    "vitest": "^4.0.16"
   }
 }

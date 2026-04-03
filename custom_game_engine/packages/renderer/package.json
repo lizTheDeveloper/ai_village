@@ -24,9 +24,9 @@
     "@ai-village/magic": "*",
     "@ai-village/persistence": "*",
     "@ai-village/world": "*",
-    "@types/three": "0.182.0",
-    "pixi.js": "8.15.0",
-    "react": "18.2.0",
-    "three": "0.182.0"
+    "@types/three": "^0.182.0",
+    "pixi.js": "^8.15.0",
+    "react": "^18.2.0",
+    "three": "^0.182.0"
   }
 }

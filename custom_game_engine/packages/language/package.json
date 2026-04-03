@@ -21,15 +21,8 @@
   },
   "dependencies": {
     "@ai-village/core": "*",
-    "react": "18.2.0"
+    "react": "^18.2.0"
   },
-  "keywords": [
-    "language",
-    "phonemes",
-    "translation",
-    "alien",
-    "procedural",
-    "ecs"
-  ],
+  "keywords": ["language", "phonemes", "translation", "alien", "procedural", "ecs"],
   "license": "MIT"
 }
