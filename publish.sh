@@ -81,6 +81,14 @@ git archive HEAD | tar -x -C "$BUILD_TMPDIR"
 log "Installing dependencies in clean archive..."
 (cd "$BUILD_TMPDIR/custom_game_engine" && npm ci --silent)
 
+log "Stubbing folkfork-bridge (file: dep lives outside this repo)..."
+FOLKFORK_PKG="$BUILD_TMPDIR/custom_game_engine/node_modules/@multiverse-studios/folkfork-bridge"
+mkdir -p "$FOLKFORK_PKG"
+cp "$BUILD_TMPDIR/custom_game_engine/packages/core/src/typings/folkfork-bridge.d.ts" "$FOLKFORK_PKG/index.d.ts"
+echo '{"name":"@multiverse-studios/folkfork-bridge","version":"0.0.0","types":"index.d.ts","main":"index.js"}' > "$FOLKFORK_PKG/package.json"
+echo 'module.exports = {};' > "$FOLKFORK_PKG/index.js"
+log "folkfork-bridge stubbed."
+
 log "Building production bundle from clean archive..."
 (cd "$BUILD_TMPDIR/custom_game_engine" && npm run build:prod)
 
