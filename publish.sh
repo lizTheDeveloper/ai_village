@@ -2,7 +2,7 @@
 # MVEE: The End of Eternity — One-command publish
 # Builds production bundle, deploys to play.multiversestudios.xyz/mvee/, and verifies.
 #
-# Usage: ./publish.sh [--skip-tests] [--paperclip MUL-NNNN]
+# Usage: ./publish.sh [--skip-tests] [--force] [--paperclip MUL-NNNN]
 
 set -euo pipefail
 
@@ -23,10 +23,12 @@ warn() { echo -e "${YELLOW}[publish]${NC} $*"; }
 err()  { echo -e "${RED}[publish]${NC} $*"; }
 
 SKIP_TESTS=false
+FORCE=false
 PAPERCLIP_ISSUE=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --skip-tests) SKIP_TESTS=true; shift ;;
+        --force) FORCE=true; shift ;;
         --paperclip) PAPERCLIP_ISSUE="${2:-}"; shift 2 ;;
         *) err "Unknown arg: $1"; exit 1 ;;
     esac
@@ -34,7 +36,24 @@ done
 
 cd "$ENGINE_DIR"
 
-# --- Step 0: Quality Gate ---
+# --- Step 0a: Dirty-tree guard ---
+# v0.4.79 incident: we published a build from a dirty working tree where one side of a
+# cross-package type change had been edited but not committed. The build succeeded locally
+# because Vite/tsc saw the unstaged file, but the deployed tag was missing the fix, causing
+# 6.5 hours of downtime. Publishing MUST only happen from a clean, committed state.
+if [ "$FORCE" = false ]; then
+    if ! git diff --quiet HEAD || ! git diff --cached --quiet HEAD; then
+        err "Dirty working tree detected — uncommitted changes present."
+        err "Commit or stash all changes before publishing."
+        err "To bypass this check (dangerous), re-run with --force."
+        exit 1
+    fi
+    log "Working tree is clean."
+else
+    warn "--force passed: skipping dirty-tree guard. This bypasses a v0.4.79 incident safeguard."
+fi
+
+# --- Step 0b: Quality Gate ---
 if [ "$SKIP_TESTS" = false ]; then
     log "Running quality gate..."
     if ! "$GAMES_DIR/quality-gate.sh" mvee; then
@@ -46,10 +65,30 @@ else
     warn "Skipping quality gate (--skip-tests)."
 fi
 
-# --- Step 3: Production bundle ---
-log "Building production bundle..."
-npm run build:prod
-log "Production bundle ready at demo/dist/"
+# --- Step 3: Production bundle (clean-archive build) ---
+# v0.4.79 incident: building directly from the working tree means any uncommitted edits
+# (or files not part of the current HEAD commit) can silently influence the output. We now
+# build exclusively from a `git archive` of HEAD, so the build reflects exactly what is
+# committed. If the tag/commit is missing one side of a cross-package change, tsc will
+# catch it here with a TypeScript error — before anything is deployed.
+BUILD_TMPDIR="$(mktemp -d)"
+trap 'log "Cleaning up build temp dir..."; rm -rf "$BUILD_TMPDIR"' EXIT
+
+log "Extracting clean git archive of HEAD to $BUILD_TMPDIR..."
+# git repo root is games/mvee/, so archive contains custom_game_engine/ as a subdirectory
+git archive HEAD | tar -x -C "$BUILD_TMPDIR"
+
+log "Installing dependencies in clean archive..."
+(cd "$BUILD_TMPDIR/custom_game_engine" && npm ci --legacy-peer-deps --silent)
+
+log "Building production bundle from clean archive..."
+(cd "$BUILD_TMPDIR/custom_game_engine" && npm run build:prod)
+
+log "Copying demo/dist/ from clean archive back to working tree..."
+rm -rf demo/dist/
+cp -r "$BUILD_TMPDIR/custom_game_engine/demo/dist/" demo/dist/
+
+log "Production bundle ready at demo/dist/ (built from clean git archive)"
 
 # --- Step 3b: Copy sprite assets into dist ---
 # Vite copies demo/public/ to dist/, but pixellab sprites live in
@@ -126,5 +165,8 @@ else
     warn "Playwright not installed in scripts/ — skipping browser smoke test."
     warn "Run: cd $SMOKE_DIR && npm install && npx playwright install chromium"
 fi
+
+# --- Step 8: Notify Nova to write devlog (MUL-5056) ---
+"$GAMES_DIR/scripts/notify-devlog.sh" "MVEE" "$(git rev-parse --short HEAD)" || true
 
 log "MVEE published to https://play.multiversestudios.xyz/mvee/"
