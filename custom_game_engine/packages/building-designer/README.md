@@ -225,7 +225,7 @@ type Material =
   | 'fire' | 'water' | 'lightning' | 'magma' | 'frost'
 
   // Fantasy metals
-  | 'mithril' | 'adamantine' | 'valyrian_steel' | 'orichalcum'
+  | 'mithril' | 'adamantine' | 'drakforged_steel' | 'orichalcum'
 
   // Creature materials
   | 'dragon_scale' | 'phoenix_feather' | 'unicorn_hair'
@@ -350,7 +350,7 @@ type MagicParadigm =
   | 'academic' | 'divine' | 'blood' | 'breath' | 'pact' | 'name' | 'emotional'
 
   // Animist
-  | 'shinto' | 'sympathy' | 'allomancy' | 'dream' | 'song' | 'rune' | 'daemon'
+  | 'shinto' | 'tethermancy' | 'ferromancy' | 'dream' | 'song' | 'rune' | 'daemon'
 
   // Creative
   | 'debt' | 'bureaucratic' | 'luck' | 'threshold' | 'belief' | 'echo' | 'game' | 'commerce'

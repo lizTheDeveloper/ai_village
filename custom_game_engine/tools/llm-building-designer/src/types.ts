@@ -86,11 +86,11 @@ export type Material =
   | 'fire' | 'water' | 'air' | 'earth' | 'lightning' | 'magma' | 'steam' | 'frost'
   // Technological materials
   | 'circuitry' | 'data' | 'plasma' | 'force_field' | 'nanomaterial'
-  // Allomantic metals (Mistborn)
+  // Ferromancy metals (CrucibleBorn)
   | 'pewter' | 'tin' | 'zinc' | 'brass' | 'chromium' | 'nickel'
-  | 'aluminum' | 'duralumin' | 'atium' | 'lerasium'
+  | 'aluminum' | 'amplium' | 'temporite' | 'chorium'
   // Fantasy metals (various universes)
-  | 'valyrian_steel' | 'dragonglass' | 'starmetal' | 'moonsilver'
+  | 'drakforged_steel' | 'pyrrhic_obsidian' | 'starmetal' | 'moonsilver'
   | 'soulsteel' | 'oathgold' | 'cold_iron' | 'meteoric_iron'
   | 'darksteel' | 'etherium' | 'wraithbone' | 'blackite'
   | 'gromril' | 'ithilmar' | 'hihi_irokane' | 'celestial_bronze'
@@ -205,8 +205,8 @@ export type MagicParadigm =
   | 'emotional'     // Feelings-based casting
   // Animist paradigms
   | 'shinto'        // Kami relationships
-  | 'sympathy'      // Like affects like
-  | 'allomancy'     // Metal-burning powers
+  | 'tethermancy'      // Like affects like
+  | 'ferromancy'     // Metal-burning powers
   | 'dream'         // Oneiromancy
   | 'song'          // Bardic magic
   | 'rune'          // Inscription magic
@@ -279,7 +279,7 @@ export interface BuildingFunction {
     | 'belief_focus'        // Concentrates collective belief
     | 'song_amplifier'      // Bardic magic enhancement
     | 'rune_forge'          // Inscription crafting
-    | 'metal_reserve';      // Allomantic metal storage
+    | 'metal_reserve';      // Ferromancy metal storage
   params: Record<string, unknown>;
 }
 

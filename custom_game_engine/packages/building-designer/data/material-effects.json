@@ -5238,7 +5238,7 @@
     "description": "Pure structure and rule",
     "lore": "The principle of order itself, made manifest."
   },
-  "valyrian_steel": {
+  "drakforged_steel": {
     "insulation": 50,
     "durability": 100,
     "weirdness": 60,
@@ -5278,10 +5278,10 @@
     ],
     "moodModifier": 0,
     "atmosphere": "neutral",
-    "description": "Dragonfire-forged steel",
-    "lore": "Forged in dragonfire with blood magic, its secrets lost to doom."
+    "description": "Steel folded and tempered in dragonfire by Ettin forge-singers",
+    "lore": "Each blade holds its edge indefinitely — the forging technique is a lost art, and existing blades are irreplaceable heirlooms."
   },
-  "dragonglass": {
+  "pyrrhic_obsidian": {
     "insulation": 50,
     "durability": 30,
     "weirdness": 50,
@@ -5310,13 +5310,13 @@
       {
         "type": "undead_bane",
         "magnitude": 100,
-        "description": "Destroys Others/undead"
+        "description": "Disrupts incorporeal entities on contact"
       }
     ],
     "moodModifier": -5,
     "atmosphere": "neutral",
-    "description": "Volcanic glass with magical properties",
-    "lore": "Frozen fire from the dawn of days."
+    "description": "Volcanic glass saturated with elemental fire energy",
+    "lore": "Formed at extreme thermal vents where fire energy saturates the magma. Naturally anathema to incorporeal beings."
   },
   "starmetal": {
     "insulation": 50,

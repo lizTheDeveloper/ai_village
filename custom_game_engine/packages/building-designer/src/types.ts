@@ -90,7 +90,7 @@ export type Material =
   | 'pewter' | 'tin' | 'zinc' | 'brass' | 'chromium' | 'nickel'
   | 'aluminum' | 'amplium' | 'temporite' | 'chorium'
   // Fantasy metals (various universes)
-  | 'valyrian_steel' | 'dragonglass' | 'starmetal' | 'moonsilver'
+  | 'drakforged_steel' | 'pyrrhic_obsidian' | 'starmetal' | 'moonsilver'
   | 'soulsteel' | 'oathgold' | 'cold_iron' | 'meteoric_iron'
   | 'darksteel' | 'etherium' | 'wraithbone' | 'blackite'
   | 'gromril' | 'ithilmar' | 'hihi_irokane' | 'celestial_bronze'

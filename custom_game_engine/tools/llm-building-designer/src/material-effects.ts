@@ -209,12 +209,12 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     conducts_magic: true,
     element: 'metal',
     elementalStrength: 90,
-    paradigmAffinities: { allomancy: 20, rune: 10 },
+    paradigmAffinities: { ferromancy: 20, rune: 10 },
     protection: 10,
     moodModifier: -5,
     atmosphere: 'neutral',
     description: 'Worked metal, cold and strong',
-    lore: 'Metal channels power. Allomancers feel its pull.',
+    lore: 'Metal channels power. Ferromancers feel its pull.',
   },
 
   glass: {
@@ -461,14 +461,14 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     conducts_magic: true,
     element: 'metal',
     elementalStrength: 50,
-    paradigmAffinities: { allomancy: 30 },
+    paradigmAffinities: { ferromancy: 30 },
     specialEffects: [
-      { type: 'metal_burning_boost', magnitude: 20, description: 'Enhances Allomantic copper (Smoker)' },
+      { type: 'metal_burning_boost', magnitude: 20, description: 'Enhances Ferromancy copper (Smoker)' },
     ],
     moodModifier: 0,
     atmosphere: 'neutral',
     description: 'Reddish copper metal',
-    lore: 'Copper clouds Allomantic pulses. Smokers prize pure copper.',
+    lore: 'Copper clouds Ferromancy pulses. Smokers prize pure copper.',
   },
 
   bronze: {
@@ -479,14 +479,14 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     conducts_magic: true,
     element: 'metal',
     elementalStrength: 55,
-    paradigmAffinities: { allomancy: 25, rune: 10 },
+    paradigmAffinities: { ferromancy: 25, rune: 10 },
     specialEffects: [
-      { type: 'metal_burning_boost', magnitude: 15, description: 'Enhances Allomantic bronze (Seeker)' },
+      { type: 'metal_burning_boost', magnitude: 15, description: 'Enhances Ferromancy bronze (Seeker)' },
     ],
     moodModifier: 5,
     atmosphere: 'neutral',
     description: 'Bronze alloy',
-    lore: 'Bronze detects Allomantic pulses. Seekers can sense magic through bronze.',
+    lore: 'Bronze detects Ferromancy pulses. Seekers can sense magic through bronze.',
   },
 
   iron: {
@@ -496,11 +496,11 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     conducts_electricity: true,
     element: 'metal',
     elementalStrength: 75,
-    paradigmAffinities: { allomancy: 35, rune: 15 },
+    paradigmAffinities: { ferromancy: 35, rune: 15 },
     protection: 10,
     specialEffects: [
       { type: 'spirit_repulsion', magnitude: 30, description: 'Cold iron repels fae and spirits' },
-      { type: 'metal_burning_boost', magnitude: 25, description: 'Enhances Allomantic iron (Lurcher)' },
+      { type: 'metal_burning_boost', magnitude: 25, description: 'Enhances Ferromancy iron (Iron-Puller)' },
     ],
     moodModifier: -5,
     atmosphere: 'neutral',
@@ -515,15 +515,15 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     conducts_electricity: true,
     element: 'metal',
     elementalStrength: 80,
-    paradigmAffinities: { allomancy: 35 },
+    paradigmAffinities: { ferromancy: 35 },
     protection: 15,
     specialEffects: [
-      { type: 'metal_burning_boost', magnitude: 25, description: 'Enhances Allomantic steel (Coinshot)' },
+      { type: 'metal_burning_boost', magnitude: 25, description: 'Enhances Ferromancy steel (Iron-Puller)' },
     ],
     moodModifier: 0,
     atmosphere: 'neutral',
     description: 'Refined steel',
-    lore: 'Steel pushes. Coinshots hurl steel through the air.',
+    lore: 'Steel pushes. Iron-Pullers hurl steel through the air.',
   },
 
   mithril: {
@@ -653,7 +653,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     weirdness: 30,
     element: 'wood',
     elementalStrength: 85,
-    paradigmAffinities: { shinto: 25, breath: 20, sympathy: 15 },
+    paradigmAffinities: { shinto: 25, breath: 20, tethermancy: 15 },
     manaRegen: 1.4,
     specialEffects: [
       { type: 'healing_aura', magnitude: 15, radius: 5, description: 'Promotes natural healing' },
@@ -791,7 +791,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     ...DEFAULT_PROPERTIES,
     durability: 70,
     conducts_magic: true,
-    paradigmAffinities: { academic: 15, sympathy: 20 },
+    paradigmAffinities: { academic: 15, tethermancy: 20 },
     manaRegen: 1.4,
     specialEffects: [
       { type: 'memory_enhancement', magnitude: 15, description: 'Aids recollection' },
@@ -799,7 +799,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     moodModifier: 5,
     atmosphere: 'neutral',
     description: 'Common crystalline mineral',
-    lore: 'Quartz remembers. Sympathy mages use quartz to store connections.',
+    lore: 'Quartz remembers. Tethermancy mages use quartz to store connections.',
   },
 
   // ===========================================================================
@@ -859,7 +859,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     alive: true,
     element: 'water',
     elementalStrength: 60,
-    paradigmAffinities: { shinto: 15, sympathy: 10 },
+    paradigmAffinities: { shinto: 15, tethermancy: 10 },
     specialEffects: [
       { type: 'spirit_attraction', magnitude: 10, description: 'Ocean spirits favor coral' },
     ],
@@ -908,7 +908,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     maintenance: 60,
     element: 'wood',
     elementalStrength: 40,
-    paradigmAffinities: { dream: 20, sympathy: 25 },
+    paradigmAffinities: { dream: 20, tethermancy: 25 },
     specialEffects: [
       { type: 'dream_induction', magnitude: 20, description: 'Spores induce visions' },
       { type: 'light_emission', magnitude: 20, description: 'Bioluminescent glow' },
@@ -1836,7 +1836,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     conducts_magic: true,
     element: 'metal',
     elementalStrength: 55,
-    paradigmAffinities: { allomancy: 40, blood: 10 },
+    paradigmAffinities: { ferromancy: 40, blood: 10 },
     protection: 15,
     specialEffects: [
       { type: 'metal_burning_boost', magnitude: 30, description: 'Pewter enhances physical strength' },
@@ -1844,8 +1844,8 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     ],
     moodModifier: 5,
     atmosphere: 'energizing',
-    description: 'Allomantic pewter',
-    lore: 'Pewter grants physical might. Thugs feel stronger near pure pewter.',
+    description: 'Ferromancy pewter',
+    lore: 'Pewter grants physical might. Pewter-Arms feel stronger near pure pewter.',
   },
 
   tin: {
@@ -1855,14 +1855,14 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     conducts_magic: true,
     element: 'metal',
     elementalStrength: 50,
-    paradigmAffinities: { allomancy: 35, sympathy: 15 },
+    paradigmAffinities: { ferromancy: 35, tethermancy: 15 },
     specialEffects: [
       { type: 'metal_burning_boost', magnitude: 25, description: 'Tin enhances senses' },
     ],
     moodModifier: 0,
     atmosphere: 'neutral',
-    description: 'Allomantic tin',
-    lore: 'Tin sharpens the senses. Tineyes see in darkest night.',
+    description: 'Ferromancy tin',
+    lore: 'Tin sharpens the senses. Tin-Senses see in darkest night.',
   },
 
   zinc: {
@@ -1872,15 +1872,15 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     conducts_magic: true,
     element: 'metal',
     elementalStrength: 45,
-    paradigmAffinities: { allomancy: 35, emotional: 25 },
+    paradigmAffinities: { ferromancy: 35, emotional: 25 },
     specialEffects: [
       { type: 'metal_burning_boost', magnitude: 25, description: 'Zinc riots emotions' },
       { type: 'emotion_amplification', magnitude: 15, description: 'Emotions run hot' },
     ],
     moodModifier: 5,
     atmosphere: 'energizing',
-    description: 'Allomantic zinc',
-    lore: 'Zinc inflames emotions. Rioters use it to enrage or terrify.',
+    description: 'Ferromancy zinc',
+    lore: 'Zinc inflames emotions. Brass-Kindlers use it to enrage or terrify.',
   },
 
   brass: {
@@ -1890,15 +1890,15 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     conducts_magic: true,
     element: 'metal',
     elementalStrength: 50,
-    paradigmAffinities: { allomancy: 35, emotional: 25 },
+    paradigmAffinities: { ferromancy: 35, emotional: 25 },
     specialEffects: [
       { type: 'metal_burning_boost', magnitude: 25, description: 'Brass soothes emotions' },
       { type: 'emotion_dampening', magnitude: 15, description: 'Calm pervades' },
     ],
     moodModifier: 10,
     atmosphere: 'calming',
-    description: 'Allomantic brass',
-    lore: 'Brass calms emotions. Soothers bring peace—or apathy.',
+    description: 'Ferromancy brass',
+    lore: 'Brass calms emotions. Zinc-Whispers bring peace—or apathy.',
   },
 
   chromium: {
@@ -1908,15 +1908,15 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     conducts_magic: true,
     element: 'metal',
     elementalStrength: 60,
-    paradigmAffinities: { allomancy: 45 },
+    paradigmAffinities: { ferromancy: 45 },
     specialEffects: [
-      { type: 'metal_burning_boost', magnitude: 35, description: 'Chromium wipes Allomantic reserves' },
+      { type: 'metal_burning_boost', magnitude: 35, description: 'Chromium wipes Ferromancy reserves' },
       { type: 'corruption_resistance', magnitude: 20, description: 'Purges foreign magic' },
     ],
     moodModifier: 0,
     atmosphere: 'neutral',
-    description: 'Allomantic chromium',
-    lore: 'Chromium drains Allomantic reserves. Leechers are feared.',
+    description: 'Ferromancy chromium',
+    lore: 'Chromium drains Ferromancy reserves. Leechers are feared.',
   },
 
   nickel: {
@@ -1926,15 +1926,15 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     conducts_magic: true,
     element: 'metal',
     elementalStrength: 55,
-    paradigmAffinities: { allomancy: 40 },
+    paradigmAffinities: { ferromancy: 40 },
     protection: 10,
     specialEffects: [
-      { type: 'metal_burning_boost', magnitude: 30, description: 'Nickel reveals Allomantic abilities' },
+      { type: 'metal_burning_boost', magnitude: 30, description: 'Nickel reveals Ferromancy abilities' },
     ],
     moodModifier: 0,
     atmosphere: 'neutral',
-    description: 'Allomantic nicrosil',
-    lore: 'Nicrosil enhances another\'s Allomantic burn.',
+    description: 'Ferromancy nicrosil',
+    lore: 'Nicrosil enhances another\'s Ferromancy burn.',
   },
 
   aluminum: {
@@ -1944,68 +1944,68 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     conducts_magic: false, // Blocks magic
     element: 'metal',
     elementalStrength: 30,
-    paradigmAffinities: { allomancy: -50 }, // Negative - blocks Allomancy
+    paradigmAffinities: { ferromancy: -50 }, // Negative - blocks Ferromancy
     specialEffects: [
-      { type: 'corruption_resistance', magnitude: 100, description: 'Blocks all Allomancy' },
+      { type: 'corruption_resistance', magnitude: 100, description: 'Blocks all Ferromancy' },
     ],
     moodModifier: 0,
     atmosphere: 'neutral',
-    description: 'Allomancy-blocking aluminum',
-    lore: 'Aluminum is immune to Allomancy. It blocks pushes and pulls.',
+    description: 'Ferromancy-blocking aluminum',
+    lore: 'Aluminum is immune to Ferromancy. It blocks pushes and pulls.',
   },
 
-  duralumin: {
+  amplium: {
     ...DEFAULT_PROPERTIES,
     durability: 65,
     density: 45,
     conducts_magic: true,
     element: 'metal',
     elementalStrength: 65,
-    paradigmAffinities: { allomancy: 50 },
+    paradigmAffinities: { ferromancy: 50 },
     spellPower: 40,
     specialEffects: [
-      { type: 'metal_burning_boost', magnitude: 50, description: 'Duralumin explosively boosts burns' },
+      { type: 'metal_burning_boost', magnitude: 50, description: 'Amplium explosively boosts burns' },
     ],
     moodModifier: 5,
     atmosphere: 'energizing',
-    description: 'Allomantic duralumin',
-    lore: 'Duralumin burns all your metals in one explosive moment.',
+    description: 'Ferromancy amplium',
+    lore: 'Amplium burns all your metals in one explosive moment.',
   },
 
-  atium: {
+  temporite: {
     ...DEFAULT_PROPERTIES,
     durability: 80,
     weirdness: 90,
     conducts_magic: true,
     glows: true,
-    paradigmAffinities: { allomancy: 100, dimensional: 30 },
+    paradigmAffinities: { ferromancy: 100, dimensional: 30 },
     spellPower: 50,
     specialEffects: [
-      { type: 'metal_burning_boost', magnitude: 100, description: 'Atium reveals the future' },
+      { type: 'metal_burning_boost', magnitude: 100, description: 'Temporite reveals the future' },
       { type: 'time_dilation', magnitude: 30, description: 'Time seems to slow' },
     ],
     moodModifier: 10,
     atmosphere: 'dreamy',
-    description: 'The body of a god',
-    lore: 'Atium is Ruin\'s body. Burning it grants precognition.',
+    description: 'A Chorus-shadow relic metal',
+    lore: 'Temporite is a Chorus-shadow relic. Burning it grants precognition.',
   },
 
-  lerasium: {
+  chorium: {
     ...DEFAULT_PROPERTIES,
     durability: 100,
     weirdness: 100,
     conducts_magic: true,
     glows: true,
-    paradigmAffinities: { allomancy: 100, divine: 50 },
+    paradigmAffinities: { ferromancy: 100, divine: 50 },
     manaRegen: 3.0,
     spellPower: 100,
     specialEffects: [
-      { type: 'metal_burning_boost', magnitude: 100, description: 'Lerasium grants Allomancy' },
+      { type: 'metal_burning_boost', magnitude: 100, description: 'Chorium grants Ferromancy' },
     ],
     moodModifier: 30,
     atmosphere: 'euphoric',
-    description: 'The body of a god',
-    lore: 'Lerasium is Preservation\'s body. Consuming it makes one Mistborn.',
+    description: 'A Chorus-light relic metal',
+    lore: 'Chorium is a Chorus-light relic. Consuming it can awaken a Crucible-Born ferromancer.',
   },
 
   // ===========================================================================
@@ -2132,7 +2132,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     weirdness: 75,
     element: 'water',
     elementalStrength: 60,
-    paradigmAffinities: { emotional: 60, sympathy: 30, dream: 20 },
+    paradigmAffinities: { emotional: 60, tethermancy: 30, dream: 20 },
     specialEffects: [
       { type: 'emotion_amplification', magnitude: 40, description: 'Sorrow magnified' },
       { type: 'corruption_resistance', magnitude: 20, description: 'Tears purify' },
@@ -2492,7 +2492,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     ...DEFAULT_PROPERTIES,
     durability: 35,
     weirdness: 75,
-    paradigmAffinities: { emotional: 80, dream: 40, sympathy: 30 },
+    paradigmAffinities: { emotional: 80, dream: 40, tethermancy: 30 },
     manaRegen: 1.5,
     element: 'water',
     moodModifier: -35,
@@ -2542,7 +2542,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
   // FANTASY METALS (Various Universes)
   // ==========================================================================
 
-  valyrian_steel: {
+  drakforged_steel: {
     ...DEFAULT_PROPERTIES,
     durability: 100,
     weirdness: 60,
@@ -2556,11 +2556,11 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
       { type: 'dragonfire_forged', magnitude: 50, description: 'Cuts through magic' },
       { type: 'undead_bane', magnitude: 80, description: 'Destroys undead' },
     ],
-    description: 'Dragonfire-forged steel',
-    lore: 'Forged in dragonfire with blood magic, its secrets lost to doom.',
+    description: 'Steel folded and tempered in dragonfire by Ettin forge-singers',
+    lore: 'Each blade holds its edge indefinitely — the forging technique is a lost art, and existing blades are irreplaceable heirlooms.',
   },
 
-  dragonglass: {
+  pyrrhic_obsidian: {
     ...DEFAULT_PROPERTIES,
     durability: 30,
     weirdness: 50,
@@ -2571,10 +2571,10 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     moodModifier: -5,
     atmosphere: 'neutral',
     specialEffects: [
-      { type: 'undead_bane', magnitude: 100, description: 'Destroys Others/undead' },
+      { type: 'undead_bane', magnitude: 100, description: 'Disrupts incorporeal entities on contact' },
     ],
-    description: 'Volcanic glass with magical properties',
-    lore: 'Frozen fire from the dawn of days.',
+    description: 'Volcanic glass saturated with elemental fire energy',
+    lore: 'Formed at extreme thermal vents where fire energy saturates the magma. Naturally anathema to incorporeal beings.',
   },
 
   starmetal: {
@@ -3024,7 +3024,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     durability: 30,
     weirdness: 60,
     glows: true,
-    paradigmAffinities: { divine: 70, sympathy: 50 },
+    paradigmAffinities: { divine: 70, tethermancy: 50 },
     manaRegen: 1.6,
     element: 'water',
     moodModifier: 30,
@@ -3164,7 +3164,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     ...DEFAULT_PROPERTIES,
     durability: 55,
     weirdness: 50,
-    paradigmAffinities: { blood: 60, sympathy: 40, wild: 30 },
+    paradigmAffinities: { blood: 60, tethermancy: 40, wild: 30 },
     protection: 30,
     element: 'earth',
     moodModifier: -10,
@@ -3393,7 +3393,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     ...DEFAULT_PROPERTIES,
     durability: 35,
     weirdness: 80,
-    paradigmAffinities: { sympathy: 80, dream: 50, emotional: 40 },
+    paradigmAffinities: { tethermancy: 80, dream: 50, emotional: 40 },
     manaRegen: 1.4,
     element: null,
     moodModifier: -5,
@@ -3411,7 +3411,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     durability: 60,
     weirdness: 50,
     alive: true,
-    paradigmAffinities: { shinto: 90, dream: 40, sympathy: 30 },
+    paradigmAffinities: { shinto: 90, dream: 40, tethermancy: 30 },
     manaRegen: 1.5,
     element: 'wood',
     moodModifier: 20,
@@ -3429,7 +3429,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     durability: 10,
     weirdness: 65,
     glows: true,
-    paradigmAffinities: { emotional: 80, sympathy: 60, dream: 40 },
+    paradigmAffinities: { emotional: 80, tethermancy: 60, dream: 40 },
     manaRegen: 1.6,
     element: 'water',
     moodModifier: 0,
