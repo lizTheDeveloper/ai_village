@@ -82,9 +82,11 @@ log "Installing dependencies in clean archive..."
 (cd "$BUILD_TMPDIR/custom_game_engine" && npm ci --silent)
 
 log "Stubbing folkfork-bridge (file: dep lives outside this repo)..."
+# git archive strips the custom_game_engine/ prefix, so typings are at $BUILD_TMPDIR/packages/
+# but npm ci runs from $BUILD_TMPDIR/custom_game_engine/, so node_modules is there
 FOLKFORK_PKG="$BUILD_TMPDIR/custom_game_engine/node_modules/@multiverse-studios/folkfork-bridge"
 mkdir -p "$FOLKFORK_PKG"
-cp "$BUILD_TMPDIR/custom_game_engine/packages/core/src/typings/folkfork-bridge.d.ts" "$FOLKFORK_PKG/index.d.ts"
+cp "$BUILD_TMPDIR/packages/core/src/typings/folkfork-bridge.d.ts" "$FOLKFORK_PKG/index.d.ts"
 echo '{"name":"@multiverse-studios/folkfork-bridge","version":"0.0.0","types":"index.d.ts","main":"index.js"}' > "$FOLKFORK_PKG/package.json"
 echo 'module.exports = {};' > "$FOLKFORK_PKG/index.js"
 log "folkfork-bridge stubbed."
