@@ -2030,7 +2030,7 @@ interface CrossVoiceCommunication {
 
 // Who can speak to dual-voice species?
 const dualVoiceCommunicators = {
-  trill_symbionts: true,              // Two minds, can coordinate
+  bonded_symbionts: true,              // Two minds, can coordinate
   pack_minds: true,                   // Multiple bodies, can harmonize
   bonded_pairs: true,                 // Trained human pairs
   ai_systems: true,                   // Can generate both voices

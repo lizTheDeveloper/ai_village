@@ -1,6 +1,6 @@
 # Parasitic Reproduction System
 
-Simulates parasitic hive minds that colonize hosts and control their reproduction. Inspired by Body Snatchers, Yeerks (Animorphs), Goa'uld (Stargate), and Cordyceps fungi.
+Simulates parasitic hive minds that colonize hosts and control their reproduction. Inspired by Body Snatchers, psychic parasites, neck symbionts, and Cordyceps fungi.
 
 ## Overview
 

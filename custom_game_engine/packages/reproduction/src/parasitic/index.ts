@@ -5,8 +5,8 @@
  * that propagate through host bodies. Inspired by:
  *
  * - Body Snatchers (Invasion of the Body Snatchers)
- * - Yeerks (Animorphs)
- * - Goa'uld (Stargate)
+ * - Psychic parasites (ear-entry colonizers)
+ * - Neck symbionts (injection-style takeover)
  * - Cordyceps fungi
  * - The Pluribus concept
  *

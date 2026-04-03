@@ -640,9 +640,9 @@ describe('ParasiticHiveMind Integration Tests', () => {
     });
   });
 
-  describe('Yeerk-style Resistance', () => {
+  describe('Psychic Parasite-style Resistance', () => {
     it('simulates a host breaking free', () => {
-      const collective = createCollective('yeerk-pool', 'Yeerk Pool 359', 0 as Tick);
+      const collective = createCollective('parasite-pool', 'Parasite Pool 359', 0 as Tick);
 
       // Create a strong-willed host
       const host = createResistantHost();
@@ -650,7 +650,7 @@ describe('ParasiticHiveMind Integration Tests', () => {
 
       // Colonize
       host.colonize(
-        'yeerk-pool',
+        'parasite-pool',
         'ear_entry',
         collective.createLineage(0 as Tick).lineageId,
         0 as Tick,

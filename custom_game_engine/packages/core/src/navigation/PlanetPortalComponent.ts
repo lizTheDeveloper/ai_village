@@ -144,7 +144,7 @@ export interface PlanetPortalComponent extends Component {
   /** Visual appearance */
   visual: {
     /** Visual effect type */
-    effectType: 'swirling_energy' | 'stargate' | 'crystal_arch' | 'ancient_stones' | 'natural_rift';
+    effectType: 'swirling_energy' | 'ring_portal' | 'crystal_arch' | 'ancient_stones' | 'natural_rift';
 
     /** Primary color (hex) */
     primaryColor: string;

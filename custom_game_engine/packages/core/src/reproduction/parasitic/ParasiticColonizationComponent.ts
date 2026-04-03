@@ -6,8 +6,8 @@
  *
  * This models scenarios like:
  * - Body Snatchers (pod people)
- * - Yeerks (Animorphs)
- * - Goa'uld (Stargate)
+ * - Psychic parasites (ear-entry colonizers)
+ * - Neck symbionts (injection-style takeover)
  * - Cordyceps-style fungal control
  * - The Pluribus concept
  */
@@ -22,7 +22,7 @@ export type ControlLevel =
   | 'partial' // Parasite has control but host has moments of autonomy
   | 'full' // Complete control, host is suppressed
   | 'integrated' // Host personality has been absorbed/merged
-  | 'symbiotic'; // Rare: both entities cooperate (becomes more like Trill)
+  | 'symbiotic'; // Rare: both entities cooperate (becomes more like bonded symbiont)
 
 /** How the host's original personality is treated */
 export type HostPersonalityState =
@@ -35,10 +35,10 @@ export type HostPersonalityState =
 
 /** The method by which colonization occurred */
 export type ColonizationMethod =
-  | 'ear_entry' // Classic Yeerk-style
+  | 'ear_entry' // Classic psychic parasite-style
   | 'spore_inhalation' // Cordyceps-style
   | 'pod_replacement' // Body Snatchers - host body is replaced
-  | 'injection' // Goa'uld-style through neck
+  | 'injection' // Neck symbiont-style through neck
   | 'consumption' // Eaten and rebuilt
   | 'psychic_override' // No physical parasite, pure mental takeover
   | 'birth_colonization' // Born already colonized

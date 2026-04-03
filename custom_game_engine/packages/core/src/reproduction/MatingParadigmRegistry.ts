@@ -1352,14 +1352,14 @@ export const THREE_SEX_PARADIGM: MatingParadigm = {
 };
 
 // ============================================================================
-// Parasitic Hive Mind Paradigm (Body Snatchers / Yeerk-style)
+// Parasitic Hive Mind Paradigm (Body Snatchers / Psychic Parasite-style)
 // ============================================================================
 
 export const PARASITIC_HIVEMIND_PARADIGM: MatingParadigm = {
   id: 'parasitic_hivemind',
   name: 'Parasitic Collective',
   description: 'A hive mind that propagates by taking over host bodies. Hosts retain reproductive capability, but the hive controls mating decisions.',
-  speciesIds: ['body_snatcher', 'yeerk', 'goa_uld', 'cordyceps_sentient', 'pluribus'],
+  speciesIds: ['body_snatcher', 'psychic_parasite', 'neck_symbiont', 'cordyceps_sentient', 'pluribus'],
   lore: 'The host body still hungers, still desires, still reproduces. But the mind behind the eyes is not their own. The offspring emerge... and we are already there, waiting.',
 
   biologicalSex: {
@@ -1482,14 +1482,14 @@ export const PARASITIC_HIVEMIND_PARADIGM: MatingParadigm = {
 };
 
 // ============================================================================
-// Symbiotic Paradigm (Trill-style / Mutual Benefit)
+// Symbiotic Paradigm (Bonded Symbiont-style / Mutual Benefit)
 // ============================================================================
 
 export const SYMBIOTIC_PARADIGM: MatingParadigm = {
   id: 'symbiotic',
   name: 'Symbiotic Union',
   description: 'Two species that require each other. The host and symbiont together form a complete being. Both must consent, and both benefit.',
-  speciesIds: ['trill', 'symbiont_host', 'bonded_pair_species'],
+  speciesIds: ['bonded_symbiont', 'symbiont_host', 'bonded_pair_species'],
   lore: 'Neither is complete alone. The host provides the body, the symbiont provides memory across generations. Together, they are more than either could be. Their love is... complicated.',
 
   biologicalSex: {
