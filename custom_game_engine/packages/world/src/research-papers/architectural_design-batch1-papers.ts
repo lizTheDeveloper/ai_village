@@ -104,7 +104,7 @@ The historical development of blueprint creation reads like a comedy of errors p
 
 **The Dimensional Cartographers were allegedly founded in AM 1203, disbanded in AM 1204 following what records mysteriously refer to as "The Incident with the Recursive Staircase." Their headquarters building, ironically, was never successfully mapped†.
 
-†The building still stands, but its floor plan changes depending on which entrance you use, what day of the week it is, and whether you've been good this year. The Ankh-Morpork Tourism Board lists it as "architecturally significant" and "navigationally inadvisable."
+†The building still stands, but its floor plan changes depending on which entrance you use, what day of the week it is, and whether you've been good this year. The Thornhaven Tourism Board lists it as "architecturally significant" and "navigationally inadvisable."
 
 ††Catastrophic blueprint creation incidents include the Genua Tower of 1823 (built three stories shorter than planned when the architect forgot to account for floor thickness), the Bridge of Quirm (which spanned everything except the river), and the notorious Casa di Confusion in Brindisi, where the architect drew the north elevation upside-down and no one noticed until the windows were installed on the ceiling‡.
 
@@ -112,7 +112,7 @@ The historical development of blueprint creation reads like a comedy of errors p
 
 ‡‡Historians debate whether Archimedes actually drew blueprints or just shouted measurements at builders until they gave up and made something that looked about right. The "Archimedes Approximation Method" remains popular in certain construction circles, particularly among those who don't own measuring tapes.
 
-***The wavy line convention was introduced by the Ankh-Morpork Guild of Draughtsmen in AM 1734 as an official symbol meaning "something goes here but I haven't decided what yet." It has since evolved to mean "good luck figuring this out."
+***The wavy line convention was introduced by the Thornhaven Guild of Draughtsmen in AM 1734 as an official symbol meaning "something goes here but I haven't decided what yet." It has since evolved to mean "good luck figuring this out."
 
 †††The famous "Centimeter Catastrophe of Prague" (1891) resulted in a mansion with doorways 3.5 centimeters tall. The architect's defense—"I clearly marked the units"—was technically correct. He now works exclusively on dollhouses. The mansion still stands and is inhabited entirely by cats, who find the proportions reasonable††.
 

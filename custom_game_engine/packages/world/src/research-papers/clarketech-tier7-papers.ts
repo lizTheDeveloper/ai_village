@@ -61,11 +61,11 @@ FOOTNOTES:
 
 †These include obvious metrics like heart rate and blood oxygen, but also more obscure measurements such as "neural coherence index" and "existential certainty quotient"—the latter being a measurement of how confident the brain is about which reality it currently inhabits. A score below 0.4 triggers automatic ejection*.
 
-*The existential certainty quotient was developed after the Sanderson Experiments of 2053, when test subject David Sanderson became so thoroughly convinced of his virtual reality that his brain rejected the real world as "obviously fake"†. He spent three weeks insisting that the hospital was an elaborate simulation and that his "real" body was still in the fantasy realm of Aethermoor‡. He eventually accepted reality, but only after his insurance company declined to cover "injuries sustained in fictional locations."
+*The existential certainty quotient was developed after the Chorus canon Experiments of 2053, when test subject David Chorus canon became so thoroughly convinced of his virtual reality that his brain rejected the real world as "obviously fake"†. He spent three weeks insisting that the hospital was an elaborate simulation and that his "real" body was still in the fantasy realm of Aethermoor‡. He eventually accepted reality, but only after his insurance company declined to cover "injuries sustained in fictional locations."
 
 †His reasoning, documented in the medical literature, was internally consistent: "Reality doesn't have this many budget constraints or uncomfortable chairs. Clearly this is the simulation."
 
-‡Aethermoor doesn't exist, but Sanderson's description of it was so detailed and consistent that the recreational dive company he'd been testing for briefly considered implementing it as an actual destination. The Ethics Committee shut this down on the grounds that "reality shouldn't be taking notes from delusion." The company's response that "reality started it" was deemed unhelpful.
+‡Aethermoor doesn't exist, but Chorus canon's description of it was so detailed and consistent that the recreational dive company he'd been testing for briefly considered implementing it as an actual destination. The Ethics Committee shut this down on the grounds that "reality shouldn't be taking notes from delusion." The company's response that "reality started it" was deemed unhelpful.
 
 †††The Neural Safety Commission's official description is "rapidly-escalating sensory reintegration with controlled shock elements." Survivors prefer more colorful language, much of which cannot be reproduced in academic literature. The most printable version compares it to "being born, except you remember it and your mother is made of electricity."
 
@@ -1041,7 +1041,7 @@ FOOTNOTES
 
 * The author's own mobile device dropped seventeen calls while writing this sentence, despite being in a major metropolitan area with allegedly "excellent coverage." The device was not enchanted at the time. This feels relevant.
 
-† Professor Emmeline Darkweather of the Unseen University's Department of Applied Impossibilities notes that "we spent three thousand years perfecting magical communication across any distance, then invented technology and had to start over." She sounded tired when she said this.
+† Professor Emmeline Darkweather of the The Invisible College's Department of Applied Impossibilities notes that "we spent three thousand years perfecting magical communication across any distance, then invented technology and had to start over." She sounded tired when she said this.
 
 ‡ A seventh-century runecrafter, upon being shown a modern smartphone through a complicated temporal viewing spell, reportedly said, "Obviously you'd carve runes into it. What else would you do?" before asking why it was so sad-looking and flat. This account comes from the Journal of Anachronistic Conversations, Vol. 23, and may be entirely fabricated.
 

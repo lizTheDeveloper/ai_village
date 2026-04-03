@@ -479,7 +479,7 @@ The historical development of door frame installation reveals humanity's gradual
 
 *The Door Frame Paradox, as noted by the philosopher Heraclitus in his lesser-known work "On Things That Frame Other Things," observes that the door frame simultaneously represents permanence (being fixed to the wall) and transience (facilitating passage through that wall). He was reportedly thinking about this while a carpenter waited impatiently to measure his study.
 
-**The exact frequency of curse words per installation has been studied extensively by the Department of Construction Linguistics at Unseen University. Their findings suggest a direct correlation between the age of the building and the creativity of profanity, with pre-1900 structures requiring the invention of entirely new expletives.
+**The exact frequency of curse words per installation has been studied extensively by the Department of Construction Linguistics at The Invisible College. Their findings suggest a direct correlation between the age of the building and the creativity of profanity, with pre-1900 structures requiring the invention of entirely new expletives.
 
 ***The Guild of Geometers has been lobbying since 1847 for walls to be constructed "rectangle-first, studs second," a proposal that builders have described as "mathematically sound but practically hilarious."
 
@@ -578,7 +578,7 @@ export const FLOORING_SYSTEMS: ResearchPaper = {
   ],
   description: `FLOORING SYSTEMS: A Comprehensive Examination of Horizontal Load-Bearing Surfaces and Their Relationship to Not Falling Through Buildings
 
-By Professor Artemisia Groundling, Department of Underfoot Engineering, University of Ankh-Morpork*
+By Professor Artemisia Groundling, Department of Underfoot Engineering, University of Thornhaven*
 
 
 The fundamental principle of flooring systems rests upon a deceptively simple premise: that humans and their possessions should remain at consistent vertical elevations within structures, rather than experiencing what the Ancient Carpenters' Guild euphemistically termed "involuntary rapid descent events."† The modern understanding of flooring emerged slowly over several millennia, primarily through what the historian Lord Vetinari III described as "an extended period of architectural Darwinism in which unsuccessful approaches were self-eliminating."‡ Contemporary flooring systems consist of three primary components: the structural framework (joists, beams, or slabs), the substrate (that which receives the walking-upon), and the finish layer (that which prevents splinters and makes one's landlord feel they can charge extra rent).** The relationship between these components determines not merely the floor's load-bearing capacity, but also its acoustic properties, thermal characteristics, and—most critically—its tendency to remain precisely where the architect intended it.††

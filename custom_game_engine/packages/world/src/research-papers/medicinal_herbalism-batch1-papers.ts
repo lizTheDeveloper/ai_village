@@ -461,7 +461,7 @@ FOOTNOTES:
 
 *Not to be confused with increasingly nervous herbalists, who maintain their composure significantly better, possibly due to superior tea consumption.
 
-**According to the Department of Extremely Old Plants and Their Human Relationships at the University of Ankh-Morpork. The Department's founding charter includes the phrase "because someone should be keeping track of these things before they become entirely mythological."
+**According to the Department of Extremely Old Plants and Their Human Relationships at the University of Thornhaven. The Department's founding charter includes the phrase "because someone should be keeping track of these things before they become entirely mythological."
 
 †The proper time for harvesting elderflowers is late spring to early summer, specifically when the flowers are fully open but before they begin browning, on a dry morning after the dew has evaporated but before the afternoon heat has caused the volatile oils to dissipate. This window lasts approximately seventeen minutes, depending on latitude, weather patterns, and whether you remembered to actually check the elder tree before the afternoon you planned to harvest.
 
@@ -534,7 +534,7 @@ Modern practitioners would do well to remember that digestive herbs function not
 
 †††Also known as "that which prevents the stomach from digesting itself," a situation that occurs with distressing regularity in the absence of proper herbal or dietary intervention. The Comfortable Coating received its name from High Priestess Ninhursag, who apparently possessed both profound botanical knowledge and a gift for understatement.
 
-‡‡‡A now-lost manuscript, though the Librarian of the Unseen University insists he knows where it is if anyone would just stop bothering him about it. The few surviving excerpts suggest it was written with more attention to practicality than poetry, containing such memorable passages as "For Griping of the Bowels, mint; for Griping of the Heart about the Bowels, also mint, but with honey."
+‡‡‡A now-lost manuscript, though the Librarian of the The Invisible College insists he knows where it is if anyone would just stop bothering him about it. The few surviving excerpts suggest it was written with more attention to practicality than poetry, containing such memorable passages as "For Griping of the Bowels, mint; for Griping of the Heart about the Bowels, also mint, but with honey."
 
 §Prior to this innovation, herb books organized their contents according to principles that made sense to their authors but to absolutely no one else. The 1312 Herbarium Alphabeticus placed "Wormwood for Worms" directly after "Wormwood for Worry," which led to several documented cases of patients receiving treatment for the wrong affliction entirely††††.
 

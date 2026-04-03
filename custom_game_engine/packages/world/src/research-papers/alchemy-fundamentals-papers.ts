@@ -152,7 +152,7 @@ The successful distiller develops a relationship with their apparatus that borde
 
 *The earliest recorded distillation apparatus dates to the third century CE in Alexandria, where it was used to create perfumes and, more importantly, substances that made the creation of perfumes more bearable. The inventor, one Zosimos of Panopolis, described the process in texts so deliberately obscure that scholars still debate whether he was protecting sacred knowledge or simply couldn't write very well.
 
-**According to the Department of Preventable Catastrophes at the Unseen University, approximately 73.4% of all beginning alchemists attempt distillation before understanding this principle, resulting in apparatus failure, mysterious odors, and what the department terms "educational scarring."
+**According to the Department of Preventable Catastrophes at the The Invisible College, approximately 73.4% of all beginning alchemists attempt distillation before understanding this principle, resulting in apparatus failure, mysterious odors, and what the department terms "educational scarring."
 
 †The word "alembic" derives from the Arabic al-anbiq, itself from the Greek ambix, meaning "cup" or "beaker," which seems rather like calling the Great Pyramid of Giza "that big pointy thing." The Arabs, who perfected the art of distillation while Europe was still trying to remember how to make decent pottery, showed considerably more sophistication in their apparatus design than their naming conventions suggested†.
 
@@ -222,7 +222,7 @@ The practical applications of calcination extend far beyond the philosophical, t
 
 †Though the term actually translates more accurately as "the body that doesn't rot anymore," which is less poetic but more technically precise. The alchemists were great believers in making things sound more impressive than they were, a tradition maintained today by academic publishing.
 
-‡According to the Archives of the Salamander's Regret in Ankh-Morpork, which maintains meticulous records of every alchemical mishap since the incident of 1123 CE, when Brother Ignatius discovered that "calcining" and "conflagrating" were not, in fact, synonyms**. The Archives occupy seventeen buildings and require a staff of forty-three scribes working in shifts.
+‡According to the Archives of the Salamander's Regret in Thornhaven, which maintains meticulous records of every alchemical mishap since the incident of 1123 CE, when Brother Ignatius discovered that "calcining" and "conflagrating" were not, in fact, synonyms**. The Archives occupy seventeen buildings and require a staff of forty-three scribes working in shifts.
 
 **Brother Ignatius survived, though he lost his eyebrows, his workshop, and his reputation. He later founded the School of Cautious Combustion, whose motto—"Rather Slow Than Scattered"—appears on approximately sixty percent of alchemical safety pamphlets to this day††.
 

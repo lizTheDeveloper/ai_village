@@ -36,7 +36,7 @@ The cardinal rule of wild plant foraging remains breathtakingly simple yet routi
 
 ‡Charles Darwin reportedly remarked that if he had designed plants, he would have made the poisonous ones bright purple with warning labels. His notebooks contain a sketch of what appears to be a skull-and-crossbones flower, marked "if only."
 
-**The phenomenon of "botanical mimicry between edible and toxic species" has been studied extensively by the University of Ankh-Morpork's Department of Inadvisable Botany†, which maintains both a research garden and an adjacent emergency medical facility. The proximity is not coincidental.
+**The phenomenon of "botanical mimicry between edible and toxic species" has been studied extensively by the University of Thornhaven's Department of Inadvisable Botany†, which maintains both a research garden and an adjacent emergency medical facility. The proximity is not coincidental.
 
 †The Department was founded in 1623 after what came to be known as "The Great Salad Incident," which reduced the faculty dining hall attendance by approximately 40% and led to significant curriculum reforms.
 
@@ -101,7 +101,7 @@ The fundamental challenge facing any extraction lies in this paradox: the condit
 
 *The historical record contains accounts of herbal preparation dating back to the Neolithic period, when someone first noticed that chewing certain leaves made headaches go away and other leaves made everything go away, including consciousness and, in one notable case, the ability to count to three.
 
-**Covered in the prerequisite text "Herb Identification: Or, Learning Which Green Things Won't Kill You Immediately," available from the Ankh-Morpork Botanical Society Press, price: reasonable, casualties: moderate.
+**Covered in the prerequisite text "Herb Identification: Or, Learning Which Green Things Won't Kill You Immediately," available from the Thornhaven Botanical Society Press, price: reasonable, casualties: moderate.
 
 †The Venn diagram of "people with deep knowledge of chemistry" and "people with the patience to wait three weeks for a tincture to steep" contains surprisingly little overlap. The middle section consists almost entirely of monks.
 
@@ -286,7 +286,7 @@ The fundamental principle that separates the poisoner from the physician is not,
 
 The situation becomes considerably more complex when one considers that the therapeutic window is not, in fact, a fixed entity, but rather shifts with the patient's age, weight, liver function, kidney function, what they ate for breakfast, the phase of the moon‡‡, and approximately seventy-three other variables that the Guild of Apothecaries maintains in a ledger so large it requires its own storage building***. Children metabolize substances at rates that would give an adult liver a panic attack†††, while the elderly process medications so slowly that a dose perfectly calibrated for a forty-year-old farmer becomes, in an eighty-year-old scholar, a one-way ticket to the Poison Information Centre‡‡‡. This is why the ancient wisdom "a spoonful for adults, a half-spoonful for children" is now recognized as dangerously oversimplified**** and has been replaced with complex calculations that require, at minimum, a working knowledge of arithmetic and, at maximum, a degree in applied mathematics from the University of Quirm†††† or its equivalent.
 
-The historical record is, regrettably, littered with well-meaning herbalists who failed to appreciate these subtleties‡‡‡‡. The Incident at Ankh-Morpork's Charity Hospital of 1782***** remains a cautionary tale: Sister Oona Goodheart, determined to ease the suffering of her elderly patients, administered her grandmother's "heart tonic" recipe with such enthusiasm that the subsequent inquiry filled fourteen volumes and led to the establishment of the rather unfortunately named "Goodheart Commission"†††††, which now sets standards for all medical practitioners across the continent‡‡‡‡‡. Modern practice requires not merely knowledge of which plants heal and which kill, but the ability to navigate the treacherous middle ground where both properties exist simultaneously******, a skill that separates the professional from the enthusiastic amateur approximately as effectively as a brick wall separates the living room from the great outdoors.
+The historical record is, regrettably, littered with well-meaning herbalists who failed to appreciate these subtleties‡‡‡‡. The Incident at Thornhaven's Charity Hospital of 1782***** remains a cautionary tale: Sister Oona Goodheart, determined to ease the suffering of her elderly patients, administered her grandmother's "heart tonic" recipe with such enthusiasm that the subsequent inquiry filled fourteen volumes and led to the establishment of the rather unfortunately named "Goodheart Commission"†††††, which now sets standards for all medical practitioners across the continent‡‡‡‡‡. Modern practice requires not merely knowledge of which plants heal and which kill, but the ability to navigate the treacherous middle ground where both properties exist simultaneously******, a skill that separates the professional from the enthusiastic amateur approximately as effectively as a brick wall separates the living room from the great outdoors.
 
 ---
 
@@ -306,7 +306,7 @@ FOOTNOTES:
 
 ‡‡ The phase of the moon affects approximately nothing in pharmaceutical terms, but the Guild of Apothecaries discovered that patients felt better when told their treatment was "astronomically aligned," and placebo effects are, after all, still effects‡.
 
-‡‡‡ The actual scientific term. The Poison Information Centre of Ankh-Morpork handles approximately 1,847 calls per year, of which 43% involve the phrase "but the label said," 31% involve the phrase "how was I supposed to know," and 26% involve the phrase "Granny's recipe never mentioned this part." The remaining inquiries consist largely of screaming.
+‡‡‡ The actual scientific term. The Poison Information Centre of Thornhaven handles approximately 1,847 calls per year, of which 43% involve the phrase "but the label said," 31% involve the phrase "how was I supposed to know," and 26% involve the phrase "Granny's recipe never mentioned this part." The remaining inquiries consist largely of screaming.
 
 *** The Repository of Pharmacological Variables, located in a converted warehouse in Pseudopolis, measures 47 meters long, 23 meters wide, and contains approximately 89,000 individual entries. It is maintained by a dedicated staff of twelve, who are all, according to guild regulations, required to have "excellent handwriting, exceptional patience, and no family history of insanity." The last requirement was added after what the Guild refers to only as "The Regrettable Copying Error of 1691."
 
@@ -314,7 +314,7 @@ FOOTNOTES:
 
 ***** The children reported seeing, variously, "tiny dragons in waistcoats," "talking furniture," and "Granny, but with too many teeth." The furniture was later confirmed to be non-verbal. The dragons remain unverified.
 
-†††† Children, due to their enhanced metabolic rate, process foxglove approximately 3.7 times faster than adults, but extract approximately 2.1 times more of the active compound due to intestinal permeability differences, resulting in a net therapeutic window that is roughly 40% narrower and requires calculations that would make a tax assessor weep. This is why the Children's Hospital of Ankh-Morpork employs an actual mathematician on staff, and why that mathematician drinks.
+†††† Children, due to their enhanced metabolic rate, process foxglove approximately 3.7 times faster than adults, but extract approximately 2.1 times more of the active compound due to intestinal permeability differences, resulting in a net therapeutic window that is roughly 40% narrower and requires calculations that would make a tax assessor weep. This is why the Children's Hospital of Thornhaven employs an actual mathematician on staff, and why that mathematician drinks.
 
 †††† The University of Quirm's College of Pharmaceutical Mathematics is housed in a building that was originally constructed for an entirely different purpose†††††, but the pharmacists made the University an offer involving both gold and the removal of certain embarrassing records, and the University decided that mathematics was exactly what that building had been meant for all along.
 

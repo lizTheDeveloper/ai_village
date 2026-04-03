@@ -36,7 +36,7 @@ The practical application of companion planting requires careful observation, me
 
 †Following the Irish Potato Famine, during which the catastrophic vulnerability of monoculture became horrifyingly apparent. The fact that potatoes are not native to Ireland and that the entire nation had become dependent on a single crop variety is one of those historical details that makes one wonder about humanity's capacity for forward planning.
 
-**Dr. Millicent Weedsworth of the Ankh-Morpork Agricultural College described it as "precisely like a suburban homeowners association, except the disputes are settled through chemical warfare rather than passive-aggressive notes." Her seminal work, "Your Garden Hates You: A Practical Guide," remains banned in fourteen gardening clubs for excessive honesty.
+**Dr. Millicent Weedsworth of the Thornhaven Agricultural College described it as "precisely like a suburban homeowners association, except the disputes are settled through chemical warfare rather than passive-aggressive notes." Her seminal work, "Your Garden Hates You: A Practical Guide," remains banned in fourteen gardening clubs for excessive honesty.
 
 †††One Hieronymus Boschgarten (1634-1701), who spent forty years documenting plant relationships in such obsessive detail that his 47-volume manuscript had to be stored in a specially constructed library wing. He was eventually found living IN his garden, claiming he needed to "better understand the perspective of the lettuce." The manuscript itself is written in progressively smaller handwriting as he apparently began to identify more with the plants than with humanity.
 
@@ -106,7 +106,7 @@ The integration of these methods requires what the Institute for Agricultural Co
 
 **The Agricultural Archives of Çatalhöyük suggest that Neolithic farmers understood insect predation, but were too busy inventing farming to write it down. Or possibly they wrote it down and it was eaten by insects. History is unclear on this point.
 
-††The Coccinellidae Deployment Strategy was first formally documented by Professor Hieronymus Beetle-Wrangler of the Unseen University of Applied Entomology in 1873. Professor Beetle-Wrangler later disappeared under mysterious circumstances†.
+††The Coccinellidae Deployment Strategy was first formally documented by Professor Hieronymus Beetle-Wrangler of the The Invisible College of Applied Entomology in 1873. Professor Beetle-Wrangler later disappeared under mysterious circumstances†.
 
 †His laboratory was found empty except for approximately 40,000 well-fed ladybugs and a note reading "they were hungrier than anticipated." The Occupational Safety Board ruled it a "workplace miscalculation."
 
@@ -175,9 +175,9 @@ The adjustment of soil chemistry to achieve optimal growing conditions represent
 
 ---
 
-*Popular belief, in this context, refers to the approximately 6,000-year period between the development of agriculture and the invention of soil science, during which farming was conducted according to principles best described as "vigorously optimistic." See Pratchett-Boyle, T. & Ankh-Morpork Agricultural Extension Service (1887), "How We Survived Despite Ourselves: A History."
+*Popular belief, in this context, refers to the approximately 6,000-year period between the development of agriculture and the invention of soil science, during which farming was conducted according to principles best described as "vigorously optimistic." See Pratchett-Boyle, T. & Thornhaven Agricultural Extension Service (1887), "How We Survived Despite Ourselves: A History."
 
-**This method, while charmingly direct, produces success rates comparable to determining one's fortune by reading cheese mold—occasionally accurate, frequently disappointing, and prone to spectacular misinterpretation. The Lancre Agricultural College reports that this approach yields positive results approximately 23.4% of the time, and "character-building experiences" the remainder.
+**This method, while charmingly direct, produces success rates comparable to determining one's fortune by reading cheese mold—occasionally accurate, frequently disappointing, and prone to spectacular misinterpretation. The Heathglen Agricultural College reports that this approach yields positive results approximately 23.4% of the time, and "character-building experiences" the remainder.
 
 †Known colloquially as N-P-K, these elements form what ancient agricultural texts referred to as "The Gifts of the Three Sisters," though which three sisters remains unclear. The most credible theory suggests they were the daughters of a Sumerian farmer named Ea-Nasir*, who was already infamous for copper quality issues and apparently extended his lackadaisical approach to soil management.
 
@@ -193,7 +193,7 @@ The adjustment of soil chemistry to achieve optimal growing conditions represent
 
 **Professor Wilhelmina Grundschmutz of the Überwald Agricultural Academy famously remarked that pH adjustment "separates the competent from the confident," by which she meant that confident farmers tend to add approximately 400% more lime than necessary, creating conditions suitable primarily for growing concrete. Her seminal paper, "Alkalinity and Hubris: A Correlation Study" (1956), documents 2,847 cases of pH overcorrection, including the Notable Tragedy of Lower Feldspar*, where an entire valley became briefly capable of supporting only thistles and spite.
 
-*The valley eventually recovered after approximately fifteen years and is now ironically famous for its exceptionally resilient thistles, which are harvested and sold to masochistic herbalists throughout the Disc.
+*The valley eventually recovered after approximately fifteen years and is now ironically famous for its exceptionally resilient thistles, which are harvested and sold to masochistic herbalists throughout the Known World.
 
 †Plants evolved in specific pH ranges over millions of years and tend to regard sudden environmental shifts with what can only be described as "botanical displeasure." Blueberries, for instance, require acidic soil (pH 4.5-5.5) and will express their dissatisfaction with alkaline conditions by turning yellow, refusing to fruit, and generally exhibiting the agricultural equivalent of a prolonged sulk. Lilacs, conversely, prefer alkaline conditions and respond to acidic soil by becoming what the Horticultural Society of Bad Mergentheim calls "aggressively mediocre."
 
@@ -245,7 +245,7 @@ Disease resistance through grafting has transformed commercial fruit production,
 
 §The percentage drops to 3.1% if the drink in question is the notorious Scrumble of the Ramtop Mountains, which is technically less of a drink and more of a liquid weapon. ††
 
-††One Mr. Dibbler of Ankh-Morpork was known to sell "Grafted Wonders" from a tray, though botanical experts noted that the joins were suspiciously accomplished with twine and hope rather than proper technique. When questioned, Mr. Dibbler claimed the plants were "artisanally fused" and "would probably take eventually."
+††One Mr. Dibbler of Thornhaven was known to sell "Grafted Wonders" from a tray, though botanical experts noted that the joins were suspiciously accomplished with twine and hope rather than proper technique. When questioned, Mr. Dibbler claimed the plants were "artisanally fused" and "would probably take eventually."
 
 **The Third Dynasty of Ur (2112-2004 BCE) kept extensive clay tablet records of their grafting attempts. Tablet UR-1847-B contains what scholars believe is the first recorded use of the phrase "Well, that didn't work," though the cuneiform is somewhat ambiguous.
 

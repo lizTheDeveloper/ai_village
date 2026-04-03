@@ -142,13 +142,13 @@ The transformation of iron ore into metallic iron represents one of humanity's m
 
 The introduction of flux—typically limestone—serves to separate the non-metallic impurities (collectively termed "slag") from the desired iron†††. The flux combines with silicates and other contaminants to form a liquid slag that floats atop the denser molten iron‡‡‡, allowing for their separation****. This represents one of those elegant solutions that took humanity approximately three thousand years to discover††††, suggesting that our ancestors were either remarkably patient or remarkably stubborn*****. The Guild of Metallurgists‡‡‡‡ maintains that both qualities remain essential to the profession, along with a high tolerance for singed eyebrows and the philosophical acceptance that some batches will simply need to be melted down and tried again******.
 
-The most common failure mode in early iron production was excessive carbon absorption, resulting in cast iron that was brittle rather than workable†††††. Iron absorbs carbon enthusiastically from the surrounding charcoal‡‡‡‡‡, and the difference between "enough carbon to strengthen the iron" and "so much carbon it shatters like pottery" is frustratingly narrow*******. Master Ironwright Torquil of Lancre famously noted that "the iron knows when you're confident, and that's when it betrays you"††††††, a statement that initially sounds like mystical nonsense until one has personally experienced the phenomenon‡‡‡‡‡‡. The control of carbon content separates serviceable iron from excellent iron, and excellent iron from expensive shrapnel********.
+The most common failure mode in early iron production was excessive carbon absorption, resulting in cast iron that was brittle rather than workable†††††. Iron absorbs carbon enthusiastically from the surrounding charcoal‡‡‡‡‡, and the difference between "enough carbon to strengthen the iron" and "so much carbon it shatters like pottery" is frustratingly narrow*******. Master Ironwright Torquil of Heathglen famously noted that "the iron knows when you're confident, and that's when it betrays you"††††††, a statement that initially sounds like mystical nonsense until one has personally experienced the phenomenon‡‡‡‡‡‡. The control of carbon content separates serviceable iron from excellent iron, and excellent iron from expensive shrapnel********.
 
 ---
 
 *The term "alchemical" is used here in its historical sense, meaning "any process involving fire that we don't fully understand yet." Modern alchemists have rebranded to "hermetic philosophers" and insist they were never about the metalwork anyway.
 
-†Metallurgists object because the process is entirely chemical and reproducible. Alchemists object because it doesn't involve nearly enough mercury or cryptic symbolism. A 1,247 conference in Ankh-Morpork attempting to resolve this dispute ended when someone's demonstration furnace achieved an unplanned thermite reaction. No one was seriously injured, but the conference hall's roof was never quite the same.
+†Metallurgists object because the process is entirely chemical and reproducible. Alchemists object because it doesn't involve nearly enough mercury or cryptic symbolism. A 1,247 conference in Thornhaven attempting to resolve this dispute ended when someone's demonstration furnace achieved an unplanned thermite reaction. No one was seriously injured, but the conference hall's roof was never quite the same.
 
 ‡The precision of this temperature range is somewhat academic when your thermometer is "can you still hold your hand near it, or has all the hair burned off?" The Guild of Precision Measurement takes a dim view of such methodology, but the Guild of Precision Measurement wasn't founded until after iron tools made their precision instruments possible, creating a causality loop that philosophers still argue about in taverns.
 
@@ -285,7 +285,7 @@ Even after separation, the slag retains value*****. The reprocessing of slag for
 
 † Primarily through the expedient method of "trying things and seeing what happened." The Historical Records of Accidents Involving Molten Materials runs to forty-three volumes, and that's just covering the period from 1247 to 1249.
 
-‡ The incident at the Ankh-Morpork School of Practical Metallurgy in 1734 is referred to only as "The Regrettable Thursday" and all records were sealed by order of the Guild.
+‡ The incident at the Thornhaven School of Practical Metallurgy in 1734 is referred to only as "The Regrettable Thursday" and all records were sealed by order of the Guild.
 
 ** The term "borax" derives from the ancient Bukharan word "būrah," meaning "white" or possibly "that which makes things work better, we're not entirely sure why."† Throughout history, approximately 67% of metallurgical advances have been made by people adding random white powders to furnaces and noting the results. The survival rate of these pioneers was significantly lower, estimated at 34%.
 

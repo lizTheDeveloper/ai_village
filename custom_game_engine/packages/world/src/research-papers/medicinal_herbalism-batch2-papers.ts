@@ -362,7 +362,7 @@ Historical development of immune-supporting herbs follows the general trajectory
 
 FOOTNOTES:
 
-* The relationship between humans and medicinal plants predates written history by a margin that archaeobotanists describe as "substantial" and that everyone else describes as "we have literally no idea but probably a very long time." Evidence suggests Neanderthals used yarrow and chamomile, though whether for medicinal purposes or because they simply tasted nice remains subject to interpretation. One cannot exactly interview the deceased about their herbal preferences, though the Department of Necromantic Inquiry at Unseen University continues to try.
+* The relationship between humans and medicinal plants predates written history by a margin that archaeobotanists describe as "substantial" and that everyone else describes as "we have literally no idea but probably a very long time." Evidence suggests Neanderthals used yarrow and chamomile, though whether for medicinal purposes or because they simply tasted nice remains subject to interpretation. One cannot exactly interview the deceased about their herbal preferences, though the Department of Necromantic Inquiry at The Invisible College continues to try.
 
 † Dr. Fennsworth Blackwood, in his seminal 1823 work "Herbs What Don't Kill You Immediately: A Promising Start," outlined this principle with admirable clarity. His research methodology involved what he termed "careful observation" and what his critics termed "throwing plants at sick people and writing down what happened." Remarkably, this approach succeeded more often than it failed, which tells you everything about early 19th-century medicine that you probably didn't want to know.
 

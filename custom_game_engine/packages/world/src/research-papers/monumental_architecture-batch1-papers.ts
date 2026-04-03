@@ -110,7 +110,7 @@ The historical development of large workforce coordination stretches back to the
 
 \*\* The historical record suggests that punctuality in construction workers follows a probability curve with a mean arrival time of 23 minutes after the stated start, with a standard deviation of "whenever they feel like it." The Bureau of Labor Statistics refuses to publish these findings, calling them "demoralizing to management everywhere."
 
-\*\*\* The Ankh-Morpork Guild of Builders maintains mortality statistics going back 800 years. They are kept in a very large basement. Very large.
+\*\*\* The Thornhaven Guild of Builders maintains mortality statistics going back 800 years. They are kept in a very large basement. Very large.
 
 † This was before they realized that chaos cannot, in fact, be controlled, only directed toward less catastrophic outcomes. The revised term is *Orchestrierte Chaosumleitung*, or "orchestrated chaos redirection," but it never caught on because it's even harder to pronounce.
 
@@ -518,7 +518,7 @@ Contemporary aqueduct design integrates computational fluid dynamics***********,
 
 ‡Though whether this was actual genius or simply spite distributed equally has been debated by scholars for centuries§.
 
-§Professor Emeritus Bladderwick of the Unseen University's Applied Engineering Department argues it was definitely spite, citing a lengthy footnote in the original scroll that translates roughly to "now everyone can be equally annoyed."
+§Professor Emeritus Bladderwick of the The Invisible College's Applied Engineering Department argues it was definitely spite, citing a lengthy footnote in the original scroll that translates roughly to "now everyone can be equally annoyed."
 
 **There are exceptions. Pumped systems exist but require energy input, violating water's fundamental desire to exert minimal effort. The Gravitational Ethics Committee has repeatedly condemned forced pumping as "unnecessarily antagonistic to natural law"††.
 

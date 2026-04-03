@@ -193,7 +193,7 @@ The ethical considerations surrounding soul interrogation have generated more co
 
 ¶¶The opening paragraph reads: "Just because someone has shuffled off this mortal coil does not mean they have shuffled off their mortal personality, their grudges, their sense of humor, or their profound desire to mess with you. Proceed accordingly."
 
-¶¶¶The turnips, preserved by magical fields, were estimated to be worth approximately 400 years of appreciation in the turnip futures market, which the Merchant-Prince apparently found hilarious even in death. His spectral laughter could be heard echoing through the vault for weeks. The turnips were eventually donated to the Ankh-Morpork Museum of Boring But Historically Significant Vegetables#.
+¶¶¶The turnips, preserved by magical fields, were estimated to be worth approximately 400 years of appreciation in the turnip futures market, which the Merchant-Prince apparently found hilarious even in death. His spectral laughter could be heard echoing through the vault for weeks. The turnips were eventually donated to the Thornhaven Museum of Boring But Historically Significant Vegetables#.
 
 #The museum receives approximately 34 visitors per year, 33 of whom entered by mistake. The remaining visitor is the museum's curator.
 

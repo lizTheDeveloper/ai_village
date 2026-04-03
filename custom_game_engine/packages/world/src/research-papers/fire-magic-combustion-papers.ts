@@ -307,7 +307,7 @@ This brings us to the great theoretical question that has tantalized and terrifi
 
 †The Department of Uncomfortable Statistics at the University of Last Chances has calculated that approximately 94.7% of Phoenix Transformation attempts fail at this stage, largely because the practitioner is, at that moment, on fire and dying, which proves distracting. The remaining 5.3% is divided between successful transformations (0.8%) and cases where the paperwork was filed incorrectly (4.5%).
 
-‡One must be quite specific about *which* ashes. The Great Fire of Ankh-Morpork in 1672† produced enough ash to theoretically reconstitute seventeen thousand people, leading to what historians call "the Confusion of Identities" when several overeager necromancers attempted simultaneous resurrections using the same ash pile.
+‡One must be quite specific about *which* ashes. The Great Fire of Thornhaven in 1672† produced enough ash to theoretically reconstitute seventeen thousand people, leading to what historians call "the Confusion of Identities" when several overeager necromancers attempted simultaneous resurrections using the same ash pile.
 
 †Not our 1672. A different 1672. Possibly in a different universe. The records are unclear, having themselves been lost in a fire††.
 

@@ -100,7 +100,7 @@ FOOTNOTES
 
 † Published posthumously after Hogshead died attempting to age spirits in a barrel stored alternately in an ice house and a sauna. The experiment was declared "ambitious but fatally flawed" by the investigative committee.
 
-†† The Loompaugh Barrel Works of Greater Ankh-Morpork attempted to cultivate specific bacterial colonies within their barrels, believing it would enhance flavor. The resulting product was indeed memorable, though not in any way the alchemists had hoped. The barrels were eventually buried in a consecrated site, and the formula burned. Three times. Just to be sure.
+†† The Loompaugh Barrel Works of Greater Thornhaven attempted to cultivate specific bacterial colonies within their barrels, believing it would enhance flavor. The resulting product was indeed memorable, though not in any way the alchemists had hoped. The barrels were eventually buried in a consecrated site, and the formula burned. Three times. Just to be sure.
 
 ††† Three of the coopers involved in the incident still wake screaming. The therapy bills are covered by the Guild's comprehensive insurance policy, which specifically includes a clause for "existential horror arising from one's own creation."
 

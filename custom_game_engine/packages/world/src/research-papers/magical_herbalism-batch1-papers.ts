@@ -261,13 +261,13 @@ export const CONSECRATION_OF_HERBS: ResearchPaper = {
   ],
   description: `# Consecration Of Herbs: A Theoretical and Practical Framework for Alchemical Preparation
 
-The consecration of herbs represents a fundamental bridge between the raw materials harvested from field and forest and their subsequent transformation into alchemically viable reagents*. While many practitioners assume that herbs gathered during the appropriate lunar phase† are immediately ready for inclusion in the Great Work‡, this represents a dangerous oversimplification that has resulted in approximately 847 recorded laboratory explosions, 1,203 cases of temporary transmutation into waterfowl, and one rather awkward incident at the Ankh-Morpork College of Heralds involving what was supposed to be calming chamomile**. The process of consecration serves to align the inherent virtues of the plant matter with the specific intention of the alchemist, creating what the ancient Zamonians called the "Symphonius Herbalis"—a state in which herb and purpose resonate at identical frequencies††.
+The consecration of herbs represents a fundamental bridge between the raw materials harvested from field and forest and their subsequent transformation into alchemically viable reagents*. While many practitioners assume that herbs gathered during the appropriate lunar phase† are immediately ready for inclusion in the Great Work‡, this represents a dangerous oversimplification that has resulted in approximately 847 recorded laboratory explosions, 1,203 cases of temporary transmutation into waterfowl, and one rather awkward incident at the Thornhaven College of Heralds involving what was supposed to be calming chamomile**. The process of consecration serves to align the inherent virtues of the plant matter with the specific intention of the alchemist, creating what the ancient Zamonians called the "Symphonius Herbalis"—a state in which herb and purpose resonate at identical frequencies††.
 
 The fundamental principle underlying herbal consecration rests upon the understanding that plants, like all living things, absorb ambient magical influences from their surroundings‡‡. A sprig of rosemary grown beside a battlefield will carry martial energies quite unsuitable for a love philtre***, while sage harvested during a thunderstorm possesses electrical affinities that complicate its use in calming draughts†††. Consecration therefore functions as a form of magical laundering‡‡‡, stripping away unwanted influences while simultaneously impressing the herb with the operator's specific intention. The classical method involves three phases: Purification (removal of contradictory energies), Dedication (alignment with purpose), and Sealing (permanent fixing of the desired state)****. Each phase requires specific ritual actions, spoken formulae, and—most critically—an absolutely unwavering focus of will, which explains why the Guild of Alchemists maintains its membership at precisely 127 individuals at any given time†††† and why applications are only accepted between 3 and 4 AM on the second Tuesday of months containing the letter 'r'‡‡‡‡.
 
 ---
 
-*The term "consecration" derives from the Old Ephemeral "consecratus," meaning "to dedicate ritually," though some scholars argue it comes from the Zamonite phrase "kon-sekrat-ios," roughly translatable as "please don't explode this time." Both etymologies are probably correct. See Appendix XIV of Magister Havelock Venturi's "A Loquacious History of Alchemical Terms That Nobody Asked For" (Unseen University Press, 1789).
+*The term "consecration" derives from the Old Ephemeral "consecratus," meaning "to dedicate ritually," though some scholars argue it comes from the Zamonite phrase "kon-sekrat-ios," roughly translatable as "please don't explode this time." Both etymologies are probably correct. See Appendix XIV of Magister Havelock Venturi's "A Loquacious History of Alchemical Terms That Nobody Asked For" (The Invisible College Press, 1789).
 
 †See previous work on Magical Harvest Rituals. The author assumes the reader has not skipped ahead, though statistical analysis by the Librarian suggests 73.4% of practitioners do exactly that, then wonder why their fennel transmutes their cooking pot into a very surprised otter.
 
@@ -279,7 +279,7 @@ The fundamental principle underlying herbal consecration rests upon the understa
 
 ‡‡This absorption happens whether the plants want it to or not, which raises interesting philosophical questions about plant consciousness that several scholars have spent their entire careers debating. The current record for "longest academic argument about whether grass has feelings" stands at forty-seven years, held by Professors Windlestraw and Hogshead of Braseneck College. They're still not speaking to each other, which has made department meetings considerably more efficient.
 
-***The results of using combat-seasoned rosemary in an attraction charm are documented in the case study "Why Lady Sybil Ramkin's Garden Party Ended in a Riot: An Analysis" (Journal of Applied Herbalism, Vol. 34, Issue 9). The subsequent diplomatic incident with Klatch took three months to resolve and required the intervention of two ambassadors and a very apologetic fruit basket.
+***The results of using combat-seasoned rosemary in an attraction charm are documented in the case study "Why Baroness Thornewood's Garden Party Ended in a Riot: An Analysis" (Journal of Applied Herbalism, Vol. 34, Issue 9). The subsequent diplomatic incident with Klatch took three months to resolve and required the intervention of two ambassadors and a very apologetic fruit basket.
 
 †††Professor Emeritus Lobsang Thwap's seminal work "Electrical Affinities in Storm-Harvested Aromatics" (1841) was written entirely with his left hand after the accident involving lightning-charged sage and a copper cauldron left him unable to move his right arm without broadcasting his thoughts to anyone within a fifty-foot radius. The condition eventually wore off after six weeks, during which time he was banned from faculty meetings, poker games, and anywhere Lady Deirdre Waggon might be present.
 
@@ -441,7 +441,7 @@ Contemporary applications of extracted aetheric essence range from the mundane�
 
 *The official terminology is "inducing controlled quantum-mythic dissociation," but most practitioners find this needlessly pretentious. We are, after all, pulling the soul-stuff out of plants, not writing poetry about it. Though some do both. We don't invite them to conferences anymore.
 
-†The Library of Unseen University maintains 2,847 volumes on aetheric theory. Exactly four of them are useful. The rest appear to have been written by people who heard about aetheric extraction from someone who read about it in a dream.
+†The Library of The Invisible College maintains 2,847 volumes on aetheric theory. Exactly four of them are useful. The rest appear to have been written by people who heard about aetheric extraction from someone who read about it in a dream.
 
 ‡See the prerequisite research paper, "Enchanted Growing Methods," available from the Guild Library for the modest fee of three silver pieces or one interesting story. The librarian has heard all the ones about the chicken, so don't even try.
 
@@ -497,7 +497,7 @@ Contemporary applications range from the mundane to the spectacular. Weapon-smit
 
 ## Footnotes
 
-*Though it should be noted that lead has shown remarkably little ambition in this regard, remaining stubbornly leadish despite millennia of alchemists insisting it wants to be gold. Recent research by the Department of Material Psychology at Unseen University suggests lead is perfectly happy as it is, thank you very much, and would appreciate being left alone.
+*Though it should be noted that lead has shown remarkably little ambition in this regard, remaining stubbornly leadish despite millennia of alchemists insisting it wants to be gold. Recent research by the Department of Material Psychology at The Invisible College suggests lead is perfectly happy as it is, thank you very much, and would appreciate being left alone.
 
 **The obsession with gold-making occupied approximately 94.7% of all alchemical research hours between 800 BCE and 1650 CE, according to the Archives of Wasted Effort maintained in Prague. The remaining 5.3% was divided between trying to create homunculi (2.1%), attempting to brew universal solvents that immediately dissolved their containers (2.4%), and useful discoveries (0.8%).
 
