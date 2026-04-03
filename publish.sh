@@ -85,6 +85,7 @@ log "Installing dependencies in clean archive..."
 
 log "Stubbing folkfork-bridge (file: dep lives outside this repo)..."
 FOLKFORK_PKG="$BUILD_TMPDIR/node_modules/@multiverse-studios/folkfork-bridge"
+rm -f "$FOLKFORK_PKG"  # npm ci creates a broken symlink for the file: dep
 mkdir -p "$FOLKFORK_PKG"
 cp "$BUILD_TMPDIR/packages/core/src/typings/folkfork-bridge.d.ts" "$FOLKFORK_PKG/index.d.ts"
 echo '{"name":"@multiverse-studios/folkfork-bridge","version":"0.0.0","types":"index.d.ts","main":"index.js"}' > "$FOLKFORK_PKG/package.json"
