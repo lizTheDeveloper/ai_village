@@ -23,14 +23,14 @@ MagicSkillNode = {
 - **foundation**: Basic attunement (Name Sense, Basic Prayer)
 - **discovery**: Unlocked elements (metals, runes, kami, names)
 - **technique**: How to cast (Speaking Power, Flaring)
-- **specialization**: Paradigm-specific paths (Coinshot, Life Domain)
+- **specialization**: Paradigm-specific paths (Iron-Puller, Life Domain)
 - **mastery**: Advanced/capstone (Name of Names, Avatar Manifestation)
 - **efficiency**: Cost reduction, regen bonuses
-- **relationship**: Entity bonds (kami favor, daemon bond)
+- **relationship**: Entity bonds (kami favor, animus bond)
 
 ### Unlock Conditions
 60+ condition types including:
-- **Inherent**: bloodline, daemon_settled, innate_talent
+- **Inherent**: bloodline, animus_settled, innate_talent
 - **Discovery**: metal_consumed, rune_discovered, name_learned, kami_met
 - **Relationship**: attention_given, deity_favor, pact_signed
 - **Skill**: xp_accumulated, magic_proficiency, nodes_unlocked
@@ -48,18 +48,18 @@ MagicSkillNode = {
 
 25+ paradigms, each with unique progression:
 
-**Allomancy**: Bloodline gating, metal discovery, Misting vs Mistborn paths
+**Ferromancy**: Bloodline gating, metal discovery, OreAttuned vs CrucibleBorn paths
 **Divine**: Deity worship, domain specialization, clerical ranks, miracles
 **Name**: True speech learning, name category discovery, speaking power mastery
 **Shinto**: Kami relationships, purity maintenance, ritual knowledge
 **Rune**: Rune discovery, material affinity, bindrune complexity
 **Song**: Harmony mastery, voice techniques, choir coordination
-**Daemon**: Form flexibility, dust sensitivity, separation abilities
-**Sympathy**: Alar training, link strength, slippage reduction
+**Animus**: Form flexibility, Aether Mote sensitivity, separation abilities
+**Tethermancy**: Attunement training, link strength, drift reduction
 **Dream**: Lucidity, realm access, nightmare resistance
 **Blood**: Sacrifice efficiency, corruption balance, vitae control
 
-See individual files (`AllomancySkillTree.ts`, `DivineSkillTree.ts`, etc.) for complete trees.
+See individual files (`FerromancySkillTree.ts`, `DivineSkillTree.ts`, etc.) for complete trees.
 
 ## XP Sources
 

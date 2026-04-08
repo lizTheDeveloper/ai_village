@@ -16,8 +16,8 @@ import {
 
 // Import from creative paradigms
 import {
-  SYMPATHY_PARADIGM,
-  ALLOMANCY_PARADIGM,
+  TETHERMANCY_PARADIGM,
+  FERROMANCY_PARADIGM,
   DREAM_PARADIGM,
   SONG_PARADIGM,
   RUNE_PARADIGM,
@@ -42,7 +42,7 @@ import {
 
 // Import from animist paradigms
 import {
-  DAEMON_PARADIGM,
+  ANIMUS_PARADIGM,
   ANIMIST_PARADIGM_REGISTRY,
 } from '../AnimistParadigms.js';
 
@@ -55,8 +55,8 @@ export {
   CORRUPTION_PARADIGM,
   DIMENSIONAL_PARADIGM_REGISTRY,
   // Creative
-  SYMPATHY_PARADIGM,
-  ALLOMANCY_PARADIGM,
+  TETHERMANCY_PARADIGM,
+  FERROMANCY_PARADIGM,
   DREAM_PARADIGM,
   SONG_PARADIGM,
   RUNE_PARADIGM,
@@ -78,7 +78,7 @@ export {
   SHINTO_PARADIGM,
   ALL_CREATIVE_PARADIGMS,
   // Animist
-  DAEMON_PARADIGM,
+  ANIMUS_PARADIGM,
   ANIMIST_PARADIGM_REGISTRY,
 };
 
@@ -95,7 +95,7 @@ export const CREATIVE_PARADIGMS = ALL_CREATIVE_PARADIGMS;
 // Animist/Spirit paradigms - unique to AnimistParadigms.ts
 export const ANIMIST_PARADIGMS = [
   SHINTO_PARADIGM,
-  DAEMON_PARADIGM,
+  ANIMUS_PARADIGM,
 ];
 
 // All paradigms combined
@@ -125,7 +125,7 @@ export const PARADIGM_CATEGORIES = {
   },
   animist: {
     name: 'Animist Magic',
-    description: 'Magic involving spirits, kami, and daemons',
+    description: 'Magic involving spirits, kami, and animuses',
     paradigms: ANIMIST_PARADIGMS,
   },
 } as const;

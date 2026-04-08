@@ -21,6 +21,8 @@ export interface IDoorTile {
   state: 'open' | 'closed' | 'locked';
   lastOpened?: number;
   constructionProgress?: number;
+  /** Rune category required to traverse this door (undefined = no rune gate) */
+  requiredRune?: string;
 }
 
 /**

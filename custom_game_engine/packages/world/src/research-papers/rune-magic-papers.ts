@@ -6,8 +6,8 @@ import type { ResearchPaper } from './types.js';
  * The knowledge tree for discovering and mastering the art of rune-craft,
  * from basic symbol recognition to inscribing elder runes of power.
  *
- * Footnote styles: Pratchett (informative humor), Moers (fantastical),
- * Gaiman (mythological), Adams (bureaucratic absurdity)
+ * Footnote styles: Thornhaven-school (informative humor), fantastical elaboration,
+ * mythological, bureaucratic-absurdist
  */
 
 export const SYMBOL_RECOGNITION: ResearchPaper = {

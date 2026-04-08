@@ -92,6 +92,12 @@ export async function queueBiosphereSprites(
   // Dynamic imports for Node.js modules (only in server environment)
   const fs = await import('fs');
   const path = await import('path');
+  // Dynamic path prevents TypeScript from resolving across package rootDir boundary.
+  // This module is Node.js-only (guarded by typeof window check above).
+  const gatePath = '../../../../scripts/sprite-approval-gate.js';
+  const { checkSpriteApprovalGate } = await import(/* @vite-ignore */ gatePath) as {
+    checkSpriteApprovalGate: (options: { folderId: string; traits?: Record<string, unknown>; allowRegeneration?: boolean; ledgerPath?: string }) => { allowed: boolean; speciesKey: string; reason?: string; claimedPending?: boolean; approved?: boolean };
+  };
 
   // Use default path in Node.js environment
   const finalPath = queuePath || path.join(process.cwd(), 'sprite-generation-queue.json');
@@ -129,6 +135,31 @@ export async function queueBiosphereSprites(
     const niche = biosphere.niches.find(n => n.id === nicheId);
     const sizeClass = niche?.sizeClass ?? 'medium';
     const size = getSpriteSize(sizeClass);
+
+    const gateDecision = checkSpriteApprovalGate({
+      folderId: species.id,
+      traits: {
+        species: species.id,
+        speciesId: species.id,
+        category: 'planet_species',
+      },
+    });
+    if (!gateDecision.allowed) {
+      // Keep manifest honest: this sprite is intentionally not queued yet.
+      addSpriteToManifest(manifest, {
+        folderId: species.id,
+        name: species.name,
+        category: 'species',
+        status: 'missing',
+        size,
+        metadata: {
+          nicheId,
+          scientificName: species.scientificName,
+          description: `${species.spritePrompt}\n[BLOCKED] ${gateDecision.reason}`,
+        },
+      });
+      continue;
+    }
 
     // Create queue entry
     const entry: SpriteQueueEntry = {

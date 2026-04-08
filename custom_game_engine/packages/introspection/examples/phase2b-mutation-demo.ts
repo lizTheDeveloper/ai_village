@@ -153,8 +153,8 @@ function runDemo() {
   // Example 1: Valid mutation
   // ----------------------------------------
   console.log('\n--- Example 1: Valid mutation ---');
-  const result1 = MutationService.mutate(player, 'player', 'name', 'Thorin');
-  console.log('Changed name to "Thorin":', result1.success ? '✓' : '✗');
+  const result1 = MutationService.mutate(player, 'player', 'name', 'Brokkr');
+  console.log('Changed name to "Brokkr":', result1.success ? '✓' : '✗');
   console.log('Current name:', player.getComponent<PlayerComponent>('player')?.name);
 
   // ----------------------------------------

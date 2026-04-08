@@ -13,7 +13,7 @@
  * - Emotional constructs and embodiments
  *
  * Inspired by:
- * - Sanderson's Allomancy (but with emotions)
+ * - Multiverse Chorus's Ferromancy (but with emotions)
  * - Emotional Spectrum from DC (Green Lantern)
  * - Empathy-based magic systems
  * - The concept that emotions are power

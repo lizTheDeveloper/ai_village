@@ -11,7 +11,7 @@ const NEW_PARADIGM_IDS = [
   'names',
   'pact',
   'shinto',
-  'allomancy',
+  'ferromancy',
   'lunar',
   'seasonal',
 ] as const;

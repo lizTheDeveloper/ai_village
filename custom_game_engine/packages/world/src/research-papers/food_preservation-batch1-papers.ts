@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -20,7 +20,7 @@ export const SALT_PRESERVATION_FUNDAMENTALS: ResearchPaper = {
   ],
   description: `# Salt Preservation Fundamentals: A Primer on Ancient Wisdom and Modern Practicality
 
-The fundamental principle underlying salt preservation is deceptively simple: salt creates an osmotic environment hostile to the microorganisms that would otherwise gleefully consume your winter provisions*. When applied in sufficient concentration, salt draws moisture from both the food itself and from any bacterial or fungal entities foolish enough to attempt colonization**, thereby rendering the substrate unsuitable for microbial life while simultaneously concentrating the inherent flavors of the preserved material†. This process, known technically as osmotic dehydration, operates on the same physical principles that govern tides, pickled herrings, and the annual flooding of the Sto Plains‡—which is to say, it is both ancient and inevitable.
+The fundamental principle underlying salt preservation is deceptively simple: salt creates an osmotic environment hostile to the microorganisms that would otherwise gleefully consume your winter provisions*. When applied in sufficient concentration, salt draws moisture from both the food itself and from any bacterial or fungal entities foolish enough to attempt colonization**, thereby rendering the substrate unsuitable for microbial life while simultaneously concentrating the inherent flavors of the preserved material†. This process, known technically as osmotic dehydration, operates on the same physical principles that govern tides, pickled herrings, and the annual flooding of the Ashvale Plains‡—which is to say, it is both ancient and inevitable.
 
 The practical applications of salt preservation divide into three primary methodologies: dry salting, wet brining, and the hybrid approach favored by those who cannot make up their minds††. Dry salting, as practiced by approximately 73.6% of traditional preservation societies‡‡, involves the direct application of salt crystals to the surface of the food, typically in ratios ranging from 1:20 to 1:10 salt-to-food by weight***. The salt must be worked into every crevice and fold—a process that the Guild of Preserved Meats describes with the unfortunately vivid phrase "as though performing a very thorough massage on someone who is already quite dead"†††. Wet brining, conversely, submerges the food in a saline solution of carefully calculated concentration‡‡‡, which the Department of Historical Culinary Studies notes should be "strong enough to float an egg, but not so strong as to float the cook's sense of optimism"****. The salt concentration in a proper brine typically measures between 5% and 20% by weight, depending on the desired preservation duration and the local humidity, which in some regions can make the difference between breakfast and biological warfare*****.
 
@@ -40,7 +40,7 @@ Contemporary applications of salt preservation range from the mundane (bacon, ol
 
 †A fact that surprises exactly no one who has ever tasted properly salt-cured fish and compared it to fresh fish. The difference is approximately the same as that between a vague notion and a STRONGLY HELD CONVICTION.
 
-‡The Sto Plains flooding is caused by the Ankh River's spring overflow and has nothing whatsoever to do with salt, but both phenomena involve water moving places it wasn't previously, which is good enough for this particular metaphor.
+‡The Ashvale Plains flooding is caused by the Thorn River's spring overflow and has nothing whatsoever to do with salt, but both phenomena involve water moving places it wasn't previously, which is good enough for this particular metaphor.
 
 ††The hybrid approach, sometimes called "equilibrium curing," involves coating food in salt initially and then submerging it in brine, thereby ensuring that even the indecisive can successfully preserve food. The Department of Philosophical Approaches to Cooking notes this as "hedging your bets, culinarily speaking."
 
@@ -518,7 +518,7 @@ The historical development of air drying traces back to the moment our ancestors
 
 ---
 
-*The noted philosopher-chef Didactylos of Ephebe remarked that "the difference between sun drying and air drying is the difference between praying to the gods and taking matters into one's own hands—both work, but only one lets you feel smugly self-sufficient."
+*The noted philosopher-chef Didacticus of Solathene remarked that "the difference between sun drying and air drying is the difference between praying to the gods and taking matters into one's own hands—both work, but only one lets you feel smugly self-sufficient."
 
 †Measured in what the Thornhaven College of Moisture Management calls "dampness units" or, more technically, "how wet things feel when you touch them with your finger and make a considered judgment."
 
@@ -530,7 +530,7 @@ The historical development of air drying traces back to the moment our ancestors
 
 †††This represents what scholars of the obvious call "a fundamental truth disguised in technical language to justify research funding."
 
-‡‡Though the noted food scientist Dr. Pterry Haumchilde of the University of Quirm successfully dried salted cod at temperatures as low as 4°C, a process he described as "glacially slow" and "an exercise in patience that nearly killed me, though not as nearly as attempting it at 35°C killed my first three batches."
+‡‡Though the noted food scientist Dr. Petrov Haumchilde of the University of Vintara successfully dried salted cod at temperatures as low as 4°C, a process he described as "glacially slow" and "an exercise in patience that nearly killed me, though not as nearly as attempting it at 35°C killed my first three batches."
 
 ‡‡‡The Guild of Atmospheric Specialists maintains a network of monitoring stations across the Known World, measuring humidity with instruments calibrated to a precision of 0.001%, though guild members admit "we mostly just stick our heads out the window and have a good think about it."
 

@@ -403,7 +403,7 @@ describe('ItemInstance', () => {
       const instance: ItemInstance = {
         instanceId: 'uuid-bad',
         definitionId: 'iron_sword',
-        materialOverride: 'mithril', // Not registered
+        materialOverride: 'starweave', // Not registered
         quality: 60,
         condition: 100,
         stackSize: 1,

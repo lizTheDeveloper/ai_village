@@ -209,6 +209,23 @@ export class ContextActionRegistry {
     });
 
     this.register({
+      id: 'hand_carry',
+      label: 'Pick Up (Hand)',
+      icon: 'hand',
+      shortcut: 'K',
+      category: 'agent',
+      isApplicable: (ctx) => ctx.targetType === 'agent' && ctx.targetEntity !== null,
+      execute: (ctx, _world, eventBus) => {
+        if (!ctx.targetEntity) return;
+        eventBus.emit({
+          type: 'hand:carry',
+          source: 'ui:contextmenu',
+          data: { agentId: ctx.targetEntity },
+        } as Parameters<EventBus['emit']>[0]);
+      },
+    });
+
+    this.register({
       id: 'inspect',
       label: 'Inspect',
       icon: 'inspect',

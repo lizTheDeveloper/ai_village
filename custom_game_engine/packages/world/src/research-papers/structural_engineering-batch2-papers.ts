@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -45,9 +45,9 @@ Contemporary applications of suspension principles extend far beyond bridges, en
 
 ‡‡These conditions include: wind, rain, snow, ice, earthquake, the weight of pedestrians, the weight of vehicles, the weight of other engineers standing on it taking measurements, thermal expansion, material fatigue, metal corrosion, cable stretch, foundation settlement, and what the International Bridge Consortium euphemistically categorizes as "unforeseen circumstances." The remaining 52.7% of conditions can be safely ignored until something goes wrong, at which point they become "foreseen in retrospect."
 
-***This may sound obvious, but the archives of the Patrician's Palace in Thornhaven contain plans for a suspension bridge submitted in 1782 that appeared to lack all three elements. When questioned, the designer explained it was "more of a conceptual bridge." The Patrician, displaying his characteristic wisdom, approved the project on the condition that the designer personally test it. Historical records indicate the designer suddenly remembered a pressing engagement in Überwald and was never seen again.
+***This may sound obvious, but the archives of the Lord Magistrate's Palace in Thornhaven contain plans for a suspension bridge submitted in 1782 that appeared to lack all three elements. When questioned, the designer explained it was "more of a conceptual bridge." The Lord Magistrate, displaying his characteristic wisdom, approved the project on the condition that the designer personally test it. Historical records indicate the designer suddenly remembered a pressing engagement in the Duskwald and was never seen again.
 
-†††Professional weeping among cantilever engineers, according to a study by Dr. Helmut Würgerschaft of the Sto Plains Technical University, occurs at a rate of 0.73 instances per major suspension project, rising to 2.4 instances if the suspension bridge is both longer and cheaper than competing cantilever designs.
+†††Professional weeping among cantilever engineers, according to a study by Dr. Helmut Würgerschaft of the Ashvale Plains Technical University, occurs at a rate of 0.73 instances per major suspension project, rising to 2.4 instances if the suspension bridge is both longer and cheaper than competing cantilever designs.
 
 ‡‡‡This calculation was performed by the Golden Gate Bridge Engineering Team, who apparently had a lot of time on their hands and access to comprehensive elephant weight data. Their report includes seventeen pages of elephant-related calculations, including a memorable appendix titled "Considerations for Elephant Load Distribution Should Circumstances Require It."
 
@@ -520,7 +520,7 @@ The contemporary practice of failure analysis synthesizes centuries of hard-won 
 
 ‡‡The site must be secured before evidence is "helpfully" cleared away by well-meaning civilians, souvenir hunters, or contractors eager to rebuild before anyone can document what they did wrong the first time. The average time between failure and arrival of the first person with a trailer and a "Salvage Contractor" business card is estimated at 47 minutes.
 
-***In 1923, the failure analysis of the Pseudopolis Flour Mill was delayed by three weeks when the primary investigator tripped over a sample case and scattered metal fragments across four city blocks. The subsequent analysis of this secondary failure took nearly as long as the primary investigation.
+***In 1923, the failure analysis of the Clockhaven Flour Mill was delayed by three weeks when the primary investigator tripped over a sample case and scattered metal fragments across four city blocks. The subsequent analysis of this secondary failure took nearly as long as the primary investigation.
 
 †††Material samples must be collected in accordance with the Byzantine protocols established by the International Materials Testing Federation, which require samples to be: properly labeled, carefully transported, stored at appropriate temperatures, and definitely not left on the dashboard of your carriage where they can be exposed to direct sunlight, which happened to approximately 15% of samples in a 1934 survey†††.
 
@@ -530,7 +530,7 @@ The contemporary practice of failure analysis synthesizes centuries of hard-won 
 
 §Fractography—the study of fracture surfaces—reveals how materials failed at the microscopic level. Professor Gustav Moltenweld discovered that fracture patterns could be read like a book, specifically like a very depressing book with an unhappy ending that was obvious from page one but everyone was too polite to mention§.
 
-§The Institute of Catastrophic Studies in Quirm offers a course called "Reading the Failure Narrative," which begins with the professor holding up a fractured beam and asking, "What were this beam's hopes and dreams?" Students who laugh are asked to leave; students who provide a serious answer are marked for advancement.
+§The Institute of Catastrophic Studies in Vintara offers a course called "Reading the Failure Narrative," which begins with the professor holding up a fractured beam and asking, "What were this beam's hopes and dreams?" Students who laugh are asked to leave; students who provide a serious answer are marked for advancement.
 
 §§Finite element analysis allows engineers to simulate failure without the expense and paperwork of actual failure. The software divides structures into thousands of tiny elements and calculates stress on each one, producing colorful graphics that look impressive in presentations and occasionally even predict real-world behavior§§.
 
@@ -578,7 +578,7 @@ Contemporary bridge design methodology requires not only structural analysis but
 
 †††The legendary Professor Emeritus Ignatius Loadbeam spent forty-seven years teaching "Why Bridges Fall Down" at the Imperial Institute of Engineering and only three years teaching "Why Bridges Stay Up," explaining that students found failure far more educational than success. His final lecture, delivered from a hospital bed after a pedestrian bridge collapsed beneath him, was titled "I Told You So: A Retrospective."
 
-‡‡This ability, documented extensively in the Douglas-Adams Bureaucratic Inertia Index, measures the time between an engineer identifying a structural concern and a budget committee acknowledging it. The current record stands at seventeen years, four months, and six days—precisely four months longer than the bridge in question remained standing.
+‡‡This ability, documented extensively in the Thornhaven Bureaucratic Inertia Index, measures the time between an engineer identifying a structural concern and a budget committee acknowledging it. The current record stands at seventeen years, four months, and six days—precisely four months longer than the bridge in question remained standing.
 
 ***The Königsberg Guild of Mathematical Precision maintains that load calculations should be accurate to at least twelve decimal places. Practical engineers maintain that load calculations should be accurate enough that the bridge doesn't fall down. This philosophical difference has resulted in a schism that has lasted 340 years and counting, with both sides producing bridges that work perfectly well, though the mathematicians' bridges take four years longer to design.
 

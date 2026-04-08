@@ -387,7 +387,7 @@
         }
       ],
       "conditionMode": "all",
-      "lore": "Strings vibrate in sympathy with the human heart. A skilled player can\npluck emotions as easily as strings - drawing out sorrow, inspiring joy,\nkindling love or rage.",
+      "lore": "Strings vibrate in tethermancy with the human heart. A skilled player can\npluck emotions as easily as strings - drawing out sorrow, inspiring joy,\nkindling love or rage.",
       "prerequisites": [
         "instrument-attunement"
       ]

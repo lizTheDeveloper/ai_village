@@ -540,8 +540,32 @@ export class UniverseCreationScreen {
       box-sizing: border-box;
       margin-bottom: 20px;
     `;
+    let createBtn: HTMLButtonElement | null = null;
+    let previewNameText: HTMLDivElement | null = null;
+    const updateNameDrivenUI = () => {
+      const trimmedName = this.universeName.trim();
+      const hasName = trimmedName.length > 0;
+      const previewName = hasName
+        ? `${trimmedName} ${this.fateSuffix}`
+        : `[Your Name] ${this.fateSuffix}`;
+
+      if (previewNameText) {
+        previewNameText.textContent = previewName;
+      }
+
+      if (createBtn) {
+        createBtn.disabled = !hasName;
+        createBtn.style.background = hasName
+          ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+          : '#333';
+        createBtn.style.color = hasName ? '#fff' : '#666';
+        createBtn.style.cursor = hasName ? 'pointer' : 'not-allowed';
+      }
+    };
+
     nameInput.oninput = (e) => {
       this.universeName = (e.target as HTMLInputElement).value;
+      updateNameDrivenUI();
     };
     inputContainer.appendChild(nameInput);
 
@@ -562,6 +586,7 @@ export class UniverseCreationScreen {
     randomBtn.onclick = () => {
       this.universeName = UniverseCreationScreen.generateUniverseName();
       nameInput.value = this.universeName;
+      updateNameDrivenUI();
     };
     inputContainer.appendChild(randomBtn);
 
@@ -601,7 +626,7 @@ export class UniverseCreationScreen {
     inputContainer.appendChild(fateContainer);
 
     // Preview
-    const fullName = this.universeName
+    const fullName = this.universeName.trim()
       ? `${this.universeName} ${this.fateSuffix}`
       : `[Your Name] ${this.fateSuffix}`;
 
@@ -613,10 +638,16 @@ export class UniverseCreationScreen {
       border-radius: 10px;
       text-align: center;
     `;
-    preview.innerHTML = `
-      <div style="font-size: 22px; color: #fff; font-weight: bold; text-shadow: 0 0 15px rgba(156, 39, 176, 0.5);">${fullName}</div>
-      <div style="font-size: 12px; color: #9c27b0; margin-top: 8px;">✨ Blessed by Clotho, Lachesis, and Atropos ✨</div>
-    `;
+    previewNameText = document.createElement('div');
+    previewNameText.style.cssText = 'font-size: 22px; color: #fff; font-weight: bold; text-shadow: 0 0 15px rgba(156, 39, 176, 0.5);';
+    previewNameText.textContent = fullName;
+
+    const previewBlessing = document.createElement('div');
+    previewBlessing.style.cssText = 'font-size: 12px; color: #9c27b0; margin-top: 8px;';
+    previewBlessing.textContent = '✨ Blessed by Clotho, Lachesis, and Atropos ✨';
+
+    preview.appendChild(previewNameText);
+    preview.appendChild(previewBlessing);
     inputContainer.appendChild(preview);
 
     this.container.appendChild(inputContainer);
@@ -639,7 +670,7 @@ export class UniverseCreationScreen {
     `;
     backBtn.onclick = () => { this.currentStep = 'deities'; this.render(); };
 
-    const createBtn = document.createElement('button');
+    createBtn = document.createElement('button');
     const hasName = this.universeName.trim().length > 0;
     createBtn.textContent = 'Create Universe';
     createBtn.disabled = !hasName;
@@ -681,6 +712,7 @@ export class UniverseCreationScreen {
     buttonContainer.appendChild(backBtn);
     buttonContainer.appendChild(createBtn);
     this.container.appendChild(buttonContainer);
+    updateNameDrivenUI();
   }
 
   destroy(): void {

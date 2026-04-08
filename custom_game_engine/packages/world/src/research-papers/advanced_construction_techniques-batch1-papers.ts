@@ -228,7 +228,7 @@ The historical development of scaffold safety reads like a chronicle of expensiv
 
 ††See the paper "Why Everyone Thinks They're Good at Estimating Load Capacity Despite All Evidence to the Contrary" (Journal of Optimistic Engineering, Vol. 47).
 
-§§§This phenomenon, first documented by the philosopher Douglas of House Adams, describes how humans possess an almost supernatural ability to misinterpret safety margins as personal challenges‡‡.
+§§§This phenomenon, first documented by the philosopher Professor Adalbert of House Thornewood, describes how humans possess an almost supernatural ability to misinterpret safety margins as personal challenges‡‡.
 
 ‡‡The equation is: Perceived Safety Margin = Actual Safety Margin × (Confidence ÷ Experience), which explains why the most dangerous scaffolds are those used by people who have "done this a thousand times."
 
@@ -356,7 +356,7 @@ The mathematics underlying crane stability deserves special attention, particula
 
 †† The pulley multiplication works through what physicists describe as "making physics do the work instead of your back," which is the entire point of civilization really.
 
-‡‡ The hook, while appearing simple, has been the subject of 1,247 engineering papers, 89 doctoral theses, and one interpretive dance performance at the University of Quirm.
+‡‡ The hook, while appearing simple, has been the subject of 1,247 engineering papers, 89 doctoral theses, and one interpretive dance performance at the University of Vintara.
 
 \*\*\* According to the Guild of Crane Operators' psychological survey, 67.3% of operators report having had the dream where they're back in school taking an exam, except the exam is "don't drop the thing" and they're naked, and the thing is an extremely expensive yacht.
 
@@ -420,7 +420,7 @@ Contemporary formwork practice exists at the intersection of engineering precisi
 
 ## Footnotes
 
-*The Pratchett Institute for Paradoxical Construction Studies maintains that formwork represents the purest expression of construction philosophy: investing significant effort into something specifically designed to be discarded. Their motto, "Build to Destroy," has caused considerable confusion at fundraising events.
+*The Thornhaven Institute for Paradoxical Construction Studies maintains that formwork represents the purest expression of construction philosophy: investing significant effort into something specifically designed to be discarded. Their motto, "Build to Destroy," has caused considerable confusion at fundraising events.
 
 †Before 1847, when the International Conference on Construction Terminology (Brussels) standardized the term "formwork," various regional terms included "concrete boxes," "cement jails," "the wooden bits," and—in one notably poetic Welsh valley—"yr ymgais olaf" (the final attempt).
 

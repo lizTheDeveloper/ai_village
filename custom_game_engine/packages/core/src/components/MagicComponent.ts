@@ -221,8 +221,8 @@ export interface ParadigmSpecificState {
   /** For breath magic: number of breaths held */
   breathCount?: number;
 
-  /** For breath magic: heightening tier achieved */
-  heighteningTier?: number;
+  /** For breath magic: pneumantic tier achieved */
+  pneumanticTier?: number;
 
   /** For pact magic: patron entity ID */
   patronId?: string;

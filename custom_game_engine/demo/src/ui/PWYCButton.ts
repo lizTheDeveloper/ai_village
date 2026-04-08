@@ -459,7 +459,7 @@ export class PWYCButton {
       const response = await fetch(CHECKOUT_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ game: 'mvee', amount: cents }),
+        body: JSON.stringify({ game: 'mvee', amount: cents, source_page: window.location.href }),
       });
 
       if (!response.ok) {

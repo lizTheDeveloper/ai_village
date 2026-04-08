@@ -1,16 +1,16 @@
 /**
- * BreathCostCalculator - Cost calculation for Breath/BioChromatic paradigm
+ * BreathCostCalculator - Cost calculation for Breath/Pneumantic paradigm
  *
  * Costs: health (represents Breaths - units of life essence)
  *
- * Breath magic (Warbreaker-inspired):
+ * Breath magic (Animus-inspired):
  * - Everyone is born with 1 Breath
  * - Breaths can be given, stored, stolen
  * - Simple commands cost 0 Breaths (use existing Awakened)
  * - Awakening objects consumes Breaths
  * - Permanent Awakening is expensive
- * - At 0 Breaths = Drab (grey, emotionally muted)
- * - Heightening tiers unlock at: 50, 200, 600, 1000, 2000, 10000, 50000
+ * - At 0 Breaths = Hollow (grey, emotionally muted)
+ * - Pneumantic Tier tiers unlock at: 50, 200, 600, 1000, 2000, 10000, 50000
  */
 
 import {
@@ -24,11 +24,11 @@ import {
 import type { ComposedSpell, MagicComponent } from '@ai-village/core';
 import type { MagicCostType } from '../../MagicParadigm.js';
 
-/** Heightening tier thresholds */
+/** Pneumantic Tier tier thresholds */
 const HEIGHTENING_THRESHOLDS = [50, 200, 600, 1000, 2000, 10000, 50000];
 
 /**
- * Cost calculator for the Breath/BioChromatic magic paradigm.
+ * Cost calculator for the Breath/Pneumantic magic paradigm.
  */
 export class BreathCostCalculator extends BaseCostCalculator {
   readonly paradigmId = 'breath';
@@ -48,7 +48,7 @@ export class BreathCostCalculator extends BaseCostCalculator {
       type: 'health', // Using health as Breaths
       amount: breathCost,
       source: this.getBreathSource(spell),
-      terminal: breathCost > 0, // 0 Breaths = Drab (only terminal if actually costing)
+      terminal: breathCost > 0, // 0 Breaths = Hollow (only terminal if actually costing)
     });
 
     return costs;
@@ -111,7 +111,7 @@ export class BreathCostCalculator extends BaseCostCalculator {
   }
 
   /**
-   * Override affordability check with Drab warning.
+   * Override affordability check with Hollow warning.
    */
   override canAfford(costs: SpellCost[], caster: MagicComponent): AffordabilityResult {
     const result = super.canAfford(costs, caster);
@@ -123,14 +123,14 @@ export class BreathCostCalculator extends BaseCostCalculator {
     // Add warning if this would reduce to 0 Breaths
     if (currentBreaths - breathCost <= 0) {
       result.wouldBeTerminal = true;
-      result.warning = 'This will drain all your Breaths and make you a Drab!';
+      result.warning = 'This will drain all your Breaths and make you a Hollow!';
     } else if (currentBreaths - breathCost < 10) {
       result.warning = 'You will have very few Breaths remaining.';
     }
 
-    // Check if this would drop a Heightening tier
-    const currentTier = this.getHeighteningTier(currentBreaths);
-    const afterTier = this.getHeighteningTier(currentBreaths - breathCost);
+    // Check if this would drop a Pneumantic Tier tier
+    const currentTier = this.getPneumanticTier(currentBreaths);
+    const afterTier = this.getPneumanticTier(currentBreaths - breathCost);
     if (afterTier < currentTier) {
       const tierWarning = `This will drop you from ${this.getTierName(currentTier)} to ${this.getTierName(afterTier)}.`;
       result.warning = result.warning ? `${result.warning} ${tierWarning}` : tierWarning;
@@ -156,13 +156,13 @@ export class BreathCostCalculator extends BaseCostCalculator {
       locked: 0,
     };
 
-    // Calculate initial Heightening tier
-    const tier = this.getHeighteningTier(breathsCurrent);
+    // Calculate initial Pneumantic Tier tier
+    const tier = this.getPneumanticTier(breathsCurrent);
 
     // Set paradigm state
     caster.paradigmState.breath = {
       breathCount: breathsCurrent,
-      heighteningTier: tier,
+      pneumanticTier: tier,
       custom: {
         awakenedObjects: [], // Track Awakened items
         colorDrained: 0, // Track color consumed
@@ -171,9 +171,9 @@ export class BreathCostCalculator extends BaseCostCalculator {
   }
 
   /**
-   * Get Heightening tier for a Breath count.
+   * Get Pneumantic Tier tier for a Breath count.
    */
-  private getHeighteningTier(breaths: number): number {
+  private getPneumanticTier(breaths: number): number {
     for (let i = HEIGHTENING_THRESHOLDS.length - 1; i >= 0; i--) {
       const threshold = HEIGHTENING_THRESHOLDS[i];
       if (threshold !== undefined && breaths >= threshold) {
@@ -188,14 +188,14 @@ export class BreathCostCalculator extends BaseCostCalculator {
    */
   private getTierName(tier: number): string {
     const names = [
-      'Drab',
-      'First Heightening',
-      'Second Heightening',
-      'Third Heightening',
-      'Fourth Heightening',
-      'Fifth Heightening',
-      'Sixth Heightening',
-      'Seventh Heightening',
+      'Hollow',
+      'First Pneumantic Tier',
+      'Second Pneumantic Tier',
+      'Third Pneumantic Tier',
+      'Fourth Pneumantic Tier',
+      'Fifth Pneumantic Tier',
+      'Sixth Pneumantic Tier',
+      'Seventh Pneumantic Tier',
     ];
     return names[tier] ?? `Tier ${tier}`;
   }
@@ -210,7 +210,7 @@ export class BreathCostCalculator extends BaseCostCalculator {
   ): TerminalEffect {
     if (costType === 'health') {
       return {
-        type: 'drab',
+        type: 'hollow',
         breathsRemaining: 0,
       };
     }

@@ -116,8 +116,8 @@ export class TerminalEffectHandler {
       case 'sanity_zero':
         return this.handleSanityZero(entity, effect.madnessType);
 
-      case 'drab':
-        return this.handleDrab(entity);
+      case 'hollow':
+        return this.handleHollow(entity);
 
       case 'forsaken':
         return this.handleForsaken(entity, effect.deityId);
@@ -289,9 +289,9 @@ export class TerminalEffectHandler {
   }
 
   /**
-   * Handle becoming Drab (breath magic - no more breaths)
+   * Handle becoming Hollow (breath magic - no more breaths)
    */
-  private handleDrab(entity: EntityImpl): TerminalEffectResult {
+  private handleHollow(entity: EntityImpl): TerminalEffectResult {
     const agentName = this.getAgentName(entity);
 
     // Remove breath magic
@@ -302,17 +302,17 @@ export class TerminalEffectHandler {
         knownParadigmIds: current.knownParadigmIds.filter(p => p !== 'breath'),
         paradigmState: {
           ...current.paradigmState,
-          breath: { ...current.paradigmState?.breath, isDrab: true, breathCount: 0 },
+          breath: { ...current.paradigmState?.breath, isHollow: true, breathCount: 0 },
         },
       }));
     }
 
-    this.emitEvent('magic:drab', entity.id, { agentName });
+    this.emitEvent('magic:hollow', entity.id, { agentName });
 
     return {
       handled: true,
       entityRemoved: false,
-      description: `${agentName} has become a Drab, unable to use breath magic`,
+      description: `${agentName} has become a Hollow, unable to use breath magic`,
     };
   }
 

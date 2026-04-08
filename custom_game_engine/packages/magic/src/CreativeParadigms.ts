@@ -5,13 +5,13 @@
  * Each paradigm has distinct mechanics, costs, and thematic coherence.
  *
  * Categories:
- * - Fiction-inspired: Sympathy, Allomancy, Dream, Song, Rune (shared with Animist)
+ * - Fiction-inspired: Tethermancy, Ferromancy, Dream, Song, Rune (shared with Animist)
  * - Conceptually weird: Debt, Bureaucratic, Luck, Threshold, Belief, Consumption,
  *                      Silence, Paradox, Echo, Game, Craft, Commerce
  * - Seasonal/Cyclical: Lunar, Seasonal, Age
  * - Spiritual: Shinto (shared with Animist)
  *
- * Note: 6 paradigms (sympathy, allomancy, dream, song, rune, shinto) are shared
+ * Note: 6 paradigms (tethermancy, ferromancy, dream, song, rune, shinto) are shared
  * with AnimistParadigms and re-exported from there. The remaining 15 are unique
  * to Creative and loaded from creative-paradigms.json.
  */
@@ -21,8 +21,8 @@ import { loadCreativeParadigms } from './data-loader.js';
 
 // Re-export shared paradigms from Animist
 import {
-  SYMPATHY_PARADIGM,
-  ALLOMANCY_PARADIGM,
+  TETHERMANCY_PARADIGM,
+  FERROMANCY_PARADIGM,
   DREAM_PARADIGM,
   SONG_PARADIGM,
   RUNE_PARADIGM,
@@ -34,8 +34,8 @@ const _loadedCreativeParadigms = loadCreativeParadigms();
 
 // Re-export shared paradigms
 export {
-  SYMPATHY_PARADIGM,
-  ALLOMANCY_PARADIGM,
+  TETHERMANCY_PARADIGM,
+  FERROMANCY_PARADIGM,
   DREAM_PARADIGM,
   SONG_PARADIGM,
   RUNE_PARADIGM,
@@ -50,7 +50,7 @@ export {
 // ============================================================================
 // FICTION-INSPIRED PARADIGMS (shared with Animist)
 // ============================================================================
-// SYMPATHY_PARADIGM, ALLOMANCY_PARADIGM, DREAM_PARADIGM, SONG_PARADIGM, RUNE_PARADIGM
+// TETHERMANCY_PARADIGM, FERROMANCY_PARADIGM, DREAM_PARADIGM, SONG_PARADIGM, RUNE_PARADIGM
 // are imported from AnimistParadigms.ts above
 
 // ============================================================================
@@ -253,8 +253,8 @@ export const AGE_PARADIGM: MagicParadigm = _loadedCreativeParadigms.age!;
 
 export const ALL_CREATIVE_PARADIGMS = [
   // Fiction
-  SYMPATHY_PARADIGM,
-  ALLOMANCY_PARADIGM,
+  TETHERMANCY_PARADIGM,
+  FERROMANCY_PARADIGM,
   DREAM_PARADIGM,
   SONG_PARADIGM,
   RUNE_PARADIGM,

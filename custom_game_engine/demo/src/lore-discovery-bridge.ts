@@ -157,6 +157,17 @@ export async function initLoreDiscoveryBridge(eventBus: EventBus): Promise<void>
       }
     }
 
+    function defaultPortablePersonality(): DeityPersonalityVector {
+      return {
+        benevolence: 0.5,
+        interventionism: 0.5,
+        wrathfulness: 0.5,
+        mysteriousness: 0.5,
+        generosity: 0.5,
+        consistency: 0.5,
+      };
+    }
+
     const RITUAL_TYPE_MAP: Record<string, PortableRitualType> = {
       daily_prayer: 'worship',
       weekly_ceremony: 'communion',
@@ -210,17 +221,18 @@ export async function initLoreDiscoveryBridge(eventBus: EventBus): Promise<void>
     unsubscribers.push(
       eventBus.on('lore:deity_emerged' as any, (event: any) => {
         const d = event.data ?? event;
+        const mappedPersonality = tryMapPersonality(d.deityPersonality ?? d.personality);
         const portableDeity: PortableDeity = {
           deityId: d.deityId,
           sourceGame: 'mvee',
           primaryName: d.deityName ?? d.deityId,
-          epithets: [],
+          epithets: Array.isArray(d.epithets) ? d.epithets : [],
           domain: d.domain ?? 'mystery',
-          secondaryDomains: [],
-          personality: { benevolence: 0.5, interventionism: 0.5, wrathfulness: 0.5, mysteriousness: 0.5, generosity: 0.5, consistency: 0.5 },
-          alignment: 'unknown',
+          secondaryDomains: Array.isArray(d.secondaryDomains) ? d.secondaryDomains : [],
+          personality: mappedPersonality ?? defaultPortablePersonality(),
+          alignment: d.alignment ?? 'unknown',
           believerCount: d.believerCount ?? 0,
-          mythCount: 0,
+          mythCount: d.mythCount ?? 0,
           canonicalMythIds: [],
           exportedAt: new Date().toISOString(),
         };

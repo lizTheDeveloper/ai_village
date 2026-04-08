@@ -567,9 +567,9 @@ export class ExplorationDiscoverySystem extends BaseSystem {
         return 0.7; // Good coordination
       case 'story_ship':
         return 0.6; // Narrative focus
-      case 'gleisner_vessel':
+      case 'synthetic_vessel':
         return 0.7; // Digital precision
-      case 'svetz_retrieval':
+      case 'chrono_salvage':
         return 0.8; // Specialized for dangerous retrieval
       case 'probability_scout':
         return 0.9; // Best at exploration

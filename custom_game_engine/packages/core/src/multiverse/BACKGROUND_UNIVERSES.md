@@ -661,7 +661,7 @@ await saveLoadService.saveBackgroundUniverses(bgManager.getAllBackgroundUniverse
 **Inspired by:**
 - **Dwarf Fortress** - Background world generation, emergent civilizations
 - **RimWorld** - Autonomous faction raids, storyteller events
-- **The End of Eternity (Asimov)** - Time travel mechanics, timeline branching
+- **Timeline Liberation** - Time travel mechanics, timeline branching
 - **5D Chess with Multiverse Time Travel** - Multiverse combat, dimensional invasions
 
 **Architecture:**

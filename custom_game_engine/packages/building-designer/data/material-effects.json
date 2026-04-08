@@ -719,13 +719,13 @@
       {
         "type": "metal_burning_boost",
         "magnitude": 20,
-        "description": "Enhances Ferromancy copper (Smoker)"
+        "description": "Enhances Ferromancy copper (Copper-Shroud)"
       }
     ],
     "moodModifier": 0,
     "atmosphere": "neutral",
     "description": "Reddish copper metal",
-    "lore": "Copper clouds Ferromancy pulses. Smokers prize pure copper."
+    "lore": "Copper clouds Ferromancy pulses. Copper-Shrouds prize pure copper."
   },
   "bronze": {
     "insulation": 50,
@@ -756,13 +756,13 @@
       {
         "type": "metal_burning_boost",
         "magnitude": 15,
-        "description": "Enhances Ferromancy bronze (Seeker)"
+        "description": "Enhances Ferromancy bronze (Bronze-Finder)"
       }
     ],
     "moodModifier": 5,
     "atmosphere": "neutral",
     "description": "Bronze alloy",
-    "lore": "Bronze detects Ferromancy pulses. Seekers can sense magic through bronze."
+    "lore": "Bronze detects Ferromancy pulses. Bronze-Finders can sense magic through bronze."
   },
   "iron": {
     "insulation": 50,
@@ -842,7 +842,7 @@
     "description": "Refined steel",
     "lore": "Steel pushes. Iron-Pullers hurl steel through the air."
   },
-  "mithril": {
+  "starweave": {
     "insulation": 50,
     "durability": 95,
     "weirdness": 40,
@@ -871,8 +871,8 @@
     "specialEffects": [],
     "moodModifier": 15,
     "atmosphere": "calming",
-    "description": "Silvery elven metal, light as air",
-    "lore": "Mithril is stronger than steel yet light as silk. Magic flows through it like water."
+    "description": "Ultra-light metallic ore with innate magical conductivity",
+    "lore": "Found only in meteorite impact sites. When drawn into wire, it sings at frequencies only magical beings can hear."
   },
   "adamantine": {
     "insulation": 50,
@@ -5633,7 +5633,7 @@
     "description": "Blue metal infused with aether",
     "lore": "Etherium flows with the essence of pure magic."
   },
-  "wraithbone": {
+  "resonite": {
     "insulation": 50,
     "durability": 70,
     "weirdness": 85,
@@ -5673,8 +5673,8 @@
     ],
     "moodModifier": -15,
     "atmosphere": "unsettling",
-    "description": "Psychically-shaped wraithbone",
-    "lore": "Grown from the psychic emanations of ancient spirits."
+    "description": "Psycho-responsive crystalline growth",
+    "lore": "Resonite is not mined but cultivated — it grows in response to sustained emotional output."
   },
   "blackite": {
     "insulation": 50,
@@ -5713,7 +5713,7 @@
     "description": "Stone of the void between stars",
     "lore": "Blackstone remembers the silence before creation."
   },
-  "gromril": {
+  "urdmetal": {
     "insulation": 50,
     "durability": 95,
     "weirdness": 30,
@@ -5747,10 +5747,10 @@
     ],
     "moodModifier": 10,
     "atmosphere": "neutral",
-    "description": "Dwarven master-metal",
-    "lore": "The finest metal in dwarven holds, hoarded jealously."
+    "description": "Deep-planetary alloy from Urd Prime's mantle",
+    "lore": "Extraordinary density and thermal resistance. Ettin smiths consider working it a sacred act."
   },
-  "ithilmar": {
+  "lunaril": {
     "insulation": 50,
     "durability": 60,
     "weirdness": 45,
@@ -5785,8 +5785,8 @@
     ],
     "moodModifier": 15,
     "atmosphere": "calming",
-    "description": "Elven sea-silver",
-    "lore": "Light as silk, strong as steel, blessed by the sea."
+    "description": "Light-reactive alloy that shifts color with ambient light",
+    "lore": "Weighs one-third of equivalent steel. Spriggan artisans weave it into fabric-thin armor that rings like a bell when struck."
   },
   "hihi_irokane": {
     "insulation": 50,
@@ -5826,7 +5826,7 @@
     "description": "Sacred metal of the sun",
     "lore": "Metal of the gods, said to be fragments of the sun."
   },
-  "celestial_bronze": {
+  "astral_bronze": {
     "insulation": 50,
     "durability": 75,
     "weirdness": 55,
@@ -5860,10 +5860,10 @@
     ],
     "moodModifier": 10,
     "atmosphere": "neutral",
-    "description": "Bronze blessed by the gods",
-    "lore": "Forged by divine smiths for heroes to wield."
+    "description": "Bronze alloy forged under starlight",
+    "lore": "Infused with ambient celestial energy during the cooling process. Effective against extraplanar entities."
   },
-  "stygian_iron": {
+  "abyssal_iron": {
     "insulation": 50,
     "durability": 80,
     "weirdness": 70,
@@ -5898,10 +5898,10 @@
     ],
     "moodModifier": -25,
     "atmosphere": "terrifying",
-    "description": "Iron from the underworld",
-    "lore": "Cooled in the River Styx, it touches more than flesh."
+    "description": "Iron quenched in the deep Underflow waters",
+    "lore": "Carries a chill that never fully dissipates. Affects incorporeal beings as though they were solid."
   },
-  "imperial_gold": {
+  "sovereign_gold": {
     "insulation": 50,
     "durability": 70,
     "weirdness": 50,
@@ -5929,15 +5929,15 @@
     "elementalStrength": 0,
     "specialEffects": [
       {
-        "type": "roman_blessing",
+        "type": "divine_resonance",
         "magnitude": 50,
-        "description": "Jupiter's favor"
+        "description": "Divine favor"
       }
     ],
     "moodModifier": 15,
     "atmosphere": "neutral",
-    "description": "Gold consecrated to the gods",
-    "lore": "Sacred to Roman gods, deadly to their enemies."
+    "description": "Gold alloyed with trace Fateite",
+    "lore": "Sacred to sky-domain deities. Weapons forged from Sovereign Gold carry a faint golden glow visible only to those with divine heritage."
   },
   "enchanted_wood": {
     "insulation": 50,
@@ -5977,7 +5977,7 @@
     "description": "Magically-treated living wood",
     "lore": "Wood that remembers being a tree, and dreams of forest."
   },
-  "warpstone": {
+  "voidite": {
     "insulation": 50,
     "durability": 50,
     "weirdness": 100,
@@ -6017,10 +6017,10 @@
     ],
     "moodModifier": -40,
     "atmosphere": "terrifying",
-    "description": "Solidified chaos energy",
-    "lore": "Pure crystallized chaos. Incredibly powerful, utterly dangerous."
+    "description": "Crystallized void-resonance ore",
+    "lore": "Forms where dimensional boundaries thin. Emits a low hum detectable by sensitive species. Unstable."
   },
-  "wyrdstone": {
+  "fateite": {
     "insulation": 50,
     "durability": 45,
     "weirdness": 95,
@@ -6055,10 +6055,10 @@
     ],
     "moodModifier": -30,
     "atmosphere": "unsettling",
-    "description": "Meteoric chaos-touched stone",
-    "lore": "Wyrdstone fell with the comet, and nothing was the same."
+    "description": "Meteoric mineral from the Convergence of Threads",
+    "lore": "Each fragment contains a frozen moment of probability. Diviners prize it above gold."
   },
-  "promethium": {
+  "ignium": {
     "insulation": 50,
     "durability": 40,
     "weirdness": 20,
@@ -6091,10 +6091,10 @@
     ],
     "moodModifier": -10,
     "atmosphere": "neutral",
-    "description": "Refined fuel of war",
-    "lore": "The lifeblood of the Imperium's war machine."
+    "description": "Self-sustaining combustion gel",
+    "lore": "Refined from deep-vent thermal blooms. Burns without oxygen."
   },
-  "ceramite": {
+  "aegisite": {
     "insulation": 50,
     "durability": 95,
     "weirdness": 15,
@@ -6127,10 +6127,10 @@
     ],
     "moodModifier": 0,
     "atmosphere": "neutral",
-    "description": "Heat-resistant armor plating",
-    "lore": "The ceramite of power armor, proof against plasma."
+    "description": "Layered ceramic-mineral composite",
+    "lore": "Each layer is fired at a different resonant frequency, creating interference patterns that dissipate kinetic and thermal energy."
   },
-  "plasteel": {
+  "synthalloy": {
     "insulation": 50,
     "durability": 85,
     "weirdness": 10,
@@ -6157,8 +6157,8 @@
     "specialEffects": [],
     "moodModifier": 0,
     "atmosphere": "neutral",
-    "description": "Composite metal-plastic alloy",
-    "lore": "Standard construction material of the far future."
+    "description": "Programmable metallic composite",
+    "lore": "Internal grain structure can be realigned by applying specific harmonic frequencies."
   },
   "dragon_scale": {
     "insulation": 50,

@@ -932,8 +932,8 @@
     ],
     "advancedMaterials": [
       {
-        "id": "mithril_ingot",
-        "displayName": "Mithril Ingot",
+        "id": "starweave_ingot",
+        "displayName": "Starweave Ingot",
         "category": "material",
         "weight": 2,
         "stackSize": 20,
@@ -986,7 +986,7 @@
         "isGatherable": false,
         "craftedFrom": [
           {
-            "itemId": "mithril_ingot",
+            "itemId": "starweave_ingot",
             "amount": 4
           },
           {
@@ -1610,8 +1610,8 @@
       "rarity": "common"
     },
     {
-      "id": "mithril_ingot",
-      "displayName": "Mithril Ingot",
+      "id": "starweave_ingot",
+      "displayName": "Starweave Ingot",
       "category": "material",
       "weight": 2,
       "stackSize": 20,
@@ -1664,7 +1664,7 @@
       "isGatherable": false,
       "craftedFrom": [
         {
-          "itemId": "mithril_ingot",
+          "itemId": "starweave_ingot",
           "amount": 4
         },
         {
@@ -6609,8 +6609,8 @@
       "rarity": "legendary"
     },
     {
-      "id": "oblivion_hammer",
-      "displayName": "Oblivion Hammer",
+      "id": "void_hammer",
+      "displayName": "Void Hammer",
       "category": "equipment",
       "weight": 6,
       "stackSize": 1,

@@ -16,8 +16,8 @@ Design a paradigm-specific skill tree system that integrates with the existing S
 /** What can unlock a magic skill node */
 export type UnlockConditionType =
   // Inherent conditions
-  | 'bloodline'        // Must have specific lineage (Allomancy)
-  | 'snapping'         // Must experience trauma event (Allomancy)
+  | 'bloodline'        // Must have specific lineage (Ferromancy)
+  | 'the_crucible'         // Must experience trauma event (Ferromancy)
   | 'daemon_settled'   // Daemon must have settled (Daemon paradigm)
   | 'witch_birth'      // Born into witch clan
 
@@ -63,7 +63,7 @@ export interface UnlockCondition {
   params: {
     // For bloodline
     bloodlineId?: string;
-    bloodlineStrength?: number; // 0-1, mistings vs mistborn
+    bloodlineStrength?: number; // 0-1, ore_attuneds vs crucible_born
 
     // For kami/spirit
     kamiId?: string;
@@ -213,7 +213,7 @@ export type MagicSkillEffectType =
   | 'unlock_ritual'            // Learn ritual
 
   // Discovery unlocks
-  | 'unlock_metal'             // Can burn this metal (Allomancy)
+  | 'unlock_metal'             // Can burn this metal (Ferromancy)
   | 'unlock_rune'              // Know this rune
   | 'unlock_song'              // Know this song
   | 'unlock_kami_type'         // Can interact with this kami type
@@ -224,10 +224,10 @@ export type MagicSkillEffectType =
   | 'pact_leverage'            // Better pact terms
 
   // Paradigm-specific
-  | 'alar_strength'            // Sympathy: mental focus strength
-  | 'alar_split'               // Sympathy: can split focus X ways
-  | 'burn_rate_control'        // Allomancy: control burn rate
-  | 'flare_control'            // Allomancy: can flare safely
+  | 'alar_strength'            // Tethermancy: mental focus strength
+  | 'alar_split'               // Tethermancy: can split focus X ways
+  | 'burn_rate_control'        // Ferromancy: control burn rate
+  | 'flare_control'            // Ferromancy: can flare safely
   | 'lucidity'                 // Dream: lucid dreaming control
   | 'purity_maintenance'       // Shinto: slower purity decay
   | 'rune_precision'           // Rune: carving quality bonus
@@ -381,27 +381,27 @@ Entry nodes:
 - "Basic Purity" - Learn to maintain ritual cleanliness
 - "Spirit Sense" - Can detect nearby kami
 
-### Allomancy Tree (Discovery-Based)
+### Ferromancy Tree (Discovery-Based)
 
 Key features:
 - Bloodline check as tree prerequisite
-- Snapping event unlocks tree
+- The Crucible event unlocks tree
 - Each metal is a discovery node
 - Burn rate control progression
 - Flaring mastery
-- Mistborn vs Misting paths (bloodline strength determines available metals)
+- CrucibleBorn vs OreAttuned paths (bloodline strength determines available metals)
 
 Entry nodes:
-- "Snapped" - Requires trauma event, unlocks tree
+- "Fractured" - Requires trauma event, unlocks tree
 - First metal discovered (based on circumstance)
 
-### Sympathy Tree (Skill-Based)
+### Tethermancy Tree (Skill-Based)
 
 Key features:
 - Alar strength progression
 - Link type nodes
 - Split focus mastery
-- Slippage reduction
+- Drift reduction
 - Study-based progression (traditional skill tree)
 
 Entry nodes:
@@ -450,10 +450,10 @@ Entry nodes:
 ### Daemon Paradigm Tree (Relationship-Based)
 
 Key features:
-- Daemon bond strength
+- Animus bond strength
 - Separation range progression
-- Dust sensitivity
-- Alethiometer reading (very advanced)
+- Aether Mote sensitivity
+- Veridex reading (very advanced)
 - Form flexibility (pre-settling)
 
 Entry nodes:
@@ -466,8 +466,8 @@ Entry nodes:
 2. **`src/magic/MagicSkillTreeEvaluator.ts`** - Logic for checking conditions
 3. **`src/magic/MagicSkillTreeRegistry.ts`** - Registry of all skill trees
 4. **`src/magic/skillTrees/ShintoSkillTree.ts`** - Shinto-specific tree
-5. **`src/magic/skillTrees/AllomancySkillTree.ts`** - Allomancy-specific tree
-6. **`src/magic/skillTrees/SympathySkillTree.ts`** - Sympathy-specific tree
+5. **`src/magic/skillTrees/FerromancySkillTree.ts`** - Ferromancy-specific tree
+6. **`src/magic/skillTrees/TethermancySkillTree.ts`** - Tethermancy-specific tree
 7. **`src/magic/skillTrees/DreamSkillTree.ts`** - Dream-specific tree
 8. **`src/magic/skillTrees/SongSkillTree.ts`** - Song-specific tree
 9. **`src/magic/skillTrees/RuneSkillTree.ts`** - Rune-specific tree
@@ -486,10 +486,10 @@ Entry nodes:
 
 ### Phase 2: Weird Trees (Manual Implementation)
 Focus on paradigms with unique mechanics:
-1. **Allomancy** - Bloodline + snapping + metal discovery
+1. **Ferromancy** - Bloodline + the_crucible + metal discovery
 2. **Daemon** - External soul + separation + Dust
 3. **Shinto** - Kami relationships + purity
-4. **Sympathy** - Alar mechanics + link types
+4. **Tethermancy** - Alar mechanics + link types
 
 ### Phase 3: Simpler Trees (Can Be Generated)
 These follow more standard skill tree patterns:
@@ -507,7 +507,7 @@ These follow more standard skill tree patterns:
 
 ## Notes
 
-- The "weird" paradigms (Allomancy, Daemon, Shinto, Sympathy) need careful manual implementation because they have unique mechanics that don't fit standard skill tree patterns
+- The "weird" paradigms (Ferromancy, Daemon, Shinto, Tethermancy) need careful manual implementation because they have unique mechanics that don't fit standard skill tree patterns
 - The simpler paradigms can potentially be auto-generated from the MagicParadigm definition
 - Discovery mechanics should tie into the exploration and memory systems
 - Attention-based unlocks integrate with the existing PresenceSpectrum divinity system

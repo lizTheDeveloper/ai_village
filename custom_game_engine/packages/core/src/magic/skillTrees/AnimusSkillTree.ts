@@ -31,7 +31,7 @@ import {
 const PARADIGM_ID = 'animus';
 
 /** Animus form categories - affects abilities */
-export const DAEMON_FORM_CATEGORIES = {
+export const ANIMUS_FORM_CATEGORIES = {
   predator: ['wolf', 'hawk', 'leopard', 'snake', 'fox'],
   companion: ['dog', 'cat', 'horse', 'rabbit', 'otter'],
   wisdom: ['owl', 'raven', 'elephant', 'dolphin', 'crow'],
@@ -41,7 +41,7 @@ export const DAEMON_FORM_CATEGORIES = {
 } as const;
 
 /** Aether Motes interaction types */
-export const DUST_INTERACTIONS = {
+export const AETHER_MOTE_INTERACTIONS = {
   sensing: 'Perceive Aether Mote particles in the environment',
   reading: 'Interpret Aether Motes patterns for divination',
   attracting: 'Draw Aether Motes to yourself or objects',
@@ -54,7 +54,7 @@ export const DUST_INTERACTIONS = {
 // ============================================================================
 
 /** Basic animus awareness - everyone starts here */
-const DAEMON_BOND_NODE = createSkillNode(
+const ANIMUS_BOND_NODE = createSkillNode(
   'animus-bond',
   'Animus Bond',
   PARADIGM_ID,
@@ -290,8 +290,8 @@ const FORM_MASTERY_NODE = createSkillNode(
 // ============================================================================
 
 /** Basic Aether Motes awareness */
-const DUST_SENSE_NODE = createSkillNode(
-  'dust-sense',
+const AETHER_SENSE_NODE = createSkillNode(
+  'aether-sense',
   'Aether Mote Sense',
   PARADIGM_ID,
   'aether_motes',
@@ -300,7 +300,7 @@ const DUST_SENSE_NODE = createSkillNode(
   [
     createSkillEffect('unlock_ability', 1, {
       description: 'Can perceive Aether Motes particles',
-      target: { abilityId: 'dust_perception' },
+      target: { abilityId: 'aether_perception' },
     }),
   ],
   {
@@ -314,8 +314,8 @@ to settled animuses and mature minds.`,
 );
 
 /** Enhanced Aether Motes perception */
-const DUST_VISION_NODE = createSkillNode(
-  'dust-vision',
+const AETHER_VISION_NODE = createSkillNode(
+  'aether-vision',
   'Aether Mote Vision',
   PARADIGM_ID,
   'aether_motes',
@@ -324,20 +324,20 @@ const DUST_VISION_NODE = createSkillNode(
   [
     createSkillEffect('unlock_ability', 1, {
       description: 'See Aether Mote currents and concentrations',
-      target: { abilityId: 'dust_vision' },
+      target: { abilityId: 'aether_vision' },
     }),
   ],
   {
     description: 'See the golden streams of Aether Motes flowing through the world',
-    prerequisites: ['dust-sense'],
+    prerequisites: ['aether-sense'],
     maxLevel: 3,
     levelCostMultiplier: 1.5,
   }
 );
 
 /** Aether Motes attraction - draw Aether Motes to yourself */
-const DUST_ATTRACTION_NODE = createSkillNode(
-  'dust-attraction',
+const AETHER_ATTRACTION_NODE = createSkillNode(
+  'aether-attraction',
   'Aether Mote Attraction',
   PARADIGM_ID,
   'aether_motes',
@@ -352,14 +352,14 @@ const DUST_ATTRACTION_NODE = createSkillNode(
   {
     description: 'Learn to draw Aether Motes toward you through focused consciousness',
     lore: 'Those who think deeply, who question, who love and hate with passion - they draw Aether Motes like lodestone draws iron.',
-    prerequisites: ['dust-sense'],
+    prerequisites: ['aether-sense'],
     maxLevel: 5,
     levelCostMultiplier: 1.4,
   }
 );
 
 /** Veridex reading - requires special training */
-const ALETHIOMETER_TRAINING_NODE = createSkillNode(
+const VERIDEX_TRAINING_NODE = createSkillNode(
   'veridex-training',
   'Veridex Reading',
   PARADIGM_ID,
@@ -368,20 +368,20 @@ const ALETHIOMETER_TRAINING_NODE = createSkillNode(
   200,
   [
     createSkillEffect('unlock_ability', 1, {
-      description: 'Can read the golden compass',
+      description: 'Can read the Veridex',
       target: { abilityId: 'veridex_read' },
     }),
   ],
   {
-    description: 'Learn to read the veridex - the golden compass of truth',
+    description: 'Learn to read the Veridex — an instrument of symbolic truth',
     lore: `The veridex speaks through Aether Motes. Thirty-six symbols, infinite
 meanings, and truth for those patient enough to learn. Most scholars take
 decades to master even a portion of its language.`,
-    prerequisites: ['dust-vision'],
+    prerequisites: ['aether-vision'],
     unlockConditions: [
       createUnlockCondition(
         'teacher_found',
-        { teacherType: 'alethiometrist' },
+        { teacherType: 'veridex_reader' },
         'Must find a teacher of veridex reading'
       ),
       createUnlockCondition(
@@ -415,7 +415,7 @@ const INTUITIVE_READING_NODE = createSkillNode(
     lore: `Some rare individuals - almost always children - can read the veridex
 without training. They slip into a trance-like state and the answers come.
 But this gift fades with settling, with knowledge, with growing up.`,
-    prerequisites: ['dust-sense'],
+    prerequisites: ['aether-sense'],
     unlockConditions: [
       createUnlockCondition(
         'gift_innate',
@@ -431,8 +431,8 @@ But this gift fades with settling, with knowledge, with growing up.`,
 );
 
 /** Aether Motes navigation - finding windows between worlds */
-const DUST_NAVIGATION_NODE = createSkillNode(
-  'dust-navigation',
+const AETHER_NAVIGATION_NODE = createSkillNode(
+  'aether-navigation',
   'Aether Mote Navigation',
   PARADIGM_ID,
   'aether_motes',
@@ -447,7 +447,7 @@ const DUST_NAVIGATION_NODE = createSkillNode(
   {
     description: 'Learn to sense the currents of Aether Motes that flow between worlds',
     lore: 'Aether Motes flow between worlds through windows and cracks in reality. Those sensitive enough can feel these currents and follow them.',
-    prerequisites: ['dust-vision', 'veridex-training'],
+    prerequisites: ['aether-vision', 'veridex-training'],
     unlockConditions: [
       createUnlockCondition(
         'node_level',
@@ -641,7 +641,7 @@ const WITCH_FLIGHT_NODE = createSkillNode(
 );
 
 /** Animus as scout */
-const DAEMON_SCOUT_NODE = createSkillNode(
+const ANIMUS_SCOUT_NODE = createSkillNode(
   'animus-scout',
   'Animus Scout',
   PARADIGM_ID,
@@ -767,7 +767,7 @@ const DEEP_BOND_NODE = createSkillNode(
 );
 
 /** Animus combat - fighting as one */
-const DAEMON_COMBAT_NODE = createSkillNode(
+const ANIMUS_COMBAT_NODE = createSkillNode(
   'animus-combat',
   'Animus Combat',
   PARADIGM_ID,
@@ -801,8 +801,8 @@ const DAEMON_COMBAT_NODE = createSkillNode(
 );
 
 /** Aether Motes communion - advanced consciousness work */
-const DUST_COMMUNION_NODE = createSkillNode(
-  'dust-communion',
+const AETHER_COMMUNION_NODE = createSkillNode(
+  'aether-communion',
   'Aether Mote Communion',
   PARADIGM_ID,
   'aether_motes',
@@ -811,7 +811,7 @@ const DUST_COMMUNION_NODE = createSkillNode(
   [
     createSkillEffect('unlock_ability', 1, {
       description: 'Enter deep communion with Aether Motes',
-      target: { abilityId: 'dust_communion' },
+      target: { abilityId: 'aether_communion' },
     }),
     createSkillEffect('wisdom', 20, {
       description: 'Wisdom gained from Aether Mote consciousness',
@@ -820,11 +820,11 @@ const DUST_COMMUNION_NODE = createSkillNode(
   {
     description: 'Achieve direct communion with Aether Motes consciousness',
     lore: 'Aether Motes are not merely particles - it is consciousness itself, the accumulated wisdom of countless beings. To commune with Aether Motes is to touch something vast and ancient.',
-    prerequisites: ['dust-attraction', 'deep-bond'],
+    prerequisites: ['aether-attraction', 'deep-bond'],
     unlockConditions: [
       createUnlockCondition(
         'node_level',
-        { nodeId: 'dust-attraction', level: 5 },
+        { nodeId: 'aether-attraction', level: 5 },
         'Must have strong Aether Mote affinity'
       ),
     ],
@@ -848,7 +848,7 @@ const XP_SOURCES: MagicXPSource[] = [
     description: "Use your animus's form abilities",
   },
   {
-    eventType: 'dust_perceived',
+    eventType: 'aether_perceived',
     xpAmount: 15,
     description: 'Successfully perceive Aether Motes',
   },
@@ -890,7 +890,7 @@ const XP_SOURCES: MagicXPSource[] = [
 
 const ALL_NODES: MagicSkillNode[] = [
   // Foundation
-  DAEMON_BOND_NODE,
+  ANIMUS_BOND_NODE,
   EMOTIONAL_SYNC_NODE,
   SILENT_SPEECH_NODE,
   TOUCH_TABOO_NODE,
@@ -903,13 +903,13 @@ const ALL_NODES: MagicSkillNode[] = [
   FORM_MASTERY_NODE,
 
   // Aether Motes
-  DUST_SENSE_NODE,
-  DUST_VISION_NODE,
-  DUST_ATTRACTION_NODE,
-  ALETHIOMETER_TRAINING_NODE,
+  AETHER_SENSE_NODE,
+  AETHER_VISION_NODE,
+  AETHER_ATTRACTION_NODE,
+  VERIDEX_TRAINING_NODE,
   INTUITIVE_READING_NODE,
-  DUST_NAVIGATION_NODE,
-  DUST_COMMUNION_NODE,
+  AETHER_NAVIGATION_NODE,
+  AETHER_COMMUNION_NODE,
 
   // Separation (Witch Path)
   WITCH_BLOOD_NODE,
@@ -918,7 +918,7 @@ const ALL_NODES: MagicSkillNode[] = [
   EXTENDED_SEPARATION_NODE,
   UNLIMITED_SEPARATION_NODE,
   WITCH_FLIGHT_NODE,
-  DAEMON_SCOUT_NODE,
+  ANIMUS_SCOUT_NODE,
 
   // Severance Resistance
   INTERCISION_AWARENESS_NODE,
@@ -926,7 +926,7 @@ const ALL_NODES: MagicSkillNode[] = [
 
   // Advanced
   DEEP_BOND_NODE,
-  DAEMON_COMBAT_NODE,
+  ANIMUS_COMBAT_NODE,
 ];
 
 /**
@@ -975,7 +975,7 @@ price is paid in pain.`,
 /**
  * Get bonuses based on animus form category.
  */
-export function getFormBonuses(formCategory: keyof typeof DAEMON_FORM_CATEGORIES): {
+export function getFormBonuses(formCategory: keyof typeof ANIMUS_FORM_CATEGORIES): {
   primary: string;
   secondary: string;
   description: string;
@@ -1029,18 +1029,18 @@ export function getFormBonuses(formCategory: keyof typeof DAEMON_FORM_CATEGORIES
 /**
  * Check if a specific animus form is available in a category.
  */
-export function isFormInCategory(form: string, category: keyof typeof DAEMON_FORM_CATEGORIES): boolean {
-  const forms = DAEMON_FORM_CATEGORIES[category];
+export function isFormInCategory(form: string, category: keyof typeof ANIMUS_FORM_CATEGORIES): boolean {
+  const forms = ANIMUS_FORM_CATEGORIES[category];
   return (forms as readonly string[]).includes(form);
 }
 
 /**
  * Get the category for a animus form.
  */
-export function getFormCategory(form: string): keyof typeof DAEMON_FORM_CATEGORIES | null {
-  for (const [category, forms] of Object.entries(DAEMON_FORM_CATEGORIES)) {
+export function getFormCategory(form: string): keyof typeof ANIMUS_FORM_CATEGORIES | null {
+  for (const [category, forms] of Object.entries(ANIMUS_FORM_CATEGORIES)) {
     if ((forms as readonly string[]).includes(form)) {
-      return category as keyof typeof DAEMON_FORM_CATEGORIES;
+      return category as keyof typeof ANIMUS_FORM_CATEGORIES;
     }
   }
   return null;

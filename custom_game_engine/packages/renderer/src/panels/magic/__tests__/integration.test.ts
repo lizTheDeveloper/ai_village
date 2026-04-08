@@ -499,8 +499,8 @@ describe('Integration: Magic Skill Tree UI', () => {
   describe('Multi-Paradigm XP Isolation', () => {
     it('should not affect other paradigms XP when unlocking node', () => {
       const entity = createMockMagicEntity({
-        paradigms: ['shinto', 'allomancy', 'sympathy'],
-        xp: { shinto: 500, allomancy: 300, sympathy: 200 },
+        paradigms: ['shinto', 'ferromancy', 'tethermancy'],
+        xp: { shinto: 500, ferromancy: 300, tethermancy: 200 },
         unlockedNodes: ['shinto_spirit_sense']
       });
 
@@ -517,14 +517,14 @@ describe('Integration: Magic Skill Tree UI', () => {
 
       // Verify only Shinto XP deducted
       expect(magicComponent.skillTreeState.shinto.xp).toBe(400); // 500 - 100
-      expect(magicComponent.skillTreeState.allomancy.xp).toBe(300); // Unchanged
-      expect(magicComponent.skillTreeState.sympathy.xp).toBe(200); // Unchanged
+      expect(magicComponent.skillTreeState.ferromancy.xp).toBe(300); // Unchanged
+      expect(magicComponent.skillTreeState.tethermancy.xp).toBe(200); // Unchanged
     });
 
     it('should maintain separate unlocked nodes per paradigm', () => {
       const entity = createMockMagicEntity({
-        paradigms: ['shinto', 'allomancy'],
-        xp: { shinto: 500, allomancy: 500 }
+        paradigms: ['shinto', 'ferromancy'],
+        xp: { shinto: 500, ferromancy: 500 }
       });
 
       const panel = new SkillTreePanel(createMockWindowManager());
@@ -534,15 +534,15 @@ describe('Integration: Magic Skill Tree UI', () => {
       panel.setActiveParadigm('shinto');
       panel.handleClick(150, 100, mockWorld);
 
-      // Unlock Allomancy node
-      panel.setActiveParadigm('allomancy');
+      // Unlock Ferromancy node
+      panel.setActiveParadigm('ferromancy');
       panel.handleClick(150, 100, mockWorld);
 
       const magicComponent = entity.getComponent('magic');
 
       // Verify nodes tracked separately
       expect(magicComponent.skillTreeState.shinto.unlockedNodes).not.toEqual(
-        magicComponent.skillTreeState.allomancy.unlockedNodes
+        magicComponent.skillTreeState.ferromancy.unlockedNodes
       );
     });
   });
@@ -815,15 +815,15 @@ function setupMockSkillTrees() {
     ],
   };
 
-  // Create mock Allomancy tree
-  const allomancyTree: MagicSkillTree = {
-    id: 'allomancy_tree',
-    paradigmId: 'allomancy',
-    name: 'Allomancy',
+  // Create mock Ferromancy tree
+  const ferromancyTree: MagicSkillTree = {
+    id: 'ferromancy_tree',
+    paradigmId: 'ferromancy',
+    name: 'Ferromancy',
     description: 'Pushing and pulling on metals',
     nodes: [
       {
-        id: 'allomancy_steel_push',
+        id: 'ferromancy_steel_push',
         name: 'Steel Push',
         description: 'Push on metals',
         category: 'foundation',
@@ -833,27 +833,27 @@ function setupMockSkillTrees() {
         effects: [],
       },
     ],
-    entryNodes: ['allomancy_steel_push'],
+    entryNodes: ['ferromancy_steel_push'],
     connections: [],
     categories: [
       {
         id: 'foundation',
         name: 'Foundation',
-        description: 'Basic Allomancy',
+        description: 'Basic Ferromancy',
         displayOrder: 0,
       },
     ],
   };
 
-  // Create mock Sympathy tree
-  const sympathyTree: MagicSkillTree = {
-    id: 'sympathy_tree',
-    paradigmId: 'sympathy',
-    name: 'Sympathy',
+  // Create mock Tethermancy tree
+  const tethermancyTree: MagicSkillTree = {
+    id: 'tethermancy_tree',
+    paradigmId: 'tethermancy',
+    name: 'Tethermancy',
     description: 'Binding energy between objects',
     nodes: [
       {
-        id: 'sympathy_heat_link',
+        id: 'tethermancy_heat_link',
         name: 'Heat Link',
         description: 'Transfer heat between objects',
         category: 'foundation',
@@ -863,13 +863,13 @@ function setupMockSkillTrees() {
         effects: [],
       },
     ],
-    entryNodes: ['sympathy_heat_link'],
+    entryNodes: ['tethermancy_heat_link'],
     connections: [],
     categories: [
       {
         id: 'foundation',
         name: 'Foundation',
-        description: 'Basic Sympathy',
+        description: 'Basic Tethermancy',
         displayOrder: 0,
       },
     ],
@@ -878,7 +878,7 @@ function setupMockSkillTrees() {
   // Register trees
   (registry as Record<string, unknown>).trees = new Map([
     ['shinto', shintoTree],
-    ['allomancy', allomancyTree],
-    ['sympathy', sympathyTree],
+    ['ferromancy', ferromancyTree],
+    ['tethermancy', tethermancyTree],
   ]);
 }

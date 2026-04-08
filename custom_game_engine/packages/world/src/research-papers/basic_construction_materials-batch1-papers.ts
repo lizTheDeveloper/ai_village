@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -498,7 +498,7 @@ The historical development of quarrying methods reveals humanity's characteristi
 
 ‡"Overburden" is the technical term for "all the inconvenient material between you and the valuable stone you want." It is used exclusively by quarriers. Everyone else calls it "the ground" or "dirt" or, in particularly philosophical moments, "the literal foundation of the terrestrial realm upon which all terrestrial life depends."††
 
-††See Gaiman, N., "Conversations With the Stone: Animistic Practices in Pre-Industrial Mining" (Journal of Applied Geology and Ancient Mysticism, Vol 23, pp. 147-891). The paper was rejected by seventeen mainstream journals before finding a home in a publication that also accepts articles about ley lines and the true purpose of standing stones. Gaiman argues that rocks do remember, and they hold grudges. His evidence is entirely circumstantial and consists primarily of the observation that quarriers who spoke respectfully to the stone had fewer "accidents" than those who didn't. The peer reviewers called it "uncomfortably convincing."
+††See Kelvar, N., "Conversations With the Stone: Animistic Practices in Pre-Industrial Mining" (Journal of Applied Geology and Ancient Mysticism, Vol 23, pp. 147-891). The paper was rejected by seventeen mainstream journals before finding a home in a publication that also accepts articles about ley lines and the true purpose of standing stones. Kelvar argues that rocks do remember, and they hold grudges. His evidence is entirely circumstantial and consists primarily of the observation that quarriers who spoke respectfully to the stone had fewer "accidents" than those who didn't. The peer reviewers called it "uncomfortably convincing."
 
 ‡‡The deep desire of objects to remain stationary is one of the fundamental forces of the universe, alongside gravity, electromagnetism, and the tendency of toast to land butter-side down. Sir Isaac Newton nearly included it in his Principia but was distracted by an apple‡.
 

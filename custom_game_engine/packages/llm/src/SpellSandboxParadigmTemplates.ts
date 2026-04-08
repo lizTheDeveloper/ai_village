@@ -107,7 +107,7 @@ The effect fades as suddenly as it came, leaving behind only the faint sense tha
  */
 const BREATH: ParadigmTemplate = {
   id: 'breath',
-  name: 'Awakening (Breath)',
+  name: 'Investing (Breath)',
   philosophy: `Breath is not merely the movement of air — it is the gift of animation that one living thing can bestow upon another. \
 Every exhale transfers a tiny fragment of the caster's own animating force; over a lifetime of study, practitioners learn to give \
 or withhold this force with surgical precision. Objects breathed upon become subtly more themselves: a blade sharpened, a wall fortified, \
@@ -154,12 +154,12 @@ The information is offered honestly, without judgment.`,
 };
 
 /**
- * Sympathy Magic — links between similar things
+ * Tethermancy Magic — links between similar things
  */
-const SYMPATHY: ParadigmTemplate = {
-  id: 'sympathy',
-  name: 'Sympathy',
-  philosophy: `Sympathy is the oldest of magics: the recognition that like calls to like, that the world is \
+const TETHERMANCY: ParadigmTemplate = {
+  id: 'tethermancy',
+  name: 'Tethermancy',
+  philosophy: `Tethermancy is the oldest of magics: the recognition that like calls to like, that the world is \
 woven from invisible correspondences. A fragment of someone's hair is still them, in some diminished sense. \
 A precise model of a door is, briefly, a door. Practitioners work by identifying correspondences — \
 sometimes obvious, sometimes surprising — and reinforcing them until the link carries force. \
@@ -542,7 +542,7 @@ The rune does not lie on behalf of the text; it only opens what was already ther
 };
 
 // ---------------------------------------------------------------------------
-// New paradigms: blood, divine, names, pact, shinto, allomancy, lunar, seasonal
+// New paradigms: blood, divine, names, pact, shinto, ferromancy, lunar, seasonal
 // ---------------------------------------------------------------------------
 
 const BLOOD: ParadigmTemplate = {
@@ -805,16 +805,16 @@ as if the ground had been considering their arrival.`,
   ],
 };
 
-const ALLOMANCY: ParadigmTemplate = {
-  id: 'allomancy',
-  name: 'Allomancy',
-  philosophy: `Allomancy does not work with the world — it works through the body. \
+const FERROMANCY: ParadigmTemplate = {
+  id: 'ferromancy',
+  name: 'Ferromancy',
+  philosophy: `Ferromancy does not work with the world — it works through the body. \
 Certain bloodlines carry the capacity to consume metals and burn them from within, \
 converting mass into precisely-typed power. Every metal produces a specific, repeatable effect: \
 steel pushes, iron pulls, tin sharpens the senses, pewter strengthens the flesh. \
 There is no interpretation and no creativity in the paradigm, only precision and courage: \
-a Coinshot who hesitates mid-flight is a Coinshot who falls. \
-The tradition carries a particular pride — allomancy requires no study, no spirit, no bargain. \
+an Iron-Puller who hesitates mid-flight is an Iron-Puller who falls. \
+The tradition carries a particular pride — ferromancy requires no study, no spirit, no bargain. \
 It only requires the blood, and the willingness to spend it.`,
   vocabularyRegister: `Physical, precise, and kinetic. Language should feel like movement — \
 quick, controlled, with consequences. Use internal body sensation: "the burn", "the flare", \
@@ -987,7 +987,7 @@ what they actually require.`,
 export const PARADIGM_TEMPLATES: Record<string, ParadigmTemplate> = {
   emotional: EMOTIONAL,
   breath: BREATH,
-  sympathy: SYMPATHY,
+  tethermancy: TETHERMANCY,
   dream: DREAM,
   craft: CRAFT,
   song: SONG,
@@ -999,7 +999,7 @@ export const PARADIGM_TEMPLATES: Record<string, ParadigmTemplate> = {
   names: NAMES,
   pact: PACT,
   shinto: SHINTO,
-  allomancy: ALLOMANCY,
+  ferromancy: FERROMANCY,
   lunar: LUNAR,
   seasonal: SEASONAL,
 };

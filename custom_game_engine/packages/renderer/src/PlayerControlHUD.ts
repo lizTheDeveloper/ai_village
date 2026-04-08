@@ -21,7 +21,23 @@ export class PlayerControlHUD {
   private readonly padding = 14;
   private readonly warningBeliefThreshold = 50;
 
+  // Smoothly interpolated display values
+  private displayBelief = -1; // -1 = uninitialized
+  private displayTime = -1;
+  private displayHealth = -1;
+  private displayHunger = -1;
+  private displayEnergy = -1;
+  private readonly lerpSpeed = 0.08;
+
   constructor() {}
+
+  /** Lerp a displayed value toward target. Returns new displayed value. */
+  private _lerp(current: number, target: number, speed: number): number {
+    if (current < 0) return target; // First frame: snap to target
+    const diff = target - current;
+    if (Math.abs(diff) < 0.002) return target; // Close enough, snap
+    return current + diff * speed;
+  }
 
   /**
    * Render the possession HUD (top-right corner)
@@ -56,7 +72,9 @@ export class PlayerControlHUD {
     const x = canvasWidth - hudWidth - 12;
     const y = 12;
 
-    const beliefFraction = Math.max(0, Math.min(1, status.beliefRemaining / 100));
+    // Smoothly interpolate belief toward actual value
+    this.displayBelief = this._lerp(this.displayBelief, status.beliefRemaining / 100, this.lerpSpeed);
+    const beliefFraction = Math.max(0, Math.min(1, this.displayBelief));
     const showWarning = status.beliefRemaining < this.warningBeliefThreshold;
     const showCritical = status.beliefRemaining < 10;
 
@@ -166,7 +184,10 @@ export class PlayerControlHUD {
     const mins = Math.floor(secondsRemaining / 60);
     const secs = secondsRemaining % 60;
     const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
-    const timeFraction = Math.min(1, secondsRemaining / 300); // 5 min max display
+    // Smoothly interpolate time bar
+    const rawTimeFraction = Math.min(1, secondsRemaining / 300);
+    this.displayTime = this._lerp(this.displayTime, rawTimeFraction, this.lerpSpeed);
+    const timeFraction = this.displayTime; // 5 min max display
     const timeColor = timeFraction < 0.15 ? '#FF6060' : timeFraction < 0.35 ? '#FFAA44' : '#60C8FF';
     curY = this._drawLabeledBar(
       ctx,
@@ -193,9 +214,14 @@ export class PlayerControlHUD {
 
       const barW = (hudWidth - this.padding * 2 - 12) / 3;
 
-      this._drawMiniBar(ctx, x + this.padding,              curY, barW, '❤ Health', needs.health,          this._needColor(needs.health));
-      this._drawMiniBar(ctx, x + this.padding + barW + 6,   curY, barW, '🍖 Fed',   1 - needs.hunger,       this._needColor(1 - needs.hunger));
-      this._drawMiniBar(ctx, x + this.padding + barW * 2 + 12, curY, barW, '⚡ Energy', needs.energy,        this._needColor(needs.energy));
+      // Smoothly interpolate need bars
+      this.displayHealth = this._lerp(this.displayHealth, needs.health, this.lerpSpeed);
+      this.displayHunger = this._lerp(this.displayHunger, 1 - needs.hunger, this.lerpSpeed);
+      this.displayEnergy = this._lerp(this.displayEnergy, needs.energy, this.lerpSpeed);
+
+      this._drawMiniBar(ctx, x + this.padding,              curY, barW, '❤ Health', this.displayHealth,    this._needColor(needs.health));
+      this._drawMiniBar(ctx, x + this.padding + barW + 6,   curY, barW, '🍖 Fed',   this.displayHunger,    this._needColor(1 - needs.hunger));
+      this._drawMiniBar(ctx, x + this.padding + barW * 2 + 12, curY, barW, '⚡ Energy', this.displayEnergy, this._needColor(needs.energy));
     }
   }
 
@@ -268,17 +294,19 @@ export class PlayerControlHUD {
     const trackH = 30;
     const fillH = Math.max(2, trackH * fraction);
 
-    // Track
+    // Track (rounded)
     ctx.save();
     ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
-    ctx.fillRect(x, y, width, trackH);
+    this._roundRect(ctx, x, y, width, trackH, 3);
+    ctx.fill();
 
-    // Fill (bottom-up)
+    // Fill (bottom-up, rounded)
     const grad = ctx.createLinearGradient(x, y + trackH, x, y + trackH - fillH);
     grad.addColorStop(0, color);
     grad.addColorStop(1, this._brighten(color, 30));
     ctx.fillStyle = grad;
-    ctx.fillRect(x, y + trackH - fillH, width, fillH);
+    this._roundRect(ctx, x, y + trackH - fillH, width, fillH, 3);
+    ctx.fill();
 
     // Label
     ctx.font = '9px monospace';

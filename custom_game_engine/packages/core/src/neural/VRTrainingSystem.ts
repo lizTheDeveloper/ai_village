@@ -216,7 +216,7 @@ export const TRAINING_PROGRAM_NAMES: Record<TrainingCategory, string[]> = {
     'Climbing: Gravity Is Just A Suggestion',
   ],
   academic: [
-    'Every Language: A Babel Fish Replacement',
+    'Every Language: Universal Translation Through Neural Immersion',
     'History: Relive The Mistakes So You Don\'t Repeat Them',
     'Mathematics: Numbers Are Real (In Here)',
     'Science: Break Everything Safely',

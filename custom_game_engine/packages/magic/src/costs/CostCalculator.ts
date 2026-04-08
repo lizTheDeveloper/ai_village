@@ -119,7 +119,7 @@ export type TerminalEffect =
   | { type: 'soul_lost'; fragmentsRemaining: number }
   | { type: 'favor_zero'; patronAction: string }
   | { type: 'sanity_zero'; madnessType: string }
-  | { type: 'drab'; breathsRemaining: 0 }
+  | { type: 'hollow'; breathsRemaining: 0 }
   | { type: 'forsaken'; deityId: string }
   | { type: 'emotional_burnout'; dominantEmotion: string }
   | { type: 'mutation'; mutationType: string }
@@ -137,17 +137,17 @@ export type TerminalEffect =
   | { type: 'runic_zero'; runesDepleted: boolean }
   | { type: 'runic_exhaustion'; cause: string }
   | { type: 'material_shortage'; materialType: string }
-  // Sympathy terminal effects
-  | { type: 'alar_zero'; bindingsLost: boolean }
-  | { type: 'slippage_max'; burnedOut: boolean }
-  | { type: 'alar_break'; cause: string }
-  | { type: 'slippage_burn'; severity: string }
-  // Allomancy terminal effects
+  // Tethermancy terminal effects
+  | { type: 'attunement_zero'; bindingsLost: boolean }
+  | { type: 'drift_max'; burnedOut: boolean }
+  | { type: 'attunement_break'; cause: string }
+  | { type: 'drift_burn'; severity: string }
+  // Ferromancy terminal effects
   | { type: 'metal_depleted'; metalType: string; effectDescription?: string }
-  | { type: 'atium_gone'; visionLost: boolean }
+  | { type: 'temporite_gone'; visionLost: boolean }
   | { type: 'pewter_collapse'; cause: string }
-  // Daemon terminal effects
-  | { type: 'bond_severed'; daemonLost: boolean; effectDescription?: string }
+  // Animus terminal effects
+  | { type: 'bond_severed'; animusLost: boolean; effectDescription?: string }
   | { type: 'dust_depleted'; connectionLost: boolean; effectDescription?: string };
 
 /**

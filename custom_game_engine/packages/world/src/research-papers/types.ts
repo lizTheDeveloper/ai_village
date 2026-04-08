@@ -42,7 +42,7 @@ export type ResearchField =
   | 'military'               // Defense, coordination, strategic technology
   | 'collaboration'          // Task management, project coordination, precursor to hive minds
   // Magic paths to β-space
-  | 'animus_magic'           // Dust navigation, Rift Edge, world-walking
+  | 'animus_magic'           // Aether Mote navigation, Rift Edge, world-walking
   | 'rune_magic'             // Dimensional runes, portal gates, symbolic navigation
   | 'pact_magic'             // Demon contracts, entity-granted travel, bargained passage
   | 'divine_magic'           // Divine ascension, god-granted travel, celestial navigation

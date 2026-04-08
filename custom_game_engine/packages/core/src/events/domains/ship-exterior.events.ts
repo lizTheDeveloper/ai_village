@@ -3,6 +3,15 @@
  */
 
 export interface ShipExteriorEvents {
+  // === Heartbeat Events ===
+
+  /** Ship awareness changed state; heartbeat cadence should transition */
+  'ship:heartbeat_transition': {
+    from: 'dormant' | 'scanning' | 'alert' | 'critical';
+    to: 'dormant' | 'scanning' | 'alert' | 'critical';
+    awarenessLevel: number;
+  };
+
   // === Exterior View Events ===
 
   /** Player opened the exterior view */

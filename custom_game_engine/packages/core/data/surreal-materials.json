@@ -1012,8 +1012,8 @@
       }
     },
     {
-      "id": "material:mithril",
-      "name": "Mithril",
+      "id": "material:starweave",
+      "name": "Starweave",
       "category": "material",
       "weight": 0.5,
       "stackSize": 15,
@@ -1031,7 +1031,7 @@
           "isSolid": true,
           "decayRate": 0,
           "hostility": 0,
-          "aestheticDescription": "Silvery-white metal with faint blue moonlight glow, incredibly light yet stronger than steel",
+          "aestheticDescription": "Ultra-light metallic ore with innate magical conductivity, found only in meteorite impact sites",
           "isBuildingMaterial": true,
           "structuralStrength": 90,
           "temperatureResistance": 85,

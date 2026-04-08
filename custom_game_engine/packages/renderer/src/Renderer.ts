@@ -42,7 +42,7 @@ import { Renderer3D } from './Renderer3D.js';
 import { TerrainRenderer } from './terrain/index.js';
 import { SideViewTerrainRenderer } from './terrain/index.js';
 import { AgentRenderer, AnimalRenderer, BuildingRenderer } from './entities/index.js';
-import { DebugOverlay, InteractionOverlay, AetherMantaOverlay, EternalReturnGlyphOverlay } from './overlays/index.js';
+import { DebugOverlay, InteractionOverlay, AetherMantaOverlay, EternalReturnGlyphOverlay, EighthChildOverlay, ShipHeartbeatOverlay } from './overlays/index.js';
 import { EntityPicker } from './EntityPicker.js';
 import { PixelLabEntityRenderer } from './sprites/PixelLabEntityRenderer.js';
 import { DimensionalControls } from './DimensionalControls.js';
@@ -76,6 +76,8 @@ export class Renderer {
   private interactionOverlay!: InteractionOverlay;
   private aetherMantaOverlay!: AetherMantaOverlay;
   private eternalReturnGlyph!: EternalReturnGlyphOverlay;
+  private eighthChildOverlay!: EighthChildOverlay;
+  private shipHeartbeatOverlay!: ShipHeartbeatOverlay;
   private entityPicker!: EntityPicker;
   private pixelLabEntityRenderer!: PixelLabEntityRenderer;
   private dimensionalControls!: DimensionalControls;
@@ -176,6 +178,8 @@ export class Renderer {
     this.interactionOverlay = new InteractionOverlay(this.ctx);
     this.aetherMantaOverlay = new AetherMantaOverlay(this.ctx);
     this.eternalReturnGlyph = new EternalReturnGlyphOverlay(this.ctx);
+    this.eighthChildOverlay = new EighthChildOverlay(this.ctx);
+    this.shipHeartbeatOverlay = new ShipHeartbeatOverlay(this.ctx);
     this.entityPicker = new EntityPicker(this.tileSize);
     this.pixelLabEntityRenderer = new PixelLabEntityRenderer(this.ctx);
     this.dimensionalControls = new DimensionalControls();
@@ -274,6 +278,16 @@ export class Renderer {
   /** Eternal Return glyph overlay (MUL-2543). */
   get eternalReturnGlyphOverlay(): EternalReturnGlyphOverlay {
     return this.eternalReturnGlyph;
+  }
+
+  /** Trigger the Eighth Child ambient signal pulse. */
+  triggerEighthChildSignal(): void {
+    this.eighthChildOverlay.trigger();
+  }
+
+  /** Whether the Eighth Child ambient signal is currently active. */
+  get isEighthChildSignalActive(): boolean {
+    return this.eighthChildOverlay.isActive;
   }
 
   /**
@@ -476,6 +490,8 @@ export class Renderer {
     // Update camera
     this.camera.update();
 
+    let shipExterior: ShipExteriorComponent | undefined;
+
     // Render parallax starfield above the ship's top deck (space region)
     {
       const now = performance.now();
@@ -493,6 +509,7 @@ export class Renderer {
       if (shipEntities.length > 0) {
         const ext = shipEntities[0]!.components.get('ship_exterior') as ShipExteriorComponent | undefined;
         if (ext) {
+          shipExterior = ext;
           vx = ext.velocity.x;
           vy = ext.velocity.y;
         }
@@ -948,6 +965,19 @@ export class Renderer {
     const cssWidth = this.canvas.width / ((window.devicePixelRatio || 1) * this._resolutionScale);
     const cssHeight = this.canvas.height / ((window.devicePixelRatio || 1) * this._resolutionScale);
     this.aetherMantaOverlay.render(cssWidth, cssHeight);
+    this.eighthChildOverlay.render(cssWidth, cssHeight);
+
+    const heartbeatState = (shipExterior as any)?.heartbeat;
+    const awarenessState = (shipExterior as any)?.awareness;
+    if (heartbeatState && awarenessState) {
+      this.shipHeartbeatOverlay.update({
+        awareness: awarenessState,
+        heartbeat: heartbeatState,
+      });
+    } else {
+      this.shipHeartbeatOverlay.update(null);
+    }
+    this.shipHeartbeatOverlay.render(cssWidth, cssHeight);
 
     // Draw floating text (resource gathering feedback, etc.)
     this.getFloatingTextRenderer().render(this.ctx, this.camera, Date.now());

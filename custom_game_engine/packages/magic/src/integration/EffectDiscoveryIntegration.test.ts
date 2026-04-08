@@ -125,7 +125,7 @@ describe('EffectDiscoveryIntegration', () => {
       } as EffectGenerationResult);
 
       const result = await integration.discoverEffect({
-        spellName: 'Death Star',
+        spellName: 'Void Cascade',
         description: 'Destroys everything',
         requesterId: 'rogue_agent',
         requesterName: 'Evil Wizard',
@@ -442,7 +442,7 @@ function createValidEffect(): EffectExpression {
 
 function createUnsafeEffect(): EffectExpression {
   return {
-    name: 'Death Star',
+    name: 'Void Cascade',
     description: 'Destroys everything',
     target: {
       type: 'area',

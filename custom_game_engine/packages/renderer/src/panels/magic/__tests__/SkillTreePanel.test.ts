@@ -208,7 +208,7 @@ describe('SkillTreePanel', () => {
 
     it('should render tabs for each paradigm agent knows', () => {
       const entity = createMockMagicEntity({
-        paradigms: ['shinto', 'allomancy', 'sympathy']
+        paradigms: ['shinto', 'ferromancy', 'tethermancy']
       });
 
       const panel = new SkillTreePanel(mockWindowManager);
@@ -219,7 +219,7 @@ describe('SkillTreePanel', () => {
 
       // Verify tabs rendered (check canvas draw calls)
       const tabDrawCalls = ctx.fillText.mock.calls.filter((call: any[]) =>
-        ['Shinto', 'Allomancy', 'Sympathy'].includes(call[0])
+        ['Shinto', 'Ferromancy', 'Tethermancy'].includes(call[0])
       );
       expect(tabDrawCalls).toHaveLength(3);
     });
@@ -584,8 +584,8 @@ describe('SkillTreePanel', () => {
   describe('Criterion 5: Multi-Paradigm Support', () => {
     it('should show independent XP pools for each paradigm', () => {
       const entity = createMockMagicEntity({
-        paradigms: ['shinto', 'allomancy'],
-        xp: { shinto: 450, allomancy: 320 }
+        paradigms: ['shinto', 'ferromancy'],
+        xp: { shinto: 450, ferromancy: 320 }
       });
 
       const panel = new SkillTreePanel(mockWindowManager);
@@ -599,33 +599,33 @@ describe('SkillTreePanel', () => {
       const shintoXP = ctx.fillText.mock.calls.find((call: any[]) => call[0].includes('450'));
       expect(shintoXP).toBeDefined();
 
-      // Render Allomancy tab
+      // Render Ferromancy tab
       
-      panel.setActiveParadigm('allomancy');
+      panel.setActiveParadigm('ferromancy');
       panel.render(ctx, 0, 0, 800, 600, mockWorld);
-      const allomancyXP = ctx.fillText.mock.calls.find((call: any[]) => call[0].includes('320'));
-      expect(allomancyXP).toBeDefined();
+      const ferromancyXP = ctx.fillText.mock.calls.find((call: any[]) => call[0].includes('320'));
+      expect(ferromancyXP).toBeDefined();
     });
 
     it('should switch paradigm when tab clicked', () => {
       const entity = createMockMagicEntity({
-        paradigms: ['shinto', 'allomancy', 'sympathy']
+        paradigms: ['shinto', 'ferromancy', 'tethermancy']
       });
 
       const panel = new SkillTreePanel(mockWindowManager);
       panel.setSelectedEntity(entity);
 
       // Tabs are 120px wide, first tab starts at 0
-      // Click on Allomancy tab (second tab at x=120-239, y < 30)
+      // Click on Ferromancy tab (second tab at x=120-239, y < 30)
       const clicked = panel.handleClick(150, 15, mockWorld); // x=150 is in second tab, y=15 is in tab area
 
       expect(clicked).toBe(true);
-      expect(panel.getActiveParadigm()).toBe('allomancy');
+      expect(panel.getActiveParadigm()).toBe('ferromancy');
     });
 
     it('should preserve scroll/zoom state when switching tabs', () => {
       const entity = createMockMagicEntity({
-        paradigms: ['shinto', 'allomancy']
+        paradigms: ['shinto', 'ferromancy']
       });
 
       const panel = new SkillTreePanel(mockWindowManager);
@@ -636,8 +636,8 @@ describe('SkillTreePanel', () => {
       panel.setZoom(1.5);
       panel.setActiveParadigm('shinto');
 
-      // Switch to Allomancy
-      panel.setActiveParadigm('allomancy');
+      // Switch to Ferromancy
+      panel.setActiveParadigm('ferromancy');
 
       // Switch back to Shinto
       panel.setActiveParadigm('shinto');
@@ -649,8 +649,8 @@ describe('SkillTreePanel', () => {
 
     it('should not allow XP cross-contamination between paradigms', () => {
       const entity = createMockMagicEntity({
-        paradigms: ['shinto', 'allomancy'],
-        xp: { shinto: 500, allomancy: 200 },
+        paradigms: ['shinto', 'ferromancy'],
+        xp: { shinto: 500, ferromancy: 200 },
         unlockedNodes: ['shinto_spirit_sense'] // Prerequisite for shinto_cleansing_ritual
       });
 
@@ -665,7 +665,7 @@ describe('SkillTreePanel', () => {
 
       // Verify only Shinto XP deducted
       expect(magicComponent.skillTreeState.shinto.xp).toBe(400);
-      expect(magicComponent.skillTreeState.allomancy.xp).toBe(200); // Unchanged
+      expect(magicComponent.skillTreeState.ferromancy.xp).toBe(200); // Unchanged
     });
   });
 
@@ -763,7 +763,7 @@ describe('SkillTreePanel', () => {
 
     it('should switch paradigms with Tab key', () => {
       const entity = createMockMagicEntity({
-        paradigms: ['shinto', 'allomancy', 'sympathy']
+        paradigms: ['shinto', 'ferromancy', 'tethermancy']
       });
 
       const panel = new SkillTreePanel(mockWindowManager);
@@ -771,10 +771,10 @@ describe('SkillTreePanel', () => {
 
       panel.setActiveParadigm('shinto');
       panel.handleKeyDown('Tab', mockWorld);
-      expect(panel.getActiveParadigm()).toBe('allomancy');
+      expect(panel.getActiveParadigm()).toBe('ferromancy');
 
       panel.handleKeyDown('Tab', mockWorld);
-      expect(panel.getActiveParadigm()).toBe('sympathy');
+      expect(panel.getActiveParadigm()).toBe('tethermancy');
 
       panel.handleKeyDown('Tab', mockWorld);
       expect(panel.getActiveParadigm()).toBe('shinto'); // Wrap around
@@ -826,7 +826,7 @@ describe('SkillTreePanel', () => {
       // Verify no tab text rendered (tabs are hidden for single paradigm)
       // Tab text would include capitalized paradigm names like "Shinto"
       const tabText = ctx.fillText.mock.calls.filter((call: any[]) =>
-        ['Shinto', 'Allomancy', 'Sympathy'].includes(call[0])
+        ['Shinto', 'Ferromancy', 'Tethermancy'].includes(call[0])
       );
       expect(tabText.length).toBe(0); // No tabs rendered for single paradigm
     });
@@ -1186,15 +1186,15 @@ function setupMockSkillTrees() {
     ],
   };
 
-  // Create mock Allomancy tree
-  const allomancyTree: MagicSkillTree = {
-    id: 'allomancy_tree',
-    paradigmId: 'allomancy',
-    name: 'Allomancy',
+  // Create mock Ferromancy tree
+  const ferromancyTree: MagicSkillTree = {
+    id: 'ferromancy_tree',
+    paradigmId: 'ferromancy',
+    name: 'Ferromancy',
     description: 'Pushing and pulling on metals',
     nodes: [
       {
-        id: 'allomancy_steel_push',
+        id: 'ferromancy_steel_push',
         name: 'Steel Push',
         description: 'Push on metals',
         category: 'foundation',
@@ -1204,27 +1204,27 @@ function setupMockSkillTrees() {
         effects: [],
       },
     ],
-    entryNodes: ['allomancy_steel_push'],
+    entryNodes: ['ferromancy_steel_push'],
     connections: [],
     categories: [
       {
         id: 'foundation',
         name: 'Foundation',
-        description: 'Basic Allomancy',
+        description: 'Basic Ferromancy',
         displayOrder: 0,
       },
     ],
   };
 
-  // Create mock Sympathy tree
-  const sympathyTree: MagicSkillTree = {
-    id: 'sympathy_tree',
-    paradigmId: 'sympathy',
-    name: 'Sympathy',
+  // Create mock Tethermancy tree
+  const tethermancyTree: MagicSkillTree = {
+    id: 'tethermancy_tree',
+    paradigmId: 'tethermancy',
+    name: 'Tethermancy',
     description: 'Binding energy between objects',
     nodes: [
       {
-        id: 'sympathy_heat_link',
+        id: 'tethermancy_heat_link',
         name: 'Heat Link',
         description: 'Transfer heat between objects',
         category: 'foundation',
@@ -1234,13 +1234,13 @@ function setupMockSkillTrees() {
         effects: [],
       },
     ],
-    entryNodes: ['sympathy_heat_link'],
+    entryNodes: ['tethermancy_heat_link'],
     connections: [],
     categories: [
       {
         id: 'foundation',
         name: 'Foundation',
-        description: 'Basic Sympathy',
+        description: 'Basic Tethermancy',
         displayOrder: 0,
       },
     ],
@@ -1356,8 +1356,8 @@ function setupMockSkillTrees() {
   // Register trees
   (registry as Record<string, unknown>).trees = new Map([
     ['shinto', shintoTree],
-    ['allomancy', allomancyTree],
-    ['sympathy', sympathyTree],
+    ['ferromancy', ferromancyTree],
+    ['tethermancy', tethermancyTree],
     ['mega_paradigm', megaParadigmTree],
     ['complex_paradigm', complexParadigmTree],
     ...Array.from(paradigmTrees.entries()),

@@ -104,19 +104,19 @@ export class UniverseConfigScreen {
   // Art style configurations - determines the visual aesthetic of all sprites
   private static readonly ART_STYLES: Record<string, { name: string; era: string; description: string; icon: string; category: string }> = {
     // Classic Console Era
-    nes: { name: 'NES Classic', era: '1985-1990', description: 'Chunky pixels, limited palette, Super Mario Bros style', icon: '🎮', category: 'Classic' },
-    snes: { name: 'SNES Golden Age', era: '1991-1996', description: 'Detailed sprites, rich colors, Chrono Trigger style', icon: '🎨', category: 'Classic' },
-    genesis: { name: 'Sega Genesis', era: '1988-1997', description: 'Bold colors, dithered gradients, Sonic style', icon: '💙', category: 'Classic' },
-    gameboy: { name: 'Game Boy', era: '1989-1998', description: 'Monochrome green, 4-shade palette, Pokemon style', icon: '🟢', category: 'Classic' },
-    gba: { name: 'GBA', era: '2001-2008', description: 'Bright colors, clean outlines, Golden Sun style', icon: '🌟', category: 'Classic' },
+    nes: { name: 'NES Classic', era: '1985-1990', description: 'Chunky pixels, limited palette, 8-bit platformer aesthetic', icon: '🎮', category: 'Classic' },
+    snes: { name: 'SNES Golden Age', era: '1991-1996', description: 'Detailed sprites, rich colors, 16-bit RPG aesthetic', icon: '🎨', category: 'Classic' },
+    genesis: { name: 'Sega Genesis', era: '1988-1997', description: 'Bold colors, dithered gradients, fast-action aesthetic', icon: '💙', category: 'Classic' },
+    gameboy: { name: 'Game Boy', era: '1989-1998', description: 'Monochrome green, 4-shade palette, handheld classic style', icon: '🟢', category: 'Classic' },
+    gba: { name: 'GBA', era: '2001-2008', description: 'Bright colors, clean outlines, portable RPG aesthetic', icon: '🌟', category: 'Classic' },
     // 32-bit Era
-    ps1: { name: 'PS1/Saturn', era: '1995-2000', description: 'Pre-rendered 3D, Final Fantasy Tactics style', icon: '💿', category: '32-bit' },
-    neogeo: { name: 'Neo Geo Arcade', era: '1990-2004', description: 'Massive detailed sprites, Metal Slug style', icon: '🕹️', category: '32-bit' },
-    n64: { name: 'N64 Era', era: '1996-2002', description: 'Pre-rendered sprites, Paper Mario style', icon: '📺', category: '32-bit' },
+    ps1: { name: 'PS1/Saturn', era: '1995-2000', description: 'Pre-rendered 3D, tactical isometric style', icon: '💿', category: '32-bit' },
+    neogeo: { name: 'Neo Geo Arcade', era: '1990-2004', description: 'Massive detailed sprites, run-and-gun action aesthetic', icon: '🕹️', category: '32-bit' },
+    n64: { name: 'N64 Era', era: '1996-2002', description: 'Pre-rendered sprites, 2D-3D hybrid aesthetic', icon: '📺', category: '32-bit' },
     // Modern Indie
-    stardew: { name: 'Stardew Style', era: '2016', description: 'Cozy farming aesthetic, warm colors', icon: '🌾', category: 'Modern' },
-    celeste: { name: 'Celeste Style', era: '2018', description: 'Modern pixel art, smooth animation', icon: '🏔️', category: 'Modern' },
-    undertale: { name: 'Undertale Style', era: '2015', description: 'Minimalist sprites, indie charm', icon: '❤️', category: 'Modern' },
+    cozy: { name: 'Cozy Farming', era: '2016+', description: 'Cozy farming aesthetic, warm colors', icon: '🌾', category: 'Modern' },
+    precision: { name: 'Precision Platformer', era: '2018+', description: 'Modern pixel art, smooth animation', icon: '🏔️', category: 'Modern' },
+    minimalist: { name: 'Minimalist Indie', era: '2015+', description: 'Minimalist sprites, indie charm', icon: '❤️', category: 'Modern' },
     // Retro Computer
     c64: { name: 'Commodore 64', era: '1982-1994', description: '16-color palette, classic C64 aesthetic', icon: '💾', category: 'Retro' },
     amiga: { name: 'Amiga', era: '1985-1996', description: 'Rich palette, European computer style', icon: '🖥️', category: 'Retro' },
@@ -223,11 +223,11 @@ export class UniverseConfigScreen {
   private getSpectrumPresetInfo(presetId: string): { name: string; description: string; icon: string } {
     const meta: Record<string, { name: string; description: string; icon: string }> = {
       mundane: { name: 'Mundane World', description: 'No magic exists. Pure technology and science.', icon: '🌍' },
-      low_fantasy: { name: 'Low Fantasy', description: 'Magic is rare and subtle. (Game of Thrones)', icon: '🌙' },
-      classic_fantasy: { name: 'Classic Fantasy', description: 'Multiple magic traditions flourish. (D&D)', icon: '⚔️' },
+      low_fantasy: { name: 'Low Fantasy', description: 'Magic is rare and subtle.', icon: '🌙' },
+      classic_fantasy: { name: 'Classic Fantasy', description: 'Multiple magic traditions flourish.', icon: '⚔️' },
       mythic: { name: 'Mythic', description: 'Gods walk among mortals. (Greek Mythology)', icon: '⚡' },
       shinto_animism: { name: 'Shinto Animism', description: 'Everything has a spirit. Kami everywhere.', icon: '🌸' },
-      hard_magic: { name: 'Hard Magic', description: 'Magic follows strict rules like science. (Mistborn)', icon: '⚙️' },
+      hard_magic: { name: 'Hard Magic', description: 'Magic follows strict rules like science. (CrucibleBorn)', icon: '⚙️' },
       literary_surrealism: { name: 'Literary Surrealism', description: 'Words have weight. Metaphors become real.', icon: '📚' },
       wild_magic: { name: 'Wild Magic', description: 'Chaotic and unpredictable. Reality is unstable.', icon: '🌀' },
       dead_magic: { name: 'Dead Magic', description: 'Magic once existed but is gone.', icon: '💀' },

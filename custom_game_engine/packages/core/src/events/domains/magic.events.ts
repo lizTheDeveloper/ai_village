@@ -2,6 +2,7 @@
  * Magic, divine, and spiritual events.
  */
 import type { EntityId } from '../../types.js';
+import type { PerceivedPersonality } from '../../divinity/DeityTypes.js';
 
 export interface MagicEvents {
   'prayer:offered': {
@@ -174,6 +175,8 @@ export interface MagicEvents {
     origin: 'proto_belief' | 'miracle' | 'ascension' | 'external';
     believerCount: number;
     initialBelief: number;
+    deityPersonality?: PerceivedPersonality;
+    alignment?: 'benevolent' | 'malevolent' | 'neutral' | 'dualistic' | 'unknown';
     tick: number;
   };
   'divinity:magic_detected': {

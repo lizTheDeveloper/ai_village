@@ -138,7 +138,7 @@ export interface BuildingBlueprint {
 
   // Dimensional features (4D/5D/6D buildings)
   dimensional?: DimensionalConfig;      // W-axis, V-axis, U-axis configurations
-  realmPocket?: RealmPocketConfig;      // Bigger on inside (TARDIS-like)
+  realmPocket?: RealmPocketConfig;      // Bigger on inside (dimensionally folded)
   clarkeTechTier?: ClarkeTechTier;      // Tech requirements (0-8)
 }
 
@@ -1335,7 +1335,7 @@ export class BuildingBlueprintRegistry {
       height: 3,
       resourceCost: [
         { resourceId: 'stone', amountRequired: 100 },
-        { resourceId: 'mithril_ingot', amountRequired: 20 },
+        { resourceId: 'starweave_ingot', amountRequired: 20 },
         { resourceId: 'crystal', amountRequired: 30 },
       ],
       techRequired: ['arcane_studies'],

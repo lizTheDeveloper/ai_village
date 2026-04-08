@@ -164,7 +164,7 @@
     "craftedFrom": [],
     "baseValue": 600,
     "rarity": "rare",
-    "researchRequired": "svetz_retrieval"
+    "researchRequired": "chrono_salvage"
   },
   {
     "id": "emotional_essence",
@@ -252,7 +252,7 @@
     "craftedFrom": [],
     "baseValue": 1500,
     "rarity": "epic",
-    "researchRequired": "svetz_retrieval"
+    "researchRequired": "chrono_salvage"
   },
   {
     "id": "emotional_amplifier",
@@ -297,7 +297,7 @@
     "baseValue": 2500,
     "rarity": "epic",
     "clarketechTier": 2,
-    "researchRequired": "gleisner_vessel"
+    "researchRequired": "synthetic_vessel"
   },
   {
     "id": "resonance_core",
@@ -380,7 +380,7 @@
     "baseValue": 12000,
     "rarity": "legendary",
     "clarketechTier": 4,
-    "researchRequired": "svetz_retrieval"
+    "researchRequired": "chrono_salvage"
   },
   {
     "id": "observation_nullifier",
@@ -486,7 +486,7 @@
     "baseValue": 4000,
     "rarity": "epic",
     "clarketechTier": 2,
-    "researchRequired": "gleisner_vessel"
+    "researchRequired": "synthetic_vessel"
   },
   {
     "id": "communication_relay",
@@ -584,8 +584,8 @@
     "researchRequired": "vr_systems"
   },
   {
-    "id": "gleisner_body_frame",
-    "name": "Gleisner Body Frame",
+    "id": "synthetic_body_frame",
+    "name": "Synthetic Body Frame",
     "type": "material",
     "weight": 40.0,
     "stackSize": 1,
@@ -593,11 +593,11 @@
     "baseValue": 35000,
     "rarity": "legendary",
     "clarketechTier": 3,
-    "researchRequired": "gleisner_vessel"
+    "researchRequired": "synthetic_vessel"
   },
   {
-    "id": "svetz_retrieval_engine",
-    "name": "Svetz Retrieval Engine",
+    "id": "chrono_salvage_engine",
+    "name": "Chrono Salvage Engine",
     "type": "material",
     "weight": 35.0,
     "stackSize": 1,
@@ -605,7 +605,7 @@
     "baseValue": 60000,
     "rarity": "legendary",
     "clarketechTier": 4,
-    "researchRequired": "svetz_retrieval"
+    "researchRequired": "chrono_salvage"
   },
   {
     "id": "probability_drive",
@@ -692,8 +692,8 @@
     "researchRequired": "story_ship"
   },
   {
-    "id": "gleisner_hull_kit",
-    "name": "Gleisner Vessel Hull Kit",
+    "id": "synthetic_hull_kit",
+    "name": "Synthetic Vessel Hull Kit",
     "type": "material",
     "weight": 120.0,
     "stackSize": 1,
@@ -701,11 +701,11 @@
     "baseValue": 200000,
     "rarity": "legendary",
     "clarketechTier": 3,
-    "researchRequired": "gleisner_vessel"
+    "researchRequired": "synthetic_vessel"
   },
   {
-    "id": "svetz_hull_kit",
-    "name": "Svetz Retrieval Hull Kit",
+    "id": "chrono_salvage_hull_kit",
+    "name": "Chrono Salvage Hull Kit",
     "type": "material",
     "weight": 180.0,
     "stackSize": 1,
@@ -713,7 +713,7 @@
     "baseValue": 350000,
     "rarity": "legendary",
     "clarketechTier": 4,
-    "researchRequired": "svetz_retrieval"
+    "researchRequired": "chrono_salvage"
   },
   {
     "id": "probability_scout_hull_kit",

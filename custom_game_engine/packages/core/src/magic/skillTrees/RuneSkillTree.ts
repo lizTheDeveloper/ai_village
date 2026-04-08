@@ -13,7 +13,7 @@
  *
  * Inspired by:
  * - Norse/Germanic runic tradition
- * - Tolkien's runes (Cirth, Tengwar, runes of power)
+ * - Ancient runic traditions across multiple species
  * - Rune magic from various fantasy settings
  * - The concept that writing itself is magical
  * - Craftsmanship as a form of magic

@@ -508,50 +508,50 @@ Here's the taxonomy, as recorded by the Association of Emotional Practitioners (
 });
 
 // ============================================================================
-// BREATH MAGIC (BIOCHROMATIC)
+// BREATH MAGIC (PNEUMANTIC)
 // ============================================================================
 
 export const BREATH_MAGIC_HELP = createEffectHelp('breath_magic', {
   summary: 'Life-force as color, invested in objects and returned with interest',
-  description: `BioChromatic Breath is the closest thing magic has to a proper economy. You have Breath—everyone does, exactly one unit at birth, the spark that animates your meat and makes you technically alive rather than technically a corpse. This Breath can be given away. It can be invested in objects, stored in perfect receptacles, transferred between people. It can accumulate. And unlike most magical currencies, it generates returns.*
+  description: `Pneumantic Breath is the closest thing magic has to a proper economy. You have Breath—everyone does, exactly one unit at birth, the spark that animates your meat and makes you technically alive rather than technically a corpse. This Breath can be given away. It can be invested in objects, stored in perfect receptacles, transferred between people. It can accumulate. And unlike most magical currencies, it generates returns.*
 
-Here's how it works: you give your Breath to an object. The object Awakens—not alive, exactly, but animated, purposeful, able to follow commands. The more Breath invested, the more capable the Awakened object. A rope given one Breath might tie knots on command. A rope given a thousand Breaths might strangle enemies independently, track targets across cities, develop something uncomfortably close to preferences. The Breath remains in the object until released, at which point it returns to you, often with interest: Breath invested wisely earns more Breath.
+Here's how it works: you give your Breath to an object. The object becomes Invested—not alive, exactly, but animated, purposeful, able to follow commands. The more Breath invested, the more capable the Invested object. A rope given one Breath might tie knots on command. A rope given a thousand Breaths might strangle enemies independently, track targets across cities, develop something uncomfortably close to preferences. The Breath remains in the object until released, at which point it returns to you, often with interest: Breath invested wisely earns more Breath.
 
 The catch—because there's always a catch—is that giving away your Breath feels like dying. Not metaphorically. Your single birth-Breath is your life force; transferring it makes you gray, literally gray, colors draining from your skin and hair as if you'd lived a century in seconds. You survive, technically. The grayness fades if you acquire replacement Breath. But the experience is profoundly unpleasant, and some practitioners never give away their birth-Breath, relying entirely on traded or earned surplus.
 
-**The Heightenings**: accumulated Breath grants passive powers at certain thresholds. At fifty Breaths, you perceive auras around living things. At two hundred, your appearance becomes unnaturally perfect—your body using excess life-force for aggressive self-improvement. At a thousand, you stop aging. At ten thousand, you can Awaken objects without physical contact, reaching through walls, across rooms, possibly across worlds. The God-Kings who reached fifty thousand Breaths could do things the texts refuse to describe, calling them merely "interventions in the fabric" and moving quickly to other topics.**
+**The Pneumantic Tiers**: accumulated Breath grants passive powers at certain thresholds. At fifty Breaths, you perceive auras around living things. At two hundred, your appearance becomes unnaturally perfect—your body using excess life-force for aggressive self-improvement. At a thousand, you stop aging. At ten thousand, you can Invest objects without physical contact, reaching through walls, across rooms, possibly across worlds. The God-Kings who reached fifty thousand Breaths could do things the texts refuse to describe, calling them merely "interventions in the fabric" and moving quickly to other topics.**
 
 The color thing isn't metaphorical either. Breath drains color from its surroundings during use—vivid reds, brilliant blues, anything saturated gets pulled toward gray as the magic activates. Experienced Breathers work near paintings, tapestries, flower arrangements—color reservoirs that fuel their magic without draining their own appearance. The fashion implications are significant: gray clothes are invisible to Breath-drain, making gray the color of poverty or asceticism. Vivid colors signal wealth, power, and the willingness to sacrifice beauty for magic.
 
-*The economic implications are staggering. Several civilizations have used Breath as literal currency, which works fine until someone accumulates enough to Awaken an army of furniture.
+*The economic implications are staggering. Several civilizations have used Breath as literal currency, which works fine until someone accumulates enough to Invest an army of furniture.
 
 **"Intervention in the fabric" is scholarly code for "we don't want to write this down." The implications are probably fine. Probably.`,
   category: 'magic',
-  tags: ['breath', 'biochromatic', 'paradigm', 'life_force', 'investment', 'color'],
+  tags: ['breath', 'pneumantic', 'paradigm', 'life_force', 'investment', 'color'],
   effectCategory: 'paradigm',
   targetType: 'object',
 
   mechanics: {
     values: {
-      source: 'BioChromatic Breath (life-force)',
+      source: 'Pneumantic Breath (life-force)',
       birthBreath: 1,
-      firstHeightening: 50,
+      firstPneumanticTier: 50,
       agelessness: 1000,
       colorDrain: 'proportional to Breath used',
     },
     formulas: {
       awakeningPower: 'breathInvested * commandClarity * objectSuitability',
       breathReturn: 'investedBreath * (1 + returnRate * investmentDuration)',
-      heighteningPower: 'log10(totalBreath) * heighteningMultiplier',
+      pneumanticTierPower: 'log10(totalBreath) * pneumanticTierMultiplier',
     },
     conditions: {
       'Breath is tangible': 'Can be given, traded, stolen, stored',
       'Color required': 'Casting drains color from surroundings',
-      'Commands matter': 'Awakened objects follow commands literally',
-      'Heightenings permanent': 'Once reached, cannot be lost except through Breath loss',
+      'Commands matter': 'Invested objects follow commands literally',
+      'Pneumantic Tiers permanent': 'Once reached, cannot be lost except through Breath loss',
     },
     dependencies: ['breath_reserve', 'color_source', 'command_clarity'],
-    unlocks: ['object_awakening', 'breath_investment', 'heightening_powers', 'economic_magic'],
+    unlocks: ['object_investing', 'breath_investment', 'pneumantic_tier_powers', 'economic_magic'],
   },
 
   tips: [
@@ -562,30 +562,30 @@ The color thing isn't metaphorical either. Breath drains color from its surround
   ],
 
   warnings: [
-    'Awakened objects are literal: "hold tight" might mean fatally tight',
+    'Invested objects are literal: "hold tight" might mean fatally tight',
     'Breath-begging is a recognized addiction in some societies',
     'High-Breath individuals become targets—thousand-Breath is walking immortality',
-    'The agelessness Heightening doesn\'t prevent violent death, just aging',
+    'The agelessness Pneumantic Tier doesn\'t prevent violent death, just aging',
     'Commands cannot be revoked without reclaiming the Breath entirely',
   ],
 
   examples: [
     {
-      title: 'The First Awakening',
+      title: 'The First Investing',
       description:
-        'The instructor handed her a rope, a simple hemp rope, nothing special. "Give it your Breath," he said. "Not all of it—just ten." She\'d accumulated fifteen over the past year, careful investments returned with modest interest. She focused on the rope, visualized the transfer, and spoke: "Hold tight, then release when I say." The world grayed slightly; the rope\'s fibers seemed to pulse. She tested it: threw it at a post, watched it coil and grip without her touching it. Said "release" and it fell limp. Ten Breath for a self-tying rope. Small magic, but hers. She\'d made something that listened. The instructor nodded: "Now make it do something you didn\'t command." She couldn\'t. That was the second lesson: Awakened objects don\'t improvise. They obey. Creativity requires more Breath than she\'d ever seen.',
+        'The instructor handed her a rope, a simple hemp rope, nothing special. "Give it your Breath," he said. "Not all of it—just ten." She\'d accumulated fifteen over the past year, careful investments returned with modest interest. She focused on the rope, visualized the transfer, and spoke: "Hold tight, then release when I say." The world grayed slightly; the rope\'s fibers seemed to pulse. She tested it: threw it at a post, watched it coil and grip without her touching it. Said "release" and it fell limp. Ten Breath for a self-tying rope. Small magic, but hers. She\'d made something that listened. The instructor nodded: "Now make it do something you didn\'t command." She couldn\'t. That was the second lesson: Invested objects don\'t improvise. They obey. Creativity requires more Breath than she\'d ever seen.',
     },
     {
       title: 'The Thousand-Breath Choice',
       description:
-        'Variel reached a thousand Breaths on her seventy-third birthday and felt the change immediately: death receding, not eliminated but postponed, indefinitely. Her joints stopped aching. Her vision sharpened. Her gray hair began, slowly, to regain color. She would live—could live—forever, barring violence. Her children were in their fifties. Their children had children. She watched generations pass, accumulated more Breath, reached two thousand, three. At five thousand she could sense souls, actual souls, the Breath-signatures of everyone around her. At ten thousand she could Awaken objects by thought alone. At twenty thousand she stopped counting and started wondering: what was she becoming? Not human anymore, not exactly. Something else. Something that remembered being human the way you remember being a child: true but distant, belonging to someone you used to be.',
+        'Variel reached a thousand Breaths on her seventy-third birthday and felt the change immediately: death receding, not eliminated but postponed, indefinitely. Her joints stopped aching. Her vision sharpened. Her gray hair began, slowly, to regain color. She would live—could live—forever, barring violence. Her children were in their fifties. Their children had children. She watched generations pass, accumulated more Breath, reached two thousand, three. At five thousand she could sense souls, actual souls, the Breath-signatures of everyone around her. At ten thousand she could Invest objects by thought alone. At twenty thousand she stopped counting and started wondering: what was she becoming? Not human anymore, not exactly. Something else. Something that remembered being human the way you remember being a child: true but distant, belonging to someone you used to be.',
     },
   ],
 
   relatedTopics: [
     'breath_economics',
-    'awakening_commands',
-    'heightening_chart',
+    'investing_commands',
+    'pneumantic_tier_chart',
     'color_theory',
     'breath_storage',
     'god_kings',
@@ -802,7 +802,7 @@ The structure is consistent even when the content differs wildly: fundamentals a
 
 **Emotional Magic** splits by emotion: Rage (destruction), Fear (protection), Joy (healing), Grief (entropy), Love (connection). Multi-emotional casting is theoretically possible but requires feeling multiple intense emotions simultaneously, which is called "having a breakdown" in non-magical contexts.
 
-**Breath Magic** follows the Heightening progression, but specializes into Awakening (objects), Investment (economics), Command (directing awakened items), and Color Manipulation (environmental shaping). Higher Heightenings unlock entire branches at once.
+**Breath Magic** follows the Pneumantic Tier progression, but specializes into Investing (objects), Investment (economics), Command (directing invested items), and Color Manipulation (environmental shaping). Higher Pneumantic Tiers unlock entire branches at once.
 
 The remaining paradigms—Natural, Ancestral, Geometric, Musical, Temporal, Linguistic, and Symbiotic—each have their own trees, documented in the Comprehensive Magical Taxonomy that nobody has actually read in its entirety because it's forty-seven volumes and counting.
 

@@ -381,8 +381,8 @@ export {
 // Animus (spirit-bond inspired)
 export {
   ANIMUS_SKILL_TREE,
-  DAEMON_FORM_CATEGORIES,
-  DUST_INTERACTIONS,
+  ANIMUS_FORM_CATEGORIES,
+  AETHER_MOTE_INTERACTIONS,
   getFormBonuses,
   isFormInCategory,
   getFormCategory,
@@ -430,15 +430,15 @@ export {
   hasMasterNaming,
 } from './skillTrees/NameSkillTree.js';
 
-// Breath (Animus-inspired Awakening)
+// Breath (Pneumantic Investing)
 export {
   BREATH_SKILL_TREE,
-  HEIGHTENINGS,
+  PNEUMANTIC_TIERS,
   AWAKENING_TYPES,
   COMMAND_CATEGORIES,
   BREATH_SOURCES,
-  getCurrentHeightening,
-  getHeighteningAbilities,
+  getCurrentPneumanticTier,
+  getPneumanticTierAbilities,
   calculateAwakeningCost,
   canPerformAwakening,
   getMaxCommandComplexity,

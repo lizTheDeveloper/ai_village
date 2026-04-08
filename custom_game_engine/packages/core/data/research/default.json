@@ -310,7 +310,7 @@
     "prerequisites": ["metallurgy_ii", "alchemy_i"],
     "requiredBuilding": "forge",
     "unlocks": [
-      { "type": "recipe", "recipeId": "mithril_ingot" },
+      { "type": "recipe", "recipeId": "starweave_ingot" },
       { "type": "recipe", "recipeId": "adamantine_ingot" }
     ]
   },

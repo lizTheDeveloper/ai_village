@@ -44,8 +44,8 @@ const NOUN_TOKENS = [
 // Matches paradigm IDs used in SpellComposition.
 const PARADIGMS: Array<{ id: string; name: string; lore: string }> = [
   { id: 'academic',   name: 'The Academies',    lore: 'Magic is a science of precise formulae.' },
-  { id: 'sympathy',   name: 'Sympathy',          lore: 'Like affects like across any distance.' },
-  { id: 'allomancy',  name: 'Allomancy',         lore: 'Power is burned from ingested metals.' },
+  { id: 'tethermancy',   name: 'Tethermancy',          lore: 'Like affects like across any distance.' },
+  { id: 'ferromancy',  name: 'Ferromancy',         lore: 'Power is burned from ingested metals.' },
   { id: 'dream',      name: 'Dream Magic',       lore: 'Reality is shaped through lucid dreaming.' },
   { id: 'song',       name: 'Song Magic',        lore: 'Melodies bind and release natural forces.' },
   { id: 'rune',       name: 'Runic Art',         lore: 'Carved symbols channel elemental truths.' },
@@ -68,8 +68,8 @@ interface ParadigmFx {
 
 const PARADIGM_FX: Record<string, ParadigmFx> = {
   academic:  { glow: '#88CCFF', particles: ['rgba(136,204,255,0.95)', 'rgba(180,225,255,0.85)', 'rgba(255,255,255,0.80)'] },
-  sympathy:  { glow: '#FF88CC', particles: ['rgba(255,136,200,0.95)', 'rgba(255,180,220,0.85)', 'rgba(255,220,240,0.75)'] },
-  allomancy: { glow: '#CCCCCC', particles: ['rgba(180,180,180,0.95)', 'rgba(220,220,220,0.85)', 'rgba(255,220,160,0.80)'] },
+  tethermancy:  { glow: '#FF88CC', particles: ['rgba(255,136,200,0.95)', 'rgba(255,180,220,0.85)', 'rgba(255,220,240,0.75)'] },
+  ferromancy: { glow: '#CCCCCC', particles: ['rgba(180,180,180,0.95)', 'rgba(220,220,220,0.85)', 'rgba(255,220,160,0.80)'] },
   dream:     { glow: '#CC88FF', particles: ['rgba(180,100,255,0.95)', 'rgba(220,160,255,0.85)', 'rgba(255,200,255,0.75)'] },
   song:      { glow: '#88FFCC', particles: ['rgba(100,255,200,0.95)', 'rgba(160,255,220,0.85)', 'rgba(220,255,240,0.75)'] },
   rune:      { glow: '#FF8844', particles: ['rgba(255,120,40,0.95)',  'rgba(255,180,80,0.85)',  'rgba(255,220,140,0.75)'] },

@@ -11,14 +11,14 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 // Import all skill trees
-import { DAEMON_SKILL_TREE } from '../src/skillTrees/DaemonSkillTree.js';
+import { ANIMUS_SKILL_TREE } from '../src/skillTrees/AnimusSkillTree.js';
 import { ARCHITECTURE_SKILL_TREE } from '../src/skillTrees/ArchitectureSkillTree.js';
 import { DREAM_SKILL_TREE } from '../src/skillTrees/DreamSkillTree.js';
 import { SONG_SKILL_TREE } from '../src/skillTrees/SongSkillTree.js';
 import { NAME_SKILL_TREE } from '../src/skillTrees/NameSkillTree.js';
 import { PACT_SKILL_TREE } from '../src/skillTrees/PactSkillTree.js';
-import { ALLOMANCY_SKILL_TREE } from '../src/skillTrees/AllomancySkillTree.js';
-import { SYMPATHY_SKILL_TREE } from '../src/skillTrees/SympathySkillTree.js';
+import { FERROMANCY_SKILL_TREE } from '../src/skillTrees/FerromancySkillTree.js';
+import { TETHERMANCY_SKILL_TREE } from '../src/skillTrees/TethermancySkillTree.js';
 import { RUNE_SKILL_TREE } from '../src/skillTrees/RuneSkillTree.js';
 import { SHINTO_SKILL_TREE } from '../src/skillTrees/ShintoSkillTree.js';
 import { BREATH_SKILL_TREE } from '../src/skillTrees/BreathSkillTree.js';
@@ -43,14 +43,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const SKILL_TREES: MagicSkillTree[] = [
-  DAEMON_SKILL_TREE,
+  ANIMUS_SKILL_TREE,
   ARCHITECTURE_SKILL_TREE,
   DREAM_SKILL_TREE,
   SONG_SKILL_TREE,
   NAME_SKILL_TREE,
   PACT_SKILL_TREE,
-  ALLOMANCY_SKILL_TREE,
-  SYMPATHY_SKILL_TREE,
+  FERROMANCY_SKILL_TREE,
+  TETHERMANCY_SKILL_TREE,
   RUNE_SKILL_TREE,
   SHINTO_SKILL_TREE,
   BREATH_SKILL_TREE,

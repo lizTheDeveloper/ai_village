@@ -36,7 +36,7 @@ const STATION_REQUIREMENTS: Record<string, string | null> = {
   'copper_ingot': 'forge',
   'gold_ingot': 'forge',
   'steel_ingot': 'forge',
-  'mithril_ingot': 'forge',
+  'starweave_ingot': 'forge',
   'adamantine_ingot': 'forge',
 
   // Forge + workbench (metal tools)

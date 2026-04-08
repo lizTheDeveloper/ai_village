@@ -4,7 +4,7 @@
  */
 
 const SNES_REFERENCE_ID = '762d156d-60dc-4822-915b-af55bc06fb49';
-const STYLE = '16-bit SNES era pixel art, RPG style like Chrono Trigger';
+const STYLE = '16-bit SNES era pixel art, detailed RPG aesthetic';
 const OUTPUT_DIR = 'assets/parts/snes';
 
 interface PartSpec {

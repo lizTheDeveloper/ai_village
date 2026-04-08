@@ -335,7 +335,7 @@ import { PassageSystem } from './PassageSystem.js';
 import { PassageTraversalSystem } from './PassageTraversalSystem.js';
 import { TimelineMergerSystem } from './TimelineMergerSystem.js';
 import { ProbabilityScoutSystem } from './ProbabilityScoutSystem.js';
-import { SvetzRetrievalSystem } from './SvetzRetrievalSystem.js';
+import { ChronoSalvageSystem } from './ChronoSalvageSystem.js';
 import { InvasionSystem } from './InvasionSystem.js';
 import { PortalSystem } from './PortalSystem.js';
 import { RealmTimeSystem } from './RealmTimeSystem.js';
@@ -1046,7 +1046,7 @@ export function registerAllSystems(
     registerDisabled(new PassageTraversalSystem());
     registerDisabled(new TimelineMergerSystem());
     registerDisabled(new ProbabilityScoutSystem());
-    registerDisabled(new SvetzRetrievalSystem());
+    registerDisabled(new ChronoSalvageSystem());
     registerDisabled(new InvasionSystem());
     registerDisabled(new ParadoxDetectionSystem());
     registerDisabled(new PortalSystem());

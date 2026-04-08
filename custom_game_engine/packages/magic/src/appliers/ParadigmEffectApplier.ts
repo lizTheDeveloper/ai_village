@@ -340,7 +340,7 @@ export class ParadigmEffectApplier implements EffectApplier<ParadigmEffect> {
         'verbal', 'somatic', 'material', 'focus', 'glyph', 'musical', 'dance',
         'will', 'true_name', 'prayer', 'blood', 'emotion', 'meditation', 'dream',
         'consumption', 'touch', 'link', 'tattoo', 'breath', 'ritual', 'offering',
-        'purity', 'binding', 'rhythm', 'instrument', 'daemon', 'symbols', 'sleep'
+        'purity', 'binding', 'rhythm', 'instrument', 'animus', 'symbols', 'sleep'
       ];
       return validTypes.includes(value as MagicChannelType);
     }

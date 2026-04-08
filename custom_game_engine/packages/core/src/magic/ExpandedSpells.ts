@@ -2,10 +2,10 @@
  * Expanded Spell Library - Comprehensive spell definitions for all paradigms
  *
  * This file contains extensive spell lists written in the blended voice style:
- * - Baroque encyclopedic detail (Pratchett-esque)
- * - Dry cosmic pragmatism (Adams-esque)
+ * - Baroque encyclopedic detail (comic-academic style)
+ * - Dry cosmic pragmatism (bureaucratic-absurdist)
  * - Humane satire with moral clarity
- * - Lyrical intimate mythology (Gaiman-esque)
+ * - Lyrical intimate mythology (mythological-literary)
  */
 
 import type { SpellDefinition } from './SpellRegistry.js';
@@ -2201,7 +2201,7 @@ export const BREATH_SPELLS: SpellDefinition[] = [
   },
   {
     id: 'breath_heighten_first',
-    name: 'First Heightening',
+    name: 'First Pneumantic Tier',
     paradigmId: 'breath',
     technique: 'enhance',
     form: 'body',
@@ -2212,21 +2212,21 @@ export const BREATH_SPELLS: SpellDefinition[] = [
     duration: -1,
     effectId: 'heal_effect',
     description: 'Accumulate fifty Breaths and reality notices. Your aura becomes visible—subtle, but there—radiating vitality. Colors seem brighter near you. People unconsciously defer. This isn\'t a spell you cast; it\'s a state of being. The first step toward something more than human.',
-    school: 'heightening',
+    school: 'pneumantic_tier',
     baseMishapChance: 0.0,
     hotkeyable: false,
     icon: '✨',
-    tags: ['breath', 'heightening', 'passive'],
+    tags: ['breath', 'pneumantic_tier', 'passive'],
     creatorDetection: {
       detectionRisk: 'low',
       powerLevel: 2,
       leavesMagicalSignature: false,
-      detectionNotes: 'Breath magic: Passive heightening - natural accumulation of life force',
+      detectionNotes: 'Breath magic: Passive pneumantic_tier - natural accumulation of life force',
     },
   },
   {
     id: 'breath_heighten_second',
-    name: 'Second Heightening',
+    name: 'Second Pneumantic Tier',
     paradigmId: 'breath',
     technique: 'enhance',
     form: 'body',
@@ -2237,16 +2237,16 @@ export const BREATH_SPELLS: SpellDefinition[] = [
     duration: -1,
     effectId: 'heal_effect',
     description: 'Two hundred Breaths grants perfect pitch and color recognition. Your senses sharpen—not superhuman, but perfectly calibrated. You hear harmonics others miss. See color gradations invisible to normal sight. Useful for Awakening, where precision matters. The world becomes more vivid.',
-    school: 'heightening',
+    school: 'pneumantic_tier',
     baseMishapChance: 0.0,
     hotkeyable: false,
     icon: '🎨',
-    tags: ['breath', 'heightening', 'senses'],
+    tags: ['breath', 'pneumantic_tier', 'senses'],
     creatorDetection: {
       detectionRisk: 'low',
       powerLevel: 3,
       leavesMagicalSignature: false,
-      detectionNotes: 'Breath magic: Passive heightening - enhanced perception through accumulated breath',
+      detectionNotes: 'Breath magic: Passive pneumantic_tier - enhanced perception through accumulated breath',
     },
   },
   {

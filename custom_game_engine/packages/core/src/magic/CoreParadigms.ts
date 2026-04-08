@@ -454,7 +454,7 @@ your own name is to know yourself truly.`,
 };
 
 // ============================================================================
-// Breath Magic (BioChromatic)
+// Breath Magic (Pneumantic)
 // ============================================================================
 
 /**
@@ -476,12 +476,12 @@ export const BREATH_PARADIGM: MagicParadigm = {
   lore: `Every person is born with one Breath - a fragment of divine essence.
 Breaths can be given away, stored in objects, or used to fuel magic.
 Those with many Breaths gain superhuman abilities. Those with none
-become Drabs - grey, passionless, diminished.`,
+become Hollows - grey, passionless, diminished.`,
 
   sources: [
     {
       id: 'breath',
-      name: 'BioChromatic Breath',
+      name: 'Pneumantic Breath',
       type: 'internal',
       regeneration: 'none',
       storable: true,
@@ -526,8 +526,8 @@ become Drabs - grey, passionless, diminished.`,
       description: 'Magic drains color from nearby objects, leaving grey',
     },
     {
-      id: 'heightening',
-      name: 'Heightening Thresholds',
+      id: 'pneumantic_tier',
+      name: 'Pneumantic Tier Thresholds',
       type: 'threshold',
       strictness: 'absolute',
       canBeCircumvented: false,
@@ -537,7 +537,7 @@ become Drabs - grey, passionless, diminished.`,
 
   risks: [
     { trigger: 'exhaustion', consequence: 'corruption_gain', severity: 'severe', probability: 0.7, mitigatable: false,
-      description: 'Running out of Breaths while Awakening leaves you a Drab' },
+      description: 'Running out of Breaths while Investing leaves you a Hollow' },
     { trigger: 'overuse', consequence: 'addiction_worsens', severity: 'moderate', probability: 0.3, mitigatable: true,
       description: 'The power becomes intoxicating; you crave more Breaths' },
   ],

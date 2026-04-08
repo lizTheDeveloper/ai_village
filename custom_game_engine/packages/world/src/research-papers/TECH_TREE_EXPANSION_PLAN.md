@@ -175,7 +175,7 @@
 | 440 | Advanced Applications Complete | VR games, task management (hive mind precursor), advanced factory automation |
 | 475 | Exotic Physics & Megastructures | Dyson swarms, QFT understanding, ready for β-space |
 | 485 | **β-Space Ships Unlock** | Threshold ship, Courier ship - first inter-universe travel |
-| 500 | **Full Clarke Tech** | All timeline manipulation, Gleisner vessels, Stage 3 awareness |
+| 500 | **Full Clarke Tech** | All timeline manipulation, Synthetic vessels, Stage 3 awareness |
 
 ## Integration Points
 

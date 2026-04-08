@@ -56,7 +56,7 @@ Demonstrates "everything is a paper" philosophy:
   - Basic Baking: Need 2 of 5 (with yeast mandatory)
   - Artisan Baking: Need 4 of 5 (with perfect_bread mandatory)
 - Shows how recipes ARE research papers
-- Extensive footnotes in Pratchett/Moers/Gaiman/Adams style
+- Extensive footnotes in witty, footnote-heavy academic parody style
 
 ### 5. Updated Documentation (`README.md`)
 
@@ -212,7 +212,7 @@ console.log(`Basic baking needs ${breadSet.unlocks[0].papersRequired} papers`);
 2. **Optional Fields:** New fields are optional to support gradual migration
 3. **Renamed Export:** `isTechnologyUnlockedNofM` avoids conflict with legacy function
 4. **Cooking as Papers:** Demonstrates "everything is a paper" philosophy
-5. **Extensive Footnotes:** All papers maintain Pratchett/Moers/Gaiman/Adams style
+5. **Extensive Footnotes:** All papers maintain witty, footnote-heavy academic parody style
 6. **Discovery Uncertainty:** Agents don't know set membership or N values
 7. **Multiple Paths:** Same tech can unlock via different paper combinations
 

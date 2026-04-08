@@ -5253,7 +5253,7 @@
             },
             {
               "type": "modify_wisdom",
-              "delta": 15
+              "delta": 20
             },
             {
               "type": "modify_mood",
@@ -5293,7 +5293,7 @@
         {
           "stage_id": "deeper_understanding",
           "name": "The Third Path",
-          "description": "Neither pure compassion nor cold preservation. You found a way to quarantine the Norn while treating it — accepting the risk, managing it, refusing to pretend the choice was binary. The Shee who broke the world thought in binaries too: create or abandon. You choose to maintain. This is what they should have done.",
+          "description": "Neither pure compassion nor cold preservation. You found a way to quarantine the Norn while treating it — accepting the risk, managing it. The Shee would call this observer contamination. You call it responsibility. Perhaps the Entanglement Heresy was right — perhaps when the question can ask back, you are in dialogue, not experiment. Or perhaps you just broke the methodology the way a parent breaks a promise to let their child cry it out. You do not know. The Shee did not know either. You proceed knowing you may be wrong. This is itself a form of understanding.",
           "on_enter_effects": [
             {
               "type": "learn_lesson",
@@ -5301,7 +5301,7 @@
             },
             {
               "type": "modify_wisdom",
-              "delta": 25
+              "delta": 20
             },
             {
               "type": "modify_mood",

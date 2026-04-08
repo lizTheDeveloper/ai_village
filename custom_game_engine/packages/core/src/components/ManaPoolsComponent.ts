@@ -41,7 +41,7 @@ export interface ResourcePool {
  * Different paradigms use different resources:
  * - Academic: Arcane mana
  * - Divine: Favor points
- * - Allomancy: Metal reserves
+ * - Ferromancy: Metal reserves
  * - Blood Magic: Blood debt / life force
  * - Breath Magic: Breath count
  */

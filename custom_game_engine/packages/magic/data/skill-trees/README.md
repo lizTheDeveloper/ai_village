@@ -18,12 +18,12 @@ This directory contains the skill tree definitions for all 25 magic paradigms, e
 
 | Paradigm | Nodes | File |
 |----------|-------|------|
-| Allomancy | 32 | `allomancy.json` |
+| Ferromancy | 32 | `ferromancy.json` |
 | Daemon | 27 | `daemon.json` |
 | Shinto | 26 | `shinto.json` |
 | Architecture | 26 | `architecture.json` |
 | Dream | 24 | `dream.json` |
-| Sympathy | 24 | `sympathy.json` |
+| Tethermancy | 24 | `tethermancy.json` |
 | Song | 23 | `song.json` |
 | Name | 23 | `name.json` |
 | Pact | 23 | `pact.json` |
@@ -97,8 +97,8 @@ Each JSON file contains a complete `MagicSkillTree` object with:
 
 ### Daemon Paradigm
 - Unlimited Separation (500 XP)
-- Dust Communion (350 XP)
-- Dust Navigation (300 XP)
+- Aether Communion (350 XP)
+- Aether Mote Navigation (300 XP)
 
 ### Dream Paradigm
 - Nested Dreaming (400 XP)
@@ -110,8 +110,8 @@ Each JSON file contains a complete `MagicSkillTree` object with:
 - Type IV Awakening (500 XP)
 - Perfect Awakening (500 XP)
 
-### Sympathy Paradigm
-- Bloodless Sympathy (600 XP)
+### Tethermancy Paradigm
+- Bloodless Tethermancy (600 XP)
 - Quaternary Mind (500 XP)
 - Mommet Binding (450 XP)
 

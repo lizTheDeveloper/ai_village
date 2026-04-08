@@ -183,7 +183,7 @@ export interface NeuralInterfaceComponent {
 // ============================================================================
 
 /**
- * Neural implant model names (Pratchett/Adams/Gaiman style)
+ * Neural implant model names (satirical style)
  */
 export const IMPLANT_MODEL_NAMES: Record<NeuralImplantType, string[]> = {
   basic_bci: [

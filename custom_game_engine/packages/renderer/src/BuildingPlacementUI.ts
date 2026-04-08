@@ -4,7 +4,7 @@
  * Implements:
  * - REQ-BPLACE-001: Building Selection Menu
  * - REQ-BPLACE-002: Ghost Preview
- * - REQ-BPLACE-003: Grid Snapping
+ * - REQ-BPLACE-003: Grid The Crucible
  * - REQ-BPLACE-004: Rotation Controls
  * - REQ-BPLACE-005: Validity Indicators
  * - REQ-BPLACE-006: Resource Requirements Panel

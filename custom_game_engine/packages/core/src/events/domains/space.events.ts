@@ -267,6 +267,15 @@ export interface SpaceEvents {
     alignmentRate: number;
   };
 
+  /** Cross-ship communication quality dropped below acceptable threshold */
+  'fleet:communication_degraded': {
+    shipId: string;
+    squadronId: string | null;
+    fleetId: string | null;
+    communicationQuality: number;
+    techTier: number;
+  };
+
   /** Fleet battle started */
   'fleet:battle_started': {
     fleetId1: string;
@@ -285,6 +294,51 @@ export interface SpaceEvents {
     shipsLost1: number;
     shipsLost2: number;
     duration: number;
+  };
+
+  // === Cross-Ship Communication Events ===
+
+  /** Two squadrons in the same fleet exchanged messages */
+  'fleet:cross_ship_communication': {
+    fleetId: string;
+    squadronIdA: string;
+    squadronIdB: string;
+    tick: number;
+  };
+
+  /** Two squadrons established a communication channel */
+  'fleet:comm_established': {
+    squadronIdA: string;
+    squadronIdB: string;
+    sameFleet: boolean;
+  };
+
+  /** Two squadrons lost their communication channel (timeout) */
+  'fleet:comm_lost': {
+    squadronIdA: string;
+    squadronIdB: string;
+  };
+
+  // === Dialect Drift Events ===
+
+  /** Dialect divergence between two squadrons crossed the split threshold */
+  'fleet:dialect_divergence': {
+    fleetId: string;
+    squadronIdA: string;
+    squadronIdB: string;
+    divergence: number;
+    isolationFactor: number;
+    populationSizeFactor: number;
+    culturalContactFrequency: number;
+    sharedMediaFactor: number;
+  };
+
+  /** Previously divergent squadron pair converged back below threshold */
+  'fleet:dialect_convergence': {
+    fleetId: string;
+    squadronIdA: string;
+    squadronIdB: string;
+    divergence: number;
   };
 
   // === Armada Events ===

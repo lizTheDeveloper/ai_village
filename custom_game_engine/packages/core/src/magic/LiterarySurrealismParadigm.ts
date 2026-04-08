@@ -4,13 +4,11 @@
  * Where language has physical weight, metaphors become literal,
  * and reality itself is written text that can be edited.
  *
- * Inspired by:
- * - Jorge Luis Borges - The Library of Babel, infinite stories
- * - Italo Calvino - Invisible Cities, impossible architectures
- * - Lewis Carroll - Nonsense that makes perfect sense
- * - China Miéville - Bas-Lag's impossible physics
- * - Terry Pratchett - Narrativium, the element that makes stories real
- * - Walter Moers - Zamonia, where books are alive
+ * Inspired by literary surrealism and magical realism traditions:
+ * - Infinite libraries and impossible architectures
+ * - Nonsense that makes perfect sense
+ * - Narrative magic — narrativium, the element that makes stories real
+ * - Worlds where books are alive and words have weight
  *
  * See: architecture/LITERARY_SURREALISM_SPEC.md
  *

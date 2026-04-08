@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -152,7 +152,7 @@ The successful distiller develops a relationship with their apparatus that borde
 
 *The earliest recorded distillation apparatus dates to the third century CE in Alexandria, where it was used to create perfumes and, more importantly, substances that made the creation of perfumes more bearable. The inventor, one Zosimos of Panopolis, described the process in texts so deliberately obscure that scholars still debate whether he was protecting sacred knowledge or simply couldn't write very well.
 
-**According to the Department of Preventable Catastrophes at the The Invisible College, approximately 73.4% of all beginning alchemists attempt distillation before understanding this principle, resulting in apparatus failure, mysterious odors, and what the department terms "educational scarring."
+**According to the Department of Preventable Catastrophes at the Invisible College, approximately 73.4% of all beginning alchemists attempt distillation before understanding this principle, resulting in apparatus failure, mysterious odors, and what the department terms "educational scarring."
 
 †The word "alembic" derives from the Arabic al-anbiq, itself from the Greek ambix, meaning "cup" or "beaker," which seems rather like calling the Great Pyramid of Giza "that big pointy thing." The Arabs, who perfected the art of distillation while Europe was still trying to remember how to make decent pottery, showed considerably more sophistication in their apparatus design than their naming conventions suggested†.
 

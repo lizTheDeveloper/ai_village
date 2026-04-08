@@ -4,13 +4,13 @@
  * Key mechanics:
  * - Breath is a resource you collect from willing donors (or unwilling victims)
  * - Commands are spoken phrases that Awaken objects
- * - Heightenings grant passive abilities based on total Breath held
+ * - Pneumantic Tiers grant passive abilities based on total Breath held
  * - Awakening difficulty increases with complexity (Type I to Type IV)
  * - Color drains from objects when Breath is used
  * - Returning Breath is possible but difficult
  *
  * Inspired by:
- * - Brandon Sanderson's Warbreaker (the primary inspiration)
+ * - Multiverse Chorus canon's Animus (the primary inspiration)
  * - The concept of life force as a tradeable commodity
  * - Color as visual representation of vitality
  * - Commands as precise magical programming
@@ -30,8 +30,8 @@ import {
 
 const PARADIGM_ID = 'breath';
 
-/** Heightening levels and their passive abilities */
-export const HEIGHTENINGS = {
+/** Pneumantic Tier levels and their passive abilities */
+export const PNEUMANTIC_TIERS = {
   first: { breathRequired: 50, ability: 'Perfect pitch - can identify any sound' },
   second: { breathRequired: 200, ability: 'Perfect color recognition - identify any hue instantly' },
   third: { breathRequired: 600, ability: 'Perfect life sense - detect auras of living things' },
@@ -127,10 +127,10 @@ connection - to read vitality through color itself.`,
   }
 );
 
-/** First Heightening - perfect pitch */
-const FIRST_HEIGHTENING_NODE = createSkillNode(
-  'first-heightening',
-  'First Heightening',
+/** First Pneumantic Tier - perfect pitch */
+const FIRST_PNEUMANTIC_TIER_NODE = createSkillNode(
+  'first-pneumantic-tier',
+  'First Pneumantic Tier',
   PARADIGM_ID,
   'foundation',
   1,
@@ -142,8 +142,8 @@ const FIRST_HEIGHTENING_NODE = createSkillNode(
     }),
   ],
   {
-    description: 'Reach the First Heightening - perfect pitch',
-    lore: `At 50 Breaths, you reach the First Heightening. Sounds become crystal clear.
+    description: 'Reach the First Pneumantic Tier - perfect pitch',
+    lore: `At 50 Breaths, you reach the First Pneumantic Tier. Sounds become crystal clear.
 You can identify any note, any voice, any rhythm with perfect accuracy. This
 is the first sign that you are no longer quite baseline.`,
     prerequisites: ['breath-sense'],
@@ -185,13 +185,13 @@ like a lifetime.`,
 );
 
 // ============================================================================
-// Heightening Nodes - Passive Abilities
+// Pneumantic Tier Nodes - Passive Abilities
 // ============================================================================
 
-/** Second Heightening - perfect color */
-const SECOND_HEIGHTENING_NODE = createSkillNode(
-  'second-heightening',
-  'Second Heightening',
+/** Second Pneumantic Tier - perfect color */
+const SECOND_PNEUMANTIC_TIER_NODE = createSkillNode(
+  'second-pneumantic-tier',
+  'Second Pneumantic Tier',
   PARADIGM_ID,
   'resource',
   2,
@@ -203,11 +203,11 @@ const SECOND_HEIGHTENING_NODE = createSkillNode(
     }),
   ],
   {
-    description: 'Reach the Second Heightening - perfect color',
+    description: 'Reach the Second Pneumantic Tier - perfect color',
     lore: `At 200 Breaths, colors explode in clarity. You can identify the exact hue
 of any color instantly, distinguish between shades that others cannot perceive.
 This is useful for Awakening - color is power.`,
-    prerequisites: ['first-heightening'],
+    prerequisites: ['first-pneumantic-tier'],
     unlockConditions: [
       createUnlockCondition(
         'resource_accumulated',
@@ -220,10 +220,10 @@ This is useful for Awakening - color is power.`,
   }
 );
 
-/** Third Heightening - life sense */
-const THIRD_HEIGHTENING_NODE = createSkillNode(
-  'third-heightening',
-  'Third Heightening',
+/** Third Pneumantic Tier - life sense */
+const THIRD_PNEUMANTIC_TIER_NODE = createSkillNode(
+  'third-pneumantic-tier',
+  'Third Pneumantic Tier',
   PARADIGM_ID,
   'resource',
   3,
@@ -235,11 +235,11 @@ const THIRD_HEIGHTENING_NODE = createSkillNode(
     }),
   ],
   {
-    description: 'Reach the Third Heightening - life sense',
+    description: 'Reach the Third Pneumantic Tier - life sense',
     lore: `At 600 Breaths, you gain perfect life sense. You can feel the auras of
 living things nearby - their vitality, their health, their Breath. People
 glow with inner light that only you can see.`,
-    prerequisites: ['second-heightening'],
+    prerequisites: ['second-pneumantic-tier'],
     unlockConditions: [
       createUnlockCondition(
         'resource_accumulated',
@@ -251,10 +251,10 @@ glow with inner light that only you can see.`,
   }
 );
 
-/** Fourth Heightening - perfect instinct */
-const FOURTH_HEIGHTENING_NODE = createSkillNode(
-  'fourth-heightening',
-  'Fourth Heightening',
+/** Fourth Pneumantic Tier - perfect instinct */
+const FOURTH_PNEUMANTIC_TIER_NODE = createSkillNode(
+  'fourth-pneumantic-tier',
+  'Fourth Pneumantic Tier',
   PARADIGM_ID,
   'resource',
   3,
@@ -266,11 +266,11 @@ const FOURTH_HEIGHTENING_NODE = createSkillNode(
     }),
   ],
   {
-    description: 'Reach the Fourth Heightening - perfect instinct',
+    description: 'Reach the Fourth Pneumantic Tier - perfect instinct',
     lore: `At 1000 Breaths, your instincts become supernatural. You sense danger before
 it strikes, feel hostile intent like a physical force. Ambushes are nearly
 impossible - your body knows to move before your mind understands why.`,
-    prerequisites: ['third-heightening'],
+    prerequisites: ['third-pneumantic-tier'],
     unlockConditions: [
       createUnlockCondition(
         'resource_accumulated',
@@ -283,10 +283,10 @@ impossible - your body knows to move before your mind understands why.`,
   }
 );
 
-/** Fifth Heightening - agelessness */
-const FIFTH_HEIGHTENING_NODE = createSkillNode(
-  'fifth-heightening',
-  'Fifth Heightening',
+/** Fifth Pneumantic Tier - agelessness */
+const FIFTH_PNEUMANTIC_TIER_NODE = createSkillNode(
+  'fifth-pneumantic-tier',
+  'Fifth Pneumantic Tier',
   PARADIGM_ID,
   'resource',
   4,
@@ -297,11 +297,11 @@ const FIFTH_HEIGHTENING_NODE = createSkillNode(
     }),
   ],
   {
-    description: 'Reach the Fifth Heightening - agelessness',
+    description: 'Reach the Fifth Pneumantic Tier - agelessness',
     lore: `At 2000 Breaths, you stop aging. Disease cannot touch you. You become
 functionally immortal, as long as you maintain your Breath. This is why
 the God King and Returned are what they are - Breath sustains life itself.`,
-    prerequisites: ['fourth-heightening'],
+    prerequisites: ['fourth-pneumantic-tier'],
     unlockConditions: [
       createUnlockCondition(
         'resource_accumulated',
@@ -420,7 +420,7 @@ const COLOR_DRAINING_NODE = createSkillNode(
     lore: `Awakening requires color as fuel - drained from nearby objects. The more
 vibrant the colors, the better. You learn to pull color efficiently, to
 sense which objects have the most to give.`,
-    prerequisites: ['basic-awakening', 'second-heightening'],
+    prerequisites: ['basic-awakening', 'second-pneumantic-tier'],
     maxLevel: 5,
   }
 );
@@ -613,7 +613,7 @@ const BREATH_RETURN_NODE = createSkillNode(
     lore: `Giving away Breath is harder than receiving it. Your body fights the loss.
 Returning Breath to its original owner is even harder - it must recognize
 them, flow back willingly. Few Awakeners ever manage it.`,
-    prerequisites: ['willing-transfer', 'fifth-heightening'],
+    prerequisites: ['willing-transfer', 'fifth-pneumantic-tier'],
     icon: '↩️',
   }
 );
@@ -638,7 +638,7 @@ const COMMAND_BREAKING_NODE = createSkillNode(
   ],
   {
     description: 'Learn to destroy others\' Commands',
-    lore: `At the Eighth Heightening, you can break Commands - unraveling the Breath
+    lore: `At the Eighth Pneumantic Tier, you can break Commands - unraveling the Breath
 that animates an Awakened object, returning it to stillness. This is both
 defensive (stopping enemy Awakenings) and offensive (wasting their Breath).`,
     prerequisites: ['type-iii-awakening'],
@@ -646,7 +646,7 @@ defensive (stopping enemy Awakenings) and offensive (wasting their Breath).`,
       createUnlockCondition(
         'resource_accumulated',
         { resourceType: 'breath', resourceAmountRequired: 10000 },
-        'Requires Eighth Heightening (10,000 Breaths)'
+        'Requires Eighth Pneumantic Tier (10,000 Breaths)'
       ),
     ],
     conditionMode: 'all',
@@ -669,7 +669,7 @@ const PERFECT_AWAKENING_NODE = createSkillNode(
   ],
   {
     description: 'Achieve Perfect Awakening - bypass color requirements',
-    lore: `At the Ninth Heightening, you can Awaken anything regardless of color. No
+    lore: `At the Ninth Pneumantic Tier, you can Awaken anything regardless of color. No
 need to drain colors from the environment. Your Breath is so vast it provides
 its own fuel. This is mastery of the art.`,
     prerequisites: ['command-breaking', 'type-iv-awakening'],
@@ -677,7 +677,7 @@ its own fuel. This is mastery of the art.`,
       createUnlockCondition(
         'resource_accumulated',
         { resourceType: 'breath', resourceAmountRequired: 20000 },
-        'Requires Ninth Heightening (20,000 Breaths)'
+        'Requires Ninth Pneumantic Tier (20,000 Breaths)'
       ),
     ],
     conditionMode: 'all',
@@ -700,8 +700,8 @@ const SPONTANEOUS_SENTIENCE_NODE = createSkillNode(
     }),
   ],
   {
-    description: 'Achieve the Tenth Heightening - spontaneous sentience',
-    lore: `At the Tenth Heightening, your Awakenings can spontaneously become sentient.
+    description: 'Achieve the Tenth Pneumantic Tier - spontaneous sentience',
+    lore: `At the Tenth Pneumantic Tier, your Awakenings can spontaneously become sentient.
 Not just following Commands, but thinking, choosing, becoming. You create
 life itself from lifeless matter. This is the power of gods.`,
     prerequisites: ['perfect-awakening'],
@@ -709,7 +709,7 @@ life itself from lifeless matter. This is the power of gods.`,
       createUnlockCondition(
         'resource_accumulated',
         { resourceType: 'breath', resourceAmountRequired: 50000 },
-        'Requires Tenth Heightening (50,000 Breaths)'
+        'Requires Tenth Pneumantic Tier (50,000 Breaths)'
       ),
     ],
     conditionMode: 'all',
@@ -759,9 +759,9 @@ const XP_SOURCES: MagicXPSource[] = [
     description: 'Break another Awakener\'s Command',
   },
   {
-    eventType: 'heightening_reached',
+    eventType: 'pneumantic-tier_reached',
     xpAmount: 150,
-    description: 'Reach a new Heightening level',
+    description: 'Reach a new Pneumantic Tier level',
   },
 ];
 
@@ -775,12 +775,12 @@ const ALL_NODES: MagicSkillNode[] = [
   COLOR_SENSE_NODE,
   BREATH_TRANSFER_NODE,
 
-  // Heightenings
-  FIRST_HEIGHTENING_NODE,
-  SECOND_HEIGHTENING_NODE,
-  THIRD_HEIGHTENING_NODE,
-  FOURTH_HEIGHTENING_NODE,
-  FIFTH_HEIGHTENING_NODE,
+  // Pneumantic Tiers
+  FIRST_PNEUMANTIC_TIER_NODE,
+  SECOND_PNEUMANTIC_TIER_NODE,
+  THIRD_PNEUMANTIC_TIER_NODE,
+  FOURTH_PNEUMANTIC_TIER_NODE,
+  FIFTH_PNEUMANTIC_TIER_NODE,
 
   // Awakening techniques
   BASIC_AWAKENING_NODE,
@@ -813,7 +813,7 @@ export const BREATH_SKILL_TREE: MagicSkillTree = {
   id: 'breath-tree',
   paradigmId: PARADIGM_ID,
   name: 'The Art of Awakening',
-  description: 'Collect Breath, Awaken objects with Commands, and ascend through the Heightenings.',
+  description: 'Collect Breath, Awaken objects with Commands, and ascend through the Pneumantic Tiers.',
   lore: `Everyone is born with one Breath - the divine spark that animates life. Most
 people live their entire lives with just that single Breath, never knowing its
 potential. But Breath can be given, taken, and used.
@@ -827,9 +827,9 @@ But mastery takes lifetimes. Different Awakening types have different costs and
 complexities. Type I (simple motion) is easy. Type IV (creating Lifeless) requires
 hundreds of Breaths and perfect technique.
 
-As you accumulate Breath, you pass through Heightenings - thresholds that grant
-passive abilities. The First Heightening (50 Breaths) gives perfect pitch. The
-Fifth Heightening (2000 Breaths) grants agelessness. The Tenth Heightening
+As you accumulate Breath, you pass through Pneumantic Tiers - thresholds that grant
+passive abilities. The First Pneumantic Tier (50 Breaths) gives perfect pitch. The
+Fifth Pneumantic Tier (2000 Breaths) grants agelessness. The Tenth Pneumantic Tier
 (50,000 Breaths) allows your Awakenings to spontaneously gain sentience.
 
 The God King himself is said to hold over 50,000 Breaths. The Returned are born
@@ -853,9 +853,9 @@ use it.`,
 // ============================================================================
 
 /**
- * Calculate current Heightening level based on Breath count.
+ * Calculate current Pneumantic Tier level based on Breath count.
  */
-export function getCurrentHeightening(breathCount: number): number {
+export function getCurrentPneumanticTier(breathCount: number): number {
   if (breathCount >= 50000) return 10;
   if (breathCount >= 20000) return 9;
   if (breathCount >= 10000) return 8;
@@ -870,21 +870,21 @@ export function getCurrentHeightening(breathCount: number): number {
 }
 
 /**
- * Get passive abilities granted by current Heightening.
+ * Get passive abilities granted by current Pneumantic Tier.
  */
-export function getHeighteningAbilities(heightening: number): string[] {
+export function getPneumanticTierAbilities(tier: number): string[] {
   const abilities: string[] = [];
 
-  if (heightening >= 1) abilities.push('perfect_pitch');
-  if (heightening >= 2) abilities.push('perfect_color');
-  if (heightening >= 3) abilities.push('life_sense');
-  if (heightening >= 4) abilities.push('danger_sense');
-  if (heightening >= 5) abilities.push('agelessness');
-  if (heightening >= 6) abilities.push('instinctive_awakening');
-  if (heightening >= 7) abilities.push('breath_recognition');
-  if (heightening >= 8) abilities.push('command_breaking');
-  if (heightening >= 9) abilities.push('perfect_awakening');
-  if (heightening >= 10) abilities.push('spontaneous_sentience');
+  if (tier >= 1) abilities.push('perfect_pitch');
+  if (tier >= 2) abilities.push('perfect_color');
+  if (tier >= 3) abilities.push('life_sense');
+  if (tier >= 4) abilities.push('danger_sense');
+  if (tier >= 5) abilities.push('agelessness');
+  if (tier >= 6) abilities.push('instinctive_awakening');
+  if (tier >= 7) abilities.push('breath_recognition');
+  if (tier >= 8) abilities.push('command_breaking');
+  if (tier >= 9) abilities.push('perfect_awakening');
+  if (tier >= 10) abilities.push('spontaneous_sentience');
 
   return abilities;
 }
@@ -977,7 +977,7 @@ export function getColorDrainEfficiency(unlockedNodes: Record<string, number>): 
   if (unlockedNodes['color-draining']) {
     efficiency += 15 + (unlockedNodes['color-draining'] - 1) * 5;
   }
-  if (unlockedNodes['second-heightening']) {
+  if (unlockedNodes['second-pneumantic-tier']) {
     efficiency += 10;
   }
 

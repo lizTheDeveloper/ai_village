@@ -25,10 +25,10 @@ import type { MagicTechnique, MagicForm } from '@ai-village/core';
 
 /** Categories of magical institution */
 export type AcademyType =
-  | 'university'       // Formal scholarly institution (Sympathy, Academic, Rune)
+  | 'university'       // Formal scholarly institution (Tethermancy, Academic, Rune)
   | 'conservatory'     // Performance-based (Song, Emotional, Pun, Narrative)
-  | 'temple'           // Relationship with entities (Divine, Shinto, Pact, Daemon)
-  | 'guild'            // Practical craft focus (Blood, Breath, Allomancy)
+  | 'temple'           // Relationship with entities (Divine, Shinto, Pact, Animus)
+  | 'guild'            // Practical craft focus (Blood, Breath, Ferromancy)
   | 'circle'           // Informal gathering (Dream, Wild)
   | 'monastery'        // Meditative practice (Name, academic disciplines)
   | 'scriptorium';     // Literary Surrealism focus (Narrative, Pun, Poetic)
@@ -407,7 +407,7 @@ export interface AcademyMembership {
 
 /**
  * Academy of Formal Arts - Knowledge-based magic systems
- * Combines: Academic, Sympathy, Rune, Name
+ * Combines: Academic, Tethermancy, Rune, Name
  */
 export const ACADEMY_OF_FORMAL_ARTS: MagicAcademy = {
   id: 'formal_arts',
@@ -420,21 +420,21 @@ The Academy treats magical phenomena as natural forces to be understood through
 experimentation and logic. Students here learn multiple traditions, finding the
 common principles underlying seemingly different systems.
 
-The great insight of the Academy is that sympathy, runes, true names, and academic
+The great insight of the Academy is that tethermancy, runes, true names, and academic
 spellcraft are all views of the same underlying reality - language that reality
 understands. Whether you write a rune, speak a name, or form a sympathetic link,
 you are encoding instructions in a grammar the universe must obey.`,
 
-  primaryParadigms: ['academic', 'sympathy', 'rune', 'name'],
+  primaryParadigms: ['academic', 'tethermancy', 'rune', 'name'],
   secondaryParadigms: ['breath', 'dimensional'],
   hybridParadigms: ['namebreath'],
 
   internalRelationships: {
-    'academic_sympathy': 'synergistic',
+    'academic_tethermancy': 'synergistic',
     'academic_rune': 'synergistic',
     'academic_name': 'synergistic',
-    'sympathy_rune': 'coexistent',
-    'sympathy_name': 'synergistic',
+    'tethermancy_rune': 'coexistent',
+    'tethermancy_name': 'synergistic',
     'rune_name': 'synergistic',
   },
 
@@ -465,13 +465,13 @@ you are encoding instructions in a grammar the universe must obey.`,
       maxLevel: 5,
       effects: [
         { type: 'rune_precision', baseValue: 10, perLevelValue: 5 },
-        { type: 'alar_strength', baseValue: 5, perLevelValue: 3 },
+        { type: 'attunement_strength', baseValue: 5, perLevelValue: 3 },
       ],
       unlockConditions: [
         { type: 'node_unlocked', params: { nodeId: 'formal_foundation' }, description: 'Complete Formal Magical Theory' },
       ],
       conditionMode: 'all',
-      synergyParadigms: ['rune', 'sympathy'],
+      synergyParadigms: ['rune', 'tethermancy'],
     },
     {
       id: 'cross_system_analysis',
@@ -494,12 +494,12 @@ you are encoding instructions in a grammar the universe must obey.`,
 
   crossParadigmAbilities: [
     {
-      id: 'runic_sympathy',
-      name: 'Runic Sympathy',
+      id: 'runic_tethermancy',
+      name: 'Runic Tethermancy',
       description: 'Carve runes that create permanent sympathetic links',
-      requiredParadigms: ['rune', 'sympathy'],
+      requiredParadigms: ['rune', 'tethermancy'],
       minimumMastery: 30,
-      uniqueEffects: ['Runes maintain sympathetic connections indefinitely', 'No alar required to maintain'],
+      uniqueEffects: ['Runes maintain sympathetic connections indefinitely', 'No attunement required to maintain'],
     },
     {
       id: 'named_inscription',
@@ -582,8 +582,8 @@ you are encoding instructions in a grammar the universe must obey.`,
   notableMembers: [
     { name: 'Archon Veriditas', role: 'founder', description: 'First to codify cross-paradigm principles',
       specialty: 'Paradigm Translation' },
-    { name: 'Master Kvothe', role: 'faculty', description: 'Legendary sympathist and namer',
-      specialty: 'Sympathy and Naming' },
+    { name: 'Master Kelvar', role: 'faculty', description: 'Legendary tethermancer and namer',
+      specialty: 'Tethermancy and Naming' },
   ],
 };
 
@@ -810,7 +810,7 @@ The derivative story rewrites nothing.`,
 
 /**
  * Temple of Relationships - Entity-bound magic systems
- * Combines: Divine, Shinto, Pact, Daemon
+ * Combines: Divine, Shinto, Pact, Animus
  */
 export const TEMPLE_OF_RELATIONSHIPS: MagicAcademy = {
   id: 'relationships',
@@ -820,28 +820,28 @@ export const TEMPLE_OF_RELATIONSHIPS: MagicAcademy = {
 
   lore: `All magic is relationship. The Temple teaches this fundamental truth.
 Whether you pray to gods, negotiate with kami, bargain with demons, or bond
-with your daemon, you are entering into covenant with entities of power.
+with your animus, you are entering into covenant with entities of power.
 
 The Temple is unusual in that it teaches traditions many consider opposed.
 Divine priests and demonic warlocks study in adjacent wings. Shinto practitioners
-and daemon-witches share meditation gardens. The Temple's philosophy is that
+and animus-witches share meditation gardens. The Temple's philosophy is that
 understanding all forms of spiritual relationship makes each practitioner
 stronger—and wiser about which relationships to enter.
 
 The central precept: "Know who you deal with. Know what they want. Know what
 you offer. Then, and only then, negotiate."`,
 
-  primaryParadigms: ['divine', 'shinto', 'pact', 'daemon'],
+  primaryParadigms: ['divine', 'shinto', 'pact', 'animus'],
   secondaryParadigms: ['name', 'emotional'],
   hybridParadigms: ['theurgy'],
 
   internalRelationships: {
     'divine_shinto': 'coexistent',
     'divine_pact': 'exclusive',
-    'divine_daemon': 'coexistent',
+    'divine_animus': 'coexistent',
     'shinto_pact': 'competitive',
-    'shinto_daemon': 'coexistent',
-    'pact_daemon': 'coexistent',
+    'shinto_animus': 'coexistent',
+    'pact_animus': 'coexistent',
   },
 
   sharedCurriculum: [
@@ -922,12 +922,12 @@ you offer. Then, and only then, negotiate."`,
       uniqueEffects: ['Can worship great kami for divine favor', 'Syncretism reduces conflict between traditions'],
     },
     {
-      id: 'daemon_shinto',
-      name: 'Spirit Daemon',
-      description: 'Understand daemon as external kami of the self',
-      requiredParadigms: ['daemon', 'shinto'],
+      id: 'animus_shinto',
+      name: 'Spirit Animus',
+      description: 'Understand animus as external kami of the self',
+      requiredParadigms: ['animus', 'shinto'],
       minimumMastery: 25,
-      uniqueEffects: ['Daemon can negotiate with kami', 'Purity affects daemon bond'],
+      uniqueEffects: ['Animus can negotiate with kami', 'Purity affects animus bond'],
     },
     {
       id: 'entity_negotiation',
@@ -957,7 +957,7 @@ you offer. Then, and only then, negotiate."`,
   },
 
   ranks: [
-    { id: 'seeker', name: 'Seeker', level: 0, title: 'Seeker',
+    { id: 'supplicant', name: 'Supplicant', level: 0, title: 'Supplicant',
       requirements: {}, privileges: {} },
     { id: 'initiate', name: 'Initiate', level: 1, title: 'Initiate',
       requirements: { achievements: ['first_contact'] },
@@ -1000,7 +1000,7 @@ you offer. Then, and only then, negotiate."`,
 
 /**
  * Guild of Vitality - Body-centered magic systems
- * Combines: Blood, Breath, Allomancy
+ * Combines: Blood, Breath, Ferromancy
  */
 export const GUILD_OF_VITALITY: MagicAcademy = {
   id: 'vitality',
@@ -1018,18 +1018,18 @@ metal tolerance—all require the body to be prepared and strengthened. The
 weak of body cannot walk these paths.
 
 The Guild's practitioners are often viewed with suspicion. Blood magic carries
-stigma. Allomancy is genetic and exclusive. Breath awakening is strange and
+stigma. Ferromancy is genetic and exclusive. Breath awakening is strange and
 foreign. Yet within the Guild's halls, these traditions find common ground:
 the sanctity and power of the living body.`,
 
-  primaryParadigms: ['blood', 'breath', 'allomancy'],
-  secondaryParadigms: ['emotional', 'sympathy'],
+  primaryParadigms: ['blood', 'breath', 'ferromancy'],
+  secondaryParadigms: ['emotional', 'tethermancy'],
   hybridParadigms: ['hemomancy'],
 
   internalRelationships: {
     'blood_breath': 'parasitic',  // Blood drains breath
-    'blood_allomancy': 'coexistent',
-    'breath_allomancy': 'isolated',
+    'blood_ferromancy': 'coexistent',
+    'breath_ferromancy': 'isolated',
   },
 
   sharedCurriculum: [
@@ -1097,7 +1097,7 @@ the sanctity and power of the living body.`,
       id: 'metal_blood',
       name: 'Ferrous Blood',
       description: 'Blood infused with metal burns longer',
-      requiredParadigms: ['blood', 'allomancy'],
+      requiredParadigms: ['blood', 'ferromancy'],
       minimumMastery: 40,
       uniqueEffects: ['Metal reserves regenerate from blood sacrifice', 'Blood magic can push/pull metal'],
     },

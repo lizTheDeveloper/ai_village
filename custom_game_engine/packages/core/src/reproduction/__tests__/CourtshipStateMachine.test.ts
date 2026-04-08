@@ -129,6 +129,58 @@ describe('CourtshipStateMachine', () => {
       expect(highThreshold).toBeCloseTo(0.23, 2);
       expect(lowThreshold).toBeCloseTo(0.44, 2);
     });
+
+    it('should accept the same compatibility for a high-romantic agent and reject it for a low-romantic agent', () => {
+      const highInclinationCourtship = createCourtshipComponent({
+        romanticInclination: 0.9,
+        lastCourtshipAttempt: -10000,
+      });
+      const lowInclinationCourtship = createCourtshipComponent({
+        romanticInclination: 0.2,
+        lastCourtshipAttempt: -10000,
+      });
+
+      const highCompatibilityAgent = world.createEntity();
+      const highCompatibilityTarget = world.createEntity();
+      const lowCompatibilityAgent = world.createEntity();
+      const lowCompatibilityTarget = world.createEntity();
+
+      (highCompatibilityAgent as EntityImpl).addComponent(highInclinationCourtship);
+      (highCompatibilityAgent as EntityImpl).addComponent(
+        createSexualityComponent({ activelySeeking: true, relationshipStyle: 'monogamous' })
+      );
+      (highCompatibilityTarget as EntityImpl).addComponent(createCourtshipComponent());
+      (highCompatibilityTarget as EntityImpl).addComponent(
+        createSexualityComponent({ relationshipStyle: 'polyamorous' })
+      );
+
+      (lowCompatibilityAgent as EntityImpl).addComponent(lowInclinationCourtship);
+      (lowCompatibilityAgent as EntityImpl).addComponent(
+        createSexualityComponent({ activelySeeking: true, relationshipStyle: 'monogamous' })
+      );
+      (lowCompatibilityTarget as EntityImpl).addComponent(createCourtshipComponent());
+      (lowCompatibilityTarget as EntityImpl).addComponent(
+        createSexualityComponent({ relationshipStyle: 'polyamorous' })
+      );
+
+      const highResult = stateMachine.considerCourtship(
+        highCompatibilityAgent,
+        highCompatibilityTarget,
+        world
+      );
+      const lowResult = stateMachine.considerCourtship(
+        lowCompatibilityAgent,
+        lowCompatibilityTarget,
+        world
+      );
+
+      expect(highResult).toBe(true);
+      expect(highInclinationCourtship.state).toBe('interested');
+      expect(highInclinationCourtship.currentCourtshipTarget).toBe(highCompatibilityTarget.id);
+      expect(lowResult).toBe(false);
+      expect(lowInclinationCourtship.state).toBe('idle');
+      expect(lowInclinationCourtship.currentCourtshipTarget).toBeNull();
+    });
   });
 
   describe('initiateCourtship (interested -> courting)', () => {
@@ -343,6 +395,82 @@ describe('CourtshipStateMachine', () => {
       // Interest should have changed (up or down depending on reception)
       const newInterest = courtship2.receivedCourtships[0]!.currentInterest;
       expect(newInterest).not.toBe(initialInterest);
+    });
+
+    it('should increase interest for preferred tactics and decrease it for disliked tactics', () => {
+      const preferredCourtship = createCourtshipComponent({
+        activeCourtships: [
+          {
+            targetId: agent2.id,
+            startedAt: world.tick,
+            tacticsAttempted: [],
+            responses: [],
+            compatibilityScore: 0.7,
+            successProbability: 0,
+          },
+        ],
+      });
+      const preferredTarget = createCourtshipComponent({
+        receivedCourtships: [
+          {
+            initiatorId: agent1.id,
+            startedAt: world.tick,
+            tacticsReceived: [],
+            currentInterest: 0.3,
+            willingToConsent: false,
+          },
+        ],
+      });
+
+      const dislikedAgent = world.createEntity();
+      const dislikedTarget = world.createEntity();
+      const dislikedCourtship = createCourtshipComponent({
+        activeCourtships: [
+          {
+            targetId: dislikedTarget.id,
+            startedAt: world.tick,
+            tacticsAttempted: [],
+            responses: [],
+            compatibilityScore: 0.7,
+            successProbability: 0,
+          },
+        ],
+      });
+      const dislikedTargetCourtship = createCourtshipComponent({
+        receivedCourtships: [
+          {
+            initiatorId: dislikedAgent.id,
+            startedAt: world.tick,
+            tacticsReceived: [],
+            currentInterest: 0.3,
+            willingToConsent: false,
+          },
+        ],
+      });
+
+      preferredTarget.preferredTactics = ['conversation'];
+      dislikedTargetCourtship.preferredTactics = [];
+      dislikedTargetCourtship.dislikedTactics = ['conversation'];
+
+      (agent1 as EntityImpl).addComponent(preferredCourtship);
+      (agent1 as EntityImpl).addComponent(createSexualityComponent());
+      (agent2 as EntityImpl).addComponent(preferredTarget);
+      (agent2 as EntityImpl).addComponent(createSexualityComponent());
+
+      (dislikedAgent as EntityImpl).addComponent(dislikedCourtship);
+      (dislikedAgent as EntityImpl).addComponent(createSexualityComponent());
+      (dislikedTarget as EntityImpl).addComponent(dislikedTargetCourtship);
+      (dislikedTarget as EntityImpl).addComponent(createSexualityComponent());
+
+      const tactic = createTactic('conversation', 0.4);
+      stateMachine.performCourtshipTactic(agent1, agent2, tactic, world);
+      stateMachine.performCourtshipTactic(dislikedAgent, dislikedTarget, tactic, world);
+
+      const preferredInterest = preferredTarget.receivedCourtships[0]!.currentInterest;
+      const dislikedInterest = dislikedTargetCourtship.receivedCourtships[0]!.currentInterest;
+
+      expect(preferredInterest).toBeGreaterThan(0.3);
+      expect(preferredInterest).toBeGreaterThan(dislikedInterest);
     });
 
     it('should cap interest at 1.0', () => {

@@ -2754,7 +2754,7 @@
       },
       {
         "id": "breath_heighten_first",
-        "name": "First Heightening",
+        "name": "First Pneumantic Tier",
         "paradigmId": "breath",
         "technique": "enhance",
         "form": "body",
@@ -2784,7 +2784,7 @@
       },
       {
         "id": "breath_heighten_second",
-        "name": "Second Heightening",
+        "name": "Second Pneumantic Tier",
         "paradigmId": "breath",
         "technique": "enhance",
         "form": "body",

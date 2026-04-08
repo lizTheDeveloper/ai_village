@@ -277,7 +277,7 @@ describe('AnimistParadigms', () => {
       expect(animusBond!.detectability).toBe('obvious');
     });
 
-    it('should have dust source', () => {
+    it('should have aether mote source', () => {
       const aetherMoteSource = ANIMUS_PARADIGM.sources.find(s => s.id === 'aether_motes');
       expect(aetherMoteSource).toBeDefined();
       expect(aetherMoteSource!.type).toBe('ambient');

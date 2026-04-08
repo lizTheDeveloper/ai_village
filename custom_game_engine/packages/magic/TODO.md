@@ -36,7 +36,7 @@ The magic package is **remarkably well-implemented** with minimal stubs or missi
 - **Cost Calculators**: 13+ paradigm-specific calculators registered via `registerAllCostCalculators()`
 - **Effect Appliers**: Damage, healing, protection, transform, control, perception, creation, dispel, summon, soul, body appliers all implemented
 - **Spell Casting Pipeline**: Complete validation → cost calculation → mishap → effects → proficiency
-- **Paradigm Definitions**: 25+ paradigms fully defined (Academic, Divine, Blood, Allomancy, Rune, Shinto, Daemon, Dream, Sympathy, Song, etc.)
+- **Paradigm Definitions**: 25+ paradigms fully defined (Academic, Divine, Blood, Ferromancy, Rune, Shinto, Daemon, Dream, Tethermancy, Song, etc.)
 - **Skill Trees**: All 25+ paradigms have skill tree implementations
 - **Enchantment Systems**: 7 paradigm-specific enchantment systems (Academic, Breath, Pact, Name, Divine, Blood, Emotional)
 - **Magic Academies**: 5 fully-defined academies with curricula, ranks, tutoring systems
@@ -74,7 +74,7 @@ All exported functions, classes, and interfaces appear to be actively used or pa
 6. **Separation of Concerns**: Clear boundaries between paradigms, costs, effects, casting
 
 ### Comprehensive Coverage
-- **25+ Magic Paradigms**: Each with unique mechanics (Academic, Divine, Blood, Allomancy, Rune, Shinto, Daemon, Dream, Sympathy, Song, Breath, Name, Pact, Emotional, Wild, Narrative, Pun, Poetic, Literary Surrealism, Game, Luck, Debt, Echo, Architecture, Commerce, Bureaucratic, Paradox, Feng Shui, Threshold)
+- **25+ Magic Paradigms**: Each with unique mechanics (Academic, Divine, Blood, Ferromancy, Rune, Shinto, Daemon, Dream, Tethermancy, Song, Breath, Name, Pact, Emotional, Wild, Narrative, Pun, Poetic, Literary Surrealism, Game, Luck, Debt, Echo, Architecture, Commerce, Bureaucratic, Paradox, Feng Shui, Threshold)
 - **13+ Cost Calculators**: Paradigm-specific cost logic
 - **10+ Effect Appliers**: Category-specific effect application
 - **7 Enchantment Systems**: Per-paradigm artifact creation

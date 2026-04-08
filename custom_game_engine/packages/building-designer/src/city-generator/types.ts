@@ -14,7 +14,7 @@ export type CityType =
   | 'grid'           // Planned human city with orthogonal streets
   | 'organic'        // Medieval organic growth
   | 'flying'         // Vertical city for flying creatures
-  | 'non_euclidean'  // R'lyeh-style impossible geometry
+  | 'non_euclidean'  // impossible geometry
   | 'dwarven'        // Underground vertical fortress (Dwarf Fortress homage)
   | 'literary'       // Underground literary realm (The Footnotes, Libraries)
   // Alien & Fantastical

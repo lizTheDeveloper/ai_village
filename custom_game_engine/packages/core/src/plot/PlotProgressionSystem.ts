@@ -15,7 +15,9 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { ComponentType } from '../types/ComponentType.js';
 import type {
+  PlotCondition,
   PlotLineInstance,
+  PlotLineTemplate,
   PlotTransition,
   PlotStage,
 } from './PlotTypes.js';
@@ -32,11 +34,18 @@ import {
   createEffectContext,
 } from './PlotEffectExecutor.js';
 import { getNarrativePressureSystem } from '../narrative/NarrativePressureSystem.js';
+import type { MoodComponent } from '../components/MoodComponent.js';
+import type { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 
 /**
  * System priority: 86 (runs after assignment at 85, after NarrativePressure at 80)
  */
 export class PlotProgressionSystem extends BaseSystem {
+  private static readonly SHEE_CONTAMINATION_TEMPLATE_ID = 'exotic_shee_contamination_dilemma';
+  private static readonly SHEE_CONTAMINATION_ASSESSMENT_STAGE_ID = 'contamination_assessment';
+  private static readonly SHEE_REFUSE_CHOICE_ID = 'refuse_save_norn';
+  private static readonly SHEE_SAVE_CHOICE_ID = 'save_contaminated_norn';
+
   readonly id = 'plot_progression' as const;
   readonly priority = 86;
   readonly requiredComponents: string[] = [] as const;
@@ -108,6 +117,10 @@ export class PlotProgressionSystem extends BaseSystem {
     // Find available transitions from current stage
     const availableTransitions = template.transitions.filter((t) => t.from_stage === plot.current_stage);
 
+    // Resolve stage-level choice forks that currently depend on explicit choice memories.
+    // Without this, templates like the Shee contamination dilemma can stall indefinitely.
+    this.resolvePendingChoiceFork(plot, template, availableTransitions, soul, agent);
+
     // Check each transition for condition satisfaction
     for (const transition of availableTransitions) {
       if (this.evaluateTransitionConditions(transition, plot, soul, agent, world)) {
@@ -115,6 +128,128 @@ export class PlotProgressionSystem extends BaseSystem {
         return; // Only advance one stage per tick
       }
     }
+  }
+
+  /**
+   * Resolve choice forks that require a `choice:*` episodic memory to progress.
+   * Currently this is implemented for the Shee contamination dilemma decision stage.
+   */
+  private resolvePendingChoiceFork(
+    plot: PlotLineInstance,
+    template: PlotLineTemplate,
+    availableTransitions: PlotTransition[],
+    soul: Entity,
+    agent: Entity | null
+  ): void {
+    if (
+      template.id !== PlotProgressionSystem.SHEE_CONTAMINATION_TEMPLATE_ID ||
+      plot.current_stage !== PlotProgressionSystem.SHEE_CONTAMINATION_ASSESSMENT_STAGE_ID
+    ) {
+      return;
+    }
+
+    const choiceIds = this.getChoiceIdsFromTransitions(availableTransitions);
+    if (choiceIds.length === 0) {
+      return;
+    }
+
+    const episodicMemory = soul.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent | undefined;
+    if (!episodicMemory) {
+      return;
+    }
+
+    const hasRecordedChoice = choiceIds.some((choiceId) => this.hasChoiceMemory(episodicMemory, choiceId));
+    if (hasRecordedChoice) {
+      return;
+    }
+
+    const selectedChoice = this.chooseSheeRescueDecision(soul, agent);
+    const fallbackChoice = choiceIds[0];
+    if (!fallbackChoice) {
+      return;
+    }
+    const finalChoice = choiceIds.includes(selectedChoice) ? selectedChoice : fallbackChoice;
+
+    this.recordChoiceMemory(episodicMemory, finalChoice);
+  }
+
+  /**
+   * Extract all `choice_made` IDs from transition conditions.
+   */
+  private getChoiceIdsFromTransitions(transitions: PlotTransition[]): string[] {
+    const ids = new Set<string>();
+
+    for (const transition of transitions) {
+      if (!transition.conditions) continue;
+      for (const condition of transition.conditions) {
+        this.collectChoiceIds(condition, ids);
+      }
+    }
+
+    return [...ids];
+  }
+
+  private collectChoiceIds(condition: PlotCondition, ids: Set<string>): void {
+    switch (condition.type) {
+      case 'choice_made':
+        ids.add(condition.choice_id);
+        break;
+      case 'all':
+      case 'any':
+        for (const nested of condition.conditions) {
+          this.collectChoiceIds(nested, ids);
+        }
+        break;
+      case 'not':
+        this.collectChoiceIds(condition.condition, ids);
+        break;
+      default:
+        break;
+    }
+  }
+
+  private hasChoiceMemory(episodicMemory: EpisodicMemoryComponent, choiceId: string): boolean {
+    const eventType = `choice:${choiceId}`;
+    return episodicMemory.episodicMemories.some((memory) => memory.eventType === eventType);
+  }
+
+  /**
+   * Shee dilemma heuristic:
+   * - Higher wisdom tends toward pattern-preservation (refuse rescue)
+   * - High stress also biases toward containment over contact
+   * - Lower mood (moral burden) leans toward refusal
+   */
+  private chooseSheeRescueDecision(soul: Entity, agent: Entity | null): string {
+    const identity = soul.getComponent(ComponentType.SoulIdentity) as { wisdom_level?: number } | undefined;
+    const mood = agent?.getComponent(ComponentType.Mood) as MoodComponent | undefined;
+
+    const wisdom = identity?.wisdom_level ?? 0;
+    const stress = mood?.stress?.level ?? 0;
+    const currentMood = mood?.currentMood ?? 0;
+
+    if (wisdom >= 20 || stress >= 60 || currentMood <= -25) {
+      return PlotProgressionSystem.SHEE_REFUSE_CHOICE_ID;
+    }
+
+    return PlotProgressionSystem.SHEE_SAVE_CHOICE_ID;
+  }
+
+  private recordChoiceMemory(episodicMemory: EpisodicMemoryComponent, choiceId: string): void {
+    const refusing = choiceId === PlotProgressionSystem.SHEE_REFUSE_CHOICE_ID;
+
+    episodicMemory.formMemory({
+      eventType: `choice:${choiceId}`,
+      summary: refusing
+        ? 'I refused to save the contaminated Norn to contain pattern spread.'
+        : 'I chose to save the contaminated Norn despite spread risk.',
+      timestamp: Date.now(),
+      emotionalIntensity: 0.9,
+      emotionalValence: refusing ? -0.4 : 0.2,
+      goalRelevance: 1,
+      socialSignificance: 0.8,
+      survivalRelevance: 0.9,
+      importance: 1,
+    });
   }
 
   /**

@@ -5,12 +5,13 @@ import { ComponentType } from '../../../types/ComponentType.js';
  * Tests the individual behavior classes and the AnimalBrainSystem.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { EntityImpl, createEntityId } from '../../../ecs/Entity.js';
 import { createPositionComponent } from '../../../components/PositionComponent.js';
 import { createMovementComponent } from '../../../components/MovementComponent.js';
 import type { AnimalComponent, AnimalState } from '../../../components/AnimalComponent.js';
 import type { World } from '../../../ecs/World.js';
+import { SPECIES_REGISTRY } from '../../../species/SpeciesRegistry.js';
 
 import {
   GrazeBehavior,
@@ -70,6 +71,16 @@ function createAnimalEntity(animal: AnimalComponent): EntityImpl {
   entity.addComponent(animal);
   return entity;
 }
+
+const originalChickenTemplate = SPECIES_REGISTRY.chicken;
+
+afterEach(() => {
+  if (originalChickenTemplate) {
+    SPECIES_REGISTRY.chicken = originalChickenTemplate;
+  } else {
+    delete SPECIES_REGISTRY.chicken;
+  }
+});
 
 describe('AnimalBehavior Unit Tests', () => {
   describe('GrazeBehavior', () => {
@@ -313,6 +324,50 @@ describe('AnimalBehavior Unit Tests', () => {
 
       const behaviors = system.getBehaviors();
       expect(behaviors.has('drinking')).toBe(true);
+    });
+
+    it('emits species unique behavior trigger when state transition matches trigger hint', () => {
+      const base = SPECIES_REGISTRY.human;
+      SPECIES_REGISTRY.chicken = {
+        ...base,
+        speciesId: 'chicken',
+        speciesName: 'Chicken',
+        commonName: 'Chicken',
+        compatibleSpecies: [...base.compatibleSpecies],
+        innateTraits: [...base.innateTraits],
+        speciesBehaviorProfile: {
+          cognitiveCeiling: 0.5,
+          personalityBaseline: undefined,
+          interspeciesRelations: [],
+          uniqueBehaviors: [
+            {
+              behaviorId: 'gradient_following',
+              description: 'Follows warm thermal gradients while foraging',
+              triggerHint: 'foraging_gradient',
+            },
+          ],
+        },
+      };
+
+      const world = createMockWorld();
+      const entity = createAnimalEntity(createMockAnimal({ hunger: 90, state: 'idle', speciesId: 'chicken' }));
+      const ctx = {
+        activeEntities: [entity],
+        world,
+      } as any;
+
+      (system as any).onUpdate(ctx);
+
+      expect(world.eventBus.emit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'species:unique_behavior_triggered',
+          data: expect.objectContaining({
+            behaviorId: 'gradient_following',
+            speciesId: 'chicken',
+            behaviorState: 'foraging',
+          }),
+        }),
+      );
     });
   });
 });

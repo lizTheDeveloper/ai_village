@@ -13,7 +13,7 @@
  * - Theory and practical application
  *
  * Inspired by:
- * - D&D wizards and traditional RPG magic
+ * - Traditional academic wizard archetypes
  * - Academic study as path to power
  * - The concept that magic has rules and formulas
  * - Vancian magic (prepared spells)

@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -342,7 +342,7 @@ The theoretical foundations of ion weaponry draw upon principles that predate mo
 
 \** The operational manual for the Mark VII Ion Projector includes seventeen separate warnings about "enthusiasm management," three case studies of what happens when said enthusiasm is not managed, and a memorial page dedicated to Technician First Class Herbert Brightsparkle, whose last words were reportedly "But what if we used ALL the capacitors at once?" The resulting crater is now a designated historical site.
 
-\*** The speed of light being approximately 299,792,458 meters per second, 0.3% thereof equals roughly 899,377 meters per second, or fast enough that the particles arrive at the target before the target has finished thinking "What's that humming sound?" The Douglas Adams Institute of Improbable Sciences maintains that this represents the optimal speed for comedy—slower and it's merely dangerous, faster and it becomes cosmically absurd.
+\*** The speed of light being approximately 299,792,458 meters per second, 0.3% thereof equals roughly 899,377 meters per second, or fast enough that the particles arrive at the target before the target has finished thinking "What's that humming sound?" The Thornhaven Institute of Improbable Sciences maintains that this represents the optimal speed for comedy—slower and it's merely dangerous, faster and it becomes cosmically absurd.
 
 † The Institute, headquartered in a building that exists in seven dimensions simultaneously, has made a cottage industry of coining euphemisms for "nobody expected this to work, but oh gods it does." Their annual reports are considered masterworks of academic understatement.
 
@@ -436,7 +436,7 @@ Perhaps the most sobering aspect of electromagnetic disruption technology lies i
 
 †††The Bureau of Defensive Uncertainty maintains an official policy of being unclear about precisely what they do, which makes funding requests challenging but keeps them safe from budget cuts because nobody wants to ask too many questions.
 
-‡†The exact quote from experimental subject Magus Weatherwax the Younger: "I was about to transmute that lead into gold when everything felt suddenly purple and I decided I'd rather have a nice cup of tea instead."
+‡†The exact quote from experimental subject Magus Ashworth the Younger: "I was about to transmute that lead into gold when everything felt suddenly purple and I decided I'd rather have a nice cup of tea instead."
 
 ‡‡†The butterfly study is actually quite important. The butterflies themselves are, however, extremely boring. This is considered appropriate punishment.
 
@@ -711,7 +711,7 @@ The third obstacle is the fundamental trade-off between rate and power*******. T
 
 §§These complaints manifest as explosions, primarily.
 
-***The amount required varies by model. The Lockheed-Pratchett Mark VII requires 470mL of deuterium per shot, which is precisely enough that you'll run out at the least convenient moment possible. This appears to be a fundamental law of combat engineering.
+***The amount required varies by model. The Lockheed-Thornhaven Mark VII requires 470mL of deuterium per shot, which is precisely enough that you'll run out at the least convenient moment possible. This appears to be a fundamental law of combat engineering.
 
 †††Dr. Elena Kowalski's thesis, "Magazine Capacity and the Illusion of Adequate Preparation," argued that no soldier in history has ever felt they had enough ammunition. The thesis was 847 pages long and included footnotes about footnotes about ammunition shortages§§§.
 
@@ -1214,7 +1214,7 @@ export const PARTICLE_BEAM_CANNON: ResearchPaper = {
   ],
   description: `DRAWING LINES THROUGH REALITY: HEAVY PARTICLE BEAMS
 
-The development of sustained particle acceleration in beam form represents what the Archives of St. Brutus the Practically-Minded term "the point where theoretical physics became a municipal planning concern."* The fundamental principle—maintaining a coherent stream of accelerated particles over extended duration—sounds deceptively straightforward until one considers that the system requires power consumption equivalent to a mid-sized industrial city† and produces what Professor Hendricks of the The Invisible College Department of Applied Devastation describes as "a line you can draw through literally anything, including common sense."‡
+The development of sustained particle acceleration in beam form represents what the Archives of St. Brutus the Practically-Minded term "the point where theoretical physics became a municipal planning concern."* The fundamental principle—maintaining a coherent stream of accelerated particles over extended duration—sounds deceptively straightforward until one considers that the system requires power consumption equivalent to a mid-sized industrial city† and produces what Professor Hendricks of the Invisible College Department of Applied Devastation describes as "a line you can draw through literally anything, including common sense."‡
 
 The energy requirements alone necessitate dedicated generation capacity, typically requiring a custom-built arcane reactor operating at no less than 847 megathaumaturgical units per second.** This places particle beam weaponry firmly in the category of "strategic assets requiring their own postal code,"†† as the infrastructure footprint rivals that of institutional facilities.‡‡ The Consortium of Responsible Thaumaturgical Engineering publishes quarterly reminders that particle beam installations should never share power grids with civilian populations, a guideline established after the Incident at Tallbridge*** which is still referred to in hushed tones as "the time the streetlights learned to cut through buildings."††† 
 

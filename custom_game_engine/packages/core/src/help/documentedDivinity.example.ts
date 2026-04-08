@@ -414,7 +414,7 @@ The Vision Delivery System** categorizes divine messages by method, clarity, and
     {
       title: 'The Prophecy That Went Wrong',
       description:
-        'The God of Fate sent a clear, expensive vision (200 belief): "The king\'s third daughter will bring ruin to the realm." Straightforward, right? The king locked away his third daughter. She never met anyone, never influenced anyone, grew up isolated and angry. Twenty years later, she escaped, raised an army of the dispossessed, and burned the kingdom to the ground. The prophecy was accurate—she did bring ruin. The vision just failed to mention that the ruin was preventable by not imprisoning her in a tower for two decades. The God of Fate has since added footnotes to prophecies: "This is a warning, not a script. Response matters." Nobody reads the footnotes.',
+        'The God of Fate sent a clear, expensive vision (200 belief): "The king\'s third daughter will bring downfall to the realm." Straightforward, right? The king locked away his third daughter. She never met anyone, never influenced anyone, grew up isolated and angry. Twenty years later, she escaped, raised an army of the dispossessed, and burned the kingdom to the ground. The prophecy was accurate—she did bring downfall. The vision just failed to mention that the downfall was preventable by not imprisoning her in a tower for two decades. The God of Fate has since added footnotes to prophecies: "This is a warning, not a script. Response matters." Nobody reads the footnotes.',
     },
   ],
 

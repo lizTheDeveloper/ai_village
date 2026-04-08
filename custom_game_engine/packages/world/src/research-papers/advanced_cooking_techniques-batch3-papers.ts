@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -80,7 +80,7 @@ The practical execution of spherification requires an understanding that borders
 
 †This is the same principle exploited by seaweed to maintain its structural integrity, though seaweed has had several million years to perfect the technique and doesn't have to worry about dinner service starting in twenty minutes.
 
-‡The sphere being, as Douglas Adams once nearly said, the most efficient package for containing liquid while maximizing the ratio of "impressive to witnesses" to "actual effort expended," though he was talking about planets at the time.
+‡The sphere being, as one natural philosopher once nearly observed, the most efficient package for containing liquid while maximizing the ratio of "impressive to witnesses" to "actual effort expended," though he was talking about planets at the time.
 
 **The pH must be above 3.6, a fact discovered through extensive trial and error by Chef Ambrose Kettleworth in 1998, who documented exactly 127 failed attempts before success, including one that he described only as "the incident with the sea bass and the archbishop." His notes on attempt #63 simply read: "Never again."
 
@@ -108,7 +108,7 @@ The practical execution of spherification requires an understanding that borders
 
 ‡The Guild of Molecular Gastronomes, founded in 2001, maintains that approximately 73.4% of spherification failures can be traced to what they term "casual measuring" or "eyeballing it," which they rank just below "actively malicious" and just above "temporarily insane" on their Scale of Culinary Sins.
 
-‡‡‡‡‡Specialized spoons are available from restaurant supply companies at prices ranging from reasonable to "are you sure this spoon isn't made of platinum?" The latter category exists primarily because, as Terry Pratchett observed about wizarding equipment, if you don't charge enough, people assume it won't work.
+‡‡‡‡‡Specialized spoons are available from restaurant supply companies at prices ranging from reasonable to "are you sure this spoon isn't made of platinum?" The latter category exists primarily because, as the Thornhaven School observed about wizarding equipment, if you don't charge enough, people assume it won't work.
 
 ******Spherification syringes being distinct from medical syringes, though the International Council on Kitchen Safety had to issue a specific directive on this matter after a series of unfortunate mix-ups in teaching hospitals that we shall not discuss in detail, save to say that no one was permanently harmed and the resulting spheres were, by all accounts, inappropriately formed.
 

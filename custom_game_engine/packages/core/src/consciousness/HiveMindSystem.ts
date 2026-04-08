@@ -565,7 +565,7 @@ export interface HiveMemberComponent {
 // ============================================================================
 
 /**
- * Hive mind names (Pratchett/Adams/Gaiman style)
+ * Hive mind names (satirical style)
  */
 export const HIVE_NAMES: string[] = [
   'The Unanimous Decision',

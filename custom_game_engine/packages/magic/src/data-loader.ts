@@ -44,10 +44,10 @@ export function loadExampleKami(): any[] {
 }
 
 /**
- * Get allomantic metals from JSON data
+ * Get ferromancy metals from JSON data
  */
-export function loadAllomanticMetals(): any[] {
-  return animistData.allomantic_metals || [];
+export function loadFerromancyMetals(): any[] {
+  return animistData.ferromancy_metals || [];
 }
 
 /**
@@ -57,8 +57,8 @@ export function loadAnimistParadigms(): Record<string, MagicParadigm> {
   const paradigms: Record<string, MagicParadigm> = {};
 
   for (const [key, data] of Object.entries(animistData)) {
-    // Skip helper data (example_kami, allomantic_metals)
-    if (key === 'example_kami' || key === 'allomantic_metals') {
+    // Skip helper data (example_kami, ferromancy_metals)
+    if (key === 'example_kami' || key === 'ferromancy_metals') {
       continue;
     }
     paradigms[key] = validateParadigm(data);

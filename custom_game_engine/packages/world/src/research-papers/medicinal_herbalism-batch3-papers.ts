@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -226,7 +226,7 @@ export const HERB_DOSAGE_DETERMINATION: ResearchPaper = {
 
 The determination of proper herbal dosage represents one of the most delicate balances in natural philosophy, requiring equal parts ancient wisdom, mathematical precision, and profound respect for the fact that Nature, in her infinite wisdom, has made approximately seventy-three percent of useful plants also capable of making one violently ill*. The practitioner must navigate between the Scylla of ineffective treatment and the Charybdis of what the Guild of Herbalists euphemistically terms "excessive physiological response"**, while accounting for variables so numerous that the Grand Statistical Archive of Thornhaven*** once calculated that no two patients are identical in their herbal requirements to within 99.7% certainty†.
 
-The fundamental principle, first articulated by Mistress Weatherwax the Elder (not to be confused with Mistress Weatherwax the Younger, the Middle, or the Vengeful)††, states that the correct dose exists in a space between "not enough to notice" and "enough to notice far too much"†††. This deceptively simple wisdom masks centuries of careful observation, during which herbalists developed what modern scholars call the "Doctrine of Escalating Caution"‡—the practice of starting with amounts so small that they might charitably be described as "notional" and increasing by increments that would make a glacier look hasty‡‡. The mathematics involved are Byzantine in their complexity: one must account for the patient's constitution‡‡‡, the moon's phase§, the herb's provenance§§, and approximately forty-seven other factors that vary depending on which school of herbalism one learned under§§§.
+The fundamental principle, first articulated by Mistress Ashworth the Elder (not to be confused with Mistress Ashworth the Younger, the Middle, or the Vengeful)††, states that the correct dose exists in a space between "not enough to notice" and "enough to notice far too much"†††. This deceptively simple wisdom masks centuries of careful observation, during which herbalists developed what modern scholars call the "Doctrine of Escalating Caution"‡—the practice of starting with amounts so small that they might charitably be described as "notional" and increasing by increments that would make a glacier look hasty‡‡. The mathematics involved are Byzantine in their complexity: one must account for the patient's constitution‡‡‡, the moon's phase§, the herb's provenance§§, and approximately forty-seven other factors that vary depending on which school of herbalism one learned under§§§.
 
 Practical application requires what the Dissertational Society of Plant-Based Medicine calls "calibrated intuition"*—a phrase that essentially means "we know it when we see it, but explaining it takes three years of apprenticeship."** The herbalist must master the art of the tincture drop***, where measurements are conducted in units so small they verge on the philosophical†, and learn to recognize the subtle differences between "slightly more" and "catastrophically more"††. The Guild maintains extensive charts correlating body weight, age, season, atmospheric pressure, and whether the patient had breakfast with recommended dosages, though these charts are generally regarded as "helpful starting points" rather than "rules one should strictly follow unless one enjoys predictability"†††.
 
@@ -246,7 +246,7 @@ FOOTNOTES
 
 † This calculation took seventeen years and required the invention of three new mathematical operations, two of which were later proved to be impossible. The head statistician received a medal for his dedication and a small pension for his resultant nervous condition.
 
-†† There were, in fact, seven Mistress Weatherwaxes throughout history, all practitioners of herbalism, none related by blood, and all possessing the same formidable disposition toward precision and intolerance toward foolishness. The Vengeful acquired her title after a nobleman questioned her recommended dose of nettle tea. He recovered after three months. His skepticism did not.
+†† There were, in fact, seven Mistress Ashworthes throughout history, all practitioners of herbalism, none related by blood, and all possessing the same formidable disposition toward precision and intolerance toward foolishness. The Vengeful acquired her title after a nobleman questioned her recommended dose of nettle tea. He recovered after three months. His skepticism did not.
 
 ††† This wisdom is carved above the entrance to every reputable herbalist's workshop, usually in letters large enough to be read by patients who are squinting suspiciously at their cups. Below it, in smaller letters, it typically adds: "No, seriously, trust the process."
 

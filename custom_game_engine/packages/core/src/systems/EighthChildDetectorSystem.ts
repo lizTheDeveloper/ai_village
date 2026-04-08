@@ -167,6 +167,7 @@ export class EighthChildDetectorSystem extends BaseSystem {
         presenceRatio,
         windowTicks: WINDOW_TICKS,
         timestamp: currentTick,
+        activeCategories: Array.from(presenceCategories),
       });
     }
   }

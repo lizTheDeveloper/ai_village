@@ -349,7 +349,7 @@ export const BUILDING_SUMMONING_SPELLS: MagicSpell[] = [
   },
 
   // ========================================================================
-  // Special: Realm Pocket Creation (TARDIS-like)
+  // Special: Realm Pocket Creation (dimensionally folded interior)
   // ========================================================================
   {
     id: 'weave_pocket_realm',

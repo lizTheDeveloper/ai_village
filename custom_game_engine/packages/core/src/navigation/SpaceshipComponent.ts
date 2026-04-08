@@ -8,12 +8,12 @@ export type SpaceshipType =
   | 'worldship'           // Stage 1: Generation ship, cannot navigate β-space
   | 'threshold_ship'      // Stage 2: Small crew, fragile β-navigation
   | 'story_ship'          // Stage 3: Narrative-seeking explorer
-  | 'gleisner_vessel'     // Stage 3: Digital consciousness ship
+  | 'synthetic_vessel'     // Stage 3: Digital consciousness ship
   | 'courier_ship'        // Stage 2: 2-person fast courier
-  | 'svetz_retrieval'     // Stage 3: Temporal archaeology ship
+  | 'chrono_salvage'      // Stage 3: Temporal archaeology ship
   | 'probability_scout'   // Stage 3: Solo explorer mapping unobserved branches
   | 'timeline_merger'     // Stage 3: Collapse compatible probability branches
-  | 'brainship';          // Stage 2: Ship-brain symbiosis (McCaffrey-style)
+  | 'brainship';          // Stage 2: Ship-brain symbiosis
 
 export interface EmotionalSignature {
   emotions: Record<string, number>;  // emotion name -> intensity (0-1)
@@ -247,7 +247,7 @@ function getShipTypeConfig(ship_type: SpaceshipType) {
         preferred_missions: ['narrative_exploration', 'journalism', 'history'],
       };
 
-    case 'gleisner_vessel':
+    case 'synthetic_vessel':
       // Stage 3: Digital consciousness, can edit self for coherence
       return {
         mass: 500,
@@ -261,7 +261,7 @@ function getShipTypeConfig(ship_type: SpaceshipType) {
         preferred_missions: ['data_retrieval', 'hacking', 'infiltration'],
       };
 
-    case 'svetz_retrieval':
+    case 'chrono_salvage':
       // Stage 3: Temporal archaeology, retrieve from extinct timelines
       return {
         mass: 800,

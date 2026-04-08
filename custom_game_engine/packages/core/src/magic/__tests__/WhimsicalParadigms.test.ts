@@ -57,7 +57,7 @@ describe('WhimsicalParadigms', () => {
     });
   });
 
-  describe('TALENT_PARADIGM (Xanth-style)', () => {
+  describe('TALENT_PARADIGM (individual-unique-power tradition)', () => {
     it('should have innate talent source', () => {
       const talentSource = TALENT_PARADIGM.sources.find(s => s.id === 'innate_talent');
       expect(talentSource).toBeDefined();
@@ -85,7 +85,7 @@ describe('WhimsicalParadigms', () => {
     });
   });
 
-  describe('NARRATIVE_PARADIGM (Discworld-style)', () => {
+  describe('NARRATIVE_PARADIGM (ambient and narrative tradition)', () => {
     it('should have narrative weight source', () => {
       const narrativeSource = NARRATIVE_PARADIGM.sources.find(s => s.id === 'narrative_weight');
       expect(narrativeSource).toBeDefined();

@@ -12,6 +12,7 @@
  *   civilization:biome_explored    → biome / explored
  *   agent:born                     → species / encountered (first per species)
  *                                    species / behavior (at count 5+)
+ *   hand:carry                     → species / encountered (player pickup)
  *   exploration:resource_discovered → item / found
  *   exploration:rare_find           → item / found
  *   exploration:stellar_phenomenon_discovered → event / witnessed
@@ -72,9 +73,7 @@ export class LoreDiscoverySystem extends BaseSystem {
     //            → species / behavior     (at count 5+)
     this.unsubscribeFns.push(
       this.events.on('agent:born', (data) => {
-        const entity = this.world.getEntity(data.agentId);
-        const speciesComp = entity?.getComponent<SpeciesComponent>(CT.Species);
-        const speciesId = speciesComp?.speciesId ?? data.agentId;
+        const speciesId = this.resolveSpeciesId(data.agentId);
 
         const previousCount = this.speciesEncounterCounts.get(speciesId) ?? 0;
         const newCount = previousCount + 1;
@@ -87,6 +86,15 @@ export class LoreDiscoverySystem extends BaseSystem {
         if (newCount >= 5 && previousCount < 5) {
           this.emitDiscovery('species', speciesId, 'behavior', null);
         }
+      })
+    );
+
+    // hand:carry → species / encountered
+    // Wire direct player pickup interactions into lore discovery stream.
+    this.unsubscribeFns.push(
+      this.events.on('hand:carry', (data) => {
+        const speciesId = this.resolveSpeciesId(data.agentId);
+        this.emitDiscovery('species', speciesId, 'encountered', 'hand_carry');
       })
     );
 
@@ -140,6 +148,12 @@ export class LoreDiscoverySystem extends BaseSystem {
   // --------------------------------------------------------------------------
   // Helpers
   // --------------------------------------------------------------------------
+
+  private resolveSpeciesId(agentId: string): string {
+    const entity = this.world.getEntity(agentId);
+    const speciesComp = entity?.getComponent<SpeciesComponent>(CT.Species);
+    return speciesComp?.speciesId ?? agentId;
+  }
 
   private emitDiscovery(
     category: string,

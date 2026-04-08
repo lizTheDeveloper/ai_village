@@ -22,7 +22,7 @@ import {
   renderSeparator,
   getTemperatureStateColor,
   getNeedBarColor,
-  renderLockedSection,
+  renderLockedSectionsSummary,
 } from './renderUtils.js';
 
 /** Type guard for ActionQueue component with methods */
@@ -561,6 +561,7 @@ export class InfoSection {
     }
 
     const hasBioTier = this.scannerTier === ScannerTier.BIO || this.scannerTier === ScannerTier.GENOME;
+    const lockedSections: string[] = [];
 
     if (hasBioTier) {
       // Divider
@@ -586,7 +587,7 @@ export class InfoSection {
 
       currentY += 5;
     } else {
-      currentY = renderLockedSection(ctx, 'Needs', x, currentY, padding, lineHeight);
+      lockedSections.push('Needs');
     }
 
     // Inventory section
@@ -617,12 +618,7 @@ export class InfoSection {
         currentY += lineHeight + 5;
       }
     } else {
-      currentY = renderLockedSection(ctx, 'Temperature', x, currentY, padding, lineHeight);
-    }
-
-    // Reproduction section (future BIO feature)
-    if (!hasBioTier) {
-      currentY = renderLockedSection(ctx, 'Reproduction', x, currentY, padding, lineHeight);
+      lockedSections.push('Temperature', 'Reproduction');
     }
 
     // Recent Thought section
@@ -658,22 +654,17 @@ export class InfoSection {
         currentY = renderWrappedText(ctx, `"${agent.recentSpeech}"`, x, currentY, padding, lineHeight, this.panelWidth - padding * 2, 2);
       }
     } else {
-      currentY = renderLockedSection(ctx, 'Neurotransmitters', x, currentY, padding, lineHeight);
+      lockedSections.push('Neurotransmitters');
     }
 
-    // Genome section (future GENOME feature)
+    // Genome-tier locked sections
     if (!hasGenomeTier) {
-      currentY = renderLockedSection(ctx, 'Genome', x, currentY, padding, lineHeight);
+      lockedSections.push('Genome', 'Languages', 'Dreams');
     }
 
-    // Languages section (future GENOME feature)
-    if (!hasGenomeTier) {
-      currentY = renderLockedSection(ctx, 'Languages', x, currentY, padding, lineHeight);
-    }
-
-    // Dreams section (future GENOME feature)
-    if (!hasGenomeTier) {
-      currentY = renderLockedSection(ctx, 'Dreams', x, currentY, padding, lineHeight);
+    // Render compact locked sections summary
+    if (lockedSections.length > 0) {
+      currentY = renderLockedSectionsSummary(ctx, lockedSections, x, currentY, padding, lineHeight);
     }
 
     // Planned Builds section

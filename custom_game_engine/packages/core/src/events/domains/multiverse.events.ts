@@ -419,18 +419,18 @@ export interface MultiverseEvents {
   };
 
   // ========================================================================
-  // Svetz Retrieval Events (Phase 6 Exotic Ships)
+  // Chrono Salvage Events (Phase 6 Exotic Ships)
   // ========================================================================
 
-  /** Svetz ship arrived at target timeline */
-  'multiverse:svetz_arrived': {
+  /** Chrono salvage ship arrived at target timeline */
+  'multiverse:chrono_salvage_arrived': {
     shipId: string;
     targetBranchId: string;
     tick: number;
   };
 
-  /** Svetz ship found target in timeline */
-  'multiverse:svetz_target_found': {
+  /** Chrono salvage ship found target in timeline */
+  'multiverse:chrono_salvage_target_found': {
     shipId: string;
     targetSpec: {
       type: 'item' | 'entity' | 'technology';
@@ -440,15 +440,15 @@ export interface MultiverseEvents {
     tick: number;
   };
 
-  /** Svetz ship search failed */
-  'multiverse:svetz_search_failed': {
+  /** Chrono salvage ship search failed */
+  'multiverse:chrono_salvage_search_failed': {
     shipId: string;
     reason: string;
     tick: number;
   };
 
-  /** Svetz ship retrieved an item */
-  'multiverse:svetz_item_retrieved': {
+  /** Chrono salvage ship retrieved an item */
+  'multiverse:chrono_salvage_item_retrieved': {
     shipId: string;
     itemId: string;
     itemName: string;
@@ -456,23 +456,23 @@ export interface MultiverseEvents {
     tick: number;
   };
 
-  /** Svetz ship retrieval failed */
-  'multiverse:svetz_retrieval_failed': {
+  /** Chrono salvage retrieval failed */
+  'multiverse:chrono_salvage_retrieval_failed': {
     shipId: string;
     reason: string;
     tick: number;
   };
 
-  /** Svetz ship completed anchoring */
-  'multiverse:svetz_anchoring_complete': {
+  /** Chrono salvage ship completed anchoring */
+  'multiverse:chrono_salvage_anchoring_complete': {
     shipId: string;
     itemsAnchored: number;
     totalContamination: number;
     tick: number;
   };
 
-  /** Svetz mission completed */
-  'multiverse:svetz_mission_complete': {
+  /** Chrono salvage mission completed */
+  'multiverse:chrono_salvage_mission_complete': {
     shipId: string;
     success: boolean;
     itemsRetrieved: number;

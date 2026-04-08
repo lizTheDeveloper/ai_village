@@ -12,7 +12,7 @@ export class AnimalInfoPanel implements IWindowPanel {
   private visible: boolean = false;
   private selectedEntityId: string | null = null;
   private panelWidth = 300;
-  private panelHeight = 450;
+  private panelHeight = Math.min(450, Math.max(300, window.innerHeight - 150));
   private padding = 8;
   private lineHeight = 16;
   private scrollOffset = 0;
@@ -38,7 +38,7 @@ export class AnimalInfoPanel implements IWindowPanel {
   }
 
   getDefaultHeight(): number {
-    return 400;
+    return Math.min(450, Math.max(300, window.innerHeight - 150));
   }
 
   isVisible(): boolean {

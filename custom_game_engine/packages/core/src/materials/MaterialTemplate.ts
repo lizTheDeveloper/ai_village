@@ -58,7 +58,7 @@ export type MaterialMagicForm = MagicForm
  * MaterialTemplate defines base properties that items inherit.
  *
  * Example: An iron sword inherits iron's hardness, density, and rust potential.
- * A mithril sword inherits mithril's magic affinity and lighter weight.
+ * A starweave sword inherits starweave's magic affinity and lighter weight.
  */
 export interface MaterialTemplate {
   /** Unique identifier (e.g., "iron", "oak", "leather") */

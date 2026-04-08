@@ -136,7 +136,7 @@ export const FORGE_LARGE: VoxelBuildingDefinition = {
     { type: 'crafting', params: {
       station: 'forge',
       speed: 2.0,
-      recipes: ['iron_ingot', 'copper_ingot', 'steel_ingot', 'mithril_ingot', 'adamantine_ingot', 'iron_sword', 'steel_sword']
+      recipes: ['iron_ingot', 'copper_ingot', 'steel_ingot', 'starweave_ingot', 'adamantine_ingot', 'iron_sword', 'steel_sword']
     }},
     { type: 'storage', params: { capacity: 100, itemTypes: ['ore', 'ingots', 'metal'] } },
   ],

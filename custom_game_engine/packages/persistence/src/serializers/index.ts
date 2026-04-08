@@ -366,7 +366,7 @@ export function registerAllSerializers(): void {
     'construction_project',
     'archaeological_site',
     'probability_scout_mission',
-    'svetz_retrieval_mission',
+    'chrono_salvage_mission',
 
     // --- Automation (Sprint 4+) ---
     'belt',

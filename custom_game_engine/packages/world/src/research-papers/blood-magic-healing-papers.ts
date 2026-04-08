@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -26,7 +26,7 @@ The mechanism by which magical transfusion operates requires the practitioner to
 
 Recovery from blood loss following magical transfusion follows the same temporal constraints as mundane blood donation*******, despite the persistent folk belief that magic somehow "speeds up" the body's production of replacement blood cells†††††††. The standard guideline remains six to eight weeks between donations of whole blood‡‡‡‡‡‡, though the Guild of Life-Givers maintains that proper nutritional support can reduce this to five weeks and three days********. Donors must be screened for both medical and magical contraindications, as the presence of certain enchantments in the donor's bloodstream can transfer to the recipient with unpredictable results††††††††. The famous case of Lord Pemberton, who inadvertently transferred his lycanthropic sensitivity during an emergency transfusion, remains a cornerstone of curricula at the Academy of Applied Hemomancy‡‡‡‡‡‡‡.
 
-The purification aspect of magical transfusion, while invaluable, requires constant vigilance and considerable magical stamina*********. The spell must distinguish between harmful pathogens and beneficial symbiotic organisms, between toxic enchantments and therapeutic ones, between blood components and blood contaminants—all while maintaining the structural integrity of red blood cells, white blood cells, and platelets†††††††††. The Mental Strain Index for a complete transfusion averages 7.3 on the Weatherwax Scale‡‡‡‡‡‡‡‡, roughly equivalent to simultaneously solving differential equations while juggling**********, or approximately 2.4 times the mental effort required to maintain polite conversation at a particularly tedious dinner party***********. Practitioners are therefore advised to work in pairs when possible, with one mage maintaining the bridge and another managing the purification protocols, a arrangement formally known as the "Dual-Practitioner Method"††††††††††† but informally referred to as "not dying of brain fever"‡‡‡‡‡‡‡‡‡.
+The purification aspect of magical transfusion, while invaluable, requires constant vigilance and considerable magical stamina*********. The spell must distinguish between harmful pathogens and beneficial symbiotic organisms, between toxic enchantments and therapeutic ones, between blood components and blood contaminants—all while maintaining the structural integrity of red blood cells, white blood cells, and platelets†††††††††. The Mental Strain Index for a complete transfusion averages 7.3 on the Ashworth Scale‡‡‡‡‡‡‡‡, roughly equivalent to simultaneously solving differential equations while juggling**********, or approximately 2.4 times the mental effort required to maintain polite conversation at a particularly tedious dinner party***********. Practitioners are therefore advised to work in pairs when possible, with one mage maintaining the bridge and another managing the purification protocols, a arrangement formally known as the "Dual-Practitioner Method"††††††††††† but informally referred to as "not dying of brain fever"‡‡‡‡‡‡‡‡‡.
 
 ---
 
@@ -48,11 +48,11 @@ The purification aspect of magical transfusion, while invaluable, requires const
 
 †††The term "crimson bridge" comes from the ancient Akkadian text "The Tablets of Life-Giving," though modern translations suggest the original phrase might have been "the scary red thing between people that we don't really understand but it seems to work so don't question it too hard." Ancient Akkadian is notoriously imprecise about magical terminology.
 
-‡‡‡Professor Millicent Ravenscar of the The Invisible College notes that losing concentration during bridge formation results in what she clinically describes as "a spectacular arterial fountain" and what her patients describe as "OH GODS OH GODS MAKE IT STOP." Her published paper on the subject includes seventeen footnotes that are just the word "don't" repeated.
+‡‡‡Professor Millicent Ravenscar of the Invisible College notes that losing concentration during bridge formation results in what she clinically describes as "a spectacular arterial fountain" and what her patients describe as "OH GODS OH GODS MAKE IT STOP." Her published paper on the subject includes seventeen footnotes that are just the word "don't" repeated.
 
 ****The bridge functions on principles similar to the ancient Golem filtration systems‡, using thaumic resonance to identify and eliminate threats while preserving essential blood components. Think of it as a very sophisticated coffee filter, except the coffee is alive and will sue you if you filter out the wrong bits.
 
-‡The Golem civilization, which flourished briefly in what is now the Sto Plains around 800 BCE, discovered seventeen different applications for magical filtration before discovering the eighteenth one, which filtered out the thing that kept them alive. Archaeological records end there quite abruptly.
+‡The Golem civilization, which flourished briefly in what is now the Ashvale Plains around 800 BCE, discovered seventeen different applications for magical filtration before discovering the eighteenth one, which filtered out the thing that kept them alive. Archaeological records end there quite abruptly.
 
 ††††Parasitic enchantments—commonly known as "hitchhiker hexes"—have a disturbing tendency to hide in blood cells and transfer between hosts during transfusion. The most famous case involved the Curse of Perpetual Hiccups, which spread through six patients before a practitioner noticed and cast the proper Exorcism of Minor Annoyances.
 

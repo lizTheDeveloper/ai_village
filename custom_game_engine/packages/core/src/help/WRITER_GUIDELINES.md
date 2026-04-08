@@ -115,7 +115,7 @@ Or reverse the order. Or skip one entirely. The goal is writing that is:
 
 - Don't be dry and technical unless you're the Cosmic Pragmatist being funny about it
 - Don't explain jokes or wink at the reader
-- Don't break the fourth wall except for cosmic observations
+- Don't break the fourth wall except for cosmic observations — and even then, address the *absence*, not the player (see `akashic-records/lore/cross-game/THE_FOURTH_PERSON.md`)
 - Don't let whimsy obscure critical mechanical information
 - Don't be mean-spirited—satire should illuminate, not mock
 

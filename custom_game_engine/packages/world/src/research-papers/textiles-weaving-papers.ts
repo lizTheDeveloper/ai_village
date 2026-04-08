@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -50,7 +50,7 @@ The importance of thorough preparation cannot be overstated: dirty fleece produc
 
 §Vegetable matter, in this context, means twigs, seeds, burrs, and the occasional thistle that the sheep collected while being sheep. In extreme cases, archaeological evidence suggests entire small shrubs. The record is held by a sheep in New Zealand who apparently ate, partially digested, and re-externalized a young kauri tree. The tree survived. The shearer did not.
 
-††Institutional committee meetings operate on a principle known as "temporal dilation," where one hour of clock time equals approximately seventeen hours of experienced time. The phenomenon was first documented by Douglas Adams in his notes on Vogon bureaucracy, though he failed to recognize that he was describing every committee meeting ever held.
+††Institutional committee meetings operate on a principle known as "temporal dilation," where one hour of clock time equals approximately seventeen hours of experienced time. The phenomenon was first documented by the Thornhaven Institute of Bureaucratic Studies in their notes on interstellar committee protocol, though they failed to recognize that they were describing every committee meeting ever held.
 
 †††Cotton must be washed with enthusiasm bordering on violence. This is the only context in which violence toward fiber is encouraged. All others are strictly forbidden by the Treaty of the Soft Hands (1623).
 
@@ -109,7 +109,7 @@ The relationship between twist and strength follows mathematical principles that
 
 †The spider-goddess Arachne-Tekht of the Ephesian Mysteries, who according to myth spun the first thread from moonlight and regret. According to less mythological sources, she spun it from sheep's wool like everyone else, but "sheep's wool and regret" doesn't scan properly in epic hexameter. ††The traditional hymns to Arachne-Tekht take forty-five minutes to sing and mostly consist of variations on "please don't let me drop the spindle again." They are surprisingly effective.
 
-**Though they try. The Annual Report of the The Invisible College's Department of Applied Thaumatology notes seventeen separate incidents in which chaos-touched spinning resulted in thread that: spun itself, unspun other thread nearby, attempted to strangle its creator (twice), achieved sentience (once, briefly), and somehow produced finished embroidery despite being unplied singles. That last one they're still investigating.
+**Though they try. The Annual Report of the Invisible College's Department of Applied Thaumatology notes seventeen separate incidents in which chaos-touched spinning resulted in thread that: spun itself, unspun other thread nearby, attempted to strangle its creator (twice), achieved sentience (once, briefly), and somehow produced finished embroidery despite being unplied singles. That last one they're still investigating.
 
 ***The minimum number of fibers required for structural integrity, according to Dr. Wilhelmina Threadbare's seminal paper "On the Mathematics of Textile Coherence," is "enough that you stop worrying about it."
 
@@ -162,7 +162,7 @@ The operation of a completed loom requires a meditative state wherein the weaver
 
 ††Statistics maintained by the International Bureau of Textile Mishaps, located in a surprisingly unstable building in Brussels. The Bureau employs 247 full-time statisticians, none of whom can weave but all of whom can describe exactly how weaving goes wrong.
 
-†††In Moersian terms, this represents humanity's defeat of the dreaded Flat-Cloth Demons of Lower Threadylvania‡‡, mythological entities that supposedly kept all cloth two-dimensional until the invention of the heddle.
+†††In Mortecaian terms, this represents humanity's defeat of the dreaded Flat-Cloth Demons of Lower Threadylvania‡‡, mythological entities that supposedly kept all cloth two-dimensional until the invention of the heddle.
 
 ‡‡These demons, according to the Threadvalian Chronicles, were defeated by the legendary weaver Yarnhilde the Perpendicular, who supposedly wove a cloth so three-dimensional it achieved consciousness and walked away. The story is almost certainly fabricated, though several museums claim to possess "Yarnhilde's Walking Tapestry" in their storage vaults.
 
@@ -188,7 +188,7 @@ The operation of a completed loom requires a meditative state wherein the weaver
 
 ******"Absolutely uniform" here means within 0.5 grams variance across a beam that may be two meters wide and hold 500+ individual threads, a requirement that has driven more than one apprentice to question their life choices.
 
-†††††††These goddesses include Athena (Greek), Frigg (Norse), Neith (Egyptian), Spider Grandmother (Navajo), and the relatively obscure Tantius Flaxbender (Moersian), patron deity of threads that behave badly‡‡‡‡‡‡.
+†††††††These goddesses include Athena (Greek), Frigg (Norse), Neith (Egyptian), Spider Grandmother (Navajo), and the relatively obscure Tantius Flaxbender (Mortecaian), patron deity of threads that behave badly‡‡‡‡‡‡.
 
 ‡‡‡‡‡‡Tantius Flaxbender, according to The Grand Compendium of Threadological Deities, was originally a mortal weaver whose loom became so tangled that the gods,`,
   abstract: 'Research paper on Building and operating a loom for weaving cloth',

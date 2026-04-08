@@ -1,7 +1,7 @@
 /**
  * RainbowPlanetComponent - Quantum superposition of planetary histories
  *
- * Based on Larry Niven's "Rainbow Mars" concept:
+ * Quantum superposition of planetary histories:
  * - Planets exist in multiple simultaneous pasts
  * - Which history you observe depends on your β-branch
  * - Mars can be red, green, blue, or all at once (superposition)
@@ -276,7 +276,7 @@ export function createRainbowPlanet(
 
 /**
  * Collapse a planet's superposition to a specific history
- * (Like Svetz observing Mars and collapsing it to a specific past)
+ * (Temporal archaeology: observing a planet collapses it to a specific past)
  */
 export function collapsePlanetHistory(
   planet: RainbowPlanetComponent,

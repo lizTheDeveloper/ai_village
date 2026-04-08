@@ -178,6 +178,18 @@ export interface BuildingEvents {
     y: number;
     tick: number;
   };
+  'door:rune_blocked': {
+    x: number;
+    y: number;
+    rune: string;
+    reason?: string;
+  };
+
+  // === Rune Events ===
+  'rune:comprehended': {
+    rune: string;
+    level: number;
+  };
 
   // === Housing Events ===
   'housing:dirty': {

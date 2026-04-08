@@ -316,8 +316,8 @@ export class BuildingRenderer {
     // Realm pocket indicator
     if (realmPocket) {
       const ratio = `${realmPocket.exteriorSize.width}x${realmPocket.exteriorSize.height}→${realmPocket.interiorDimensions.width}x${realmPocket.interiorDimensions.height}`;
-      label = `TARDIS [${ratio}]`;
-      color = '#0088FF'; // Blue for TARDIS
+      label = `Realm Pocket [${ratio}]`;
+      color = '#0088FF'; // Blue for realm pocket
     }
 
     if (label) {

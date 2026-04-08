@@ -46,10 +46,10 @@ describe('SpaceshipComponent', () => {
       expect(ship.narrative.significant_events).toHaveLength(0);
     });
 
-    it('creates a gleisner_vessel with correct properties', () => {
-      const ship = createSpaceshipComponent('gleisner_vessel', 'Digital Ship');
+    it('creates a synthetic_vessel with correct properties', () => {
+      const ship = createSpaceshipComponent('synthetic_vessel', 'Digital Ship');
 
-      expect(ship.ship_type).toBe('gleisner_vessel');
+      expect(ship.ship_type).toBe('synthetic_vessel');
       expect(ship.navigation.can_navigate_beta_space).toBe(true);
       expect(ship.components.emotion_theater_ids).toHaveLength(0);
       expect(ship.components.vr_system_ids).toHaveLength(0);
@@ -140,7 +140,7 @@ describe('SpaceshipComponent', () => {
     const navigableShipTypes: SpaceshipType[] = [
       'threshold_ship',
       'story_ship',
-      'gleisner_vessel',
+      'synthetic_vessel',
     ];
 
     navigableShipTypes.forEach((shipType) => {

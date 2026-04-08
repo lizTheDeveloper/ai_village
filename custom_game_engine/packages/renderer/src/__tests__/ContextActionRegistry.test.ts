@@ -242,6 +242,27 @@ describe('ContextActionRegistry', () => {
       expect(executeFn).toHaveBeenCalledWith(mockContext, world, eventBus);
     });
 
+    it('should emit hand:carry when executing hand carry action', () => {
+      const handCarryHandler = vi.fn();
+      eventBus.subscribe('hand:carry', handCarryHandler);
+
+      const mockContext = {
+        targetType: 'agent',
+        targetEntity: 'agent-123',
+      } as MenuContext;
+
+      registry.execute('hand_carry', mockContext);
+      eventBus.flush();
+
+      expect(handCarryHandler).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'hand:carry',
+          source: 'ui:contextmenu',
+          data: { agentId: 'agent-123' },
+        })
+      );
+    });
+
     it('should emit action_executed event on success', () => {
       const handler = vi.fn();
       eventBus.subscribe('ui:contextmenu:action_executed', handler);

@@ -387,7 +387,7 @@ const RULE_BENDING_NODE = createSkillNode(
   ],
   {
     description: 'Learn to bend rules without breaking them',
-    lore: `Rules can flex. Push them to their limits without snapping them.
+    lore: `Rules can flex. Push them to their limits without the_crucible them.
 Walk the line between fair and foul. The letter of the law,
 not the spirit. But bend too far and they break - taking you with them.`,
     prerequisites: ['rule-creation', 'loophole-finder'],

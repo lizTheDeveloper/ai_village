@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -156,7 +156,7 @@ The most common failure mode in early iron production was excessive carbon absor
 
 †No, the phase of the moon doesn't actually affect iron smelting. But try telling that to three generations of ironworkers who swear it does. The empirical method struggles when practitioners refuse to conduct experiments during the "wrong" moon phase.
 
-††This happened at the Forge of Broken Dreams in Pseudopolis, 1,389. The resulting iron was technically sound but smelled faintly of mint for reasons no one could explain. The batch was sold at a discount to a merchant who marketed it as "enchanted hygienic iron" and made a fortune.
+††This happened at the Forge of Broken Dreams in Clockhaven, 1,389. The resulting iron was technically sound but smelled faintly of mint for reasons no one could explain. The batch was sold at a discount to a merchant who marketed it as "enchanted hygienic iron" and made a fortune.
 
 †††The priest blessed a rival forge and cursed theirs. Or possibly it was the other way around. Either way, the iron from that week kept trying to point north, which is only useful if you're making compasses, which they weren't.
 
@@ -172,7 +172,7 @@ The most common failure mode in early iron production was excessive carbon absor
 
 †"Angry dirt" is not a recognized mineralogical term, but the assayer stood by his description. When questioned, he explained that the dirt had "a hostile aspect" and "seemed resentful about the testing process." He was later found to have been inhaling furnace fumes without proper ventilation, which explained several things.
 
-†††The word "slag" has been in use for so long that no one remembers why it's called that. The Etymological Society of Quirm has three competing theories, none of which are printable in polite company. The slag itself doesn't care what it's called; it remains stubbornly determined to contaminate perfectly good iron if given the slightest opportunity††.
+†††The word "slag" has been in use for so long that no one remembers why it's called that. The Etymological Society of Vintara has three competing theories, none of which are printable in polite company. The slag itself doesn't care what it's called; it remains stubbornly determined to contaminate perfectly good iron if given the slightest opportunity††.
 
 ††In 1,156, a forge master in Sto Lat decided that slag separation was "probably optional" and could be skipped to save time. The resulting iron was 40% slag by weight and could be used for absolutely nothing except possibly ballast, if one needed ballast that crumbled when looked at firmly. The forge master's name is preserved in metallurgical textbooks as a cautionary tale, specifically in the chapter titled "Why We Have Procedures."
 
@@ -180,7 +180,7 @@ The most common failure mode in early iron production was excessive carbon absor
 
 ‡‡The Guild of Metallurgists officially denies that any metallurgical process involves divination. The Guild of Diviners maintains detailed records of metallurgists consulting them. Both Guilds agree that whatever happens in the forge stays in the forge, especially if it involves interpreting patterns in slag formation.
 
-†††The Incident of 1,203 is never discussed directly, but the reason all forge apprentices must now take a course in "protective circles and their proper application" can be traced back to a forge in Genua where someone got creative with flux mixtures. Whatever emerged from the crucible that day was described as "geometrically unlikely" and "aggressively hot." It was eventually persuaded to depart through the roof using a method that the witnesses agreed to classify as "experimental metallurgy" rather than anything else.
+†††The Incident of 1,203 is never discussed directly, but the reason all forge apprentices must now take a course in "protective circles and their proper application" can be traced back to a forge in Cerenza where someone got creative with flux mixtures. Whatever emerged from the crucible that day was described as "geometrically unlikely" and "aggressively hot." It was eventually persuaded to depart through the roof using a method that the witnesses agreed to classify as "experimental metallurgy" rather than anything else.
 
 ****The actual`,
   abstract: 'Research paper on The chemical process of extracting iron from ore using heat and carbon',

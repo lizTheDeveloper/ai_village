@@ -353,7 +353,7 @@ export type MagicRiskTrigger =
   | 'entity_encounter' // Encountered powerful entity
   | 'death'            // Died (in dream, etc.)
   | 'separation'       // Separated from animus/soul
-  | 'rift_edge'     // Used the subtle knife
+  | 'rift_edge'     // Used the Rift Edge
   | 'severance'        // Animus/soul bond was severed
   | 'imprecision'      // Carved runes imprecisely
   | 'bindrune_failure' // Complex bindrune failed

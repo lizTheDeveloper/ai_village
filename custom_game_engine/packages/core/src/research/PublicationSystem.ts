@@ -284,7 +284,7 @@ export interface ChroniclePublication extends Publication {
 // ============================================================================
 
 /**
- * Recipe title templates by tech level (Pratchett/Adams/Gaiman style)
+ * Recipe title templates by tech level (satirical style)
  */
 const RECIPE_TITLE_TEMPLATES: Record<WritingTechLevel, string[]> = {
   [WritingTechLevel.OralTradition]: [

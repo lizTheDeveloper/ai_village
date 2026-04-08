@@ -15,10 +15,10 @@ import {
   generateRuneSource,
 
   // Animist paradigms
-  generateAllomancySource,
+  generateFerromancySource,
   generateShintoSource,
-  generateSympathySource,
-  generateDaemonSource,
+  generateTethermancySource,
+  generateAnimusSource,
   generateDreamSource,
   generateSongSource,
 
@@ -288,8 +288,8 @@ describe('MagicSourceGenerator', () => {
   });
 
   describe('Animist Paradigms', () => {
-    it('should generate allomancy source (material-based, no pool)', () => {
-      const { source, pool } = generateAllomancySource(1);
+    it('should generate ferromancy source (material-based, no pool)', () => {
+      const { source, pool } = generateFerromancySource(1);
 
       expect(source.name).toBe('Metal Reserves');
       expect(source.type).toBe('material');
@@ -310,17 +310,17 @@ describe('MagicSourceGenerator', () => {
       expect(pool!.regenRate).toBeGreaterThan(0); // Has enhanced regen
     });
 
-    it('should generate sympathy source (alar)', () => {
-      const { source, pool } = generateSympathySource(1);
+    it('should generate tethermancy source (attunement)', () => {
+      const { source, pool } = generateTethermancySource(1);
 
-      expect(source.name).toBe('Alar');
+      expect(source.name).toBe('Attunement');
       expect(source.type).toBe('internal');
       expect(source.detectability).toBe('undetectable');
       expect(source.transferable).toBe(false);
     });
 
-    it('should generate daemon source (soul bond)', () => {
-      const { source, pool } = generateDaemonSource(1);
+    it('should generate animus source (soul bond)', () => {
+      const { source, pool } = generateAnimusSource(1);
 
       expect(source.name).toBe('Soul Bond');
       expect(source.type).toBe('internal');

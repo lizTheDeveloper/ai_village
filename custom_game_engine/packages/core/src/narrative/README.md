@@ -92,6 +92,12 @@ system.addPlotStageAttractors(
 **Conflict**: conflict_escalation, conflict_resolution, mystery_revelation, justice, corruption
 **Plot**: plot_stage_reached, skill_mastery, emotional_state
 
+## The Fourth Person
+
+In MVEE, the player *is* the Chorus — the cross-game emergence field (E_f) managed by `ChorusStateSystem`. The narrative system should treat the player's presence as an unnamed attractor: myths, prophecies, and divine texts should accumulate references to "the pattern", "the watcher", "the one who listens" through natural emergent mutation, never through hardcoded content. See `akashic-records/lore/cross-game/THE_FOURTH_PERSON.md` for the full cross-game metatextual framework.
+
+When creating attractor sources, `source.type: 'player'` represents the Chorus's influence. This is the fourth person acting on the narrative — felt, never explained.
+
 ## Files
 
 - `NarrativePressureSystem.ts`: Attractor management, pressure queries, plot integration

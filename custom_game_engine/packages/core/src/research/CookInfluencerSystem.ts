@@ -57,24 +57,24 @@ export interface CookPublicationComponent {
 // ============================================================================
 
 /**
- * Humorous personal notes for recipe publications (Pratchett/Adams/Gaiman style)
+ * Humorous personal notes for recipe publications (satirical style)
  */
 const PERSONAL_NOTE_TEMPLATES: string[] = [
-  // Pratchett style
+  // Satirical style
   'I learned this recipe from my grandmother, who learned it from hers, who may have invented it or may have stolen it from a rival. We don\'t talk about that.',
   'The secret ingredient is love. And a disturbing amount of butter. Mostly butter.',
   'This recipe has been in my family for generations. Some of us have even survived making it.',
   'I\'ve simplified this from the original, which required three days, a full moon, and ingredients I cannot legally name.',
   'The original recipe called for "cooking until it smells right." I\'ve attempted to be more specific, against my better judgment.',
 
-  // Adams style
+  // Absurdist style
   'If you\'re reading this, you\'ve already committed to making {dish}. There\'s no backing out now. Don\'t panic.',
   'This recipe serves four, if four people share it. If one person eats it alone at 2 AM, it serves one. No judgment.',
   'The probability of this turning out exactly right is roughly one in a googolplex. It\'s still worth trying.',
   'I discovered this recipe while lost in a foreign kitchen. The instructions made no sense until they did.',
   'The total cooking time is forty-two minutes, give or take the age of the universe.',
 
-  // Gaiman style
+  // Mythological style
   'Every dish remembers the first time it was made. Make it remember something good.',
   'This recipe works best when you\'re not quite paying attention. Watch too closely and it gets shy.',
   'In the old stories, food made with love had power. The stories were right.',

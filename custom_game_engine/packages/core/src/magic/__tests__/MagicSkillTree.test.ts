@@ -136,7 +136,7 @@ describe('MagicSkillTree Core Types', () => {
     });
 
     it('accepts custom tree version', () => {
-      const progress = createMagicSkillProgress('allomancy', 3);
+      const progress = createMagicSkillProgress('ferromancy', 3);
       expect(progress.treeVersion).toBe(3);
     });
   });
@@ -170,17 +170,17 @@ describe('MagicSkillTree Core Types', () => {
   describe('createSkillNode', () => {
     it('creates a node with defaults', () => {
       const node = createSkillNode(
-        'basic-alar',
-        'Basic Alar',
-        'sympathy',
+        'basic-attunement',
+        'Basic Attunement',
+        'tethermancy',
         'foundation',
         0,
         100,
-        [createSkillEffect('alar_strength', 1)]
+        [createSkillEffect('attunement_strength', 1)]
       );
-      expect(node.id).toBe('basic-alar');
-      expect(node.name).toBe('Basic Alar');
-      expect(node.paradigmId).toBe('sympathy');
+      expect(node.id).toBe('basic-attunement');
+      expect(node.name).toBe('Basic Attunement');
+      expect(node.paradigmId).toBe('tethermancy');
       expect(node.category).toBe('foundation');
       expect(node.tier).toBe(0);
       expect(node.xpCost).toBe(100);
@@ -397,11 +397,11 @@ describe('MagicSkillTreeEvaluator', () => {
       it('returns met when prerequisite node is unlocked', () => {
         const condition = createUnlockCondition(
           'node_unlocked',
-          { nodeId: 'basic-alar' },
-          'Requires Basic Alar'
+          { nodeId: 'basic-attunement' },
+          'Requires Basic Attunement'
         );
         const progress = createMagicSkillProgress('test');
-        progress.unlockedNodes['basic-alar'] = 1;
+        progress.unlockedNodes['basic-attunement'] = 1;
         const context = createTestContext(progress);
         const result = evaluateCondition(condition, context);
         expect(result.met).toBe(true);
@@ -410,8 +410,8 @@ describe('MagicSkillTreeEvaluator', () => {
       it('returns not met when prerequisite is not unlocked', () => {
         const condition = createUnlockCondition(
           'node_unlocked',
-          { nodeId: 'basic-alar' },
-          'Requires Basic Alar'
+          { nodeId: 'basic-attunement' },
+          'Requires Basic Attunement'
         );
         const context = createTestContext(createMagicSkillProgress('test'));
         const result = evaluateCondition(condition, context);
@@ -423,11 +423,11 @@ describe('MagicSkillTreeEvaluator', () => {
       it('returns met when agent has bloodline', () => {
         const condition = createUnlockCondition(
           'bloodline',
-          { bloodlineId: 'mistborn', bloodlineStrength: 0.5 },
-          'Requires Mistborn bloodline'
+          { bloodlineId: 'omni_resonant', bloodlineStrength: 0.5 },
+          'Requires OmniResonant bloodline'
         );
         const context = createTestContext(createMagicSkillProgress('test'), {
-          custom: { bloodlines: { mistborn: 1.0 } },
+          custom: { bloodlines: { omni_resonant: 1.0 } },
         });
         const result = evaluateCondition(condition, context);
         expect(result.met).toBe(true);
@@ -437,11 +437,11 @@ describe('MagicSkillTreeEvaluator', () => {
       it('returns not met when bloodline is too weak', () => {
         const condition = createUnlockCondition(
           'bloodline',
-          { bloodlineId: 'mistborn', bloodlineStrength: 1.0 },
-          'Requires full Mistborn bloodline'
+          { bloodlineId: 'omni_resonant', bloodlineStrength: 1.0 },
+          'Requires full OmniResonant bloodline'
         );
         const context = createTestContext(createMagicSkillProgress('test'), {
-          custom: { bloodlines: { mistborn: 0.3 } },
+          custom: { bloodlines: { omni_resonant: 0.3 } },
         });
         const result = evaluateCondition(condition, context);
         expect(result.met).toBe(false);
@@ -639,8 +639,8 @@ describe('MagicSkillTreeEvaluator', () => {
           ...createDefaultTreeRules(true),
           innateCondition: createUnlockCondition(
             'bloodline',
-            { bloodlineId: 'mistborn' },
-            'Must be Mistborn'
+            { bloodlineId: 'omni_resonant' },
+            'Must be OmniResonant'
           ),
         },
       });
@@ -708,9 +708,9 @@ describe('MagicSkillTreeRegistry', () => {
   describe('lookup', () => {
     it('getTree returns registered tree', () => {
       const registry = getSkillTreeRegistry();
-      const tree = createTestTree([createTestNode('node')], { paradigmId: 'sympathy' });
+      const tree = createTestTree([createTestNode('node')], { paradigmId: 'tethermancy' });
       registry.register(tree);
-      expect(registry.getTree('sympathy')).toBe(tree);
+      expect(registry.getTree('tethermancy')).toBe(tree);
     });
 
     it('getTreeOrThrow throws for unknown paradigm', () => {

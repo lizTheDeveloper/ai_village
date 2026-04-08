@@ -177,7 +177,7 @@ red_mars_observation
 #### 10. Planetary Archaeology (9 of 14 papers)
 **Mandatory**: `timeline_archaeology`, `extinct_civilization_observation`
 **Unlocks**:
-- 🚢 Building: `svetz_retrieval_ship` (Stage 3: Temporal archaeology)
+- 🚢 Building: `chrono_salvage_ship` (Stage 3: Temporal archaeology)
 - ⚡ Ability: `retrieve_from_extinct_timelines`
 
 #### 11. Controlled Collapse (12 of 14 papers)
@@ -198,7 +198,7 @@ red_mars_observation
 ```
 extinct_branch_detection *mandatory
 temporal_retrieval_theory *mandatory
-svetz_protocols *mandatory
+chrono_salvage_protocols *mandatory
 entity_extraction *mandatory
 timeline_contamination_risks *mandatory
 preservation_techniques
@@ -218,10 +218,10 @@ contamination_quarantine *mandatory
 - 🏢 Building: `temporal_archive`
 - ⚡ Ability: `detect_extinct_branches`
 
-#### 13. Svetz Operations (7 of 12 papers)
-**Mandatory**: `svetz_protocols`, `entity_extraction`
+#### 13. Chrono Salvage Operations (7 of 12 papers)
+**Mandatory**: `chrono_salvage_protocols`, `entity_extraction`
 **Unlocks**:
-- 🚢 Building: `svetz_retrieval_ship` (Stage 3: Retrieve from extinct timelines)
+- 🚢 Building: `chrono_salvage_ship` (Stage 3: Retrieve from extinct timelines)
 - ⚡ Ability: `retrieve_extinct_entities`
 
 #### 14. Contamination Management (10 of 12 papers)
@@ -289,7 +289,7 @@ stage_three_transition *mandatory
 consciousness_mapping *mandatory
 neural_pattern_extraction *mandatory
 digital_substrate_design
-gleisner_architecture *mandatory
+synthetic_architecture *mandatory
 consciousness_verification
 digital_coherence_advantages *mandatory
 self_editing_protocols
@@ -307,10 +307,10 @@ substrate_independence *mandatory
 - 🏢 Building: `upload_facility`
 - ⚡ Ability: `upload_consciousness`
 
-#### 19. Gleisner Vessels (7 of 11 papers)
-**Mandatory**: `gleisner_architecture`, `digital_coherence_advantages`
+#### 19. Synthetic Vessels (7 of 11 papers)
+**Mandatory**: `synthetic_architecture`, `digital_coherence_advantages`
 **Unlocks**:
-- 🚢 Building: `gleisner_vessel` (Stage 3: Digital consciousness, 0.8 observation precision)
+- 🚢 Building: `synthetic_vessel` (Stage 3: Digital consciousness, 0.8 observation precision)
 - ⚡ Ability: `digital_beta_navigation`
 
 #### 20. Digital Transcendence (10 of 11 papers)
@@ -340,10 +340,10 @@ Stage 2 Advanced:
 └─ Detect Rainbow Planets
    ↓
 Stage 3 (Multi-Temporal):
-├─ Planetary Archaeology → svetz_retrieval_ship
-├─ Basic Temporal Retrieval → Svetz Operations
+├─ Planetary Archaeology → chrono_salvage_ship
+├─ Basic Temporal Retrieval → Chrono Salvage Operations
 ├─ Probability Scouting → probability_scout
-├─ Consciousness Upload → Gleisner Vessels
+├─ Consciousness Upload → Synthetic Vessels
 └─ Controlled Collapse
    ↓
 Stage 3 Advanced:
@@ -367,8 +367,8 @@ Stage 4 (Post-Temporal):
 | `courier_ship` | 2 | Basic Beta Navigation | 0.9 | 0.3 |
 | `brainship` | 2 | Brainship Construction | 1.0 | 0.5 |
 | `story_ship` | 3 | Advanced Beta Navigation | 0.8 | 0.7 |
-| `gleisner_vessel` | 3 | Gleisner Vessels | 0.85 | 0.8 |
-| `svetz_retrieval` | 3 | Svetz Operations | 0.75 | 0.75 |
+| `synthetic_vessel` | 3 | Synthetic Vessels | 0.85 | 0.8 |
+| `chrono_salvage` | 3 | Chrono Salvage Operations | 0.75 | 0.75 |
 | `probability_scout` | 3 | Probability Scouting | 1.0 | 0.9 |
 | `timeline_merger` | 3 | Timeline Merger | 0.6 | 0.85 |
 
@@ -420,7 +420,7 @@ Stage 4 (Post-Temporal):
 
 ### Late Game (Stage 3):
 1. Begin `rainbow_planet_discovery` and `temporal_archaeology`
-2. Get Planetary Archaeology (9 papers) → svetz_retrieval_ship
+2. Get Planetary Archaeology (9 papers) → chrono_salvage_ship
 3. Start `timeline_engineering` and `digital_consciousness` sets
 4. Get Probability Scouting (5 papers) → probability_scout (best solo ship)
 5. Work toward Stage Three Awareness (12 papers) → reality manipulation
@@ -473,4 +473,4 @@ Stage 4 (Post-Temporal):
 
 **Generated**: 2026-01-03
 **Author**: Rainbow Mars Research Division
-**Based on**: Larry Niven's "Rainbow Mars" (1999)
+**Based on**: Temporal archaeology + multiverse probability mechanics

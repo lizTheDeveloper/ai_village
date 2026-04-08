@@ -248,20 +248,20 @@ export type {
   Kami,
   PurityState,
   PollutionSource,
-  SympatheticLink,
-  AllomanticMetal,
-  Daemon,
+  ResonantTether,
+  FerromancyMetal,
+  Animus,
 } from './AnimistParadigms.js';
 
 export {
   // Paradigms
   SHINTO_PARADIGM,
-  SYMPATHY_PARADIGM,
-  ALLOMANCY_PARADIGM,
+  TETHERMANCY_PARADIGM,
+  FERROMANCY_PARADIGM,
   DREAM_PARADIGM,
   SONG_PARADIGM,
   RUNE_PARADIGM,
-  DAEMON_PARADIGM,
+  ANIMUS_PARADIGM,
 
   // Registry
   ANIMIST_PARADIGM_REGISTRY,
@@ -272,9 +272,9 @@ export {
   getKamiTypes,
   getKamiByType,
 
-  // Allomancy helpers
-  ALLOMANTIC_METALS,
-  getAllomanticMetals,
+  // Ferromancy helpers
+  FERROMANCY_METALS,
+  getFerromancyMetals,
   getMetalsByType,
 } from './AnimistParadigms.js';
 
@@ -376,10 +376,10 @@ export {
   getAllSkillTrees,
 
   // Tree exports for backward compatibility
-  ALLOMANCY_SKILL_TREE,
+  FERROMANCY_SKILL_TREE,
   SHINTO_SKILL_TREE,
-  SYMPATHY_SKILL_TREE,
-  DAEMON_SKILL_TREE,
+  TETHERMANCY_SKILL_TREE,
+  ANIMUS_SKILL_TREE,
   DREAM_SKILL_TREE,
   SONG_SKILL_TREE,
   NAME_SKILL_TREE,
@@ -407,11 +407,11 @@ export {
 // Paradigm-Specific Helpers (still from original files)
 // ============================================================================
 
-// Allomancy (Mistborn-inspired)
+// Ferromancy (OmniResonant-inspired)
 export {
-  getMistingMetals,
+  getMonoResonantMetals,
   isMetalAvailable,
-} from './skillTrees/AllomancySkillTree.js';
+} from './skillTrees/FerromancySkillTree.js';
 
 // Shinto (Kami relationships)
 export {
@@ -419,26 +419,26 @@ export {
   isPuritySufficient,
 } from './skillTrees/ShintoSkillTree.js';
 
-// Sympathy (Name of the Wind inspired)
+// Tethermancy (Chorus of Resonance inspired)
 export {
   LINK_TYPES,
   BINDING_PRINCIPLES,
   calculateLinkEfficiency,
   getMaxBindings,
-  calculateSlippage,
-} from './skillTrees/SympathySkillTree.js';
+  calculateDrift,
+} from './skillTrees/TethermancySkillTree.js';
 
-// Daemon (His Dark Materials inspired)
+// Animus (spirit-bond inspired)
 export {
-  DAEMON_FORM_CATEGORIES,
-  DUST_INTERACTIONS,
+  ANIMUS_FORM_CATEGORIES,
+  AETHER_MOTE_INTERACTIONS,
   getFormBonuses,
   isFormInCategory,
   getFormCategory,
   getSeparationDistance,
   canSeparate,
   hasSettled,
-} from './skillTrees/DaemonSkillTree.js';
+} from './skillTrees/AnimusSkillTree.js';
 
 // Dream (Lucid dreaming, oneiromancy)
 export {
@@ -476,14 +476,14 @@ export {
   hasMasterNaming,
 } from './skillTrees/NameSkillTree.js';
 
-// Breath (Warbreaker-inspired Awakening)
+// Breath (Pneumantic Investing)
 export {
-  HEIGHTENINGS,
+  PNEUMANTIC_TIERS,
   AWAKENING_TYPES,
   COMMAND_CATEGORIES,
   BREATH_SOURCES,
-  getCurrentHeightening,
-  getHeighteningAbilities,
+  getCurrentPneumanticTier,
+  getPneumanticTierAbilities,
   calculateAwakeningCost,
   canPerformAwakening,
   getMaxCommandComplexity,
@@ -748,10 +748,10 @@ export {
   generateRuneSource,
 
   // Paradigm-specific generators - Animist paradigms
-  generateAllomancySource,
+  generateFerromancySource,
   generateShintoSource,
-  generateSympathySource,
-  generateDaemonSource,
+  generateTethermancySource,
+  generateAnimusSource,
   generateDreamSource,
   generateSongSource,
 

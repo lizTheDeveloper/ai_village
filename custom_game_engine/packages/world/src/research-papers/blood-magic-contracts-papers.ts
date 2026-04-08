@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -149,7 +149,7 @@ export const BLOOD_CURSE_CASTING: ResearchPaper = {
 
 ---
 
-The establishment of a blood curse represents one of the most binding* and consequently hazardous† forms of malevolent magic known to modern thaumaturgical practice. Unlike simpler hexes or jinxes, which dissipate with time like morning dew or undergraduate enthusiasm‡, a properly constructed blood curse anchors itself to the victim's very essence through the sympathetic resonance of their vital fluid. The Council of Ethical Arcanists has, since the Incident of 1823**, maintained that blood curse casting should be restricted to those who have completed at least seven years of study††, passed the Advanced Karmic Mathematics examination‡‡, and can provide three character references from practicing wizards who are not currently serving time in any thaumaturgical correctional facility***. However, as Professor Earnest Wickwiddle of the The Invisible College noted in his seminal work "Why Everything We Know Is Wrong And Also On Fire," the definition of "ethical" has varied considerably throughout history†††, particularly in regions where blood magic was considered a legitimate form of dispute resolution‡‡‡.
+The establishment of a blood curse represents one of the most binding* and consequently hazardous† forms of malevolent magic known to modern thaumaturgical practice. Unlike simpler hexes or jinxes, which dissipate with time like morning dew or undergraduate enthusiasm‡, a properly constructed blood curse anchors itself to the victim's very essence through the sympathetic resonance of their vital fluid. The Council of Ethical Arcanists has, since the Incident of 1823**, maintained that blood curse casting should be restricted to those who have completed at least seven years of study††, passed the Advanced Karmic Mathematics examination‡‡, and can provide three character references from practicing wizards who are not currently serving time in any thaumaturgical correctional facility***. However, as Professor Earnest Wickwiddle of the Invisible College noted in his seminal work "Why Everything We Know Is Wrong And Also On Fire," the definition of "ethical" has varied considerably throughout history†††, particularly in regions where blood magic was considered a legitimate form of dispute resolution‡‡‡.
 
 The fundamental requirement for blood curse establishment involves obtaining a sample of the target's blood****, or in cases where direct access proves difficult, blood from a close bloodline member†††† - preferably within three degrees of consanguinity, though the desperate have attempted it with more distant relatives‡‡‡‡. The blood acts as a metaphysical anchor, a thread connecting curse to cursed across distances both spatial and temporal*****. The precision required in the ritual cannot be overstated; the Gormenghast Institute for Advanced Wickedness maintains detailed records of 1,247 cases where improper blood preparation resulted in the curse affecting the caster instead of the intended target†††††, and a further 892 cases where it affected random bystanders within a three-mile radius‡‡‡‡‡. The curse's persistence is its defining characteristic - these bindings endure until their specific conditions are met, whether that be "until the seventh son of a seventh son performs the Dance of Propitiation at midnight on the winter solstice" or the more straightforward "until you apologize for eating my sandwich"******.
 
@@ -169,7 +169,7 @@ The breaking of blood curses requires specific countermeasures that vary dependi
 
 \*\* The Incident of 1823 involved the entire village of Lesser Slaughtering deciding simultaneously to curse each other over a dispute about cheese. The resulting thaumaturgical cascade is why that part of the country now glows faintly purple on moonless nights and why the cows there speak in riddles.
 
-†† Though as Professor Havelock Vetinari the Elder noted, "seven years" is flexible depending on whether one counts actual study or merely "being enrolled while engaging in other activities"†, such as drinking, practicing forbidden magic in dormitory rooms, or organizing elaborate pranks that violate the Third and Seventh Accords.
+†† Though as Professor Haldren Thorne the Elder noted, "seven years" is flexible depending on whether one counts actual study or merely "being enrolled while engaging in other activities"†, such as drinking, practicing forbidden magic in dormitory rooms, or organizing elaborate pranks that violate the Third and Seventh Accords.
 
 † The University of Krull attempted to formalize this distinction in 1756 but gave up when it became clear that approximately 89.7% of enrolled students fell into the latter category. They still charged full tuition.
 

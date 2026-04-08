@@ -311,14 +311,14 @@ function detectMindControl(paradigms: string[], threats: ComboThreat[]): void {
 }
 
 function detectDuplication(paradigms: string[], threats: ComboThreat[]): void {
-  // Sympathy + Craft = Item Duplication
-  if (paradigms.includes('sympathy') && paradigms.includes('craft')) {
+  // Tethermancy + Craft = Item Duplication
+  if (paradigms.includes('tethermancy') && paradigms.includes('craft')) {
     threats.push({
       level: 'critical',
-      paradigms: ['sympathy', 'craft'],
+      paradigms: ['tethermancy', 'craft'],
       threat: 'Sympathetic Enhancement',
       exploitation: 'Link items, enhance one, enhancement transfers to linked items, duplicate quality',
-      mitigation: 'Links break under quality difference, sympathy costs scale',
+      mitigation: 'Links break under quality difference, tethermancy costs scale',
     });
   }
 
@@ -347,11 +347,11 @@ function detectDuplication(paradigms: string[], threats: ComboThreat[]): void {
     });
   }
 
-  // Sympathy + Echo = Network Effects
-  if (paradigms.includes('sympathy') && paradigms.includes('echo')) {
+  // Tethermancy + Echo = Network Effects
+  if (paradigms.includes('tethermancy') && paradigms.includes('echo')) {
     threats.push({
       level: 'apocalyptic',
-      paradigms: ['sympathy', 'echo'],
+      paradigms: ['tethermancy', 'echo'],
       threat: 'Sympathetic Echo Network',
       exploitation: 'Link many items, echo affects all linked items, each echo spreads to network, exponential spread',
       mitigation: 'Network overload breaks links, echo interference',
@@ -396,13 +396,13 @@ function detectPowerMultipliers(paradigms: string[], threats: ComboThreat[]): vo
     });
   }
 
-  // Allomancy + Consumption = Metal Vampire
-  if (paradigms.includes('allomancy') && paradigms.includes('consumption')) {
+  // Ferromancy + Consumption = Metal Vampire
+  if (paradigms.includes('ferromancy') && paradigms.includes('consumption')) {
     threats.push({
       level: 'major',
-      paradigms: ['allomancy', 'consumption'],
+      paradigms: ['ferromancy', 'consumption'],
       threat: 'Metal Drain',
-      exploitation: 'Consume metal from environment/enemies, always have fuel for Allomancy',
+      exploitation: 'Consume metal from environment/enemies, always have fuel for Ferromancy',
       mitigation: 'Metal poisoning, creates metal-drained wastelands',
     });
   }
@@ -492,7 +492,7 @@ export function isGameBreaking(paradigms: string[]): boolean {
  */
 export function getRecommendedParadigmLimit(paradigms: string[]): number {
   const dangerousParadigms = ['paradox', 'bureaucratic', 'debt', 'consumption', 'silence'];
-  const powerfulParadigms = ['dream', 'belief', 'echo', 'sympathy'];
+  const powerfulParadigms = ['dream', 'belief', 'echo', 'tethermancy'];
 
   const dangerCount = paradigms.filter(p => dangerousParadigms.includes(p)).length;
   const powerCount = paradigms.filter(p => powerfulParadigms.includes(p)).length;

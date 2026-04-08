@@ -105,12 +105,12 @@ export const MYTHIC_RIDDLES = {
     hint: 'Think of the stages of a human life...',
     source: 'The Sphinx of Thebes',
   },
-  gollum: {
-    question: 'This thing all things devours; birds, beasts, trees, flowers; gnaws iron, bites steel; grinds hard stones to meal. What is it?',
-    correctAnswer: 'time',
-    acceptedAnswers: ['age', 'aging', 'the passage of time'],
-    hint: 'It is invisible but affects all things equally...',
-    source: 'Gollum (The Hobbit)',
+  chorus: {
+    question: 'I sing without voice, shape without hands, bind without rope, and end without death. What am I?',
+    correctAnswer: 'the chorus',
+    acceptedAnswers: ['chorus', 'emergence frequency', 'the emergence frequency', 'frequency', 'resonance'],
+    hint: 'It is the hidden harmony that underlies all things...',
+    source: 'Ancient frequency bargain',
   },
   samson: {
     question: 'Out of the eater came something to eat, and out of the strong came something sweet. What is it?',

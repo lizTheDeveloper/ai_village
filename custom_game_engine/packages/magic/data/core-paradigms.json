@@ -371,11 +371,11 @@
     "name": "The Breath",
     "description": "Magic fueled by stored life-force, measured in Breaths",
     "universeIds": ["nalthis", "color_realms"],
-    "lore": "Every person is born with one Breath - a fragment of divine essence.\nBreaths can be given away, stored in objects, or used to fuel magic.\nThose with many Breaths gain superhuman abilities. Those with none\nbecome Drabs - grey, passionless, diminished.",
+    "lore": "Every person is born with one Breath - a fragment of divine essence.\nBreaths can be given away, stored in objects, or used to fuel magic.\nThose with many Breaths gain superhuman abilities. Those with none\nbecome Hollows - grey, passionless, diminished.",
     "sources": [
       {
         "id": "breath",
-        "name": "BioChromatic Breath",
+        "name": "Pneumantic Breath",
         "type": "internal",
         "regeneration": "none",
         "storable": true,
@@ -418,7 +418,7 @@
       },
       {
         "id": "heightening",
-        "name": "Heightening Thresholds",
+        "name": "Pneumantic Tier Thresholds",
         "type": "threshold",
         "strictness": "absolute",
         "canBeCircumvented": false,
@@ -426,7 +426,7 @@
       }
     ],
     "risks": [
-      { "trigger": "exhaustion", "consequence": "corruption_gain", "severity": "severe", "probability": 0.7, "mitigatable": false, "description": "Running out of Breaths while Awakening leaves you a Drab" },
+      { "trigger": "exhaustion", "consequence": "corruption_gain", "severity": "severe", "probability": 0.7, "mitigatable": false, "description": "Running out of Breaths while Investing leaves you a Hollow" },
       { "trigger": "overuse", "consequence": "addiction_worsens", "severity": "moderate", "probability": 0.3, "mitigatable": true, "description": "The power becomes intoxicating; you crave more Breaths" }
     ],
     "acquisitionMethods": [

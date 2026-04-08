@@ -183,6 +183,7 @@ export const MoodSchema = autoRegister(
           manic: 'in a manic state',
           obsessed: 'obsessively focused',
           terrified: 'paralyzed with fear',
+          dreaming: 'lost in an emotional cascade, unresponsive',
         };
 
         // Find primary factor

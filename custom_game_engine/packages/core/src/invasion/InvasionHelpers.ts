@@ -66,9 +66,9 @@ const SHIP_TECH_LEVELS: Record<string, number> = {
   // Stage 3 ships
   probability_scout: 3,
   timeline_merger: 3,
-  svetz_retrieval: 3,
+  chrono_salvage: 3,
   story_ship: 3,
-  gleisner_vessel: 3,
+  synthetic_vessel: 3,
 
   // Stage 2 ships
   threshold_ship: 2,

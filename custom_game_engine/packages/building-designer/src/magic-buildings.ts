@@ -548,7 +548,7 @@ export const HARMONY_HALL: VoxelBuildingDefinition = createMagicBuilding({
   ],
   // Music = song +60, sound_amplification, emotion_amplification, euphoric
   // Carpet = sound_dampening (controls echoes), comforting, +10 mood
-  // Bronze = ferromancy (Seeker detects magic), metal element
+  // Bronze = ferromancy (Bronze-Finder detects magic), metal element
   materials: { wall: 'music', floor: 'carpet', door: 'bronze' },
   functionality: [
     { type: 'song_amplifier', params: { powerBonus: 40, harmonyBonus: 25 } },
@@ -1607,7 +1607,7 @@ export const ABSORPTION_CHAMBER: VoxelBuildingDefinition = createMagicBuilding({
 });
 
 // =============================================================================
-// TALENT MAGIC BUILDINGS (Xanth-style)
+// TALENT MAGIC BUILDINGS (individual-unique-power tradition)
 // =============================================================================
 
 /**
@@ -1639,7 +1639,7 @@ export const TALENT_REGISTRY: VoxelBuildingDefinition = createMagicBuilding({
 });
 
 // =============================================================================
-// NARRATIVE MAGIC BUILDINGS (Discworld-style)
+// NARRATIVE MAGIC BUILDINGS (ambient and narrative tradition)
 // =============================================================================
 
 /**
@@ -1679,11 +1679,11 @@ export const STORY_CIRCLE: VoxelBuildingDefinition = createMagicBuilding({
 // =============================================================================
 
 /**
- * Library of Babel - Infinite words
+ * The Infinite Archive - Infinite words
  */
-export const LIBRARY_OF_BABEL: VoxelBuildingDefinition = createMagicBuilding({
-  id: 'library_of_babel',
-  name: 'Library of Babel',
+export const INFINITE_ARCHIVE: VoxelBuildingDefinition = createMagicBuilding({
+  id: 'infinite_archive',
+  name: 'The Infinite Archive',
   description: 'A hexagonal library containing every possible book, where words have physical weight.',
   category: 'research',
   tier: 5,
@@ -1711,16 +1711,16 @@ export const LIBRARY_OF_BABEL: VoxelBuildingDefinition = createMagicBuilding({
 });
 
 // =============================================================================
-// BREATH MAGIC BUILDING (BioChromatic Awakening)
+// BREATH MAGIC BUILDING (Pneumantic Investing)
 // =============================================================================
 
 /**
- * Awakening Workshop - BioChromatic Breath
+ * Investing Workshop - Pneumantic Breath
  */
 export const AWAKENING_WORKSHOP: VoxelBuildingDefinition = createMagicBuilding({
   id: 'awakening_workshop',
-  name: 'Awakening Workshop',
-  description: 'A colorful workshop where BioChromatic Breath is invested into objects, bringing them to life.',
+  name: 'Investing Workshop',
+  description: 'A colorful workshop where Pneumantic Breath is invested into objects, bringing them to life.',
   category: 'production',
   tier: 4,
   species: 'medium',
@@ -1884,7 +1884,7 @@ export const SEASONAL_BUILDINGS = [
   SOLSTICE_CIRCLE,
 ];
 
-export const DAEMON_BUILDINGS = [
+export const ANIMUS_BUILDINGS = [
   ANIMUS_SANCTUM,
 ];
 
@@ -1901,7 +1901,7 @@ export const NARRATIVE_BUILDINGS = [
 ];
 
 export const LITERARY_BUILDINGS = [
-  LIBRARY_OF_BABEL,
+  INFINITE_ARCHIVE,
 ];
 
 export const BREATH_BUILDINGS = [
@@ -1936,7 +1936,7 @@ export const ALL_MAGIC_BUILDINGS = [
   ...COMMERCE_BUILDINGS,
   ...LUNAR_BUILDINGS,
   ...SEASONAL_BUILDINGS,
-  ...DAEMON_BUILDINGS,
+  ...ANIMUS_BUILDINGS,
   ...CONSUMPTION_BUILDINGS,
   ...TALENT_BUILDINGS,
   ...NARRATIVE_BUILDINGS,

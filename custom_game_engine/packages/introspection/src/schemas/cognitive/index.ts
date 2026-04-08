@@ -21,7 +21,7 @@ export { DeedLedgerSchema } from './DeedLedgerSchema.js';
 // moved to afterlife/ directory (Tier 9)
 
 // Eighth Child: Self-reflective insight from presence-over-power pattern
-export { EighthChildInsightSchema, getSelfImplicationPrompt, type EighthChildInsightComponent } from './EighthChildInsightSchema.js';
+export { EighthChildInsightSchema, getSelfImplicationPrompt, buildPersonalizedInsight, type EighthChildInsightComponent, type TraitSnapshot } from './EighthChildInsightSchema.js';
 
 // Batch 9: Automation/Manufacturing + Miscellaneous
 export { RecipeDiscoverySchema, type RecipeDiscoveryComponent } from './RecipeDiscoverySchema.js';

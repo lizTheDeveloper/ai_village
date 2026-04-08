@@ -24,8 +24,59 @@
     "east",
     "south-east"
   ],
-  "animations": {},
+  "animations": {
+    "breathing-idle": {
+      "south": [
+        "animations/breathing-idle/south/frame_000.png",
+        "animations/breathing-idle/south/frame_001.png",
+        "animations/breathing-idle/south/frame_002.png",
+        "animations/breathing-idle/south/frame_003.png"
+      ],
+      "south-east": [
+        "animations/breathing-idle/south-east/frame_000.png",
+        "animations/breathing-idle/south-east/frame_001.png",
+        "animations/breathing-idle/south-east/frame_002.png",
+        "animations/breathing-idle/south-east/frame_003.png"
+      ],
+      "east": [
+        "animations/breathing-idle/east/frame_000.png",
+        "animations/breathing-idle/east/frame_001.png",
+        "animations/breathing-idle/east/frame_002.png",
+        "animations/breathing-idle/east/frame_003.png"
+      ],
+      "north-east": [
+        "animations/breathing-idle/north-east/frame_000.png",
+        "animations/breathing-idle/north-east/frame_001.png",
+        "animations/breathing-idle/north-east/frame_002.png",
+        "animations/breathing-idle/north-east/frame_003.png"
+      ],
+      "north": [
+        "animations/breathing-idle/north/frame_000.png",
+        "animations/breathing-idle/north/frame_001.png",
+        "animations/breathing-idle/north/frame_002.png",
+        "animations/breathing-idle/north/frame_003.png"
+      ],
+      "north-west": [
+        "animations/breathing-idle/north-west/frame_000.png",
+        "animations/breathing-idle/north-west/frame_001.png",
+        "animations/breathing-idle/north-west/frame_002.png",
+        "animations/breathing-idle/north-west/frame_003.png"
+      ],
+      "west": [
+        "animations/breathing-idle/west/frame_000.png",
+        "animations/breathing-idle/west/frame_001.png",
+        "animations/breathing-idle/west/frame_002.png",
+        "animations/breathing-idle/west/frame_003.png"
+      ],
+      "south-west": [
+        "animations/breathing-idle/south-west/frame_000.png",
+        "animations/breathing-idle/south-west/frame_001.png",
+        "animations/breathing-idle/south-west/frame_002.png",
+        "animations/breathing-idle/south-west/frame_003.png"
+      ]
+    }
+  },
   "description": "female black light human",
   "enriched_at": "2026-01-30T00:40:22.608Z",
-  "original_description": "female black light human, detailed pixels, rich 256-color palette, smooth gradient shading like Chrono Trigger or Secret of Mana, high top-down perspective, transparent background, pixel art"
+  "original_description": "female black light human, detailed pixels, rich 256-color palette, smooth gradient shading 16-bit SNES-era RPG aesthetic, high top-down perspective, transparent background, pixel art"
 }

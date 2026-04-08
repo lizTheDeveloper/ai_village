@@ -73,10 +73,10 @@ export interface HerbalistDiscoveryComponent {
 }
 
 /**
- * Humorous botanical paper titles in Pratchett/Adams/Gaiman style
+ * Humorous botanical paper titles in witty academic parody style
  */
 const BOTANICAL_TITLE_TEMPLATES: string[] = [
-  // Terry Pratchett style
+  // Observational humor style
   'A Brief History of {plant}, Which Is Shorter Than You\'d Think',
   'The Surprisingly Cantankerous Nature of {plant} in Laboratory Settings',
   'Why {plant} Grows Where It Damn Well Pleases: A {biome} Study',
@@ -84,19 +84,19 @@ const BOTANICAL_TITLE_TEMPLATES: string[] = [
   'On the Refusal of {plant} to Cooperate With Standard Taxonomy',
   'A Discourse on {plant}, Which Has More Going On Than Anyone Expected',
 
-  // Douglas Adams style
+  // Cosmic absurdity style
   'The Mostly Harmless {plant} of {biome}: A Field Guide for the Bewildered',
   '{plant}: 42 Observations on Its Deeply Improbable Existence',
-  'Don\'t Panic: A Hitchhiker\'s Guide to {plant} Identification',
+  'Don\'t Panic: A Practical Guide to {plant} Identification',
   'The Answer to {plant}, Its Universe, and Everything',
   'So Long, and Thanks for All the {plant}: A Farewell Expedition Report',
-  '{plant} and the Restaurant at the End of the {biome}',
+  '{plant} and the Tavern at the End of the {biome}',
 
-  // Neil Gaiman style
+  // Mythic and ominous style
   'The Dream of {plant}: A Meditation on Chlorophyll and Consciousness',
   '{plant} Was Here First: An Old Story About a New Discovery',
   'Something Very Like {plant}: Finding the Impossible in {biome}',
-  'The Sandman\'s Garden: {plant} and Other Nocturnal Flora',
+  'The Dreaming Garden: {plant} and Other Nocturnal Flora',
   'Where {plant} Goes When No One Is Looking',
   'A Very Short Story About {plant} (Which Turned Out to Be Quite Long)',
 
@@ -112,19 +112,19 @@ const BOTANICAL_TITLE_TEMPLATES: string[] = [
  * Humorous abstract openings for botanical papers
  */
 const BOTANICAL_ABSTRACT_OPENINGS: string[] = [
-  // Pratchett
+  // Satirical style
   'This plant exists despite our best attempts to classify it out of existence.',
   'The specimen in question was found growing where it shouldn\'t, as plants often do.',
   'Local wisdom suggested looking here. We ignored it for three months before conceding.',
   'The {plant} is, by all reasonable measures, impossible. It grows anyway.',
 
-  // Adams
+  // Absurdist style
   'The probability of finding {plant} in this location is 1 in 10^42, which is why we found it.',
   'If you think finding a new plant is exciting, wait until you see the paperwork.',
   'Mostly harmless. The plant, not this paper.',
   'The answer to this botanical mystery is 42. The question remains unclear.',
 
-  // Gaiman
+  // Mythological style
   'Every plant remembers the first time someone gave it a name.',
   'The {plant} was dreaming of being discovered. We simply happened to notice.',
   'In the old stories, plants like this grant wishes. The paperwork does not.',

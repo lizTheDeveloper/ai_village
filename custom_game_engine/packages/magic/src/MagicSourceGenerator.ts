@@ -535,13 +535,13 @@ export function generateRuneSource(level: number = 1): {
 }
 
 /**
- * Generate source for Allomancy paradigm (metal-based, no pool).
+ * Generate source for Ferromancy paradigm (metal-based, no pool).
  */
-export function generateAllomancySource(level: number = 1): {
+export function generateFerromancySource(level: number = 1): {
   source: MagicSource;
   pool: MagicResourcePool | null;
 } {
-  return generateParadigmSource('allomancy', 'material', level, {
+  return generateParadigmSource('ferromancy', 'material', level, {
     customName: 'Metal Reserves',
     storable: true,
     transferable: false,
@@ -568,14 +568,14 @@ export function generateShintoSource(level: number = 1): {
 }
 
 /**
- * Generate source for Sympathy paradigm (alar strength).
+ * Generate source for Tethermancy paradigm (attunement strength).
  */
-export function generateSympathySource(level: number = 1): {
+export function generateTethermancySource(level: number = 1): {
   source: MagicSource;
   pool: MagicResourcePool | null;
 } {
-  return generateParadigmSource('sympathy', 'internal', level, {
-    customName: 'Alar',
+  return generateParadigmSource('tethermancy', 'internal', level, {
+    customName: 'Attunement',
     storable: false,
     transferable: false,
     stealable: false,
@@ -584,13 +584,13 @@ export function generateSympathySource(level: number = 1): {
 }
 
 /**
- * Generate source for Daemon paradigm (external soul bond).
+ * Generate source for Animus paradigm (external soul bond).
  */
-export function generateDaemonSource(level: number = 1): {
+export function generateAnimusSource(level: number = 1): {
   source: MagicSource;
   pool: MagicResourcePool | null;
 } {
-  return generateParadigmSource('daemon', 'internal', level, {
+  return generateParadigmSource('animus', 'internal', level, {
     customName: 'Soul Bond',
     storable: false,
     transferable: false,

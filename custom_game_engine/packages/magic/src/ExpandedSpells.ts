@@ -3,10 +3,10 @@
  *
  * Spell data is loaded from JSON files in ../data/ directory.
  * This maintains the blended voice style in descriptions:
- * - Baroque encyclopedic detail (Pratchett-esque)
- * - Dry cosmic pragmatism (Adams-esque)
+ * - Baroque encyclopedic detail (comic-academic style)
+ * - Dry cosmic pragmatism (bureaucratic-absurdist)
  * - Humane satire with moral clarity
- * - Lyrical intimate mythology (Gaiman-esque)
+ * - Lyrical intimate mythology (mythological-literary)
  */
 
 import type { SpellDefinition } from './SpellRegistry.js';

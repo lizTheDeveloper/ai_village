@@ -5,7 +5,7 @@ import type { Entity } from '../../ecs/Entity';
 /**
  * Language Physics System Specifications
  *
- * Inspired by Walter Moers' Zamonia, Jorge Luis Borges, Lewis Carroll, and Terry Pratchett.
+ * Inspired by literary surrealism, narrative magic traditions, and language-as-physics concepts.
  *
  * Words have mass and momentum. Metaphors become literal. Punctuation has power.
  * A well-chosen adjective weighs more than a clumsy one. Call something "sharp as a tack"

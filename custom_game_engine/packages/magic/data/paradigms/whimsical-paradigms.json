@@ -178,7 +178,7 @@
     "id": "talent",
     "name": "Talent Magic",
     "description": "Everyone is born with exactly one unique magical talent",
-    "universeIds": ["xanth", "talent_realms"],
+    "universeIds": ["talent_realms"],
     "lore": "In these realms, magic is personal. Every person is born with exactly one\nmagical talent, never to be repeated. Some talents are grand, some are humble,\nbut each is unique. The hierarchy of talents (mundane, minor, moderate, major,\nMagician-class) determines much of social standing.",
     "sources": [
       {
@@ -268,8 +268,8 @@
     "id": "narrative",
     "name": "Narrative Causality",
     "description": "Story logic and genre conventions are laws of nature",
-    "universeIds": ["discworld", "story_realms"],
-    "lore": "On the Disc, stories are things. Narrative causality shapes events to\nmatch the stories that want to be told. The million-to-one chance works\nbecause stories say it should. Heroes survive because the story needs them.\nSome rare individuals learn to sense and manipulate these narrative threads.",
+    "universeIds": ["narrative_tradition", "story_realms"],
+    "lore": "In these realms, stories are things. Narrative causality shapes events to\nmatch the stories that want to be told. The million-to-one chance works\nbecause stories say it should. Heroes survive because the story needs them.\nSome rare individuals learn to sense and manipulate these narrative threads.",
     "sources": [
       {
         "id": "narrative_weight",
@@ -378,8 +378,8 @@
     "id": "pun",
     "name": "Pun Magic",
     "description": "Words have literal magical power based on their sounds",
-    "universeIds": ["xanth", "pun_realms"],
-    "lore": "In the land of Xanth, puns are not merely wordplay but fundamental forces\nof nature. A \"shoe tree\" grows shoes. A \"door mat\" makes doors very formal.\nThe groaner the pun, the more powerful the magic. Newcomers often groan\nat the omnipresent wordplay, but natives have learned to appreciate - or at\nleast tolerate - the punny nature of their reality.",
+    "universeIds": ["talent_realms", "pun_realms"],
+    "lore": "In the Punlands, wordplay is not merely humor \u2014 it is a fundamental force. Language warps reality here, and a sufficiently terrible pun can reshape local physics. The inhabitants call it the Groan Field.",
     "sources": [
       {
         "id": "punergy",

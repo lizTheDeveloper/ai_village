@@ -168,10 +168,10 @@ export const PACK_SPECIES_CONFIGS: Record<string, PackSpeciesConfig> = {
     canSplit: false,
   },
 
-  // Tines (A Fire Upon the Deep) - pack animals forming single mind
-  tines: {
-    speciesId: 'tines',
-    speciesName: 'Tine Pack',
+  // Chorus-bonded packs - pack animals forming single mind through localized Chorus resonance
+  chorus_pack: {
+    speciesId: 'chorus_pack',
+    speciesName: 'Chorus Pack',
     maxBodies: 8,
     minBodies: 4, // Need minimum for coherent thought
     coherenceRange: 20, // Must stay close
@@ -585,7 +585,7 @@ export interface PackMemberComponent {
 // ============================================================================
 
 /**
- * Pack names (Pratchett/Adams/Gaiman style)
+ * Pack names (satirical style)
  */
 export const PACK_NAMES: string[] = [
   'Self And Also Self',
@@ -658,8 +658,8 @@ export const BODY_LOSS_THOUGHTS: string[] = [
  * Species-specific pack thoughts (for LLM flavor by species type)
  */
 export const SPECIES_PACK_THOUGHTS: Record<string, string[]> = {
-  // Tines (A Fire Upon the Deep) - sound-based, need proximity
-  tines: [
+  // Chorus-bonded packs - sound-based, need proximity
+  chorus_pack: [
     'We think in overlapping frequencies. Silence is madness.',
     'Too far apart! The thoughts become echoes of echoes!',
     'We are eight voices in harmony. Lose one and the chord breaks.',
@@ -838,7 +838,7 @@ export const FORMATION_ANNOUNCEMENTS: Record<PackFormation, string[]> = {
  * Manages distributed consciousness across multiple bodies
  */
 export class PackMindSystem extends BaseSystem {
-  public readonly id: SystemId = 'pack_mind';
+  public readonly id: SystemId = 'chorus_pack';
   public readonly priority: number = 161;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 

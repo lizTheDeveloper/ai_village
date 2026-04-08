@@ -379,10 +379,22 @@ export class DeityEmergenceSystem extends BaseSystem {
     const deityPersonality: Partial<PerceivedPersonality> = {};
 
     if (personalityComp) {
-      // Map agent personality to perceived deity personality
-      deityPersonality.benevolence = personalityComp.openness > 0.7 ? 0.6 : 0.3;
-      deityPersonality.mysteriousness = personalityComp.openness > 0.5 ? 0.6 : 0.4;
-      deityPersonality.interventionism = personalityComp.neuroticism > 0.5 ? 0.5 : 0.3;
+      // Map emergent agent personality (0-1) into deity perception dimensions.
+      const kindness = (personalityComp.agreeableness + personalityComp.generosity) / 2;
+      const involvement = personalityComp.extraversion * 0.6 + personalityComp.leadership * 0.4;
+      const volatility = personalityComp.neuroticism * 0.65 + (1 - personalityComp.agreeableness) * 0.35;
+      const mystique = personalityComp.openness * 0.6 + personalityComp.spirituality * 0.4;
+      const seriousness = (1 - personalityComp.humor) * 0.7 + personalityComp.workEthic * 0.3;
+      const compassion = personalityComp.agreeableness * 0.7 + personalityComp.spirituality * 0.3;
+
+      deityPersonality.benevolence = this.mapToSigned(kindness);
+      deityPersonality.interventionism = this.mapToSigned(involvement);
+      deityPersonality.wrathfulness = this.clamp01(volatility);
+      deityPersonality.mysteriousness = this.clamp01(mystique);
+      deityPersonality.generosity = this.clamp01(personalityComp.generosity);
+      deityPersonality.consistency = this.clamp01(personalityComp.conscientiousness);
+      deityPersonality.seriousness = this.clamp01(seriousness);
+      deityPersonality.compassion = this.clamp01(compassion);
     }
 
     return {
@@ -407,7 +419,8 @@ export class DeityEmergenceSystem extends BaseSystem {
 
     const traits: Array<keyof PerceivedPersonality> = [
       'benevolence', 'interventionism', 'wrathfulness',
-      'mysteriousness', 'generosity', 'consistency'
+      'mysteriousness', 'generosity', 'consistency',
+      'seriousness', 'compassion'
     ];
 
     for (const trait of traits) {
@@ -714,6 +727,18 @@ If the prayer doesn't clearly fit any domain, use "mystery" as the domain.`;
     );
   }
 
+  /** Clamp a value to [0, 1]. */
+  private clamp01(value: number): number {
+    if (!Number.isFinite(value)) return 0.5;
+    return Math.max(0, Math.min(1, value));
+  }
+
+  /** Map a [0,1] trait to [-1,1] deity perception range. */
+  private mapToSigned(value: number): number {
+    const normalized = this.clamp01(value);
+    return normalized * 2 - 1;
+  }
+
   /**
    * Create a new deity from a belief pattern
    */
@@ -799,6 +824,8 @@ If the prayer doesn't clearly fit any domain, use "mystery" as the domain.`;
       origin: 'proto_belief',
       believerCount: pattern.agentIds.length,
       initialBelief: pattern.totalBelief,
+      deityPersonality: { ...identity.personality },
+      alignment: deityComponent.identity.perceivedAlignment,
       tick: currentTick,
     });
 
@@ -808,7 +835,12 @@ If the prayer doesn't clearly fit any domain, use "mystery" as the domain.`;
       deityId: deityEntity.id,
       deityName: identity.primaryName,
       domain: pattern.concept,
+      deityPersonality: { ...identity.personality },
+      secondaryDomains: [...deityComponent.identity.secondaryDomains],
+      epithets: [...deityComponent.identity.epithets],
+      alignment: deityComponent.identity.perceivedAlignment,
       believerCount: pattern.agentIds.length,
+      mythCount: deityComponent.myths.length,
       timestamp: currentTick,
     });
   }

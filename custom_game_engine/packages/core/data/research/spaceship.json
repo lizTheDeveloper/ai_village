@@ -171,8 +171,8 @@
     "type": "predefined"
   },
   {
-    "id": "spaceflight_gleisner_vessel",
-    "name": "Gleisner Vessel Design",
+    "id": "spaceflight_synthetic_vessel",
+    "name": "Synthetic Vessel Design",
     "description": "Ships where consciousness and hull are unified - the ship IS the crew.",
     "field": "spaceflight",
     "tier": 3,
@@ -184,7 +184,7 @@
       { "itemId": "soul_anchor", "amount": 1 }
     ],
     "unlocks": [
-      { "type": "ability", "abilityId": "construct_gleisner_vessel" },
+      { "type": "ability", "abilityId": "construct_synthetic_vessel" },
       { "type": "knowledge", "knowledgeId": "consciousness_distribution" }
     ],
     "type": "predefined"
@@ -220,8 +220,8 @@
     "type": "predefined"
   },
   {
-    "id": "spaceflight_svetz_retrieval",
-    "name": "Svetz Retrieval Ship",
+    "id": "spaceflight_chrono_salvage",
+    "name": "Chrono Salvage Ship",
     "description": "Temporal archaeology ships for retrieving from extinct timelines.",
     "field": "spaceflight",
     "tier": 4,
@@ -233,7 +233,7 @@
       { "itemId": "extinction_sample", "amount": 1 }
     ],
     "unlocks": [
-      { "type": "ability", "abilityId": "construct_svetz_ship" },
+      { "type": "ability", "abilityId": "construct_chrono_salvage_ship" },
       { "type": "ability", "abilityId": "temporal_retrieval" }
     ],
     "type": "predefined"
@@ -245,7 +245,7 @@
     "field": "spaceflight",
     "tier": 4,
     "progressRequired": 4500,
-    "prerequisites": ["spaceflight_gleisner_vessel"],
+    "prerequisites": ["spaceflight_synthetic_vessel"],
     "requiredBuilding": "quantum_research_lab",
     "requiredItems": [
       { "itemId": "observation_nullifier", "amount": 3 }

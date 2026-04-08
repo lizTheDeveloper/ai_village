@@ -54,7 +54,7 @@ Located in `/calculators/`:
 - `NameCostCalculator` - Soul fragments, true name power
 - `BreathCostCalculator` - Breath (life essence), Drab at zero
 - `EmotionalCostCalculator` - Emotions as fuel, burnout risk
-- Plus 8 more (Shinto, Dream, Song, Rune, Sympathy, Allomancy, Daemon)
+- Plus 8 more (Shinto, Dream, Song, Rune, Tethermancy, Ferromancy, Daemon)
 
 Each calculator implements paradigm-specific logic for cost scaling, context modifiers (time of day, moon phase), and terminal effects.
 

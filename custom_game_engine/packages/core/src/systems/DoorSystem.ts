@@ -15,6 +15,8 @@ import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
+import type { RuneComprehensionComponent } from '../components/RuneComprehensionComponent.js';
+import { canTraverseDoorGate, isGateRune } from '../components/RuneComprehensionComponent.js';
 
 /** Door auto-close timeout in ticks (5 seconds at 20 TPS) */
 const DOOR_AUTO_CLOSE_TICKS = 100;
@@ -120,10 +122,29 @@ export class DoorSystem extends BaseSystem {
 
   /**
    * Open a door at the specified position.
+   * Checks rune comprehension for rune-locked doors before opening.
    */
   private openDoor(world: WorldWithTiles, x: number, y: number, agentId: string, ctx: SystemContext): void {
     const tile = world.getTileAt(x, y);
     if (!tile?.door || tile.door.state !== 'closed') return;
+
+    // Check rune gate — comprehension is the key, not tier
+    if (tile.door.requiredRune && isGateRune(tile.door.requiredRune)) {
+      const agentEntity = ctx.world.getEntity(agentId);
+      if (!agentEntity) return;
+
+      const runeComp = (agentEntity as EntityImpl).getComponent<RuneComprehensionComponent>(CT.RuneComprehension);
+      const gateCheck = canTraverseDoorGate(runeComp ?? undefined, tile.door.requiredRune as Parameters<typeof canTraverseDoorGate>[1]);
+      if (!gateCheck.canTraverse) {
+        ctx.emit('door:rune_blocked', {
+          x,
+          y,
+          rune: tile.door.requiredRune,
+          reason: gateCheck.reason,
+        }, agentId);
+        return;
+      }
+    }
 
     // Update door state
     tile.door.state = 'open';

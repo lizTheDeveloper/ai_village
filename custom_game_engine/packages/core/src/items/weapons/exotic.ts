@@ -1,7 +1,7 @@
 /**
  * Exotic Weapon Item Definitions
  *
- * Includes energy blades (lightsaber-style), force weapons, psionic weapons,
+ * Includes energy blades (plasma edge), force weapons, psionic weapons,
  * soul weapons, radiant weapons, and void weapons.
  * Part of the Weapons Expansion (weapons-expansion spec)
  *
@@ -25,7 +25,7 @@ export const ALL_EXOTIC_WEAPONS: ItemDefinition[] = getExoticWeapons();
  */
 const exoticWeapons = WeaponsLoader.getByCategory('exotic');
 
-// Energy blades - lightsaber-style plasma melee weapons
+// Energy blades - plasma edge melee weapons
 export const ENERGY_BLADE_WEAPONS: ItemDefinition[] = exoticWeapons.filter(w =>
   ['energy_blade', 'energy_blade_dual', 'energy_blade_great', 'energy_dagger'].includes(w.id)
 );
@@ -52,5 +52,5 @@ export const RADIANT_WEAPONS: ItemDefinition[] = exoticWeapons.filter(w =>
 
 // Void weapons - entropy/antimatter damage
 export const VOID_WEAPONS: ItemDefinition[] = exoticWeapons.filter(w =>
-  ['void_dagger', 'entropy_blade', 'oblivion_hammer', 'null_lance'].includes(w.id)
+  ['void_dagger', 'entropy_blade', 'void_hammer', 'null_lance'].includes(w.id)
 );

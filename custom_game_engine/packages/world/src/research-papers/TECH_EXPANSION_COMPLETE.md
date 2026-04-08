@@ -165,7 +165,7 @@ Satellites unlock with distributed time coordination technology:
 | 440 | Advanced Applications Complete | VR games, task management (hive mind precursor), advanced factory automation |
 | 475 | Exotic Physics & Megastructures | Dyson swarms, QFT understanding, ready for β-space |
 | ~485 | **β-Space Ships Unlock** | Threshold ship, Courier ship - inter-universe travel begins |
-| 500 | **Full Clarke Tech** | Timeline manipulation, Gleisner vessels, Stage 3 awareness |
+| 500 | **Full Clarke Tech** | Timeline manipulation, Synthetic vessels, Stage 3 awareness |
 
 ## Files Modified
 

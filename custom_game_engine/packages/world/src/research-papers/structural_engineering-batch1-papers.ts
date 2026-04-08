@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -24,7 +24,7 @@ The fundamental principle of load bearing calculations rests upon a deceptively 
 
 Load bearing calculations require understanding three essential forces: compression (pushing down), tension (pulling apart), and shear (sliding sideways in a manner that makes engineers wake up in cold sweats).** The weight of a structure must be distributed through its supports to the foundation, which must in turn distribute it to the soil, which must distribute it to the bedrock, which must distribute it to the Earth's mantle, which frankly has enough to worry about already.†† The calculation itself involves determining the maximum load a structural element can support before experiencing what the Technical Institute of Prætorius terms "catastrophic geometry adjustment."‡‡ This is typically expressed in pounds per square inch, newtons per square meter, or in the case of the Thornhaven Building Council, "bits per hour."***
 
-In practice, engineers apply safety factors ranging from 1.5 to 4.0, meaning structures are designed to support considerably more weight than expected.††† This accounts for unexpected loads such as additional floors added by optimistic contractors, collections of unusually dense books,‡‡‡ or the spontaneous manifestation of relatives during holiday seasons.**** The Guild of Structural Engineers maintains that 73.4% of load bearing failures result from someone saying "it'll probably be fine" followed by inadequate calculation.†††† The remaining 26.6% involves wizards, which is why the The Invisible College requires its own engineering department.‡‡‡‡
+In practice, engineers apply safety factors ranging from 1.5 to 4.0, meaning structures are designed to support considerably more weight than expected.††† This accounts for unexpected loads such as additional floors added by optimistic contractors, collections of unusually dense books,‡‡‡ or the spontaneous manifestation of relatives during holiday seasons.**** The Guild of Structural Engineers maintains that 73.4% of load bearing failures result from someone saying "it'll probably be fine" followed by inadequate calculation.†††† The remaining 26.6% involves wizards, which is why the Invisible College requires its own engineering department.‡‡‡‡
 
 Historical development of load bearing theory progressed through a series of increasingly sophisticated collapses.***** The Romans perfected the arch through extensive trial and error, mostly error, until they discovered that the weight of a properly constructed arch actually makes it stronger – a concept so counterintuitive that three separate emperors declared it witchcraft before accepting the evidence.††††† Medieval master builders relied on geometric proportion and what they called "divine inspiration," which modern analysis reveals to have been remarkably accurate empirical observation combined with survivor bias.‡‡‡‡‡ The mathematical formalization of load bearing calculations in the 17th century by scholars such as Hooke and Bernoulli transformed architecture from an art form that occasionally defied gravity into an engineering discipline that defied gravity consistently.****** Modern computer analysis can calculate load distribution through complex structures in seconds, though experienced engineers still prefer to squint at blueprints and say "hmm" thoughtfully, as it maintains professional mystique.††††††
 
@@ -50,7 +50,7 @@ The practical application of load bearing calculations extends beyond merely pre
 
 †The Institute's building once survived an earthquake that destroyed everything around it. When asked how, the Dean of Engineering reportedly said, "spite, mostly," and refused to elaborate.
 
-‡‡‡The personal library of Lord Havelock Vetinari weighs approximately 4.3 tons and includes several books that are metaphysically as well as physically heavy.‡ Standard floor joists were deemed inadequate; his study floor is supported by a system of steel beams normally reserved for industrial facilities. The Palace Architect noted that "some books exert gravitational influence beyond their physical mass," particularly volumes concerning taxation law and treatises on the nature of power.
+‡‡‡The personal library of Lord Haldren Thorne weighs approximately 4.3 tons and includes several books that are metaphysically as well as physically heavy.‡ Standard floor joists were deemed inadequate; his study floor is supported by a system of steel beams normally reserved for industrial facilities. The Palace Architect noted that "some books exert gravitational influence beyond their physical mass," particularly volumes concerning taxation law and treatises on the nature of power.
 
 ‡Metaphysical weight is not recognized by mainstream engineering codes, but the Guild of Architects maintains an unofficial appendix listing materials that are "narratively dense" and require additional support. These include original manuscripts of epic poetry (2.3x physical weight), ancient prophecies (variable), and anything written in a language that predates recorded history (consult specialist).
 
@@ -60,7 +60,7 @@ The practical application of load bearing calculations extends beyond merely pre
 
 **The Anvil Incident of 1883 involved a Manchester apartment whose second-floor tenant decided to resume his blacksmithing hobby indoors. The anvil, weighing 312 pounds, was positioned directly over the dining room of the flat below. The resulting structural failure occurred during a dinner party, leading to what contemporary newspapers described as "an unexpected blending of the floors" and what engineers now call "inadequate consideration of operational loads."
 
-‡‡‡The Technical University of Genua studied the phenomenon of "sudden book accumulation syndrome" and determined that personal libraries expand at a rate of 14.3 books per year for casual readers and 127.6 books per year for academics who "really should stop attending publishers' sales." A typical hardcover book weighs 1.5 pounds; over twenty years, this represents`,
+‡‡‡The Technical University of Cerenza studied the phenomenon of "sudden book accumulation syndrome" and determined that personal libraries expand at a rate of 14.3 books per year for casual readers and 127.6 books per year for academics who "really should stop attending publishers' sales." A typical hardcover book weighs 1.5 pounds; over twenty years, this represents`,
   abstract: 'Research paper on Understanding load bearing calculations in the context of engineering',
   published: false
 };
@@ -79,7 +79,7 @@ export const STRESS_DISTRIBUTION_ANALYSIS: ResearchPaper = {
     { type: 'ability', abilityId: 'learn_stress_distribution_analysis' }
   ],
   description: `STRESS DISTRIBUTION ANALYSIS: A PRACTICAL GUIDE TO NOT FALLING DOWN
-By Professor Millicent Weatherwax-Pemberton, Chair of Applied Gravitational Resistance Studies, 
+By Professor Millicent Ashworth-Pemberton, Chair of Applied Gravitational Resistance Studies, 
 The The Invisible College Department of Things That Should Probably Stay Up
 
 The fundamental principle of stress distribution analysis rests upon a deceptively simple truth: when you push on something, it pushes back*, and where exactly it pushes back matters rather more than most people initially suppose**. In engineering contexts, stress distribution refers to the manner in which forces spread themselves throughout a material or structure, much like how gossip spreads through a small village†, but with more predictable mathematical properties and fewer accusations of impropriety. The analysis of these distributions allows engineers to determine whether a structure will gracefully support its intended load or whether it will demonstrate what the Ancient Guild of Catastrophic Failure Prevention†† calls "sudden and regrettable reconfiguration."
@@ -642,7 +642,7 @@ Safety considerations in cantilever design cannot be overstated, though they fre
 
 §§The Tourism Loading Coefficient (TLC) was first formalized by Dr. Yuki Tanaka of the Kyoto Institute of Structural Observation after studying tourist behaviour on 847 cantilever viewing platforms worldwide. Her groundbreaking work revealed that tourists consistently lean 23.7° further over railings than any structural designer anticipates, and that the probability of railing crowding increases proportionally to the photogenic quality of the view below***.
 
-***This is similar to the phenomenon described by Douglas Adams in his analysis of spacecraft behaviour, wherein the probability of catastrophic failure is inversely proportional to the number of safety briefings given. Tanaka's work suggests a similar principle applies to cantilever structures: the more warning signs about weight limits, the more people assume they don't apply to them personally.
+***This is similar to the phenomenon described by Professor Dent of the Thornhaven Institute of Improbable Sciences in his analysis of spacecraft behaviour, wherein the probability of catastrophic failure is inversely proportional to the number of safety briefings given. Tanaka's work suggests a similar principle applies to cantilever structures: the more warning signs about weight limits, the more people assume they don't apply to them personally.
 
 ***Professor Chen Wei of the Forbidden City Institute of Ancient Engineering Secrets has documented cantilever brackets (dougong) extending up to two meters without modern materials or calculations. These structures have survived earthquakes that destroyed modern buildings, leading to significant humility among contemporary engineers and several strongly worded papers about the limitations of computer modeling††††.
 

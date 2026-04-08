@@ -291,7 +291,7 @@ describe('Adversarial - State Corruption', () => {
     // But has paradigm state
     caster.paradigmState['unknown_paradigm'] = {
       breathCount: 100,
-      heighteningTier: 5,
+      pneumanticTier: 5,
     };
 
     expect(caster.knownParadigmIds.length).toBe(0);

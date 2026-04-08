@@ -215,13 +215,13 @@
     "category": "Building"
   },
   {
-    "id": "gleisner_body_frame",
-    "name": "Gleisner Body Frame",
+    "id": "synthetic_body_frame",
+    "name": "Synthetic Body Frame",
     "category": "Building"
   },
   {
-    "id": "svetz_retrieval_engine",
-    "name": "Svetz Retrieval Engine",
+    "id": "chrono_salvage_engine",
+    "name": "Chrono Salvage Engine",
     "category": "Building"
   },
   {
@@ -260,13 +260,13 @@
     "category": "Building"
   },
   {
-    "id": "gleisner_hull_kit",
-    "name": "Gleisner Vessel Hull Kit",
+    "id": "synthetic_hull_kit",
+    "name": "Synthetic Vessel Hull Kit",
     "category": "Building"
   },
   {
-    "id": "svetz_hull_kit",
-    "name": "Svetz Retrieval Hull Kit",
+    "id": "chrono_salvage_hull_kit",
+    "name": "Chrono Salvage Hull Kit",
     "category": "Building"
   },
   {

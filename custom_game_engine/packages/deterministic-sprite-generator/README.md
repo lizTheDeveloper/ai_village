@@ -277,33 +277,33 @@ interface ArtStyleConfig {
 
 | Category | Styles | Era | Example |
 |----------|--------|-----|---------|
-| **Nintendo 8-bit** | NES, Game Boy | 1985-1998 | Super Mario Bros, Pokemon Red |
-| **Nintendo 16-bit** | SNES, GBA | 1991-2008 | Chrono Trigger, Golden Sun |
-| **Nintendo 3D** | N64 | 1996-2002 | Paper Mario |
-| **Sega Consoles** | Genesis, Master System, Saturn, Dreamcast | 1985-2001 | Sonic, Phantasy Star |
-| **Sony** | PS1 | 1995-2000 | Final Fantasy Tactics |
-| **Arcade** | Neo Geo | 1990-2004 | Metal Slug |
-| **PC/DOS Era** | CGA, EGA, VGA | 1981-1995 | Commander Keen |
-| **Home Computers** | C64, Amiga, Atari ST, ZX Spectrum, MSX, PC-98 | 1982-2000 | European/Japanese classics |
-| **Handhelds** | Wonder Swan, Neo Geo Pocket Color, Virtual Boy | 1995-2003 | SNK/Bandai games |
-| **Modern Indie** | Celeste, Undertale, Stardew Valley, Terraria | 2011-2018 | Contemporary pixel art |
+| **Nintendo 8-bit** | NES, Game Boy | 1985-1998 | 8-bit platformers, handheld RPGs |
+| **Nintendo 16-bit** | SNES, GBA | 1991-2008 | 16-bit RPGs, portable adventures |
+| **Nintendo 3D** | N64 | 1996-2002 | 2D-3D hybrid aesthetic |
+| **Sega Consoles** | Genesis, Master System, Saturn, Dreamcast | 1985-2001 | Fast-action platformers, console RPGs |
+| **Sony** | PS1 | 1995-2000 | Isometric tactical RPGs |
+| **Arcade** | Neo Geo | 1990-2004 | Run-and-gun, fighting games |
+| **PC/DOS Era** | CGA, EGA, VGA | 1981-1995 | DOS-era adventures, early PC games |
+| **Home Computers** | C64, Amiga, Atari ST, ZX Spectrum, MSX, PC-98 | 1982-2000 | European/Japanese home computer classics |
+| **Handhelds** | Wonder Swan, Neo Geo Pocket Color, Virtual Boy | 1995-2003 | Portable console games |
+| **Modern Indie** | Cozy farming, precision platformer, minimalist | 2011-2018 | Contemporary pixel art |
 
 **Detailed style comparison:**
 
-| Style | Era | Canvas Size | Colors | Shading | Example Games |
-|-------|-----|-------------|--------|---------|---------------|
-| `nes` | 8-bit (1985-1990) | 32-48px | 56 colors | Flat | Super Mario Bros |
-| `snes` | 16-bit (1991-1996) | 64-96px | 256 colors | Medium | Chrono Trigger |
-| `ps1` | 32-bit (1995-2000) | 128-192px | Thousands | Detailed | Final Fantasy Tactics |
-| `gba` | GBA (2001-2008) | 64-80px | 32,768 colors | Medium | Golden Sun |
-| `gameboy` | GB (1989-1998) | 32-48px | 4 shades | Basic | Pokemon Red/Blue |
-| `neogeo` | Arcade (1990-2004) | 128-256px | 65,536 colors | Detailed | Metal Slug |
-| `genesis` | 16-bit (1988-1997) | 64-96px | 512 colors | Medium | Sonic the Hedgehog |
-| `c64` | 8-bit (1982-1994) | 24-32px | 16 colors | Flat | Commodore 64 games |
-| `amiga` | 16-bit (1985-1996) | 48-64px | 4096 colors | Medium | European computer games |
-| `vga` | DOS (1987-1995) | 48-80px | 256 colors | Medium | Commander Keen |
-| `celeste` | Modern (2018) | 64-96px | True color | Medium | Celeste |
-| `stardew` | Modern (2016) | 48-64px | True color | Medium | Stardew Valley |
+| Style | Era | Canvas Size | Colors | Shading | Aesthetic |
+|-------|-----|-------------|--------|---------|-----------|
+| `nes` | 8-bit (1985-1990) | 32-48px | 56 colors | Flat | 8-bit platformer |
+| `snes` | 16-bit (1991-1996) | 64-96px | 256 colors | Medium | 16-bit RPG |
+| `ps1` | 32-bit (1995-2000) | 128-192px | Thousands | Detailed | Isometric tactical |
+| `gba` | GBA (2001-2008) | 64-80px | 32,768 colors | Medium | Portable RPG |
+| `gameboy` | GB (1989-1998) | 32-48px | 4 shades | Basic | Handheld classic |
+| `neogeo` | Arcade (1990-2004) | 128-256px | 65,536 colors | Detailed | Arcade action |
+| `genesis` | 16-bit (1988-1997) | 64-96px | 512 colors | Medium | Fast-action platformer |
+| `c64` | 8-bit (1982-1994) | 24-32px | 16 colors | Flat | Commodore 64 |
+| `amiga` | 16-bit (1985-1996) | 48-64px | 4096 colors | Medium | European computer |
+| `vga` | DOS (1987-1995) | 48-80px | 256 colors | Medium | Peak DOS era |
+| `celeste` | Modern (2018) | 64-96px | True color | Medium | Precision platformer |
+| `stardew` | Modern (2016) | 48-64px | True color | Medium | Cozy farming |
 
 **Usage:**
 ```typescript

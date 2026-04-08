@@ -2,7 +2,7 @@
  * Creative Paradigms Integration Tests
  *
  * Tests for unique and unconventional magic systems including:
- * - Fiction-inspired: Sympathy, Allomancy, Dream, Song, Rune
+ * - Fiction-inspired: Tethermancy, Ferromancy, Dream, Song, Rune
  * - Weird concepts: Debt, Bureaucratic, Luck, Threshold, Belief, etc.
  * - Seasonal/Cyclical: Lunar, Seasonal, Age
  * - Spiritual: Shinto
@@ -10,8 +10,8 @@
 
 import { describe, it, expect } from 'vitest';
 import {
-  SYMPATHY_PARADIGM,
-  ALLOMANCY_PARADIGM,
+  TETHERMANCY_PARADIGM,
+  FERROMANCY_PARADIGM,
   DREAM_PARADIGM,
   SONG_PARADIGM,
   RUNE_PARADIGM,
@@ -38,16 +38,16 @@ import {
 // These tests use incorrect property names (strength/circumventable vs strictness/canBeCircumvented,
 // channel.name vs channel.type) that don't match the actual MagicParadigm data model.
 describe.skip('Creative Paradigms - Fiction-Inspired', () => {
-  describe('Sympathy Paradigm (Kingkiller)', () => {
+  describe('Tethermancy Paradigm (resonance_realms)', () => {
     it('should have similarity as absolute law', () => {
-      const similarityLaw = SYMPATHY_PARADIGM.laws.find((l) => l.type === 'similarity');
+      const similarityLaw = TETHERMANCY_PARADIGM.laws.find((l) => l.type === 'similarity');
       expect(similarityLaw).toBeDefined();
       expect(similarityLaw?.strength).toBe('absolute');
       expect(similarityLaw?.circumventable).toBe(false);
     });
 
     it('should require will, focus, and material channels', () => {
-      const requiredChannels = SYMPATHY_PARADIGM.channels.filter(
+      const requiredChannels = TETHERMANCY_PARADIGM.channels.filter(
         (c) => c.requirement === 'required'
       );
       expect(requiredChannels.length).toBe(3);
@@ -57,21 +57,21 @@ describe.skip('Creative Paradigms - Fiction-Inspired', () => {
     });
 
     it('should have backlash risk on failure', () => {
-      const backlashRisk = SYMPATHY_PARADIGM.risks.find((r) => r.consequence === 'backlash');
+      const backlashRisk = TETHERMANCY_PARADIGM.risks.find((r) => r.consequence === 'backlash');
       expect(backlashRisk).toBeDefined();
       expect(backlashRisk?.severity).toBe('severe');
     });
   });
 
-  describe('Allomancy Paradigm (Mistborn)', () => {
+  describe('Ferromancy Paradigm (CrucibleBorn)', () => {
     it('should use material source with consumption regeneration', () => {
-      const materialSource = ALLOMANCY_PARADIGM.sources.find((s) => s.type === 'material');
+      const materialSource = FERROMANCY_PARADIGM.sources.find((s) => s.type === 'material');
       expect(materialSource).toBeDefined();
       expect(materialSource?.regeneration).toBe('consumption');
     });
 
     it('should require consumption channel', () => {
-      const consumptionChannel = ALLOMANCY_PARADIGM.channels.find(
+      const consumptionChannel = FERROMANCY_PARADIGM.channels.find(
         (c) => c.name === 'consumption'
       );
       expect(consumptionChannel).toBeDefined();
@@ -79,11 +79,11 @@ describe.skip('Creative Paradigms - Fiction-Inspired', () => {
     });
 
     it('should have very high power ceiling', () => {
-      expect(ALLOMANCY_PARADIGM.powerCeiling).toBe(200);
+      expect(FERROMANCY_PARADIGM.powerCeiling).toBe(200);
     });
 
     it('should not allow teaching (must be born with it)', () => {
-      expect(ALLOMANCY_PARADIGM.allowsTeaching).toBe(false);
+      expect(FERROMANCY_PARADIGM.allowsTeaching).toBe(false);
     });
   });
 
@@ -581,15 +581,15 @@ describe('Creative Paradigms - Collection Tests', () => {
 });
 
 describe.skip('Creative Paradigms - Unique Mechanics', () => {
-  it('Sympathy should enforce similarity connections', () => {
-    const similarityLaw = SYMPATHY_PARADIGM.laws.find((l) => l.type === 'similarity');
-    const contagionLaw = SYMPATHY_PARADIGM.laws.find((l) => l.type === 'contagion');
+  it('Tethermancy should enforce similarity connections', () => {
+    const similarityLaw = TETHERMANCY_PARADIGM.laws.find((l) => l.type === 'similarity');
+    const contagionLaw = TETHERMANCY_PARADIGM.laws.find((l) => l.type === 'contagion');
     expect(similarityLaw).toBeDefined();
     expect(contagionLaw).toBeDefined();
   });
 
-  it('Allomancy should be bloodline-based', () => {
-    const bloodlineMethod = ALLOMANCY_PARADIGM.acquisitionMethods.find(
+  it('Ferromancy should be bloodline-based', () => {
+    const bloodlineMethod = FERROMANCY_PARADIGM.acquisitionMethods.find(
       (m) => m.method === 'bloodline'
     );
     expect(bloodlineMethod).toBeDefined();

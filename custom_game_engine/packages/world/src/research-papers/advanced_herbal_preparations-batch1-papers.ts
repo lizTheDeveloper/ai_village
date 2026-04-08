@@ -38,9 +38,9 @@ The historical development of cold infusion stretches back to a time when fire w
 
 **Suitable liquids include water, alcohol, oil, vinegar, or in desperate circumstances, yesterday's tea. The Compendium of Liquid Media runs to 400 pages and includes a footnote spanning pages 287-294 about why one should not use liquid mercury, regardless of how "shiny and interesting" it looks.
 
-††The phenomenon of osmosis was first described by the ancient philosopher Didactylos†, who noticed that if you leave a raisin in water long enough, it stops being a raisin and starts being "a disappointing grape." This observation revolutionized both alchemy and the dried fruit industry.
+††The phenomenon of osmosis was first described by the ancient philosopher Didacticus†, who noticed that if you leave a raisin in water long enough, it stops being a raisin and starts being "a disappointing grape." This observation revolutionized both alchemy and the dried fruit industry.
 
-†Didactylos also wrote extensively about epistemology, ethics, and why you shouldn't trust anyone who promises easy answers. He was later thrown into a barrel and rolled into the sea, which rather proved his point about skepticism being unpopular.
+†Didacticus also wrote extensively about epistemology, ethics, and why you shouldn't trust anyone who promises easy answers. He was later thrown into a barrel and rolled into the sea, which rather proved his point about skepticism being unpopular.
 
 ‡‡The drinking-it-first problem has plagued scientific observation since time immemorial. The Research Institute of Premature Consumption estimates that approximately 47.3% of all alchemical experiments are consumed before completion, usually by the alchemist's roommate, who claims not to have seen the "DO NOT DRINK" label that was definitely, absolutely there five minutes ago.
 
@@ -90,7 +90,7 @@ The practical applications of hot infusion are numerous and form the backbone of
 
 Safety considerations in hot infusion cannot be overstated, though they are frequently understated, ignored, or scoffed at until the first explosion******. The three primary dangers - burns, vapors, and unexpected reactions******** - account for 94.7% of all documented hot infusion incidents†††††††††, with the remaining 5.3% consisting of what the Alchemical Safety Board classifies as "creative improvisation gone magnificently wrong."‡‡‡‡‡‡ Always ensure adequate ventilation*********, never leave an active infusion unattended**********, and under no circumstances should one attempt to accelerate the process by "just adding more heat"***********. This last caveat exists because of what is known in hushed tones as the Pemberton Incident of 1887††††††††††, which resulted in the spontaneous creation of a new color that three witnesses described as "aggressive mauve."‡‡‡‡‡‡‡
 
-Modern understanding of hot infusion has been revolutionized by the work of scholars such as Professor Meribeth Collingwood of the Lesser Ankh Institute************, whose treatise "On the Precise Application of Thermal Energy to Botanical Matrices" remains the definitive work on the subject*************, despite her tendency to set fire to things when excited by a new discovery. Her three-tier classification system - gentle simmer, rolling boil, and "gods preserve us"************** - has been adopted by alchemical institutions throughout the civilized world and several uncivilized ones†††††††††††. The distinction between cold and hot infusion is now understood not as a binary choice but as a spectrum of thermal application, allowing practitioners to tailor their approach to the specific properties of their ingredients‡‡‡‡‡‡‡‡, though this nuanced understanding does nothing to prevent the determined student from boiling everything at maximum heat and wondering why their tincture tastes like charcoal and regret***************.
+Modern understanding of hot infusion has been revolutionized by the work of scholars such as Professor Meribeth Collingwood of the Lesser Thornhaven Institute************, whose treatise "On the Precise Application of Thermal Energy to Botanical Matrices" remains the definitive work on the subject*************, despite her tendency to set fire to things when excited by a new discovery. Her three-tier classification system - gentle simmer, rolling boil, and "gods preserve us"************** - has been adopted by alchemical institutions throughout the civilized world and several uncivilized ones†††††††††††. The distinction between cold and hot infusion is now understood not as a binary choice but as a spectrum of thermal application, allowing practitioners to tailor their approach to the specific properties of their ingredients‡‡‡‡‡‡‡‡, though this nuanced understanding does nothing to prevent the determined student from boiling everything at maximum heat and wondering why their tincture tastes like charcoal and regret***************.
 
 ---
 
@@ -126,9 +126,9 @@ Modern understanding of hot infusion has been revolutionized by the work of scho
 
 †††††Commonly known as the Tea Incident of 1756, when apprentice alchemist Thomas Merriweather suggested at the Annual Symposium that tea was technically a hot infusion. He was not technically wrong, but he was ejected from the hall by unanimous vote. The Alchemists' Guild has a long memory and still refuses to serve tea at symposiums, offering instead "infused Camellia preparations" that are absolutely, definitely, not tea, no matter how much they look and taste like tea.
 
-‡‡‡‡These mechanisms are usually imported from the Clockwork District of Pseudopolis†††††††, where precision is considered a moral virtue and the public clocks are accurate to within 0.000001 seconds, causing them to disagree with each other and leading to heated arguments about which clock is "right."
+‡‡‡‡These mechanisms are usually imported from the Clockwork District of Clockhaven†††††††, where precision is considered a moral virtue and the public clocks are accurate to within 0.000001 seconds, causing them to disagree with each other and leading to heated arguments about which clock is "right."
 
-†††††††The Clockmakers' Guild of Pseudopolis`,
+†††††††The Clockmakers' Guild of Clockhaven`,
   abstract: 'Research paper on Understanding hot infusion methods in the context of alchemy',
   published: false
 };
@@ -380,7 +380,7 @@ The historical trajectory of vinegar extraction reads like a chronicle of humani
 
 ‡‡ The debate over proper vinegar quality has consumed more academic ink than any other aspect of the process. The Vinegar Purists insist on organic, raw, unfiltered apple cider vinegar with "the mother"—a gelatinous mass that sounds like something from a horror novel†† but is actually quite beneficial. The Pragmatists argue that any vinegar with 5% acidity works fine. They are both correct, but admitting this would end several lucrative academic feuds.
 
-†† Specifically, a Walter Moers horror novel, possibly "The City of Dreaming Vinegars," which he definitely didn't write but absolutely should have.
+†† Specifically, a Thornhaven School horror novel, possibly "The City of Dreaming Vinegars," which nobody has actually written but absolutely should.
 
 *** The Guild's list includes wine vinegar (red and white, counted separately for no reason anyone can remember), rice vinegar, malt vinegar, balsamic vinegar (considered "showing off"), champagne vinegar (definitely showing off), and eleven others that most alchemists suspect they invented to make the list longer. The Guild has refused to confirm or deny this for seventy-three years.
 
@@ -606,7 +606,7 @@ Safety considerations in double extraction are primarily concerned with preventi
 
 The historical development of double extraction methodology reads like a cautionary tale that nobody heeded***********. Ancient Daoist practitioners understood the principle, though their writings refer to it elliptically as "teaching the mushroom to speak in two tongues"************, while European alchemists stumbled upon it independently while trying to make gold and instead making increasingly elaborate beverages†††††††††††. The modern understanding, codified by the Institute of Reliable Fungal Studies in 1967‡‡‡‡‡‡‡, acknowledges that different extraction methods liberate different compounds, much as different types of conversation liberate different truths from teenagers*************, and that sequential extraction maximizes the recovery of beneficial constituents while minimizing the recovery of things best left in the mushroom**************. Contemporary practitioners benefit from centuries of accumulated knowledge, detailed safety protocols, and the kind of equipment that would have made medieval alchemists weep with envy or possibly confusion†††††††††††††.
 
-The integration of double extraction into modern alchemical practice represents what the Pratchett School of Applied Magic calls "sufficiently advanced patience being indistinguishable from dedication"‡‡‡‡‡‡‡‡. Those who master the technique find themselves in possession of potent fungal preparations that capture the full spectrum of medicinal compounds, provided they can resist the temptation to rush the process, substitute inappropriate solvents***, or convince themselves that "close enough" applies to extraction ratios the way it applies to parking†††††††††††††††. The rewards, however—properly prepared tinctures that combine both water-soluble and alcohol-soluble fractions—justify the investment of time, attention, and the inevitable questions from housemates about why one's dwelling increasingly resembles an apothecary designed by someone with strong opinions about jars‡‡‡‡‡‡‡‡‡.
+The integration of double extraction into modern alchemical practice represents what the Thornhaven School of Applied Magic calls "sufficiently advanced patience being indistinguishable from dedication"‡‡‡‡‡‡‡‡. Those who master the technique find themselves in possession of potent fungal preparations that capture the full spectrum of medicinal compounds, provided they can resist the temptation to rush the process, substitute inappropriate solvents***, or convince themselves that "close enough" applies to extraction ratios the way it applies to parking†††††††††††††††. The rewards, however—properly prepared tinctures that combine both water-soluble and alcohol-soluble fractions—justify the investment of time, attention, and the inevitable questions from housemates about why one's dwelling increasingly resembles an apothecary designed by someone with strong opinions about jars‡‡‡‡‡‡‡‡‡.
 
 ---
 
@@ -618,7 +618,7 @@ The integration of double extraction into modern alchemical practice represents 
 
 †The Brotherhood dissolved itself shortly after, having established that twenty-three years of steeping Reishi in cold water produces only regret and a very patient mushroom.
 
-††Moers documented seventeen distinct cases of compounds that actively avoided aqueous solution, describing them as having "hydrophobic tendencies bordering on philosophical commitment"‡.
+††Mortecai documented seventeen distinct cases of compounds that actively avoided aqueous solution, describing them as having "hydrophobic tendencies bordering on philosophical commitment"‡.
 
 ‡His field notes include sketches of molecules with tiny faces expressing distaste. The Alchemical Review rejected his paper but published the sketches as "speculative art."
 
@@ -648,7 +648,7 @@ The integration of double extraction into modern alchemical practice represents 
 
 ******The record, held by the Monastery of Perpetual Extraction, stands at seven years. The resulting tincture was described as "transcendent," "terrifying," and "definitely conscious," sometimes in the same sentence.
 
-†††††††The Gaiman Manuscript of 1872 describes this as "the marriage of water and fire, mediated by the mushroom as ancient priest," which is poetic but less practical than the Guild's instruction to "shake the bottle gently and hope for the best."
+†††††††The Thornhaven Manuscript of 1872 describes this as "the marriage of water and fire, mediated by the mushroom as ancient priest," which is poetic but less practical than the Guild's instruction to "shake the bottle gently and hope for the best."
 
 ‡‡‡‡‡The term "undrinkable horror" has a specific technical definition in the Codex of Alchemical Disasters`,
   abstract: 'Research paper on Understanding double extraction mushrooms in the context of alchemy',

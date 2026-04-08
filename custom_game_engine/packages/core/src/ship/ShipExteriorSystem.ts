@@ -23,7 +23,12 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { ShipPower, getShipPowerState } from './ShipPowers.js';
-import type { ShipExteriorComponent, ShipSectionState } from './ShipExteriorComponent.js';
+import type {
+  ShipAwarenessState,
+  ShipExteriorComponent,
+  ShipSectionState,
+} from './ShipExteriorComponent.js';
+import type { SpaceshipComponent } from '../navigation/SpaceshipComponent.js';
 
 // ============================================================================
 // Constants
@@ -38,6 +43,17 @@ const SECTION_DAMAGE_THRESHOLDS = [0.7, 0.5, 0.3] as const;
  */
 const DENSITY_RAMP_START = 500;
 const DENSITY_RAMP_SCALE = 2000;
+const DEFAULT_STEP_SECONDS = 0.25; // 5 ticks at 20 TPS
+
+const BASE_HEARTBEAT_HZ_BY_STATE: Record<ShipAwarenessState, number> = {
+  dormant: 0.24,
+  scanning: 0.5,
+  alert: 0.9,
+  critical: 1.35,
+};
+
+const TRANSITION_BOOST_DECAY = 0.82;
+const TRANSITION_BOOST_HZ = 0.95;
 
 /** Default sections matching ShipSectionNavigation.ts */
 const DEFAULT_SECTIONS: ReadonlyArray<Omit<ShipSectionState, 'isDetached' | 'detachedAt'>> = [
@@ -199,6 +215,9 @@ export class ShipExteriorSystem extends BaseSystem {
       );
     }
 
+    // --- 6. Awareness + heartbeat state machine ---
+    updated = this.updateAwarenessAndHeartbeat(ctx, entity, updated);
+
     // Persist updated component
     entity.updateComponent<ShipExteriorComponent>(CT.ShipExterior, () => updated);
   }
@@ -215,6 +234,135 @@ export class ShipExteriorSystem extends BaseSystem {
     if (depth <= DENSITY_RAMP_START) return 0;
     const raw = (depth - DENSITY_RAMP_START) / DENSITY_RAMP_SCALE;
     return Math.min(1, raw);
+  }
+
+  private updateAwarenessAndHeartbeat(
+    ctx: SystemContext,
+    entity: EntityImpl,
+    exterior: ShipExteriorComponent
+  ): ShipExteriorComponent {
+    const previousAwareness = (exterior as Partial<ShipExteriorComponent>).awareness ?? {
+      state: 'dormant' as ShipAwarenessState,
+      level: 0,
+      lastStateChangeTick: 0,
+      transitionBoost: 0,
+    };
+    const previousHeartbeat = (exterior as Partial<ShipExteriorComponent>).heartbeat ?? {
+      baseCadenceHz: BASE_HEARTBEAT_HZ_BY_STATE.dormant,
+      cadenceHz: BASE_HEARTBEAT_HZ_BY_STATE.dormant,
+      phase: 0,
+      pulseStrength: 0.3,
+      lastPulseTick: 0,
+      beats: 0,
+    };
+
+    const spaceship = entity.getComponent<SpaceshipComponent>(CT.Spaceship);
+    const coherence = spaceship?.crew.coherence ?? 0.5;
+
+    const velocityMag = Math.sqrt(
+      exterior.velocity.x * exterior.velocity.x +
+      exterior.velocity.y * exterior.velocity.y +
+      exterior.velocity.z * exterior.velocity.z
+    );
+    const normalizedVelocity = Math.min(1, velocityMag / 120);
+
+    const asteroidThreat = exterior.asteroidField.density;
+    const hullStress = 1 - exterior.hullIntegrity;
+    const shieldExposure = exterior.shieldActive
+      ? 1 - exterior.shieldStrength
+      : 0.65 + (1 - exterior.shieldStrength) * 0.35;
+    const coherenceStress = 1 - Math.max(0, Math.min(1, coherence));
+    const impactInstability = Math.max(0, Math.min(1, exterior.asteroidField.damagePerTick * 30));
+
+    const awarenessLevel = this.clamp01(
+      asteroidThreat * 0.34 +
+      hullStress * 0.24 +
+      shieldExposure * 0.18 +
+      coherenceStress * 0.14 +
+      normalizedVelocity * 0.07 +
+      impactInstability * 0.03
+    );
+
+    const previousState = previousAwareness.state;
+    const nextState = this.classifyAwarenessState(awarenessLevel, exterior);
+    const transitioned = previousState !== nextState;
+
+    let transitionBoost = previousAwareness.transitionBoost * TRANSITION_BOOST_DECAY;
+    if (transitioned) {
+      transitionBoost = 1;
+      ctx.emit(
+        'ship:heartbeat_transition',
+        {
+          from: previousState,
+          to: nextState,
+          awarenessLevel,
+        },
+        entity.id
+      );
+    } else if (awarenessLevel - previousAwareness.level > 0.2) {
+      transitionBoost = Math.max(transitionBoost, 0.45);
+    }
+
+    const baseCadenceHz = BASE_HEARTBEAT_HZ_BY_STATE[nextState];
+    const cadenceHz = baseCadenceHz + transitionBoost * TRANSITION_BOOST_HZ;
+    const stepSeconds = Math.max(DEFAULT_STEP_SECONDS, ctx.deltaTime * Math.max(1, this.throttleInterval));
+
+    let phase = previousHeartbeat.phase + cadenceHz * stepSeconds;
+    let beats = previousHeartbeat.beats;
+    let lastPulseTick = previousHeartbeat.lastPulseTick;
+
+    if (phase >= 1) {
+      const pulseCount = Math.floor(phase);
+      beats += pulseCount;
+      phase %= 1;
+      lastPulseTick = ctx.tick;
+    }
+
+    const pulseStrength = this.clamp01(0.26 + awarenessLevel * 0.42 + transitionBoost * 0.32);
+
+    return {
+      ...exterior,
+      awareness: {
+        state: nextState,
+        level: awarenessLevel,
+        lastStateChangeTick: transitioned ? ctx.tick : previousAwareness.lastStateChangeTick,
+        transitionBoost,
+      },
+      heartbeat: {
+        baseCadenceHz,
+        cadenceHz,
+        phase,
+        pulseStrength,
+        lastPulseTick,
+        beats,
+      },
+    };
+  }
+
+  private classifyAwarenessState(
+    awarenessLevel: number,
+    exterior: Pick<ShipExteriorComponent, 'hullIntegrity' | 'shieldActive' | 'asteroidField'>
+  ): ShipAwarenessState {
+    if (awarenessLevel >= 0.8 || exterior.hullIntegrity <= 0.3) {
+      return 'critical';
+    }
+
+    if (
+      awarenessLevel >= 0.58 ||
+      (exterior.asteroidField.density >= 0.65 && !exterior.shieldActive)
+    ) {
+      return 'alert';
+    }
+
+    if (awarenessLevel >= 0.28) {
+      return 'scanning';
+    }
+
+    return 'dormant';
+  }
+
+  private clamp01(value: number): number {
+    return Math.max(0, Math.min(1, value));
   }
 
   /**
@@ -294,6 +442,20 @@ export class ShipExteriorSystem extends BaseSystem {
       laserDamage: 0.2,
       hullIntegrity: 1,
       detachableSections: defaultSections,
+      awareness: {
+        state: 'dormant',
+        level: 0,
+        lastStateChangeTick: 0,
+        transitionBoost: 0,
+      },
+      heartbeat: {
+        baseCadenceHz: BASE_HEARTBEAT_HZ_BY_STATE.dormant,
+        cadenceHz: BASE_HEARTBEAT_HZ_BY_STATE.dormant,
+        phase: 0,
+        pulseStrength: 0.3,
+        lastPulseTick: 0,
+        beats: 0,
+      },
     };
 
     shipEntity.addComponent(component);

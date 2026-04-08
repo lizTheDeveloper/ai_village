@@ -3,6 +3,7 @@ import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { AnimalComponent } from '../components/AnimalComponent.js';
 import { getAnimalSpecies } from '../data/animalSpecies.js';
+import { getSpeciesTemplate, type InterspeciesDisposition } from '../species/SpeciesRegistry.js';
 
 // Detection and interaction ranges (in world units, squared for performance)
 const PREDATOR_DETECTION_RANGE_SQ = 225; // 15 units
@@ -81,6 +82,12 @@ export class PredatorPreyEcologySystem extends BaseSystem {
 
     for (const { animal: preyAnimal } of preyList) {
       if (preyAnimal.health <= 0) continue;
+
+      const disposition = this.resolveDisposition(predator.speciesId, preyAnimal.speciesId);
+      if (disposition && !this.isPredatoryDisposition(disposition)) {
+        continue;
+      }
+
       const distSq = this.distanceSq(predator, preyAnimal);
       if (distSq <= PREDATOR_DETECTION_RANGE_SQ && distSq < nearestPreyDist) {
         nearestPreyDist = distSq;
@@ -111,8 +118,19 @@ export class PredatorPreyEcologySystem extends BaseSystem {
 
     for (const { animal: predator } of predatorList) {
       if (predator.health <= 0) continue;
-      // Only flee from hunting predators
-      if (predator.state !== 'hunting') continue;
+
+      const predatorDisposition = this.resolveDisposition(predator.speciesId, preyAnimal.speciesId);
+      const preyDisposition = this.resolveDisposition(preyAnimal.speciesId, predator.speciesId);
+
+      const predatorIsThreat =
+        predator.state === 'hunting' &&
+        (predatorDisposition === undefined || this.isPredatoryDisposition(predatorDisposition));
+      const preyIsFearful = preyDisposition === 'fearful';
+
+      // Flee from hunting predators unless contract says they are non-hostile,
+      // or if prey species has an explicit fearful disposition.
+      if (!predatorIsThreat && !preyIsFearful) continue;
+
       const distSq = this.distanceSq(preyAnimal, predator);
       if (distSq < nearestPredatorDistSq) {
         nearestPredatorDistSq = distSq;
@@ -146,5 +164,43 @@ export class PredatorPreyEcologySystem extends BaseSystem {
     const dx = a.position.x - b.position.x;
     const dy = a.position.y - b.position.y;
     return dx * dx + dy * dy;
+  }
+
+  private isPredatoryDisposition(disposition: InterspeciesDisposition): boolean {
+    return disposition === 'predatory' || disposition === 'competitive';
+  }
+
+  private resolveDisposition(
+    sourceSpeciesId: string,
+    targetSpeciesId: string,
+  ): InterspeciesDisposition | undefined {
+    const profile = this.resolveBehaviorProfile(sourceSpeciesId);
+    if (!profile) return undefined;
+
+    const relation = profile.interspeciesRelations.find((entry) =>
+      this.speciesIdMatches(entry.targetSpeciesId, targetSpeciesId),
+    );
+    return relation?.disposition;
+  }
+
+  private resolveBehaviorProfile(speciesId: string) {
+    const direct = getSpeciesTemplate(speciesId);
+    if (direct?.speciesBehaviorProfile) return direct.speciesBehaviorProfile;
+
+    if (speciesId.startsWith('folkfork_')) {
+      const unprefixed = getSpeciesTemplate(speciesId.slice('folkfork_'.length));
+      if (unprefixed?.speciesBehaviorProfile) return unprefixed.speciesBehaviorProfile;
+    }
+
+    const prefixed = getSpeciesTemplate(`folkfork_${speciesId}`);
+    return prefixed?.speciesBehaviorProfile;
+  }
+
+  private speciesIdMatches(registeredId: string, runtimeId: string): boolean {
+    return (
+      registeredId === runtimeId ||
+      `folkfork_${registeredId}` === runtimeId ||
+      registeredId === `folkfork_${runtimeId}`
+    );
   }
 }

@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -573,7 +573,7 @@ Safety protocols in sugar work cannot be overstated, as molten sugar represents 
 
 ‡‡‡‡Specifically, an environment maintained at 20-22°C with humidity between 30-40%. These are also the optimal conditions for the comfort of the Scandinavian Cloud Marmot‡, though this is purely coincidental.
 
-‡A creature invented by Walter Moers in "The 13½ Lives of Captain Bluebear," included here because if we're going to discuss humidity requirements, we might as well acknowledge literature's contribution to imaginary mammalian meteorology.
+‡A creature described in the naturalist chronicles of the Thornhaven School of Fantastical Zoology, included here because if we're going to discuss humidity requirements, we might as well acknowledge imaginary mammalian meteorology.
 
 ****The Kingdom of Pralinea, according to the Chronicles of Sweetness, dissolved both figuratively and literally during the Great Humid Summer of 1156. Historians debate whether this actually happened. Confectioners insist the metaphor is too perfect to question.
 

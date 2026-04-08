@@ -112,8 +112,8 @@ export const EMOTION_THEATER_SYSTEM = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id ===
 export const MEMORY_HALL_ARCHIVE = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'memory_hall_archive')!;
 export const MEDITATION_CHAMBER_UNIT = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'meditation_chamber_unit')!;
 export const VR_IMMERSION_POD = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'vr_immersion_pod')!;
-export const GLEISNER_BODY_FRAME = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'gleisner_body_frame')!;
-export const SVETZ_RETRIEVAL_ENGINE = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'svetz_retrieval_engine')!;
+export const SYNTHETIC_BODY_FRAME = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'synthetic_body_frame')!;
+export const CHRONO_SALVAGE_ENGINE = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'chrono_salvage_engine')!;
 export const PROBABILITY_DRIVE = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'probability_drive')!;
 export const TIMELINE_MERGER_CORE = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'timeline_merger_core')!;
 
@@ -122,8 +122,8 @@ export const THRESHOLD_HULL_KIT = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'th
 export const COURIER_HULL_KIT = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'courier_hull_kit')!;
 export const BRAINSHIP_HULL_KIT = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'brainship_hull_kit')!;
 export const STORYSHIP_HULL_KIT = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'storyship_hull_kit')!;
-export const GLEISNER_HULL_KIT = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'gleisner_hull_kit')!;
-export const SVETZ_HULL_KIT = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'svetz_hull_kit')!;
+export const SYNTHETIC_HULL_KIT = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'synthetic_hull_kit')!;
+export const CHRONO_SALVAGE_HULL_KIT = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'chrono_salvage_hull_kit')!;
 export const PROBABILITY_SCOUT_HULL_KIT = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'probability_scout_hull_kit')!;
 export const TIMELINE_MERGER_HULL_KIT = ALL_SPACEFLIGHT_ITEMS.find((i) => i.id === 'timeline_merger_hull_kit')!;
 
@@ -200,8 +200,8 @@ export const SHIP_MODULES: ItemDefinition[] = [
   MEMORY_HALL_ARCHIVE,
   MEDITATION_CHAMBER_UNIT,
   VR_IMMERSION_POD,
-  GLEISNER_BODY_FRAME,
-  SVETZ_RETRIEVAL_ENGINE,
+  SYNTHETIC_BODY_FRAME,
+  CHRONO_SALVAGE_ENGINE,
   PROBABILITY_DRIVE,
   TIMELINE_MERGER_CORE,
 ];
@@ -212,8 +212,8 @@ export const SHIP_HULL_KITS: ItemDefinition[] = [
   COURIER_HULL_KIT,
   BRAINSHIP_HULL_KIT,
   STORYSHIP_HULL_KIT,
-  GLEISNER_HULL_KIT,
-  SVETZ_HULL_KIT,
+  SYNTHETIC_HULL_KIT,
+  CHRONO_SALVAGE_HULL_KIT,
   PROBABILITY_SCOUT_HULL_KIT,
   TIMELINE_MERGER_HULL_KIT,
 ];

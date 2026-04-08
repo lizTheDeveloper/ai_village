@@ -212,6 +212,14 @@ describe('lore-discovery-bridge', () => {
         deityId: 'deity-001',
         deityName: 'Aethon',
         domain: 'sun',
+        deityPersonality: {
+          benevolence: -0.6,
+          interventionism: 0.2,
+          wrathfulness: 0.8,
+          mysteriousness: 0.4,
+          generosity: 0.9,
+          consistency: 0.3,
+        },
         believerCount: 120,
         timestamp: 500,
       });
@@ -224,6 +232,9 @@ describe('lore-discovery-bridge', () => {
       expect(deity.primaryName).toBe('Aethon');
       expect(deity.domain).toBe('sun');
       expect(deity.believerCount).toBe(120);
+      expect(deity.personality.benevolence).toBeCloseTo(0.2);
+      expect(deity.personality.interventionism).toBeCloseTo(0.6);
+      expect(deity.personality.wrathfulness).toBeCloseTo(0.8);
       expect(deity.alignment).toBe('unknown');
       expect(deity.mythCount).toBe(0);
       expect(Array.isArray(deity.canonicalMythIds)).toBe(true);
@@ -255,7 +266,7 @@ describe('lore-discovery-bridge', () => {
       expect(deity.domain).toBe('mystery');
     });
 
-    it('sets a neutral personality vector', () => {
+    it('falls back to a neutral personality vector when deity personality is absent', () => {
       mockEventBus.emit('lore:deity_emerged', {
         deityId: 'deity-004',
         deityName: 'Equilibrius',

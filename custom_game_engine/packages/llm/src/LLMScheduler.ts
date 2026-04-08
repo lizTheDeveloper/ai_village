@@ -83,11 +83,11 @@ export const DEFAULT_LAYER_CONFIG: Record<DecisionLayer, LayerConfig> = {
 };
 
 /**
- * Cognition zone — Vernor Vinge Zones of Thought mechanic.
+ * Cognition zone — Cognition Strata mechanic.
  * Creatures farther from the galactic core think slower and simpler (local inference).
  * Creatures near the core access the "galactic network" (cloud LLM) for faster, richer cognition.
  */
-export type CognitionZone = 'unthinking_depths' | 'slow_zone' | 'beyond' | 'transcend';
+export type CognitionZone = 'unthinking_depths' | 'dampened_zone' | 'open_field' | 'harmonic_peak';
 
 /**
  * Zone-aware layer overrides.
@@ -99,17 +99,17 @@ export const ZONE_LAYER_OVERRIDES: Record<CognitionZone, Partial<Record<Decision
     executor: { enabled: false },
     autonomic: { cooldownMs: 500 },
   },
-  slow_zone: {
+  dampened_zone: {
     talker: { cooldownMs: 10000 },
     executor: { enabled: false },
     autonomic: { cooldownMs: 1000 },
   },
-  transcend: {
+  harmonic_peak: {
     talker: { cooldownMs: 2000 },
     executor: { cooldownMs: 1000 },
     autonomic: { cooldownMs: 500 },
   },
-  beyond: {
+  open_field: {
     // Default behavior — no overrides
   },
 };
@@ -548,7 +548,7 @@ export class LLMScheduler {
    * Get the cognition zone for an agent based on its current planet.
    * Checks the planet zone registry first, then falls back to reading
    * the 'cognition_zone' component from the planet entity (if it exists).
-   * Defaults to 'beyond' (standard cloud) if no zone is assigned.
+   * Defaults to 'open_field' (standard cloud) if no zone is assigned.
    */
   getCognitionZone(agent: Entity, world: World): CognitionZone {
     const planetLocation = agent.components.get('planet_location') as { currentPlanetId?: string } | undefined;
@@ -566,7 +566,7 @@ export class LLMScheduler {
         return zoneComp.zone;
       }
     }
-    return 'beyond';
+    return 'open_field';
   }
 
   /**
@@ -579,11 +579,11 @@ export class LLMScheduler {
     switch (zone) {
       case 'unthinking_depths':
         return { tier: 'nn-only' };
-      case 'slow_zone':
+      case 'dampened_zone':
         return { tier: 'browser', chatOnly: true };
-      case 'beyond':
+      case 'open_field':
         return { tier: 'default' };
-      case 'transcend':
+      case 'harmonic_peak':
         return { tier: 'high' };
     }
   }

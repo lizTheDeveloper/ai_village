@@ -28,6 +28,8 @@ import type { PassageComponent } from '../components/PassageComponent.js';
 import type { SpaceshipComponent } from '../navigation/SpaceshipComponent.js';
 import { multiverseCoordinator } from '../multiverse/MultiverseCoordinator.js';
 import type { DivergenceTrackingComponent } from '../components/DivergenceTrackingComponent.js';
+import type { RuneComprehensionComponent } from '../components/RuneComprehensionComponent.js';
+import { canTraverseDoorGate, isGateRune } from '../components/RuneComprehensionComponent.js';
 
 /**
  * Result of a ship traversal attempt.
@@ -192,7 +194,8 @@ export class PassageTraversalSystem extends BaseSystem {
     ship: SpaceshipComponent,
     passage: PassageComponent,
     passageExt: PassageExtendedComponent,
-    tick: number
+    tick: number,
+    runeComp?: RuneComprehensionComponent
   ): ShipTraversalResult {
     // Early exits - check cheapest conditions first
     // Check passage state (cheapest - single boolean + string comparison)
@@ -209,6 +212,17 @@ export class PassageTraversalSystem extends BaseSystem {
         success: false,
         reason: `Passage too unstable (stability: ${passageExt.stability.toFixed(2)})`,
       };
+    }
+
+    // Check rune comprehension gate (cheap - single lookup + comparison)
+    if (passageExt.restrictions.requiredRune && isGateRune(passageExt.restrictions.requiredRune)) {
+      const gateCheck = canTraverseDoorGate(runeComp, passageExt.restrictions.requiredRune as Parameters<typeof canTraverseDoorGate>[1]);
+      if (!gateCheck.canTraverse) {
+        return {
+          success: false,
+          reason: gateCheck.reason,
+        };
+      }
     }
 
     // Check if ship can traverse (more expensive - function call with multiple checks)
@@ -271,7 +285,8 @@ export class PassageTraversalSystem extends BaseSystem {
    */
   canTraversePassage(
     passage: PassageComponent,
-    passageExt: PassageExtendedComponent
+    passageExt: PassageExtendedComponent,
+    runeComp?: RuneComprehensionComponent
   ): { canTraverse: boolean; reason?: string } {
     // Early exits - check cheapest conditions first
     if (!passage.active) {
@@ -294,6 +309,14 @@ export class PassageTraversalSystem extends BaseSystem {
         canTraverse: false,
         reason: `Unstable (${passageExt.stability.toFixed(2)})`,
       };
+    }
+
+    // Check rune comprehension gate
+    if (passageExt.restrictions.requiredRune && isGateRune(passageExt.restrictions.requiredRune)) {
+      const gateCheck = canTraverseDoorGate(runeComp, passageExt.restrictions.requiredRune as Parameters<typeof canTraverseDoorGate>[1]);
+      if (!gateCheck.canTraverse) {
+        return gateCheck;
+      }
     }
 
     return { canTraverse: true };

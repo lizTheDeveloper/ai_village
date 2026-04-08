@@ -364,7 +364,7 @@ describe('BreathCostCalculator', () => {
     expect(breathCost?.amount ?? 0).toBe(0);
   });
 
-  it('should warn about becoming a Drab', () => {
+  it('should warn about becoming a Hollow', () => {
     caster.resourcePools.health!.current = 1; // Only 1 breath
 
     const spell = createTestSpell({ technique: 'enhance', manaCost: 20 });
@@ -373,7 +373,7 @@ describe('BreathCostCalculator', () => {
 
     const result = calculator.canAfford(costs, caster);
     expect(result.wouldBeTerminal).toBe(true);
-    expect(result.warning).toContain('Drab');
+    expect(result.warning).toContain('Hollow');
   });
 });
 

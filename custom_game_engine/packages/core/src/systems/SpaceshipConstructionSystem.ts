@@ -138,7 +138,7 @@ const SHIP_CONFIGS: Record<SpaceshipType, ShipTypeConfig> = {
       meditationChamber: true,
     },
   },
-  gleisner_vessel: {
+  synthetic_vessel: {
     constructionTime: 14000,
     crewCapacity: 0, // No separate crew - consciousness IS the ship
     requiredBuilding: 'shipyard_advanced',
@@ -149,7 +149,7 @@ const SHIP_CONFIGS: Record<SpaceshipType, ShipTypeConfig> = {
       meditationChamber: false,
     },
   },
-  svetz_retrieval: {
+  chrono_salvage: {
     constructionTime: 16000,
     crewCapacity: 3,
     requiredBuilding: 'shipyard_advanced',
@@ -386,8 +386,8 @@ export class SpaceshipConstructionSystem extends BaseSystem {
         'courier_ship',
         'brainship',
         'story_ship',
-        'gleisner_vessel',
-        'svetz_retrieval',
+        'synthetic_vessel',
+        'chrono_salvage',
         'probability_scout',
         'timeline_merger',
       ],

@@ -65,8 +65,8 @@ const SHIP_CAPACITY_COSTS: Record<SpaceshipType, number> = {
   threshold_ship: 1.0,
   story_ship: 2.0,
   brainship: 3.0,
-  gleisner_vessel: 2.5,
-  svetz_retrieval: 3.5,
+  synthetic_vessel: 2.5,
+  chrono_salvage: 3.5,
   probability_scout: 1.5,
   timeline_merger: 10.0,
 };
@@ -78,8 +78,8 @@ const SHIP_BUDGET_COSTS: Record<SpaceshipType, number> = {
   threshold_ship: 10000, // 1000 mass × 10
   brainship: 5000, // 500 mass × 10
   story_ship: 20000, // 2000 mass × 10
-  gleisner_vessel: 5000, // 500 mass × 10
-  svetz_retrieval: 8000, // 800 mass × 10
+  synthetic_vessel: 5000, // 500 mass × 10
+  chrono_salvage: 8000, // 800 mass × 10
   probability_scout: 500, // 50 mass × 10
   timeline_merger: 50000, // 5000 mass × 10
 };
@@ -117,15 +117,15 @@ const SHIP_RESOURCE_REQUIREMENTS: Record<SpaceshipType, Record<string, number>> 
     stellarite_ingot: 40,
     power_core: 12,
   },
-  gleisner_vessel: {
-    gleisner_body_frame: 15,
+  synthetic_vessel: {
+    synthetic_body_frame: 15,
     quantum_processor: 25,
     advanced_circuit: 50,
     hull_plating: 60,
     stellarite_plate: 25,
   },
-  svetz_retrieval: {
-    svetz_retrieval_engine: 5,
+  chrono_salvage: {
+    chrono_salvage_engine: 5,
     temporal_regulator: 20,
     timeline_anchor: 3,
     reinforced_hull: 100,

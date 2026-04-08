@@ -563,7 +563,7 @@
       "#.........#",
       "####DDD####"
     ],
-    "// Music = song +60, sound_amplification, emotion_amplification, euphoric\n  // Carpet = sound_dampening (controls echoes), comforting, +10 mood\n  // Bronze = ferromancy (Seeker detects magic), metal element\n  materials": {
+    "// Music = song +60, sound_amplification, emotion_amplification, euphoric\n  // Carpet = sound_dampening (controls echoes), comforting, +10 mood\n  // Bronze = ferromancy (Bronze-Finder detects magic), metal element\n  materials": {
       "wall": "music",
       "floor": "carpet",
       "door": "bronze"
@@ -2018,8 +2018,8 @@
     "lore": "Here, the million-to-one chance succeeds every time. Heroes triumph, villains monologue, and stories write themselves into reality."
   },
   {
-    "id": "library_of_babel",
-    "name": "Library of Babel",
+    "id": "infinite_archive",
+    "name": "The Infinite Archive",
     "description": "A hexagonal library containing every possible book, where words have physical weight.",
     "category": "research",
     "tier": 5,
@@ -2068,8 +2068,8 @@
   },
   {
     "id": "awakening_workshop",
-    "name": "Awakening Workshop",
-    "description": "A colorful workshop where BioChromatic Breath is invested into objects, bringing them to life.",
+    "name": "Investing Workshop",
+    "description": "A colorful workshop where Pneumantic Breath is invested into objects, bringing them to life.",
     "category": "production",
     "tier": 4,
     "species": "medium",

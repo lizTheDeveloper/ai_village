@@ -29,7 +29,7 @@ export interface SkillTreeParadigmState {
 /**
  * Tracks skill tree progression per magic paradigm.
  *
- * Each paradigm (academic, divine, allomancy, etc.) has its own skill tree.
+ * Each paradigm (academic, divine, ferromancy, etc.) has its own skill tree.
  * Agents earn XP by casting spells, which unlocks nodes that grant new spells/abilities.
  */
 export interface SkillProgressComponent extends Component {

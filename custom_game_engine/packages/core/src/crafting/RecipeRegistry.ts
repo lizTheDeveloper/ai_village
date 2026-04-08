@@ -552,15 +552,15 @@ export async function initializeDefaultRecipes(registry: RecipeRegistry = global
   });
 
   tryRegister({
-    id: 'mithril_ingot',
-    name: 'Mithril Ingot',
+    id: 'starweave_ingot',
+    name: 'Starweave Ingot',
     category: 'Materials',
-    description: 'Legendary lightweight metal.',
+    description: 'Ultra-light metallic ore with innate magical conductivity.',
     ingredients: [
       { itemId: 'iron_ingot', quantity: 2 },
       { itemId: 'gold_ingot', quantity: 1 }
     ],
-    output: { itemId: 'mithril_ingot', quantity: 1 },
+    output: { itemId: 'starweave_ingot', quantity: 1 },
     craftingTime: 40,
     xpGain: 50,
     stationRequired: 'forge',

@@ -259,12 +259,12 @@
             "emotion_theater_system",
             "memory_hall_archive",
             "vr_immersion_pod",
-            "gleisner_body_frame",
+            "synthetic_body_frame",
             "worldship_hull_kit",
             "threshold_hull_kit",
             "brainship_hull_kit",
             "storyship_hull_kit",
-            "gleisner_hull_kit"
+            "synthetic_hull_kit"
           ],
           "speed": 1.2
         },
@@ -298,7 +298,7 @@
         { "resourceId": "quantum_processor", "amountRequired": 5 },
         { "resourceId": "stellarite_plate", "amountRequired": 20 }
       ],
-      "techRequired": ["svetz_retrieval"],
+      "techRequired": ["chrono_salvage"],
       "terrainRequired": ["grass", "dirt", "stone"],
       "terrainForbidden": ["water", "deep_water"],
       "skillRequired": { "skill": "building", "level": 5 },
@@ -313,7 +313,7 @@
             "temporal_regulator",
             "timeline_anchor",
             "observation_nullifier",
-            "svetz_retrieval_engine"
+            "chrono_salvage_engine"
           ],
           "speed": 0.6
         },
@@ -366,7 +366,7 @@
             "neutronium_core",
             "probability_drive",
             "timeline_merger_core",
-            "svetz_hull_kit",
+            "chrono_salvage_hull_kit",
             "probability_scout_hull_kit",
             "timeline_merger_hull_kit"
           ],
@@ -840,7 +840,7 @@
     {
       "id": "digital_fabrication_lab",
       "name": "Digital Fabrication Lab",
-      "description": "A high-tech facility for constructing Gleisner vessels where consciousness and hull are unified.",
+      "description": "A high-tech facility for constructing synthetic vessels where consciousness and hull are unified.",
       "category": "research",
       "subcategory": "shipyard",
       "width": 6,
@@ -866,7 +866,7 @@
         },
         {
           "type": "crafting",
-          "recipes": ["gleisner_hull", "consciousness_matrix", "soul_anchor_mount"],
+          "recipes": ["synthetic_hull", "consciousness_matrix", "soul_anchor_mount"],
           "speed": 0.8
         }
       ],
@@ -878,7 +878,7 @@
     {
       "id": "temporal_research_lab",
       "name": "Temporal Research Laboratory",
-      "description": "A facility for studying temporal mechanics and developing Svetz retrieval technology for temporal archaeology.",
+      "description": "A facility for studying temporal mechanics and developing chrono salvage technology for temporal archaeology.",
       "category": "research",
       "subcategory": "shipyard",
       "width": 7,
@@ -904,7 +904,7 @@
         },
         {
           "type": "crafting",
-          "recipes": ["svetz_drive", "temporal_stabilizer", "extinction_sampler"],
+          "recipes": ["chrono_salvage_drive", "temporal_stabilizer", "extinction_sampler"],
           "speed": 0.5
         }
       ],
@@ -927,7 +927,7 @@
         { "resourceId": "mana_crystal", "amountRequired": 150 },
         { "resourceId": "glass_panel", "amountRequired": 200 }
       ],
-      "techRequired": ["spaceflight_gleisner_vessel"],
+      "techRequired": ["spaceflight_synthetic_vessel"],
       "terrainRequired": ["grass", "dirt", "stone"],
       "terrainForbidden": ["water", "deep_water"],
       "skillRequired": { "skill": "building", "level": 5 },

@@ -13,7 +13,7 @@
  * - Integrated with PresenceSpectrum/Divinity system
  *
  * Inspired by:
- * - D&D clerics and paladins
+ * - Classic cleric and paladin archetypes
  * - Real-world religious traditions
  * - The concept that faith and worship create power
  * - Divine magic as granted, not learned

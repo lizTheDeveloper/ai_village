@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -264,7 +264,7 @@ Safety considerations in deep earth construction ultimately reduce to a single q
 
 ---
 
-*Attributed to various sources, including the Dwarven Safety Manual (Third Age), the Guild of Miners' Charter of 1634, and—somewhat anachronistically—J.R.R. Tolkien. The principle remains sound regardless of provenance, though the Dwarves insist they said it first and have the scars to prove it.
+*Attributed to various sources, including the Dwarven Safety Manual (Third Age), the Guild of Miners' Charter of 1634, and—somewhat anachronistically—the legendary Dwarf-King Durathon the Deep. The principle remains sound regardless of provenance, though the Dwarves insist they said it first and have the scars to prove it.
 
 **This figure represents the average depth at which conventional geology gives way to what the textbooks term "non-standard conditions." The decimal precision is maintained purely for the appearance of scientific rigor; the actual threshold varies by location, geological era, and whether anyone was paying attention during the initial survey.
 

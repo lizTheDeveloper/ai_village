@@ -933,6 +933,14 @@ export class DivinePowerSystem extends BaseSystem {
       miracleType,
       cost: miracleResult.beliefSpent,
     });
+
+    // Also emit deity:miracle so MythGenerationSystem picks it up
+    this.emitGeneric('deity:miracle', {
+      deityId: request.deityId,
+      miracleType,
+      description: `Divine ${miracleType} miracle`,
+      power: miracleResult.beliefSpent,
+    });
   }
 
   /**

@@ -30,7 +30,9 @@ export type EmotionalState =
   | 'despairing'   // Deep depression - may become catatonic
   | 'manic'        // Hyperactive, reckless behavior
   | 'obsessed'     // Strange mood - focused on single task
-  | 'terrified';   // Panic state - may flee or freeze
+  | 'terrified'    // Panic state - may flee or freeze
+  // Dreamer failure mode: agent trapped in emotional cascade feedback loop
+  | 'dreaming';    // Dreamer failure — fixated on cascaded emotion, unresponsive
 
 // ============================================================================
 // Forward-Compatibility: Stress & Trauma System
@@ -217,6 +219,28 @@ export interface MoodComponent extends Component {
 
   /** Last time mood was updated (tick) */
   lastUpdate: number;
+
+  // ============================================================================
+  // Emotional Contagion & Dreamer Failure Mode
+  // ============================================================================
+
+  /**
+   * Accumulated emotional contagion level (0-1).
+   * Rises when the agent is in a cascade; decays when isolated from it.
+   * When it exceeds DREAMER_THRESHOLD the agent enters dreamer failure mode.
+   */
+  contagionLevel?: number;
+
+  /**
+   * Whether this agent is currently in the Dreamer failure mode.
+   * Dreamer mode: stuck in a cascaded emotion, unresponsive to normal stimuli.
+   * Norns with high nurture/oxytocin can break out; other agents need the
+   * cascade to dissipate before they recover.
+   */
+  dreamerMode?: boolean;
+
+  /** Tick when dreamer mode began (for duration tracking and recovery checks). */
+  dreamerStartTick?: number;
 
   // ============================================================================
   // Mourning and Grief System
@@ -531,6 +555,8 @@ export function getMoodDescription(component: MoodComponent): string {
     manic: 'in a manic state',
     obsessed: 'obsessively focused',
     terrified: 'paralyzed with fear',
+    // Dreamer failure mode
+    dreaming: 'lost in an emotional cascade, unresponsive',
   };
 
   return `${moodLevel}, ${stateDescriptions[component.emotionalState]}`;

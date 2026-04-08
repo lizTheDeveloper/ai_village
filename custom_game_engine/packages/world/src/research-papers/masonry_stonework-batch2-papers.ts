@@ -472,7 +472,7 @@ Safety considerations in buttress construction cannot be overstated, particularl
 
 ‡Gravity, it should be noted, never stops asking questions. Unlike a particularly persistent aunt at family gatherings, however, gravity accepts only one answer: down. The Cosmological Society of Directional Inevitability has been studying this phenomenon since 1432 CE, and their findings remain consistent: gravity is "annoyingly reliable."
 
-**The term appears in the original Überwaldsteinian as "freundschaftlichzwangsunterstützung," which translates more literally as "compulsory friendship assistance." The philosophical implications of forcing stone to support other stone through sheer proximity occupied the Debating Societies of Lower Ankh for three consecutive decades††.
+**The term appears in the original Überwaldsteinian as "freundschaftlichzwangsunterstützung," which translates more literally as "compulsory friendship assistance." The philosophical implications of forcing stone to support other stone through sheer proximity occupied the Debating Societies of Lower Thornhaven for three consecutive decades††.
 
 ††During which time seventeen debating halls collapsed, proving various points about buttress theory through what historians call "aggressive demonstration." The Society of Ironic Architecture maintains a memorial to these incidents, which is itself supported by extensively over-engineered buttressing.
 

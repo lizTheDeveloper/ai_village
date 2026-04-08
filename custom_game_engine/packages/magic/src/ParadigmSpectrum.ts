@@ -16,7 +16,7 @@
  * 4. **Animism Level** - How ensouled is the world? (Kami or no Kami)
  *    only humans conscious → animals too → plants too → objects have spirits → everything has kami
  *
- * These axes are independent - you can have high magic with low animism (D&D wizards),
+ * These axes are independent - you can have high magic with low animism (rule-based wizards),
  * or low magic with high animism (mundane world where everything has a spirit but
  * magic is rare), etc.
  */
@@ -67,7 +67,7 @@ export type MagicFormality =
   | 'chaotic'        // No rules, anything can happen (Wild magic)
   | 'intuitive'      // Works by feel, no formal training (Talent, Emotional)
   | 'traditional'    // Passed down practices, some structure (Song, Shinto)
-  | 'trained'        // Requires deliberate learning (Sympathy, Rune)
+  | 'trained'        // Requires deliberate learning (Tethermancy, Rune)
   | 'academic'       // Highly systematic, university-style (Academic paradigm)
   | 'scientific';    // Magic as rigorous science, fully understood
 
@@ -181,7 +181,7 @@ export const SPECTRUM_PRESETS: Record<string, MagicSpectrumConfig> = {
   },
 
   /**
-   * Low Fantasy - Rare, subtle magic (Game of Thrones early seasons)
+   * Low Fantasy - Rare, subtle magic
    */
   low_fantasy: {
     intensity: 'low',
@@ -198,7 +198,7 @@ export const SPECTRUM_PRESETS: Record<string, MagicSpectrumConfig> = {
   },
 
   /**
-   * Classic Fantasy - D&D style magic (Forgotten Realms)
+   * Classic Fantasy - Rule-based systems
    */
   classic_fantasy: {
     intensity: 'high',
@@ -249,7 +249,7 @@ export const SPECTRUM_PRESETS: Record<string, MagicSpectrumConfig> = {
   },
 
   /**
-   * Hard Magic - Systematic, rule-based (Mistborn, Name of the Wind)
+   * Hard Magic - Systematic, rule-based (CrucibleBorn, Chorus of Resonance)
    */
   hard_magic: {
     intensity: 'high',
@@ -282,7 +282,7 @@ export const SPECTRUM_PRESETS: Record<string, MagicSpectrumConfig> = {
   },
 
   /**
-   * Wild Magic - Chaotic, unpredictable (Xanth-style)
+   * Wild Magic - Chaotic, unpredictable
    */
   wild_magic: {
     intensity: 'high',
@@ -356,15 +356,15 @@ const INTENSITY_PARADIGM_MAP: Record<MagicalIntensity, { enabled: string[]; disa
     disabled: ['academic', 'wild'],
   },
   medium: {
-    enabled: ['talent', 'emotional', 'blood', 'breath', 'sympathy', 'song', 'rune', 'divine', 'shinto'],
+    enabled: ['talent', 'emotional', 'blood', 'breath', 'tethermancy', 'song', 'rune', 'divine', 'shinto'],
     disabled: ['wild'],
   },
   high: {
-    enabled: ['academic', 'pact', 'name', 'breath', 'divine', 'blood', 'emotional', 'shinto', 'sympathy', 'allomancy', 'dream', 'song', 'rune', 'daemon', 'talent', 'narrative'],
+    enabled: ['academic', 'pact', 'name', 'breath', 'divine', 'blood', 'emotional', 'shinto', 'tethermancy', 'ferromancy', 'dream', 'song', 'rune', 'animus', 'talent', 'narrative'],
     disabled: [],
   },
   saturated: {
-    enabled: ['academic', 'pact', 'name', 'breath', 'divine', 'blood', 'emotional', 'shinto', 'sympathy', 'allomancy', 'dream', 'song', 'rune', 'daemon', 'talent', 'narrative', 'pun', 'wild', 'poetic'],
+    enabled: ['academic', 'pact', 'name', 'breath', 'divine', 'blood', 'emotional', 'shinto', 'tethermancy', 'ferromancy', 'dream', 'song', 'rune', 'animus', 'talent', 'narrative', 'pun', 'wild', 'poetic'],
     disabled: [],
   },
   reality_is_magic: {
@@ -376,35 +376,35 @@ const INTENSITY_PARADIGM_MAP: Record<MagicalIntensity, { enabled: string[]; disa
 /** Maps animism levels to enabled paradigm sets */
 const ANIMISM_PARADIGM_MAP: Record<AnimismLevel, { enabled: string[]; required: string[] }> = {
   materialist: {
-    enabled: ['academic', 'sympathy', 'rune', 'blood', 'allomancy'],
+    enabled: ['academic', 'tethermancy', 'rune', 'blood', 'ferromancy'],
     required: [],
   },
   human_only: {
-    enabled: ['academic', 'sympathy', 'rune', 'blood', 'allomancy', 'talent', 'emotional', 'breath', 'name'],
+    enabled: ['academic', 'tethermancy', 'rune', 'blood', 'ferromancy', 'talent', 'emotional', 'breath', 'name'],
     required: [],
   },
   mammalian: {
-    enabled: ['academic', 'sympathy', 'rune', 'blood', 'allomancy', 'talent', 'emotional', 'breath', 'name', 'daemon'],
+    enabled: ['academic', 'tethermancy', 'rune', 'blood', 'ferromancy', 'talent', 'emotional', 'breath', 'name', 'animus'],
     required: [],
   },
   animal: {
-    enabled: ['academic', 'sympathy', 'rune', 'blood', 'allomancy', 'talent', 'emotional', 'breath', 'name', 'daemon', 'dream'],
+    enabled: ['academic', 'tethermancy', 'rune', 'blood', 'ferromancy', 'talent', 'emotional', 'breath', 'name', 'animus', 'dream'],
     required: [],
   },
   organic: {
-    enabled: ['academic', 'sympathy', 'rune', 'blood', 'allomancy', 'talent', 'emotional', 'breath', 'name', 'daemon', 'dream', 'song'],
+    enabled: ['academic', 'tethermancy', 'rune', 'blood', 'ferromancy', 'talent', 'emotional', 'breath', 'name', 'animus', 'dream', 'song'],
     required: [],
   },
   object: {
-    enabled: ['academic', 'sympathy', 'rune', 'blood', 'allomancy', 'talent', 'emotional', 'breath', 'name', 'daemon', 'dream', 'song', 'divine', 'shinto'],
+    enabled: ['academic', 'tethermancy', 'rune', 'blood', 'ferromancy', 'talent', 'emotional', 'breath', 'name', 'animus', 'dream', 'song', 'divine', 'shinto'],
     required: ['shinto'],  // Object spirits require shinto-style magic
   },
   elemental: {
-    enabled: ['academic', 'sympathy', 'rune', 'blood', 'allomancy', 'talent', 'emotional', 'breath', 'name', 'daemon', 'dream', 'song', 'divine', 'shinto', 'pact'],
+    enabled: ['academic', 'tethermancy', 'rune', 'blood', 'ferromancy', 'talent', 'emotional', 'breath', 'name', 'animus', 'dream', 'song', 'divine', 'shinto', 'pact'],
     required: ['shinto'],
   },
   abstract: {
-    enabled: ['academic', 'sympathy', 'rune', 'blood', 'allomancy', 'talent', 'emotional', 'breath', 'name', 'daemon', 'dream', 'song', 'divine', 'shinto', 'pact', 'narrative', 'pun', 'poetic'],
+    enabled: ['academic', 'tethermancy', 'rune', 'blood', 'ferromancy', 'talent', 'emotional', 'breath', 'name', 'animus', 'dream', 'song', 'divine', 'shinto', 'pact', 'narrative', 'pun', 'poetic'],
     required: ['shinto', 'narrative'],  // Living abstractions require these
   },
   panpsychic: {
@@ -418,12 +418,12 @@ const SOURCE_PARADIGM_MAP: Record<MagicSourceOrigin, string[]> = {
   none: [],
   divine: ['divine', 'shinto'],
   pact: ['pact'],
-  ancestral: ['blood', 'allomancy', 'daemon'],
-  environmental: ['sympathy', 'shinto', 'rune'],
+  ancestral: ['blood', 'ferromancy', 'animus'],
+  environmental: ['tethermancy', 'shinto', 'rune'],
   internal: ['academic', 'breath', 'emotional', 'talent'],
-  knowledge: ['academic', 'name', 'rune', 'sympathy'],
+  knowledge: ['academic', 'name', 'rune', 'tethermancy'],
   emotional: ['emotional', 'song', 'narrative'],
-  material: ['blood', 'allomancy', 'rune'],
+  material: ['blood', 'ferromancy', 'rune'],
   narrative: ['narrative', 'pun', 'poetic'],
   universal: ['wild', 'talent'],
 };
@@ -432,26 +432,26 @@ const SOURCE_PARADIGM_MAP: Record<MagicSourceOrigin, string[]> = {
 const FORMALITY_PARADIGM_MAP: Record<MagicFormality, { preferred: string[]; discouraged: string[] }> = {
   chaotic: {
     preferred: ['wild', 'pun', 'talent'],
-    discouraged: ['academic', 'sympathy', 'rune'],
+    discouraged: ['academic', 'tethermancy', 'rune'],
   },
   intuitive: {
     preferred: ['talent', 'emotional', 'narrative', 'dream', 'song'],
     discouraged: ['academic', 'rune'],
   },
   traditional: {
-    preferred: ['song', 'shinto', 'divine', 'blood', 'daemon'],
+    preferred: ['song', 'shinto', 'divine', 'blood', 'animus'],
     discouraged: ['academic'],
   },
   trained: {
-    preferred: ['sympathy', 'rune', 'name', 'breath', 'allomancy', 'pact'],
+    preferred: ['tethermancy', 'rune', 'name', 'breath', 'ferromancy', 'pact'],
     discouraged: ['wild', 'talent'],
   },
   academic: {
-    preferred: ['academic', 'sympathy', 'rune', 'name'],
+    preferred: ['academic', 'tethermancy', 'rune', 'name'],
     discouraged: ['wild', 'talent', 'emotional'],
   },
   scientific: {
-    preferred: ['academic', 'sympathy', 'allomancy'],
+    preferred: ['academic', 'tethermancy', 'ferromancy'],
     discouraged: ['wild', 'narrative', 'pun', 'divine', 'pact'],
   },
 };
@@ -715,10 +715,10 @@ export const CONFIGURATION_QUESTIONS = {
       { value: 'null', label: 'No Magic', description: 'Magic doesn\'t exist at all' },
       { value: 'anti', label: 'Anti-Magic', description: 'Magic is actively suppressed' },
       { value: 'dead', label: 'Dead Magic', description: 'Magic used to exist but is gone' },
-      { value: 'low', label: 'Low Magic', description: 'Rare and subtle magic (Game of Thrones)' },
+      { value: 'low', label: 'Low Magic', description: 'Rare and subtle magic' },
       { value: 'medium', label: 'Medium Magic', description: 'Magic is present but not dominant' },
-      { value: 'high', label: 'High Magic', description: 'Multiple powerful magic systems (D&D)' },
-      { value: 'saturated', label: 'Saturated', description: 'Magic is everywhere (Discworld)' },
+      { value: 'high', label: 'High Magic', description: 'Multiple powerful magic systems — polyparadigm worlds' },
+      { value: 'saturated', label: 'Saturated', description: 'Magic is everywhere — ambient and narrative' },
       { value: 'reality_is_magic', label: 'Reality IS Magic', description: 'No mundane exists' },
     ],
   },

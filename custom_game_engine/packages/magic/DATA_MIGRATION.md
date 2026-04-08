@@ -10,7 +10,7 @@ Magic paradigm data has been extracted from TypeScript files into JSON files for
 packages/magic/
 ├── data/                           # JSON data files
 │   ├── core-paradigms.json        # 7 core paradigms (academic, pact, names, etc.)
-│   └── animist-paradigms.json     # Example kami and allomantic metals
+│   └── animist-paradigms.json     # Example kami and ferromancy metals
 ├── src/
 │   ├── data-loader.ts             # Loads and validates JSON data
 │   ├── CoreParadigms.ts           # Now loads from JSON
@@ -33,9 +33,9 @@ All 7 core paradigms moved to `data/core-paradigms.json`:
 ### AnimistParadigms.ts
 Extracted supporting data:
 - `EXAMPLE_KAMI` array → `data/animist-paradigms.json`
-- `ALLOMANTIC_METALS` array → `data/animist-paradigms.json`
+- `FERROMANCY_METALS` array → `data/animist-paradigms.json`
 
-Paradigm definitions remain in TypeScript for now (SHINTO_PARADIGM, SYMPATHY_PARADIGM, etc.)
+Paradigm definitions remain in TypeScript for now (SHINTO_PARADIGM, TETHERMANCY_PARADIGM, etc.)
 
 ### CreativeParadigms.ts
 Not yet migrated due to:
@@ -70,7 +70,7 @@ export const ACADEMIC_PARADIGM: MagicParadigm = LOADED_PARADIGMS.academic!;
 ## Data Loader API
 
 ```typescript
-import { loadCoreParadigms, loadExampleKami, loadAllomanticMetals } from './data-loader.js';
+import { loadCoreParadigms, loadExampleKami, loadFerromancyMetals } from './data-loader.js';
 
 // Load core paradigms
 const paradigms = loadCoreParadigms();
@@ -80,9 +80,9 @@ const paradigms = loadCoreParadigms();
 const kami = loadExampleKami();
 // Returns: Kami[]
 
-// Load allomantic metals
-const metals = loadAllomanticMetals();
-// Returns: AllomanticMetal[]
+// Load ferromancy metals
+const metals = loadFerromancyMetals();
+// Returns: FerromancyMetal[]
 ```
 
 ## Testing
@@ -96,7 +96,7 @@ npm test -- packages/magic/src/__tests__/data-loader.test.ts
 All tests pass:
 - Core paradigms load (7 paradigms)
 - Example kami load (6 kami)
-- Allomantic metals load (12 metals)
+- Ferromancy metals load (12 metals)
 - Data structure validation
 
 ## Future Work

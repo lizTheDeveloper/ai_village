@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -84,7 +84,7 @@ export const BLUEPRINT_CREATION: ResearchPaper = {
   ],
   description: `# Blueprint Creation: A Technical Discourse on the Translation of Three-Dimensional Ambition into Two-Dimensional Reality
 
-The art of blueprint creation stands as humanity's most optimistic act: the belief that one can capture the full complexity of a building—with all its load-bearing walls, plumbing nightmares, and electrical mysteries—on a single sheet of paper*. At its core, a blueprint represents the construction industry's attempt to communicate across the vast linguistic chasm between "what the architect envisions" and "what the contractor thinks the architect envisions"†. The fundamental principles are deceptively simple: orthographic projection, standardized symbols, and measurements that everyone agrees to pretend are accurate‡. The experienced blueprint creator learns to work in multiple views simultaneously—plan, elevation, and section—much like the ancient Dimensional Cartographers of Lower Quirm, who could allegedly perceive a building from all angles at once**. This skill, known technically as "spatial visualization" and colloquially as "not getting confused by your own drawings," separates the competent from the catastrophic††.
+The art of blueprint creation stands as humanity's most optimistic act: the belief that one can capture the full complexity of a building—with all its load-bearing walls, plumbing nightmares, and electrical mysteries—on a single sheet of paper*. At its core, a blueprint represents the construction industry's attempt to communicate across the vast linguistic chasm between "what the architect envisions" and "what the contractor thinks the architect envisions"†. The fundamental principles are deceptively simple: orthographic projection, standardized symbols, and measurements that everyone agrees to pretend are accurate‡. The experienced blueprint creator learns to work in multiple views simultaneously—plan, elevation, and section—much like the ancient Dimensional Cartographers of Lower Vintara, who could allegedly perceive a building from all angles at once**. This skill, known technically as "spatial visualization" and colloquially as "not getting confused by your own drawings," separates the competent from the catastrophic††.
 
 The practical techniques of blueprint creation have evolved considerably since Archimedes first sketched siege engines on papyrus while contemplating buoyancy‡‡. Modern practitioners employ a standardized language of lines—thick lines for cuts, thin lines for projections, dashed lines for hidden elements, and wavy lines for when you've given up entirely***. Scale becomes paramount; the International Bureau of Construction Documentation recommends 1:50 for general arrangements, 1:20 for detailed work, and 1:1 for contractors who claim they "don't need no fancy drawings"†††. Dimensions must be marked with obsessive precision, as the difference between 3.5 meters and 3.5 centimeters has, historically speaking, resulted in rather dramatic consequences‡‡‡. The careful blueprint creator also masters the art of notation—those cryptic symbols and abbreviations that transform a simple drawing into an arcane text requiring years of study to decipher****.  Cross-referencing between sheets becomes essential once a project exceeds three pages, at which point the blueprint set begins to resemble a choose-your-own-adventure novel where all choices lead to confusion††††.
 
@@ -106,7 +106,7 @@ The historical development of blueprint creation reads like a comedy of errors p
 
 †The building still stands, but its floor plan changes depending on which entrance you use, what day of the week it is, and whether you've been good this year. The Thornhaven Tourism Board lists it as "architecturally significant" and "navigationally inadvisable."
 
-††Catastrophic blueprint creation incidents include the Genua Tower of 1823 (built three stories shorter than planned when the architect forgot to account for floor thickness), the Bridge of Quirm (which spanned everything except the river), and the notorious Casa di Confusion in Brindisi, where the architect drew the north elevation upside-down and no one noticed until the windows were installed on the ceiling‡.
+††Catastrophic blueprint creation incidents include the Cerenza Tower of 1823 (built three stories shorter than planned when the architect forgot to account for floor thickness), the Bridge of Vintara (which spanned everything except the river), and the notorious Casa di Confusion in Brindisi, where the architect drew the north elevation upside-down and no one noticed until the windows were installed on the ceiling‡.
 
 ‡The Casa di Confusion now serves as a museum of architectural failures. Visitors frequently get lost. The gift shop is on the roof. The roof is labeled as the basement on all official plans.
 
@@ -164,7 +164,7 @@ Contemporary practitioners stand at the intersection of ancient tradition and mo
 
 †† The 1:100 scale model of the Crystal Palace, constructed for the 1851 Great Exhibition, attracted more visitors than many of the full-sized exhibits and sparked a brief craze for "meta-exhibitions" featuring models of other exhibitions. This reached its absurd zenith with the 1853 Exposition of Exposition Models, which consisted entirely of models of previous exhibitions and attracted exactly seventeen visitors, three of whom were journalists contractually obligated to attend.
 
-‡ This seemingly simple concept has nevertheless generated over 2,347 published papers debating the philosophical implications of scale, the most notable being Professor Amanda Metrics's controversial treatise "Why Isn't 1:1 a Model of Itself?: A Study in Tautological Architecture," which was simultaneously nominated for the prestigious Vitruvius Medal and the Golden Compass Award for Most Pointlessly Recursive Academic Work.
+‡ This seemingly simple concept has nevertheless generated over 2,347 published papers debating the philosophical implications of scale, the most notable being Professor Amanda Metrics's controversial treatise "Why Isn't 1:1 a Model of Itself?: A Study in Tautological Architecture," which was simultaneously nominated for the prestigious Vitruvius Medal and the Vitruvius Paradox Award for Most Pointlessly Recursive Academic Work.
 
 ‡‡ The Imperial College of London maintains a small museum dedicated entirely to incorrectly calculated scale models, including a 1:0.5 model (twice as large as the original), a 1:π model (which made sense to the mathematician who created it but to nobody else), and the infamous "Backwards Cathedral" which was constructed as a perfect 1:100 model except that the builder confused meters with feet, resulting in a model that was larger than intended by a factor of approximately 3.28, or as the project report delicately phrased it, "significantly more substantial than anticipated."
 

@@ -311,10 +311,10 @@ const TITLE_TEMPLATES: Record<ResearchField, string[]> = {
 };
 
 /**
- * Humorous abstract phrases in the style of Pratchett/Adams/Gaiman
+ * Humorous abstract phrases in witty academic parody style
  */
 const FUNNY_ABSTRACT_PHRASES: string[] = [
-  // Terry Pratchett style - footnote humor and philosophical asides
+  // Observational humor - footnote humor and philosophical asides
   'It has been observed that the universe tends toward maximum irony.*',
   'As the philosopher Ly Tin Wheedle once noted, "knowing everything about something tells you nothing about anything."',
   'The experiment succeeded in the way that a falling anvil succeeds at obeying gravity.',
@@ -322,15 +322,15 @@ const FUNNY_ABSTRACT_PHRASES: string[] = [
   'Research was conducted with all the rigor of someone who knows they will be proven wrong eventually.',
   'The results are significant in the same way that any result is significant if you stare at it long enough.',
 
-  // Douglas Adams style - cosmic absurdity and probability
+  // Cosmic absurdity and probability
   'The universe, as it turns out, is not only queerer than we suppose, but queerer than we can suppose.',
   'This discovery is rather like finding that the library book you needed was due back two million years ago.',
   'The probability of this occurring was roughly one in one googolplex, which is why it happened last Tuesday.',
   'Space is big. Really big. This research makes it approximately 0.0000001% less mysterious.',
-  'The answer to this particular question turns out to be forty-two, for values of forty-two approaching our original hypothesis.',
+  'The answer to this particular question turns out to be deeply unsatisfying, as most true answers tend to be.',
   'Much like the Guide itself, this paper contains many things that are apocryphal, or at least wildly inaccurate.',
 
-  // Neil Gaiman style - mythic undertones and quietly ominous
+  // Mythic undertones and quietly ominous
   'In the beginning, there was the hypothesis. The hypothesis was formless, and void. And the researcher said, let there be data.',
   'This knowledge has always been known, by those who know. We merely wrote it down.',
   'The experiment worked, in the way that old bargains work: it gave us what we asked for, not what we wanted.',
@@ -369,7 +369,7 @@ function generatePaperTitle(
 }
 
 /**
- * Field-specific opening lines in the Pratchett/Adams/Gaiman style
+ * Field-specific opening lines in satirical academic style
  */
 const FIELD_OPENING_LINES: Record<ResearchField, string[]> = {
   agriculture: [

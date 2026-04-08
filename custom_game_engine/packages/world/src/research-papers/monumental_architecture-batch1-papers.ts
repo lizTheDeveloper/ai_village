@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -134,11 +134,11 @@ The historical development of large workforce coordination stretches back to the
 
 §§§ The International Registry of Construction Disputes lists 1,247 documented cases of violence over tool possession between 1850 and 1950. The number drops significantly after 1950, not because of improved worker relations, but because tools became cheaper and companies just bought more of them.
 
-\* This eighth pillar was proposed by the Assassins' Guild's Coffee Research Division, which maintains that the correlation between coffee availability and structural integrity is "statistically significant and possibly causal." Their research is funded by several coffee importers, which they insist is "completely irrelevant to the findings."
+\* This eighth pillar was proposed by the Guild of Discrete Professionals's Coffee Research Division, which maintains that the correlation between coffee availability and structural integrity is "statistically significant and possibly causal." Their research is funded by several coffee importers, which they insist is "completely irrelevant to the findings."
 
 \*\* The infamous foreman Grabthroat Shinkicker once stated during his trial**: "I didn't think it needed statin'—it's common sense, innit?" The court disagreed on the common-ness of said sense.
 
-** Shinkicker was tried for 47 counts of criminal negligence after the collapse of the Pseudopolis Marketplace Extension. He was acquitted on 46 counts on the grounds that "nobody could have predicted" various outcomes. The 47th count stuck because someone had, in fact, predicted it, in writing, in a memo Shinkicker had used to wrap his lunch.
+** Shinkicker was tried for 47 counts of criminal negligence after the collapse of the Clockhaven Marketplace Extension. He was acquitted on 46 counts on the grounds that "nobody could have predicted" various outcomes. The 47th count stuck because someone had, in fact, predicted it, in writing, in a memo Shinkicker had used to wrap his lunch.
 
 \*\*\* The Guild of Funerary Services saw a 340%`,
   abstract: 'Research paper on Understanding large workforce coordination in the context of construction',
@@ -472,7 +472,7 @@ Contemporary colossus engineering benefits from mathematical modeling, improved 
 
 ‡‡‡ The Lost Civilizations Discovery Bureau estimates that approximately one in seven colossus foundations uncovers evidence of previous civilizations. Their most recent report notes, somewhat wearily, that they have "quite enough previously unknown civilizations to catalog, thank you, and could construction projects perhaps stop finding more for a while?"
 
-\*\*\*\* The Incident of Lord Pemberton remains a cautionary tale taught to all apprentice engineers. The nobleman insisted on ascending the scaffolding of the Colossus of New Ankh during a windstorm to verify that the statue's nose was "properly proportioned." The scaffolding survived. Lord Pemberton's dignity did not. Neither did his hat, which was later found three miles away in a farmer's field, still traveling.
+\*\*\*\* The Incident of Lord Pemberton remains a cautionary tale taught to all apprentice engineers. The nobleman insisted on ascending the scaffolding of the Colossus of New Thornhaven during a windstorm to verify that the statue's nose was "properly proportioned." The scaffolding survived. Lord Pemberton's dignity did not. Neither did his hat, which was later found three miles away in a farmer's field, still traveling.
 
 †††† The internal skeleton typically consists of wooden beams, copper pins, and what the Guild terms "carefully calibrated optimism." Ancient engineers used cypress and cedar; modern engineers add steel reinforcement and then spend several years arguing about whether this constitutes "traditional methods" for purposes of historical accuracy grants.
 
@@ -518,7 +518,7 @@ Contemporary aqueduct design integrates computational fluid dynamics***********,
 
 ‡Though whether this was actual genius or simply spite distributed equally has been debated by scholars for centuries§.
 
-§Professor Emeritus Bladderwick of the The Invisible College's Applied Engineering Department argues it was definitely spite, citing a lengthy footnote in the original scroll that translates roughly to "now everyone can be equally annoyed."
+§Professor Emeritus Bladderwick of the Invisible College's Applied Engineering Department argues it was definitely spite, citing a lengthy footnote in the original scroll that translates roughly to "now everyone can be equally annoyed."
 
 **There are exceptions. Pumped systems exist but require energy input, violating water's fundamental desire to exert minimal effort. The Gravitational Ethics Committee has repeatedly condemned forced pumping as "unnecessarily antagonistic to natural law"††.
 

@@ -323,7 +323,7 @@ export enum ComponentType {
 
   // Exotic Ship Missions (Grand Strategy Phase 6)
   ProbabilityScoutMission = 'probability_scout_mission', // Scout ship mapping unobserved timelines
-  SvetzRetrievalMission = 'svetz_retrieval_mission',     // Retrieval ship fetching items from extinct timelines
+  ChronoSalvageMission = 'chrono_salvage_mission',       // Retrieval ship fetching items from extinct timelines
 
   // Player Progression
   Milestone = 'milestone',                   // Tracks player achievements and unlocks

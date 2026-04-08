@@ -1,6 +1,6 @@
 # Research Papers - Knowledge Tree Data
 
-This directory contains the complete data definitions for the knowledge-based research system, featuring papers written with extensive Pratchett/Moers/Gaiman/Adams-style footnotes.
+This directory contains the complete data definitions for the knowledge-based research system, featuring papers written with extensive witty, footnote-heavy academic parody style footnotes.
 
 ## Overview: N-of-M Research Sets
 
@@ -227,9 +227,9 @@ This creates natural progression:
 
 ## Footnote Style Guide
 
-Papers include extensive footnotes in the style of Terry Pratchett and Walter Moers:
+Papers include extensive footnotes in a witty, observational humor style with footnote-heavy academic parody:
 
-**Pratchett Style:**
+**Observational Humor Style:**
 - Informative but humorous
 - Points out absurdities in the subject matter
 - Provides "historical context" for fictional events

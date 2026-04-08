@@ -6,16 +6,70 @@
  * Tests relationship growth, friendship emergence, and interest learning.
  */
 
-import { describe, test, expect, beforeEach } from 'vitest';
+import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
 import { World } from '../ecs/World.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { RelationshipConversationSystem } from '../systems/RelationshipConversationSystem.js';
 import { FriendshipSystem } from '../systems/FriendshipSystem.js';
+import { ScriptedDecisionProcessor } from '../decision/ScriptedDecisionProcessor.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
+import type { ConversationComponent } from '../components/ConversationComponent.js';
 import { InterestsComponent } from '../components/InterestsComponent.js';
 import { SocialMemoryComponent } from '../components/SocialMemoryComponent.js';
+import { GeneticComponent } from '../components/GeneticComponent.js';
+import { ensureConversationComponent, startConversation } from '../components/ConversationComponent.js';
 import { EventBusImpl } from '../events/EventBus.js';
+
+function addCultureAffinityGenetics(entity: EntityImpl, cultureAffinity: number): void {
+  entity.addComponent(
+    new GeneticComponent({
+      matePreferenceVector: {
+        assortativePreference: cultureAffinity,
+        disassortativePreference: 1 - cultureAffinity,
+        biochemicalAffinity: 0.5,
+        fertilitySensitivity: 0.5,
+        gestationSensitivity: 0.5,
+        tabooSensitivity: 0.5,
+      },
+      socialCulturalAffinityVector: {
+        socialAffinity: cultureAffinity,
+        culturalAffinity: cultureAffinity,
+        collectiveAffinity: cultureAffinity,
+        traditionAffinity: cultureAffinity,
+      },
+    })
+  );
+}
+
+function createDecisionAgent(world: World, name: string, cultureAffinity: number): EntityImpl {
+  const entity = world.createEntity() as EntityImpl;
+  entity.addComponent({ type: CT.Identity, name, appearance: 'A person' });
+  entity.addComponent({
+    type: CT.Agent,
+    behavior: 'wander',
+    behaviorState: {},
+    thinkInterval: 100,
+    lastThinkTick: 0,
+    useLLM: false,
+    llmCooldown: 0,
+    ageCategory: 'adult',
+  });
+  entity.addComponent({
+    type: CT.Relationship,
+    relationships: new Map(),
+  });
+  addCultureAffinityGenetics(entity, cultureAffinity);
+  ensureConversationComponent(entity, 10);
+  return entity;
+}
+
+function activateConversation(self: EntityImpl, partner: EntityImpl, tick: number): void {
+  const selfConversation = ensureConversationComponent(self, 10);
+  const partnerConversation = ensureConversationComponent(partner, 10);
+  self.addComponent(startConversation(selfConversation, partner.id, tick, self.id));
+  partner.addComponent(startConversation(partnerConversation, self.id, tick, partner.id));
+}
 
 describe('Phase 6: Emergent Social Dynamics', () => {
   let world: World;
@@ -102,6 +156,10 @@ describe('Phase 6: Emergent Social Dynamics', () => {
     // Just ensure they're initialized with proper world/eventBus
     await relSystem.initialize(world, eventBus);
     await friendSystem.initialize(world, eventBus);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   describe('RelationshipConversationSystem', () => {
@@ -194,6 +252,43 @@ describe('Phase 6: Emergent Social Dynamics', () => {
 
       // Affinity should be 0 (no gain for quality <= 0.5)
       expect(relationship!.affinity).toBe(0);
+    });
+
+    test('scales trust by shared culture-affinity genetics', () => {
+      const alignedA = createDecisionAgent(world, 'Aligned A', 0.95);
+      const alignedB = createDecisionAgent(world, 'Aligned B', 0.95);
+      const misalignedA = createDecisionAgent(world, 'Misaligned A', 0.05);
+      const misalignedB = createDecisionAgent(world, 'Misaligned B', 0.05);
+
+      eventBus.emit({
+        type: 'conversation:ended',
+        source: alignedA.id,
+        data: {
+          agent1: alignedA.id,
+          agent2: alignedB.id,
+          topicsDiscussed: ['the_gods'],
+          overallQuality: 0.8,
+          depth: 0.7,
+        },
+      });
+      eventBus.emit({
+        type: 'conversation:ended',
+        source: misalignedA.id,
+        data: {
+          agent1: misalignedA.id,
+          agent2: misalignedB.id,
+          topicsDiscussed: ['the_gods'],
+          overallQuality: 0.8,
+          depth: 0.7,
+        },
+      });
+      eventBus.flush();
+
+      const alignedRelationship = alignedA.getComponent<RelationshipComponent>(CT.Relationship)!.relationships.get(alignedB.id)!;
+      const misalignedRelationship = misalignedA.getComponent<RelationshipComponent>(CT.Relationship)!.relationships.get(misalignedB.id)!;
+
+      expect(alignedRelationship.trust).toBeGreaterThan(misalignedRelationship.trust);
+      expect(alignedRelationship.sharedMemories).toBeGreaterThanOrEqual(misalignedRelationship.sharedMemories);
     });
 
     // TODO: RelationshipConversationSystem trust gain formula doesn't meet test threshold (50 stays at 50)
@@ -343,6 +438,74 @@ describe('Phase 6: Emergent Social Dynamics', () => {
 
       expect(relationships1!.relationships.has(agent2.id)).toBe(true);
       expect(relationships2!.relationships.has(agent1.id)).toBe(true);
+    });
+  });
+
+  describe('ScriptedDecisionProcessor', () => {
+    test('initiates conversations more readily when both agents have strong culture affinity', () => {
+      const processor = new ScriptedDecisionProcessor();
+      const highSelf = createDecisionAgent(world, 'High Self', 0.95);
+      const highPartner = createDecisionAgent(world, 'High Partner', 0.95);
+      const lowSelf = createDecisionAgent(world, 'Low Self', 0.05);
+      const lowPartner = createDecisionAgent(world, 'Low Partner', 0.05);
+
+      const highRolls = [0.9, 0.42, 0.07];
+      const randomSpy = vi.spyOn(Math, 'random');
+      randomSpy.mockImplementation(() => highRolls.shift() ?? 0.5);
+      const highResult = processor.process(highSelf, world, () => [highPartner]);
+      const highConversation = highSelf.getComponent<ConversationComponent>(CT.Conversation);
+      const highPartnerConversation = highPartner.getComponent<ConversationComponent>(CT.Conversation);
+
+      expect(highResult.changed).toBe(false);
+      expect(highConversation?.isActive).toBe(true);
+      expect(highConversation?.partnerId).toBe(highPartner.id);
+      expect(highPartnerConversation?.isActive).toBe(true);
+
+      const lowRolls = [0.9, 0.42, 0.07];
+      randomSpy.mockImplementation(() => lowRolls.shift() ?? 0.5);
+      const lowResult = processor.process(lowSelf, world, () => [lowPartner]);
+      const lowConversation = lowSelf.getComponent<ConversationComponent>(CT.Conversation);
+      const lowPartnerConversation = lowPartner.getComponent<ConversationComponent>(CT.Conversation);
+
+      expect(lowResult.changed).toBe(false);
+      expect(lowConversation?.isActive).toBe(false);
+      expect(lowConversation?.partnerId).toBeNull();
+      expect(lowPartnerConversation?.isActive).toBe(false);
+    });
+
+    test('ends conversations less often for genetically aligned agents', () => {
+      const processor = new ScriptedDecisionProcessor();
+      const highSelf = createDecisionAgent(world, 'High Talker', 0.95);
+      const highPartner = createDecisionAgent(world, 'High Listener', 0.95);
+      const lowSelf = createDecisionAgent(world, 'Low Talker', 0.05);
+      const lowPartner = createDecisionAgent(world, 'Low Listener', 0.05);
+
+      activateConversation(highSelf, highPartner, world.tick);
+      activateConversation(lowSelf, lowPartner, world.tick);
+      highSelf.updateComponent(CT.Agent, (current) => ({ ...current, behavior: 'talk' }));
+      lowSelf.updateComponent(CT.Agent, (current) => ({ ...current, behavior: 'talk' }));
+
+      const highRolls = [0.03];
+      const randomSpy = vi.spyOn(Math, 'random');
+      randomSpy.mockImplementation(() => highRolls.shift() ?? 0.5);
+      const highResult = processor.process(highSelf, world, () => []);
+      const highConversation = highSelf.getComponent<ConversationComponent>(CT.Conversation);
+      const highPartnerConversation = highPartner.getComponent<ConversationComponent>(CT.Conversation);
+
+      expect(highResult.changed).toBe(false);
+      expect(highConversation?.isActive).toBe(true);
+      expect(highPartnerConversation?.isActive).toBe(true);
+
+      const lowRolls = [0.03];
+      randomSpy.mockImplementation(() => lowRolls.shift() ?? 0.5);
+      const lowResult = processor.process(lowSelf, world, () => []);
+      const lowConversation = lowSelf.getComponent<ConversationComponent>(CT.Conversation);
+      const lowPartnerConversation = lowPartner.getComponent<ConversationComponent>(CT.Conversation);
+
+      expect(lowResult.changed).toBe(false);
+      expect(lowConversation?.isActive).toBe(false);
+      expect(lowConversation?.partnerId).toBeNull();
+      expect(lowPartnerConversation?.isActive).toBe(false);
     });
   });
 

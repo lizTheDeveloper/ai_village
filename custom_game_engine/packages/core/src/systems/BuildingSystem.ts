@@ -1010,7 +1010,7 @@ export class BuildingSystem extends BaseSystem {
       'bank': { stone: 80, iron: 50, gold: 30 },
 
       // Tier 5
-      'arcane_tower': { stone: 100, mithril_ingot: 20, crystal: 30 },
+      'arcane_tower': { stone: 100, starweave_ingot: 20, crystal: 30 },
       'inventors_hall': { stone: 120, wood: 80, iron: 60, gold: 40 },
     };
 

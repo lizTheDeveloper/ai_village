@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -99,7 +99,7 @@ The phenomenon of lingering souls—commonly, if somewhat insensitively, referre
 For necromancers and other professionals in the death-adjacent industries, understanding the window of opportunity for intervention proves essential. The silver cord period represents the sole timeframe during which resurrection, forced reanimation, or soul-binding can occur with any reasonable chance of success††††††††† and without catastrophic consequences‡‡‡‡‡‡‡‡. After the cord severs, attempting to recall a soul becomes exponentially more difficult, requiring power levels that tend to attract unwanted attention from both civil authorities and entities best left undisturbed***********. The Guild publishes annually updated guidelines that strongly emphasize the importance of timing, proper permissions, and having a very good lawyer************.
 
 
-*Philosophers have been arguing about this "whatever comes after" for approximately 47,000 years, give or take several millennia, without reaching any consensus whatsoever. The Eternal Debate Society of Upper Quirmingham has been in continuous session since 1203 CE discussing this exact question. They're currently stuck on whether the afterlife has adequate parking.
+*Philosophers have been arguing about this "whatever comes after" for approximately 47,000 years, give or take several millennia, without reaching any consensus whatsoever. The Eternal Debate Society of Upper Vintaran Heights has been in continuous session since 1203 CE discussing this exact question. They're currently stuck on whether the afterlife has adequate parking.
 
 †Founded in 1734 by the delightfully named Professor Mortimer Gravely-Serious, who tragically died before completing his seminal work "On The Experience Of Dying: A Practical Guide." His last words were reportedly "Well, this is inconvenient timing."
 
@@ -217,7 +217,7 @@ The magnitude of this energetic discharge varies considerably depending upon the
 
 The ethical considerations surrounding the practice of deliberately attending deaths for the purpose of energy harvesting have been debated since at least the Third Conclave of Arguably Reasonable Necromancers in 1743§§§, where the assembled practitioners voted 47 to 3 (with 12 abstentions and 2 who claimed to have been dead at the time) to establish guidelines for "ethically uncomfortable but potentially quite useful observational practices"*. The primary concern, as outlined in the Conclave's resulting treatise, is not the harvesting itself—the energy exists whether collected or not—but rather the potential for what the document delicately terms "premature encouragement of the harvesting opportunity"**. Modern practitioners follow the Kettleblack Principles†, which require that one must: (a) have legitimate cause to be present††, (b) make no action to hasten the inevitable‡, (c) maintain appropriate solemnity despite the significant power rush‡‡, and (d) file the proper paperwork with the Mortuary Guild within three business days‡‡‡.
 
-The practice known as "death watching," wherein necromancers maintain vigils at the bedsides of the dying specifically to observe and measure the thanatic discharge, occupies a peculiarly uncomfortable space in both magical and mundane society§. While hospice workers generally maintain that having someone present during death is comforting to the dying§§, they tend to become significantly less enthusiastic when that someone is taking notes, muttering calculations, and positioning crystal matrices around the bed§§§. The Guild of Professional Death Watchers—an organization whose existence most necromancers publicly deny while privately maintaining their membership dues—publishes an annual directory of individuals likely to expire within the calendar year*, along with projected energy yields and recommended observation positions**. This has led to what the Thornhaven City Watch terms "competitive deathbed lurking"††, wherein multiple practitioners attempt to secure prime observational real estate around particularly powerful dying individuals, occasionally resulting in scenes that would be comedic if they weren't occurring around someone's grandmother‡‡.
+The practice known as "death watching," wherein necromancers maintain vigils at the bedsides of the dying specifically to observe and measure the thanatic discharge, occupies a peculiarly uncomfortable space in both magical and mundane society§. While hospice workers generally maintain that having someone present during death is comforting to the dying§§, they tend to become significantly less enthusiastic when that someone is taking notes, muttering calculations, and positioning crystal matrices around the bed§§§. The Guild of Professional Death Watchers—an organization whose existence most necromancers publicly deny while privately maintaining their membership dues—publishes an annual directory of individuals likely to expire within the calendar year*, along with projected energy yields and recommended observation positions**. This has led to what the Thornhaven Municipal Guard terms "competitive deathbed lurking"††, wherein multiple practitioners attempt to secure prime observational real estate around particularly powerful dying individuals, occasionally resulting in scenes that would be comedic if they weren't occurring around someone's grandmother‡‡.
 
 Contemporary research into thanatic energy harvesting has focused primarily on improving capture efficiency without requiring physical presence at the death itself§, thereby resolving many of the ethical complications that have plagued the field since its inception. The Broken Circle Laboratory has developed a series of "sympathetic collection matrices" that can be attuned to an individual while they're still healthy§§, allowing the eventual death burst to be partially redirected to a prepared vessel regardless of distance§§§. Early results suggest approximately 23% of the death energy can be captured through this method—less than direct observation, but enough to power moderate spellwork and significantly reduce the social awkwardness of explaining to bereaved relatives why you're standing in the corner with a notebook and what appears to be a very eager expression*. The ethical review board has tentatively approved this approach, noting that "at least this way they're not actually in the room when it happens, which is something"**.
 
@@ -232,7 +232,7 @@ FOOTNOTES:
 
 †† His students had been prepared for this eventuality for approximately fifteen years. They drew straws. The winner got to do the measurements while the losers had to comfort his sobbing relatives‡.
 
-‡ Though "comfort" might be strong. One student's field notes, preserved in the The Invisible College archives, include the phrase "told them the reading was excellent, which did not help."
+‡ Though "comfort" might be strong. One student's field notes, preserved in the Invisible College archives, include the phrase "told them the reading was excellent, which did not help."
 
 *** The Thanatic Energy Research Society publishes annual statistics on death energy yields, broken down by cause of death, age, species, time of day, and—controversially—astrological sign. Their methodology section is longer than most doctoral dissertations and contains seventeen separate acknowledgments of statistical improbability.
 
@@ -246,7 +246,7 @@ FOOTNOTES:
 
 * Sir Humphrey's last words were reportedly "Oh, that explains the pagodas." The energy discharge was so intense that nearby practitioners experienced what they described as "a week's worth of magical power delivered in a single, deeply uncomfortable moment," and several inadvertently cast spells they didn't know they knew. One reportedly turned invisible, another sprouted wings, and a third somehow summoned his dead grandmother, who was reportedly quite cross about being interrupted.
 
-§ The case of Apprentice Weatherwax (no relation to the famous witching family, he insists, rather loudly) serves as a caut`,
+§ The case of Apprentice Ashworth (no relation to the famous witching family, he insists, rather loudly) serves as a caut`,
   abstract: 'Research paper on The moment of death releases energy that can be captured and used',
   published: false
 };

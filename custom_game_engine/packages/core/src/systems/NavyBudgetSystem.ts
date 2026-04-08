@@ -565,8 +565,8 @@ export function getShipCost(shipType: SpaceshipType): number {
     threshold_ship: 1000,      // Medium ship
     brainship: 500,            // Medium ship with ship-brain
     story_ship: 2000,          // Large narrative ship
-    gleisner_vessel: 500,      // Medium digital ship
-    svetz_retrieval: 800,      // Medium-large temporal ship
+    synthetic_vessel: 500,      // Medium digital ship
+    chrono_salvage: 800,       // Medium-large temporal ship
     probability_scout: 50,     // Small solo scout
     timeline_merger: 5000,     // Very large crew ship
   };

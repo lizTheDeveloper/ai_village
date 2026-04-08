@@ -3,8 +3,8 @@
  *
  * Not all magic is serious! This module covers:
  *
- * 1. Talent Magic (Xanth-style) - Everyone has exactly ONE unique talent
- * 2. Narrative Magic (Discworld) - Story logic has real power
+ * 1. Talent Magic (individual-unique-power tradition) - Everyone has exactly ONE unique talent
+ * 2. Narrative Magic (ambient and narrative tradition) - Story logic has real power
  * 3. Pun Magic - Words and wordplay create effects
  * 4. Wild Magic - Chaotic, unpredictable magic
  * 5. LLM Generation - Prompts and parsers for generating magic content
@@ -14,7 +14,7 @@ import type { MagicParadigm } from './MagicParadigm.js';
 import type { MagicTechnique, MagicForm } from '../components/MagicComponent.js';
 
 // ============================================================================
-// Talent Magic (Xanth-style)
+// Talent Magic (individual-unique-power tradition)
 // ============================================================================
 
 /**
@@ -140,7 +140,7 @@ export const TALENT_PARADIGM: MagicParadigm = {
   id: 'talent',
   name: 'Talent Magic',
   description: 'Everyone is born with exactly one unique magical talent',
-  universeIds: ['xanth', 'talent_realms'],
+  universeIds: ['talent_realms'],
 
   lore: `In these realms, magic is personal. Every person is born with exactly one
 magical talent, never to be repeated. Some talents are grand, some are humble,
@@ -235,7 +235,7 @@ Magician-class) determines much of social standing.`,
 };
 
 // ============================================================================
-// Narrative Magic (Discworld-style)
+// Narrative Magic — ambient and narrative
 // ============================================================================
 
 /**
@@ -335,9 +335,9 @@ export const NARRATIVE_PARADIGM: MagicParadigm = {
   id: 'narrative',
   name: 'Narrative Causality',
   description: 'Story logic and genre conventions are laws of nature',
-  universeIds: ['discworld', 'story_realms'],
+  universeIds: ['narrative_tradition', 'story_realms'],
 
-  lore: `On the Disc, stories are things. Narrative causality shapes events to
+  lore: `In these realms, stories are things. Narrative causality shapes events to
 match the stories that want to be told. The million-to-one chance works
 because stories say it should. Heroes survive because the story needs them.
 Some rare individuals learn to sense and manipulate these narrative threads.`,
@@ -443,7 +443,7 @@ Some rare individuals learn to sense and manipulate these narrative threads.`,
 };
 
 // ============================================================================
-// Pun Magic (Xanth-style wordplay)
+// Pun Magic (Punlands-style wordplay)
 // ============================================================================
 
 /**
@@ -498,13 +498,9 @@ export const PUN_PARADIGM: MagicParadigm = {
   id: 'pun',
   name: 'Pun Magic',
   description: 'Words have literal magical power based on their sounds',
-  universeIds: ['xanth', 'pun_realms'],
+  universeIds: ['talent_realms', 'pun_realms'],
 
-  lore: `In the land of Xanth, puns are not merely wordplay but fundamental forces
-of nature. A "shoe tree" grows shoes. A "door mat" makes doors very formal.
-The groaner the pun, the more powerful the magic. Newcomers often groan
-at the omnipresent wordplay, but natives have learned to appreciate - or at
-least tolerate - the punny nature of their reality.`,
+  lore: `In the Punlands, wordplay is not merely humor — it is a fundamental force. Language warps reality here, and a sufficiently terrible pun can reshape local physics. The inhabitants call it the Groan Field.`,
 
   sources: [
     {
@@ -565,7 +561,7 @@ least tolerate - the punny nature of their reality.`,
   acquisitionMethods: [
     {
       method: 'born',
-      rarity: 'common',  // Everyone in Xanth can pun
+      rarity: 'common',  // Everyone in the Punlands can pun
       voluntary: false,
       grantsAccess: ['punergy'],
       startingProficiency: 20,
@@ -825,7 +821,7 @@ Please respond with a JSON object containing:
 }
 
 /**
- * Generate a prompt for creating a unique talent (Xanth-style).
+ * Generate a prompt for creating a unique talent (Talent Magic tradition).
  */
 export function generateTalentPrompt(request: ProceduralMagicRequest): string {
   return `Create a unique magical talent for a character in a fantasy game.

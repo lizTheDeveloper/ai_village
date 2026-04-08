@@ -15,7 +15,7 @@ This module provides ECS bindings, spell execution, cost calculation, and skill 
 - **ParadigmComposition**: Multi-paradigm casters, hybrid paradigms (Theurgy, Hemomancy)
 
 ### Specialized Paradigms
-- **AnimistParadigms**: Shinto (kami), Sympathy (Name of the Wind), Allomancy (Mistborn), Dream, Song, Rune, Daemon
+- **AnimistParadigms**: Shinto (kami), Tethermancy (Chorus of Resonance), Ferromancy (CrucibleBorn), Dream, Song, Rune, Daemon
 - **WhimsicalParadigms**: Talent, Narrative, Pun, Wild (LLM-generated)
 - **NullParadigms**: Null, Dead, Anti, Inverted, Tech Supremacy, Rational, Sealed, Divine Prohibition
 - **DimensionalParadigms**: 4D+ geometry, extradimensional entities, weirdness escalation, corruption
@@ -38,7 +38,7 @@ This module provides ECS bindings, spell execution, cost calculation, and skill 
 - **MagicSkillTree**: Progression trees with unlock conditions, XP costs, tiers
 - **MagicSkillTreeRegistry**: Validates and stores trees
 - **MagicSkillTreeEvaluator**: Evaluates unlock conditions, purchasable nodes, tree access
-- **skillTrees/**: 25+ paradigm-specific trees (Allomancy, Shinto, Sympathy, Daemon, Dream, Song, Name, Breath, Pact, Blood, Emotional, Rune, Divine, Academic, Bureaucratic, Debt, Luck, Paradox, Game, Echo, Threshold, Belief, Commerce, Feng Shui, Architecture)
+- **skillTrees/**: 25+ paradigm-specific trees (Ferromancy, Shinto, Tethermancy, Daemon, Dream, Song, Name, Breath, Pact, Blood, Emotional, Rune, Divine, Academic, Bureaucratic, Debt, Luck, Paradox, Game, Echo, Threshold, Belief, Commerce, Feng Shui, Architecture)
 
 ### Artifacts & Academies
 - **ArtifactCreation**: Enchantment systems per paradigm (methods, permanence, sentience, material requirements)

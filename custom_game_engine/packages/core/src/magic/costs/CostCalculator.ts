@@ -118,7 +118,7 @@ export type TerminalEffect =
   | { type: 'soul_lost'; fragmentsRemaining: number }
   | { type: 'favor_zero'; patronAction: string }
   | { type: 'sanity_zero'; madnessType: string }
-  | { type: 'drab'; breathsRemaining: 0 }
+  | { type: 'hollow'; breathsRemaining: 0 }
   | { type: 'forsaken'; deityId: string }
   | { type: 'emotional_burnout'; dominantEmotion: string }
   | { type: 'mutation'; mutationType: string }

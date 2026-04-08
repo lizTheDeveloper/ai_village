@@ -225,7 +225,7 @@ type Material =
   | 'fire' | 'water' | 'lightning' | 'magma' | 'frost'
 
   // Fantasy metals
-  | 'mithril' | 'adamantine' | 'drakforged_steel' | 'orichalcum'
+  | 'starweave' | 'adamantine' | 'drakforged_steel' | 'orichalcum'
 
   // Creature materials
   | 'dragon_scale' | 'phoenix_feather' | 'unicorn_hair'
@@ -601,7 +601,7 @@ const prompt = generateBuildingPrompt({
 
 For detailed building design examples and demonstrations, see:
 
-- **[src/showcase-buildings.ts](src/showcase-buildings.ts)** - 10 fully-designed showcase buildings (wizard tower, dwarven forge, fairy mushroom, market hall, elemental temple, hobbit hole, giant hall, apothecary, watchtower, underground vault) with multi-floor layouts, species-specific dimensions, validation, and lore
+- **[src/showcase-buildings.ts](src/showcase-buildings.ts)** - 10 fully-designed showcase buildings (wizard tower, dwarven forge, fairy mushroom, market hall, elemental temple, burrow den, giant hall, apothecary, watchtower, underground vault) with multi-floor layouts, species-specific dimensions, validation, and lore
 - **[src/examples.ts](src/examples.ts)** - Building design examples by tier (tier 1-5 buildings including huts, forges, towers, temples), demonstrating layout patterns, material choices, and functionality integration
 - **[src/multifloor-demo.ts](src/multifloor-demo.ts)** - Multi-floor building demonstrations (variable ceiling heights, stairs, vertical navigation, floor-specific layouts)
 

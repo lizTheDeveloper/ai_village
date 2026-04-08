@@ -60,7 +60,7 @@ export type Material =
   | 'sandstone' | 'clay' | 'reed' | 'bamboo' | 'leather' | 'hide'
   // Precious metals
   | 'gold' | 'silver' | 'copper' | 'bronze' | 'iron' | 'steel'
-  | 'mithril' | 'adamantine' | 'orichalcum'
+  | 'starweave' | 'adamantine' | 'orichalcum'
   // Gems and crystals
   | 'diamond' | 'ruby' | 'sapphire' | 'emerald' | 'amethyst' | 'topaz'
   | 'opal' | 'pearl' | 'jade' | 'obsidian' | 'crystal' | 'quartz'
@@ -92,11 +92,11 @@ export type Material =
   // Fantasy metals (various universes)
   | 'drakforged_steel' | 'pyrrhic_obsidian' | 'starmetal' | 'moonsilver'
   | 'soulsteel' | 'oathgold' | 'cold_iron' | 'meteoric_iron'
-  | 'darksteel' | 'etherium' | 'wraithbone' | 'blackite'
-  | 'gromril' | 'ithilmar' | 'hihi_irokane' | 'celestial_bronze'
-  | 'stygian_iron' | 'imperial_gold' | 'enchanted_wood'
-  // Warhammer/40k materials
-  | 'warpstone' | 'wyrdstone' | 'promethium' | 'ceramite' | 'plasteel'
+  | 'darksteel' | 'etherium' | 'resonite' | 'blackite'
+  | 'urdmetal' | 'lunaril' | 'hihi_irokane' | 'astral_bronze'
+  | 'abyssal_iron' | 'sovereign_gold' | 'enchanted_wood'
+  // Exotic dimensional materials
+  | 'voidite' | 'fateite' | 'ignium' | 'aegisite' | 'synthalloy'
   // Creature materials
   | 'dragon_scale' | 'dragon_bone' | 'phoenix_feather' | 'unicorn_hair'
   | 'basilisk_hide' | 'troll_hide' | 'giants_bone' | 'demon_bone'

@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -257,7 +257,7 @@ Safety considerations in living elixir cultivation cannot be overstated, as the 
 
 \* The exact mechanism remains subject to scholarly debate, though most contemporary theorists agree it involves "some really weird stuff happening at the molecular level." —*Proceedings of the Royal Alchemical Society*, Vol. 847
 
-† See Chapter 3 of *Why Your Potions Don't Love You Back* by Master Alchemist Gerald Weatherwax, published posthumously after an unfortunate incident that his publisher insists is unrelated to the book's content.
+† See Chapter 3 of *Why Your Potions Don't Love You Back* by Master Alchemist Gerald Ashworth, published posthumously after an unfortunate incident that his publisher insists is unrelated to the book's content.
 
 ‡ The Mesopotamians, being practical people, also maintained a separate category for "that thing in the bottle that DEFINITELY just moved, somebody fetch a sword." Their taxonomy was nothing if not thorough.
 

@@ -51,6 +51,13 @@ const HEAL_COLORS: readonly string[] = Object.freeze([
   'rgba(140, 220, 180, 0.80)', // Seafoam
 ]);
 
+const HEART_COLORS: readonly string[] = Object.freeze([
+  'rgba(255, 100, 130, 0.95)', // Soft rose
+  'rgba(230, 60, 90, 0.90)',   // Deep pink
+  'rgba(255, 160, 180, 0.85)', // Blush
+  'rgba(200, 40, 70, 0.90)',   // Crimson
+]);
+
 // Magic palettes indexed by color name for variety
 const MAGIC_PALETTES: Record<string, readonly string[]> = {
   arcane: Object.freeze([
@@ -227,6 +234,37 @@ export class ParticleRenderer {
       particle.endSize = 0; // Twinkle to nothing
       particle.startTime = now + Math.random() * 250; // Staggered appearance
       particle.lifetime = 700 + Math.random() * 500;
+      particle.alphaEase = 'late'; // Hold then fade
+      particle.trail = false;
+
+      this.particles.push(particle);
+    }
+    this.activeCount = this.particles.length;
+  }
+
+  /**
+   * Heart float — for romance, bonding, affection events.
+   * Rising pink/red motes that drift upward and fade out.
+   */
+  createHearts(worldX: number, worldY: number, count: number = 6): void {
+    const now = Date.now();
+    const colorCount = HEART_COLORS.length;
+
+    for (let i = 0; i < count; i++) {
+      const particle = this.acquireParticle();
+      // Float upward with gentle horizontal wander
+      const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 0.4;
+      const speed = 0.05 + Math.random() * 0.10;
+
+      particle.x = worldX + (Math.random() - 0.5) * 16;
+      particle.y = worldY + (Math.random() - 0.5) * 8;
+      particle.vx = Math.cos(angle) * speed;
+      particle.vy = Math.sin(angle) * speed - 0.08; // Gentle upward bias
+      particle.color = HEART_COLORS[Math.floor(Math.random() * colorCount)]!;
+      particle.size = 2 + Math.random() * 1;
+      particle.endSize = 0; // Shrink to nothing
+      particle.startTime = now + Math.random() * 300; // Staggered appearance
+      particle.lifetime = 1500 + Math.random() * 1000;
       particle.alphaEase = 'late'; // Hold then fade
       particle.trail = false;
 

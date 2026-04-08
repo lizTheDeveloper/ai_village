@@ -1666,7 +1666,7 @@ async function togglePixelLabDaemon() {
     if (data.success) {
       showToast(data.message || (pixelLabRunning ? 'Daemon stopped' : 'Daemon started'), 'success');
     } else {
-      showToast(data.error || 'Failed to toggle daemon', 'error');
+      showToast(data.error || 'Failed to toggle animus', 'error');
     }
 
     // Refresh status

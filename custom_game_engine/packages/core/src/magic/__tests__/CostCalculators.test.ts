@@ -417,7 +417,7 @@ describe('CostCalculators - Breath Paradigm', () => {
         health: { type: 'health', current: 50, maximum: 50000, regenRate: 0, locked: 0 },
       },
       paradigmState: {
-        breath: { breathCount: 50, heighteningTier: 0 },
+        breath: { breathCount: 50, pneumanticTier: 0 },
       },
     } as Record<string, unknown>;
 
@@ -489,7 +489,7 @@ describe('CostCalculators - Breath Paradigm', () => {
     expect(breathCost?.amount).toBeGreaterThanOrEqual(50); // Min for permanent
   });
 
-  it('should warn when becoming a Drab', () => {
+  it('should warn when becoming a Hollow', () => {
     mockCaster.resourcePools.health.current = 1;
 
     const spell: ComposedSpell = {
@@ -508,10 +508,10 @@ describe('CostCalculators - Breath Paradigm', () => {
     const affordability = breathCalculator.canAfford(costs, mockCaster);
 
     expect(affordability.wouldBeTerminal).toBe(true);
-    expect(affordability.warning).toContain('Drab');
+    expect(affordability.warning).toContain('Hollow');
   });
 
-  it('should create Drab terminal effect at zero breaths', () => {
+  it('should create Hollow terminal effect at zero breaths', () => {
     mockCaster.resourcePools.health.current = 5;
 
     const spell: ComposedSpell = {
@@ -531,7 +531,7 @@ describe('CostCalculators - Breath Paradigm', () => {
     const result = breathCalculator.deductCosts(costs, mockCaster);
 
     if (result.terminal) {
-      expect(result.terminalEffect?.type).toBe('drab');
+      expect(result.terminalEffect?.type).toBe('hollow');
     }
   });
 });

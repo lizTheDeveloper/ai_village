@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { AnimalComponent } from '../components/AnimalComponent.js';
 import { PredatorPreyEcologySystem } from '../systems/PredatorPreyEcologySystem.js';
 import type { SystemContext } from '../ecs/SystemContext.js';
+import { SPECIES_REGISTRY } from '../species/SpeciesRegistry.js';
 
 // Uses real species IDs from animal-species.json:
 //   'cat'    → carnivore
@@ -87,10 +88,26 @@ function callOnUpdate(system: PredatorPreyEcologySystem, ctx: SystemContext): vo
 
 describe('PredatorPreyEcologySystem', () => {
   let system: PredatorPreyEcologySystem;
+  const originalCatTemplate = SPECIES_REGISTRY.cat;
+  const originalCowTemplate = SPECIES_REGISTRY.cow;
 
   beforeEach(async () => {
     idCounter = 0;
     system = new PredatorPreyEcologySystem();
+  });
+
+  afterEach(() => {
+    if (originalCatTemplate) {
+      SPECIES_REGISTRY.cat = originalCatTemplate;
+    } else {
+      delete SPECIES_REGISTRY.cat;
+    }
+
+    if (originalCowTemplate) {
+      SPECIES_REGISTRY.cow = originalCowTemplate;
+    } else {
+      delete SPECIES_REGISTRY.cow;
+    }
   });
 
   it('hungry predator near prey → predator state becomes hunting, prey state becomes fleeing', async () => {
@@ -171,5 +188,67 @@ describe('PredatorPreyEcologySystem', () => {
   it('system has correct id and priority', async () => {
     expect(system.id).toBe('predator_prey_ecology');
     expect(system.priority).toBe(64);
+  });
+
+  it('respects non-hostile interspecies disposition by preventing hunt behavior', async () => {
+    const base = SPECIES_REGISTRY.human;
+    SPECIES_REGISTRY.cat = {
+      ...base,
+      speciesId: 'cat',
+      speciesName: 'Cat',
+      commonName: 'Cat',
+      compatibleSpecies: [...base.compatibleSpecies],
+      innateTraits: [...base.innateTraits],
+      speciesBehaviorProfile: {
+        cognitiveCeiling: 0.6,
+        uniqueBehaviors: [],
+        personalityBaseline: undefined,
+        interspeciesRelations: [
+          {
+            targetSpeciesId: 'cow',
+            disposition: 'symbiotic',
+            description: 'Shares space peacefully',
+          },
+        ],
+      },
+    };
+
+    const predator = makeAnimal({ speciesId: 'cat', hunger: 80, x: 0, y: 0 });
+    const prey = makeAnimal({ speciesId: 'cow', x: 5, y: 0 });
+    callOnUpdate(system, makeCtx([predator, prey]));
+
+    expect(predator.state).not.toBe('hunting');
+    expect(prey.state).toBe('idle');
+  });
+
+  it('uses fearful disposition to trigger prey flee even before predator is hunting', async () => {
+    const base = SPECIES_REGISTRY.human;
+    SPECIES_REGISTRY.cow = {
+      ...base,
+      speciesId: 'cow',
+      speciesName: 'Cow',
+      commonName: 'Cow',
+      compatibleSpecies: [...base.compatibleSpecies],
+      innateTraits: [...base.innateTraits],
+      speciesBehaviorProfile: {
+        cognitiveCeiling: 0.4,
+        uniqueBehaviors: [],
+        personalityBaseline: undefined,
+        interspeciesRelations: [
+          {
+            targetSpeciesId: 'cat',
+            disposition: 'fearful',
+            description: 'Instinctive fear response',
+          },
+        ],
+      },
+    };
+
+    const predator = makeAnimal({ speciesId: 'cat', hunger: 10, state: 'idle', x: 0, y: 0 });
+    const prey = makeAnimal({ speciesId: 'cow', x: 5, y: 0, stress: 10 });
+    callOnUpdate(system, makeCtx([predator, prey]));
+
+    expect(prey.state).toBe('fleeing');
+    expect(prey.stress).toBeGreaterThan(10);
   });
 });

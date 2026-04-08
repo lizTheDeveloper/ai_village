@@ -25,6 +25,17 @@ export interface ExteriorHUDData {
   asteroidDensity: number;
   laserCharge: number;
   sectionCount: number;
+  awarenessState?: 'dormant' | 'scanning' | 'alert' | 'critical';
+  heartbeatBpm?: number;
+}
+
+export interface ExteriorHeartbeatData {
+  awarenessState: 'dormant' | 'scanning' | 'alert' | 'critical';
+  awarenessLevel: number;
+  cadenceHz: number;
+  pulseStrength: number;
+  phase: number;
+  transitionBoost: number;
 }
 
 interface asteroid_entry {
@@ -48,6 +59,9 @@ export class ExteriorViewScreen {
   private asteroidContainer: HTMLElement | null = null;
   private asteroids: asteroid_entry[] = [];
   private shieldActive: boolean = false;
+  private heartbeatState: 'dormant' | 'scanning' | 'alert' | 'critical' = 'dormant';
+  private heartbeatCadenceHz: number = 0.24;
+  private heartbeatStrength: number = 0.3;
   private animationFrameIds: number[] = [];
   private asteroidRafId: number | null = null;
   private lastAsteroidTime: number = 0;
@@ -136,6 +150,38 @@ export class ExteriorViewScreen {
     this.shieldEl.style.display = active ? 'block' : 'none';
   }
 
+  setHeartbeat(data: ExteriorHeartbeatData): void {
+    this.heartbeatCadenceHz = Math.max(0.15, data.cadenceHz);
+    this.heartbeatStrength = Math.max(0, Math.min(1, data.pulseStrength));
+
+    const previousState = this.heartbeatState;
+    this.heartbeatState = data.awarenessState;
+
+    if (!this.shipHull) return;
+
+    const heartbeatPeriodSeconds = 1 / this.heartbeatCadenceHz;
+    const animationDuration = Math.max(0.4, Math.min(5, heartbeatPeriodSeconds));
+    this.shipHull.style.animationDuration = `${animationDuration.toFixed(2)}s`;
+
+    const intensity = Math.max(0.15, Math.min(1, this.heartbeatStrength * 1.25));
+    const palette = this.getHeartbeatPalette(this.heartbeatState);
+    this.shipHull.style.boxShadow = `
+      0 0 ${Math.round(24 + intensity * 32)}px rgba(${palette.outer}, ${0.2 + intensity * 0.22}),
+      0 0 ${Math.round(48 + intensity * 72)}px rgba(${palette.mid}, ${0.08 + intensity * 0.2}),
+      inset 0 0 ${Math.round(16 + intensity * 20)}px rgba(${palette.inner}, ${0.04 + intensity * 0.12})
+    `;
+
+    if (this.shieldEl) {
+      this.shieldEl.style.animationDuration = `${Math.max(0.8, animationDuration * 0.85).toFixed(2)}s`;
+      this.shieldEl.style.borderColor = `rgba(${palette.mid}, ${0.35 + intensity * 0.35})`;
+      this.shieldEl.style.boxShadow = `0 0 ${Math.round(20 + intensity * 30)}px rgba(${palette.mid}, ${0.2 + intensity * 0.2}), inset 0 0 20px rgba(${palette.inner}, 0.12)`;
+    }
+
+    if (previousState !== data.awarenessState || data.transitionBoost >= 0.7) {
+      this.spawnHeartbeatWave();
+    }
+  }
+
   fireLaser(targetX: number, targetY: number): void {
     if (!this.shipHull) return;
     const rect = this.shipHull.getBoundingClientRect();
@@ -217,7 +263,8 @@ export class ExteriorViewScreen {
     hull.style.transform = `translateX(${px}px)`;
     window.setTimeout(() => {
       hull.style.transform = 'translateX(0)';
-      hull.style.animation = 'hull_pulse 3s ease-in-out infinite';
+      hull.style.animation = 'hull_pulse 2s ease-in-out infinite';
+      hull.style.animationDuration = `${Math.max(0.4, Math.min(5, 1 / this.heartbeatCadenceHz)).toFixed(2)}s`;
     }, 400);
   }
 
@@ -277,6 +324,13 @@ export class ExteriorViewScreen {
     sectionRow.style.cssText = 'margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: #88aacc;';
     sectionRow.textContent = `SECTIONS  ${data.sectionCount}`;
     this.hudEl.appendChild(sectionRow);
+
+    const awarenessRow = document.createElement('div');
+    awarenessRow.style.cssText = 'margin-top: 4px; font-size: 11px; color: #9fd3ff;';
+    const awareness = (data.awarenessState ?? this.heartbeatState).toUpperCase();
+    const bpm = Math.max(1, Math.round((data.heartbeatBpm ?? this.heartbeatCadenceHz * 60)));
+    awarenessRow.textContent = `AWARE    ${awareness}  ${bpm} BPM`;
+    this.hudEl.appendChild(awarenessRow);
   }
 
   detachSection(sectionName: string): void {
@@ -381,6 +435,11 @@ export class ExteriorViewScreen {
         0%   { opacity: 1; transform: scale(0.3); }
         50%  { opacity: 0.9; transform: scale(1); }
         100% { opacity: 0; transform: scale(1.3); }
+      }
+      @keyframes heartbeat_ring {
+        0%   { opacity: 0.85; transform: translate(-50%, -50%) scale(0.65); }
+        70%  { opacity: 0.3; transform: translate(-50%, -50%) scale(1.08); }
+        100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
       }
     `;
     document.head.appendChild(this.styleEl);
@@ -612,7 +671,7 @@ export class ExteriorViewScreen {
       );
       border-radius: 60% 60% 45% 45% / 55% 55% 35% 35%;
       box-shadow: 0 0 30px rgba(0, 200, 180, 0.3), 0 0 60px rgba(0, 150, 200, 0.15), inset 0 0 20px rgba(0, 180, 200, 0.05);
-      animation: hull_pulse 3s ease-in-out infinite;
+      animation: hull_pulse ${(1 / this.heartbeatCadenceHz).toFixed(2)}s ease-in-out infinite;
       z-index: 2;
     `;
 
@@ -761,5 +820,49 @@ export class ExteriorViewScreen {
       this.callbacks.onReturnToInterior();
     });
     this.container.appendChild(btn);
+  }
+
+  private getHeartbeatPalette(state: 'dormant' | 'scanning' | 'alert' | 'critical'): {
+    outer: string;
+    mid: string;
+    inner: string;
+  } {
+    switch (state) {
+      case 'critical':
+        return { outer: '255, 120, 120', mid: '255, 90, 90', inner: '255, 70, 70' };
+      case 'alert':
+        return { outer: '255, 190, 120', mid: '255, 160, 90', inner: '255, 140, 70' };
+      case 'scanning':
+        return { outer: '130, 230, 255', mid: '90, 210, 255', inner: '80, 190, 230' };
+      case 'dormant':
+      default:
+        return { outer: '110, 180, 210', mid: '90, 160, 200', inner: '70, 140, 180' };
+    }
+  }
+
+  private spawnHeartbeatWave(): void {
+    if (!this.shipHull) return;
+
+    const rect = this.shipHull.getBoundingClientRect();
+    const palette = this.getHeartbeatPalette(this.heartbeatState);
+    const ring = document.createElement('div');
+    ring.style.cssText = `
+      position: fixed;
+      left: ${rect.left + rect.width / 2}px;
+      top: ${rect.top + rect.height / 2}px;
+      width: ${Math.round(rect.width * 1.35)}px;
+      height: ${Math.round(rect.height * 1.35)}px;
+      border-radius: 50%;
+      border: 2px solid rgba(${palette.mid}, ${0.45 + this.heartbeatStrength * 0.35});
+      box-shadow: 0 0 24px rgba(${palette.outer}, ${0.25 + this.heartbeatStrength * 0.25});
+      pointer-events: none;
+      z-index: 10120;
+      transform: translate(-50%, -50%);
+      animation: heartbeat_ring 650ms ease-out forwards;
+    `;
+    document.body.appendChild(ring);
+    window.setTimeout(() => {
+      if (ring.parentNode) ring.parentNode.removeChild(ring);
+    }, 700);
   }
 }

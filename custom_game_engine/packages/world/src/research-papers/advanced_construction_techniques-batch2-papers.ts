@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -581,7 +581,7 @@ export const FLOORING_SYSTEMS: ResearchPaper = {
 By Professor Artemisia Groundling, Department of Underfoot Engineering, University of Thornhaven*
 
 
-The fundamental principle of flooring systems rests upon a deceptively simple premise: that humans and their possessions should remain at consistent vertical elevations within structures, rather than experiencing what the Ancient Carpenters' Guild euphemistically termed "involuntary rapid descent events."† The modern understanding of flooring emerged slowly over several millennia, primarily through what the historian Lord Vetinari III described as "an extended period of architectural Darwinism in which unsuccessful approaches were self-eliminating."‡ Contemporary flooring systems consist of three primary components: the structural framework (joists, beams, or slabs), the substrate (that which receives the walking-upon), and the finish layer (that which prevents splinters and makes one's landlord feel they can charge extra rent).** The relationship between these components determines not merely the floor's load-bearing capacity, but also its acoustic properties, thermal characteristics, and—most critically—its tendency to remain precisely where the architect intended it.††
+The fundamental principle of flooring systems rests upon a deceptively simple premise: that humans and their possessions should remain at consistent vertical elevations within structures, rather than experiencing what the Ancient Carpenters' Guild euphemistically termed "involuntary rapid descent events."† The modern understanding of flooring emerged slowly over several millennia, primarily through what the historian Lord Magistrate Haldren III described as "an extended period of architectural Darwinism in which unsuccessful approaches were self-eliminating."‡ Contemporary flooring systems consist of three primary components: the structural framework (joists, beams, or slabs), the substrate (that which receives the walking-upon), and the finish layer (that which prevents splinters and makes one's landlord feel they can charge extra rent).** The relationship between these components determines not merely the floor's load-bearing capacity, but also its acoustic properties, thermal characteristics, and—most critically—its tendency to remain precisely where the architect intended it.††
 
 The structural framework represents perhaps the most misunderstood element of flooring systems, despite being, by definition, the thing that prevents everything else from visiting the floor below.‡‡ Traditional joist systems, consisting of parallel timber or steel members spanning between load-bearing walls or beams, have been employed since the Bronze Age, though the Bronze Age versions were notably less successful and have therefore not survived for study.*** Modern practice calls for joists to be spaced at intervals dictated by span tables†† developed through centuries of empirical observation—primarily observation of what spacing proved insufficient.‡‡‡ The introduction of engineered lumber products in the late twentieth century revolutionized joist design, though the Guild of Traditional Carpenters maintains that nothing made after 1847 can be truly trusted.**** Concrete slab systems, whether cast-in-place or precast, operate on entirely different principles, relying on the material's compressive strength and the strategic placement of reinforcement to achieve spans that would cause a timber joist to weep openly.††††
 
@@ -594,11 +594,11 @@ The evolution of flooring technology reflects humanity's gradual understanding t
 
 FOOTNOTES
 
-* Professor Groundling holds the Weatherwax Chair in Applied Floor Studies and has never personally fallen through a floor, though she acknowledges this may be more fortune than expertise. She wishes to thank the Patrician's Office for not asking too many questions about the incident at the University's East Wing, which was definitely not her fault and in any case has been properly repaired.
+* Professor Groundling holds the Ashworth Chair in Applied Floor Studies and has never personally fallen through a floor, though she acknowledges this may be more fortune than expertise. She wishes to thank the Lord Magistrate's Office for not asking too many questions about the incident at the University's East Wing, which was definitely not her fault and in any case has been properly repaired.
 
 † The Ancient Carpenters' Guild recorded 847 distinct euphemisms for structural failure, suggesting either remarkable creativity or entirely too much empirical data. Their archive also contains the cheerful observation that "thee learneth moste from floorres that falleth than from floorres that stayeth," which explains much about medieval life expectancy.
 
-‡ This observation appeared in Lord Vetinari III's "Reflections on the Built Environment," written during his brief period of architectural enthusiasm before he returned to the family business of being extremely suspicious of everyone. The book includes a haunting chapter titled "Buildings That Remain Standing Despite Their Owners' Best Efforts," which became required reading for the Guild of Architects after the Unspeakable Event of 1782.†
+‡ This observation appeared in Lord Magistrate Haldren III's "Reflections on the Built Environment," written during his brief period of architectural enthusiasm before he returned to the family business of being extremely suspicious of everyone. The book includes a haunting chapter titled "Buildings That Remain Standing Despite Their Owners' Best Efforts," which became required reading for the Guild of Architects after the Unspeakable Event of 1782.†
 
     † We speak not of 1782. The Guild maintains that detailed discussion serves no purpose except to give nightmares to young architects, and the senior partners have quite enough anxiety already without adding historical trauma to the mix.
 

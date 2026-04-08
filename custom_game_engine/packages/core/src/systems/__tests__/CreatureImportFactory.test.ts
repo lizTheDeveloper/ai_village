@@ -5,13 +5,14 @@
  * albi-norn.yaml example from folkfork-bridge.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { CreatureImportFactory, CreatureImportError } from '../CreatureImportFactory.js';
 import type { MigrationContext } from '../CreatureImportFactory.js';
 import { createMockWorld } from '../../__tests__/createMockWorld.js';
 import type { World } from '../../ecs/World.js';
 import type { GenomeMigrationV1 } from '@multiverse-studios/folkfork-bridge';
 import type { MigrationProvenanceComponent } from '../../components/MigrationProvenanceComponent.js';
+import { SPECIES_REGISTRY, type SpeciesBehaviorProfile } from '../../species/SpeciesRegistry.js';
 
 // ============================================================================
 // Test data: modelled on albi-norn.yaml
@@ -141,6 +142,21 @@ const defaultMigrationContext: MigrationContext = {
   federatedIdentityHash: null,
 };
 
+const originalNornTemplate = SPECIES_REGISTRY.norn;
+
+function installNornBehaviorProfile(profile: SpeciesBehaviorProfile): void {
+  const base = SPECIES_REGISTRY.human;
+  SPECIES_REGISTRY.norn = {
+    ...base,
+    speciesId: 'norn',
+    speciesName: 'Norn',
+    commonName: 'Norn',
+    compatibleSpecies: [...base.compatibleSpecies],
+    innateTraits: [...base.innateTraits],
+    speciesBehaviorProfile: profile,
+  };
+}
+
 // ============================================================================
 // Tests
 // ============================================================================
@@ -152,6 +168,14 @@ describe('CreatureImportFactory', () => {
   beforeEach(() => {
     factory = new CreatureImportFactory();
     world = createMockWorld({ tick: 1000 });
+  });
+
+  afterEach(() => {
+    if (originalNornTemplate) {
+      SPECIES_REGISTRY.norn = originalNornTemplate;
+    } else {
+      delete SPECIES_REGISTRY.norn;
+    }
   });
 
   // --------------------------------------------------------------------------
@@ -283,6 +307,57 @@ describe('CreatureImportFactory', () => {
       expect(llmWarnings.length).toBe(1);
       expect(llmWarnings[0]!.message).toContain('retraining_required');
     });
+
+    it('enforces species cognitive ceiling from behavior profile', () => {
+      installNornBehaviorProfile({
+        cognitiveCeiling: 0.4,
+        personalityBaseline: {
+          curiosity: 0.9,
+          fearfulness: 0.2,
+        },
+        uniqueBehaviors: [],
+        interspeciesRelations: [],
+      });
+
+      const payload = createAlbiNornPayload();
+      const result = factory.importCreature(world, payload, { x: 10, y: 20 }, defaultMigrationContext);
+      const emittedEvents = (world.eventBus.emit as any).mock.calls.map((call: any[]) => call[0]);
+      const importedEvent = emittedEvents.find((event: any) => event?.type === 'creature:imported');
+
+      expect(importedEvent).toBeDefined();
+      expect(importedEvent.data.intelligenceExpression).toBeLessThanOrEqual(40);
+      expect(result.warnings.some((warning) => warning.code === 'cognitive_ceiling_enforced')).toBe(true);
+    });
+
+    it('seeds animal personality from species personality baseline', () => {
+      installNornBehaviorProfile({
+        cognitiveCeiling: 0.95,
+        personalityBaseline: {
+          curiosity: 0.95,
+          sociability: 0.85,
+          aggression: 0.05,
+          fearfulness: 0.15,
+        },
+        uniqueBehaviors: [],
+        interspeciesRelations: [],
+      });
+
+      const payload = createAlbiNornPayload();
+      const result = factory.importCreature(world, payload, { x: 10, y: 20 }, defaultMigrationContext);
+
+      const createdEntity = (world.entities as Map<string, any>).get(result.entityId!);
+      const animalCall = createdEntity.addComponent.mock.calls.find(
+        (c: any[]) => c[0]?.type === 'animal',
+      );
+      expect(animalCall).toBeDefined();
+
+      const seededPersonality = animalCall[0].personality;
+      expect(seededPersonality.curiosity).toBeGreaterThan(0.6);
+      expect(seededPersonality.sociability).toBeGreaterThan(0.55);
+      expect(seededPersonality.aggressiveness).toBeLessThan(0.45);
+      expect(seededPersonality.fearfulness).toBeLessThan(0.55);
+      expect(result.warnings.some((warning) => warning.code === 'personality_baseline_seeded')).toBe(true);
+    });
   });
 
   // --------------------------------------------------------------------------
@@ -398,6 +473,49 @@ describe('CreatureImportFactory', () => {
           }),
         }),
       );
+    });
+
+    it('registers species unique behaviors and interspecies relations on import', () => {
+      installNornBehaviorProfile({
+        cognitiveCeiling: 0.7,
+        personalityBaseline: {
+          curiosity: 0.8,
+        },
+        uniqueBehaviors: [
+          {
+            behaviorId: 'bioluminescent_relay',
+            description: 'Pulse relay between colony members',
+            triggerHint: 'idle_relay',
+          },
+        ],
+        interspeciesRelations: [
+          {
+            targetSpeciesId: 'cow',
+            disposition: 'fearful',
+            description: 'Avoid large grazers',
+          },
+        ],
+      });
+
+      factory.importCreature(world, createAlbiNornPayload(), { x: 10, y: 20 }, defaultMigrationContext);
+      const emittedEvents = (world.eventBus.emit as any).mock.calls.map((call: any[]) => call[0]);
+
+      expect(
+        emittedEvents.some(
+          (event: any) =>
+            event?.type === 'species:unique_behavior_registered' &&
+            event.data?.behaviorId === 'bioluminescent_relay',
+        ),
+      ).toBe(true);
+
+      expect(
+        emittedEvents.some(
+          (event: any) =>
+            event?.type === 'species:interspecies_relation_registered' &&
+            event.data?.targetSpeciesId === 'cow' &&
+            event.data?.disposition === 'fearful',
+        ),
+      ).toBe(true);
     });
   });
 

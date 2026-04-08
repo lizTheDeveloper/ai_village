@@ -248,6 +248,29 @@ export function renderLockedSection(
 }
 
 /**
+ * Render a single compact summary line for multiple locked sections.
+ * Collapses consecutive locked sections to save vertical space.
+ * If one label: "🔒 {label} — Scanner upgrade required"
+ * If multiple: "🔒 {count} sections locked — Upgrade scanner"
+ */
+export function renderLockedSectionsSummary(
+  ctx: CanvasRenderingContext2D,
+  labels: string[],
+  panelX: number,
+  y: number,
+  padding: number,
+  lineHeight: number
+): number {
+  ctx.fillStyle = '#555555';
+  ctx.font = '11px monospace';
+  const text = labels.length === 1
+    ? `🔒 ${labels[0]} — Scanner upgrade required`
+    : `🔒 ${labels.length} sections locked — Upgrade scanner`;
+  ctx.fillText(text, panelX + padding, y);
+  return y + lineHeight + 5;
+}
+
+/**
  * Render a compact single-line locked section indicator.
  * Saves ~1 lineHeight + 5px vs renderLockedSection.
  */

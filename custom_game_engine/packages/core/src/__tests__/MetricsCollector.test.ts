@@ -167,6 +167,61 @@ describe('MetricsCollector', () => {
     });
   });
 
+  describe('Capability Metrics', () => {
+    it('should record capability unlock frequency across species', () => {
+      collector.recordEvent({
+        type: 'capability:unlocked',
+        timestamp: 1000,
+        agentId: 'agent-1',
+        capabilityId: 'collaborative_composition',
+        speciesId: 'norn',
+        score: 0.82,
+        geneticScore: 0.8,
+        biochemicalScore: 0.84,
+        tick: 10,
+      });
+
+      collector.recordEvent({
+        type: 'capability:unlocked',
+        timestamp: 2000,
+        agentId: 'agent-2',
+        capabilityId: 'collaborative_composition',
+        speciesId: 'ettin',
+        score: 0.72,
+        geneticScore: 0.7,
+        biochemicalScore: 0.74,
+        tick: 20,
+      });
+
+      const capabilityMetrics = collector.getMetric('capability_metrics');
+      expect(capabilityMetrics.totalUnlocks).toBe(2);
+      expect(capabilityMetrics.unlocksByCapability['collaborative_composition']).toBe(2);
+      expect(capabilityMetrics.unlocksBySpecies['norn']).toBe(1);
+      expect(capabilityMetrics.unlocksBySpecies['ettin']).toBe(1);
+      expect(capabilityMetrics.capabilitySpeciesMatrix['collaborative_composition']['norn']).toBe(1);
+      expect(capabilityMetrics.capabilitySpeciesMatrix['collaborative_composition']['ettin']).toBe(1);
+      expect(capabilityMetrics.averageUnlockScoreByCapability['collaborative_composition']).toBeCloseTo(0.77, 5);
+    });
+
+    it('should include capability metrics in getAllMetrics when unlocks exist', () => {
+      collector.recordEvent({
+        type: 'capability:unlocked',
+        timestamp: 1000,
+        agentId: 'agent-3',
+        capabilityId: 'symbolic_ritualization',
+        speciesId: 'grendel',
+        score: 0.68,
+        geneticScore: 0.66,
+        biochemicalScore: 0.7,
+        tick: 15,
+      });
+
+      const allMetrics = collector.getAllMetrics();
+      expect(allMetrics.capability_metrics).toBeDefined();
+      expect(allMetrics.capability_metrics.totalUnlocks).toBe(1);
+    });
+  });
+
   describe('Needs & Survival Metrics', () => {
     it('should sample agent needs periodically', () => {
       const agentId = 'agent-1';

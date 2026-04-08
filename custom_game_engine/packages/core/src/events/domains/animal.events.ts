@@ -92,6 +92,30 @@ export interface AnimalEvents {
     sourceGame: string;
     migrationType: string;
     speciesId: string;
+    intelligenceExpression?: number;
+    cognitiveCeiling?: number;
+  };
+  'species:unique_behavior_registered': {
+    entityId: EntityId;
+    speciesId: string;
+    behaviorId: string;
+    triggerHint: string;
+    description: string;
+  };
+  'species:interspecies_relation_registered': {
+    entityId: EntityId;
+    sourceSpeciesId: string;
+    targetSpeciesId: string;
+    disposition: string;
+    description?: string;
+  };
+  'species:unique_behavior_triggered': {
+    entityId: EntityId;
+    speciesId: string;
+    behaviorId: string;
+    triggerHint: string;
+    behaviorState: string;
+    reason: string;
   };
   'creature:quarantine_phase_changed': {
     entityId: EntityId;

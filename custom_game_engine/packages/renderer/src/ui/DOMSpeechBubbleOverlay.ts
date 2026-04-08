@@ -24,8 +24,26 @@ interface SpeechBubble {
 export class DOMSpeechBubbleOverlay {
   private container: HTMLDivElement;
   private bubbles: Map<string, { bubble: SpeechBubble; element: HTMLDivElement; timer: number }> = new Map();
+  private static stylesInjected = false;
 
   constructor(parentElement: HTMLElement) {
+    // Inject keyframe animations once
+    if (!DOMSpeechBubbleOverlay.stylesInjected) {
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes speechBubbleIn {
+          from { opacity: 0; transform: translate(-50%, -90%) scale(0.85); }
+          to   { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+        }
+        @keyframes speechBubbleOut {
+          from { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+          to   { opacity: 0; transform: translate(-50%, -110%) scale(0.9); }
+        }
+      `;
+      document.head.appendChild(style);
+      DOMSpeechBubbleOverlay.stylesInjected = true;
+    }
+
     // Create overlay container
     this.container = document.createElement('div');
     this.container.className = 'speech-bubble-overlay';
@@ -84,8 +102,13 @@ export class DOMSpeechBubbleOverlay {
     const existing = this.bubbles.get(agentId);
     if (existing) {
       window.clearTimeout(existing.timer);
-      existing.element.remove();
+      const el = existing.element;
       this.bubbles.delete(agentId);
+      // Animate out then remove from DOM
+      el.style.animation = 'speechBubbleOut 0.2s ease-in forwards';
+      el.addEventListener('animationend', () => el.remove(), { once: true });
+      // Fallback removal if animationend doesn't fire
+      window.setTimeout(() => { if (el.parentNode) el.remove(); }, 300);
     }
   }
 
@@ -124,6 +147,7 @@ export class DOMSpeechBubbleOverlay {
     wrapper.style.top = `${bubble.y}px`;
     wrapper.style.transform = 'translate(-50%, -100%)';
     wrapper.style.zIndex = '1000';
+    wrapper.style.animation = 'speechBubbleIn 0.25s ease-out forwards';
 
     // Allow pointer events only if there's alien text (for hover tooltips)
     const hasAlienText = bubble.alienTokens && bubble.alienTokens.length > 0;

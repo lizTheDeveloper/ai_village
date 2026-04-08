@@ -209,16 +209,16 @@ describe('DevPanel Paradigm Generation', () => {
   });
 
   describe('Animist Paradigms', () => {
-    it('should include daemon magic', () => {
-      expect(ANIMIST_PARADIGM_REGISTRY.daemon).toBeDefined();
+    it('should include animus magic', () => {
+      expect(ANIMIST_PARADIGM_REGISTRY.animus).toBeDefined();
     });
 
-    it('should include sympathy magic', () => {
-      expect(ANIMIST_PARADIGM_REGISTRY.sympathy).toBeDefined();
+    it('should include tethermancy magic', () => {
+      expect(ANIMIST_PARADIGM_REGISTRY.tethermancy).toBeDefined();
     });
 
-    it('should include allomancy', () => {
-      expect(ANIMIST_PARADIGM_REGISTRY.allomancy).toBeDefined();
+    it('should include ferromancy', () => {
+      expect(ANIMIST_PARADIGM_REGISTRY.ferromancy).toBeDefined();
     });
   });
 });

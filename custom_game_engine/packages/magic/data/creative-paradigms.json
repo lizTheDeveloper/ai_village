@@ -1,16 +1,16 @@
 {
-  "sympathy": {
-    "id": "sympathy",
-    "name": "Sympathy",
+  "tethermancy": {
+    "id": "tethermancy",
+    "name": "Tethermancy",
     "description": "Create connections between similar objects; what affects one affects the other",
     "universeIds": [
-      "kingkiller"
+      "tethermantic_tradition"
     ],
     "lore": "The art of creating sympathetic links between objects based on similarity. The more similar two things are, the stronger the connection. Hair and blood create the strongest links to their owners.",
     "sources": [
       {
-        "id": "sympathy_alar",
-        "name": "Alar",
+        "id": "tethermancy_alar",
+        "name": "Attunement",
         "type": "internal",
         "regeneration": "rest",
         "detectability": "subtle",
@@ -44,7 +44,7 @@
         "requirement": "required",
         "canBeMastered": true,
         "blockEffect": "prevents_casting",
-        "description": "Mental focus (Alar)"
+        "description": "Mental focus (Attunement)"
       },
       {
         "type": "focus",
@@ -94,8 +94,8 @@
         "severity": "severe",
         "probability": 0.3,
         "mitigatable": true,
-        "mitigationSkill": "alar_mastery",
-        "description": "Binder's chills from overextension"
+        "mitigationSkill": "attunement_mastery",
+        "description": "Resonance Drain from overextension"
       },
       {
         "trigger": "overuse",
@@ -106,7 +106,7 @@
         "description": "Mental exhaustion from maintaining multiple bindings"
       },
       {
-        "trigger": "split_alar",
+        "trigger": "split_attunement",
         "consequence": "feedback_loop",
         "severity": "catastrophic",
         "probability": 0.1,
@@ -123,10 +123,10 @@
           "university_access"
         ],
         "grantsAccess": [
-          "sympathy_alar"
+          "tethermancy_alar"
         ],
         "startingProficiency": 15,
-        "description": "University training in sympathy"
+        "description": "University training in tethermancy"
       },
       {
         "method": "training",
@@ -136,10 +136,10 @@
           "strong_alar"
         ],
         "grantsAccess": [
-          "sympathy_alar"
+          "tethermancy_alar"
         ],
         "startingProficiency": 10,
-        "description": "Apprenticeship with a sympathist"
+        "description": "Apprenticeship with a tethermancer"
       }
     ],
     "availableTechniques": [
@@ -160,7 +160,7 @@
       {
         "technique": "create",
         "form": "spirit",
-        "reason": "Cannot create sympathy with souls",
+        "reason": "Cannot create tethermancy with souls",
         "consequence": "Soul damage to both parties"
       }
     ],

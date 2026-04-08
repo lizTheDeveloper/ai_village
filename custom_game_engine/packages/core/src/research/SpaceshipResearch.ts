@@ -6,8 +6,8 @@
  *
  * Tier 1: Basic Spaceflight (worldships, physical propulsion)
  * Tier 2: β-Space Awareness (threshold ships, emotional navigation)
- * Tier 3: Advanced Navigation (story ships, gleisner vessels)
- * Tier 4: Specialized Ships (svetz retrieval, probability scouts)
+ * Tier 3: Advanced Navigation (story ships, synthetic vessels)
+ * Tier 4: Specialized Ships (chrono salvage, probability scouts)
  * Tier 5: Reality Engineering (timeline mergers)
  *
  * Based on dimensional awareness levels:
@@ -47,10 +47,10 @@ export const BRAINSHIP_SYMBIOSIS = SPACEFLIGHT_RESEARCH.find((r) => r.id === 'sp
 export const THE_HEART = SPACEFLIGHT_RESEARCH.find((r) => r.id === 'spaceflight_the_heart')!;
 export const MEDITATION_CHAMBERS = SPACEFLIGHT_RESEARCH.find((r) => r.id === 'spaceflight_meditation_chambers')!;
 export const STORY_SHIP = SPACEFLIGHT_RESEARCH.find((r) => r.id === 'spaceflight_story_ship')!;
-export const GLEISNER_VESSEL = SPACEFLIGHT_RESEARCH.find((r) => r.id === 'spaceflight_gleisner_vessel')!;
+export const SYNTHETIC_VESSEL = SPACEFLIGHT_RESEARCH.find((r) => r.id === 'spaceflight_synthetic_vessel')!;
 export const MEMORY_HALLS = SPACEFLIGHT_RESEARCH.find((r) => r.id === 'spaceflight_memory_halls')!;
 export const EMOTION_THEATERS = SPACEFLIGHT_RESEARCH.find((r) => r.id === 'spaceflight_emotion_theaters')!;
-export const SVETZ_RETRIEVAL = SPACEFLIGHT_RESEARCH.find((r) => r.id === 'spaceflight_svetz_retrieval')!;
+export const CHRONO_SALVAGE = SPACEFLIGHT_RESEARCH.find((r) => r.id === 'spaceflight_chrono_salvage')!;
 export const PROBABILITY_SCOUT = SPACEFLIGHT_RESEARCH.find((r) => r.id === 'spaceflight_probability_scout')!;
 export const TIMELINE_MERGER = SPACEFLIGHT_RESEARCH.find((r) => r.id === 'spaceflight_timeline_merger')!;
 export const SHIPYARD_CONSTRUCTION = SPACEFLIGHT_RESEARCH.find((r) => r.id === 'spaceflight_shipyard')!;

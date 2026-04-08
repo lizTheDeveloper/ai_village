@@ -830,8 +830,8 @@
   ],
   "advancedMaterialItems": [
     {
-      "id": "mithril_ingot",
-      "name": "Mithril Ingot",
+      "id": "starweave_ingot",
+      "name": "Starweave Ingot",
       "category": "material",
       "weight": 2.0,
       "stackSize": 20,
@@ -865,7 +865,7 @@
       "stackSize": 1,
       "isGatherable": false,
       "craftedFrom": [
-        { "itemId": "mithril_ingot", "amount": 4 },
+        { "itemId": "starweave_ingot", "amount": 4 },
         { "itemId": "wood", "amount": 10 },
         { "itemId": "gold_ingot", "amount": 2 }
       ],

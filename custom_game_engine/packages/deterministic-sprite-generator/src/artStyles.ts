@@ -23,7 +23,7 @@ export interface ArtStyleConfig {
 export const ART_STYLES: Record<ArtStyle, ArtStyleConfig> = {
   nes: {
     era: '8-bit NES (1985-1990)',
-    description: 'Chunky pixels, limited 56-color palette, simple shading like Super Mario Bros',
+    description: 'Chunky pixels, limited 56-color palette, simple flat shading, 8-bit platformer aesthetic',
     baseSizes: { min: 32, max: 48 },
     colorDepth: '56 colors',
     shadingStyle: 'flat shading',
@@ -33,7 +33,7 @@ export const ART_STYLES: Record<ArtStyle, ArtStyleConfig> = {
 
   snes: {
     era: '16-bit SNES (1991-1996)',
-    description: 'Detailed pixels, 256-color palette, smooth shading like Chrono Trigger',
+    description: 'Detailed pixels, 256-color palette, smooth gradient shading, 16-bit RPG aesthetic',
     baseSizes: { min: 64, max: 96 },
     colorDepth: '256 colors',
     shadingStyle: 'medium shading',
@@ -44,7 +44,7 @@ export const ART_STYLES: Record<ArtStyle, ArtStyleConfig> = {
 
   ps1: {
     era: '32-bit PS1/Saturn (1995-2000)',
-    description: 'Pre-rendered 3D sprites, dithered shading, high detail like Final Fantasy Tactics',
+    description: 'Pre-rendered 3D sprites, dithered shading, isometric tactical aesthetic',
     baseSizes: { min: 128, max: 192 },
     colorDepth: 'Thousands of colors',
     shadingStyle: 'detailed shading',
@@ -54,7 +54,7 @@ export const ART_STYLES: Record<ArtStyle, ArtStyleConfig> = {
 
   gba: {
     era: 'Game Boy Advance (2001-2008)',
-    description: 'Bright vibrant colors, clean outlines like Golden Sun',
+    description: 'Bright vibrant colors, clean outlines, portable RPG aesthetic',
     baseSizes: { min: 64, max: 80 },
     colorDepth: '32,768 colors',
     shadingStyle: 'medium shading',
@@ -64,7 +64,7 @@ export const ART_STYLES: Record<ArtStyle, ArtStyleConfig> = {
 
   gameboy: {
     era: 'Game Boy Classic (1989-1998)',
-    description: 'Monochrome 4-shade palette with green tint like Pokemon Red/Blue',
+    description: 'Monochrome 4-shade palette with green tint, handheld classic aesthetic',
     baseSizes: { min: 32, max: 48 },
     colorDepth: '4 shades (monochrome)',
     shadingStyle: 'basic shading',
@@ -74,7 +74,7 @@ export const ART_STYLES: Record<ArtStyle, ArtStyleConfig> = {
 
   neogeo: {
     era: 'Neo Geo Arcade (1990-2004)',
-    description: 'Massive detailed sprites, hand-drawn quality like Metal Slug',
+    description: 'Massive detailed sprites, hand-drawn quality, run-and-gun action aesthetic',
     baseSizes: { min: 128, max: 256 },
     colorDepth: '65,536 colors',
     shadingStyle: 'detailed shading',
@@ -85,7 +85,7 @@ export const ART_STYLES: Record<ArtStyle, ArtStyleConfig> = {
   // === SEGA Consoles ===
   genesis: {
     era: 'Sega Genesis/Mega Drive (1988-1997)',
-    description: 'Bold colors, dithered gradients, detailed sprites like Sonic the Hedgehog',
+    description: 'Bold colors, dithered gradients, detailed sprites, fast-action aesthetic',
     baseSizes: { min: 64, max: 96 },
     colorDepth: '512 colors',
     shadingStyle: 'medium shading',
@@ -95,7 +95,7 @@ export const ART_STYLES: Record<ArtStyle, ArtStyleConfig> = {
 
   mastersystem: {
     era: 'Sega Master System (1985-1992)',
-    description: 'Vibrant 32-color palette, simpler detail like Phantasy Star',
+    description: 'Vibrant 32-color palette, simpler detail, 8-bit console RPG aesthetic',
     baseSizes: { min: 32, max: 48 },
     colorDepth: '32 colors',
     shadingStyle: 'basic shading',
@@ -186,7 +186,7 @@ export const ART_STYLES: Record<ArtStyle, ArtStyleConfig> = {
 
   vga: {
     era: 'VGA DOS (1987-1995)',
-    description: '256-color glory, smooth gradients, peak DOS era like Commander Keen',
+    description: '256-color glory, smooth gradients, peak DOS-era aesthetic',
     baseSizes: { min: 48, max: 80 },
     colorDepth: '256 colors',
     shadingStyle: 'medium shading',
@@ -258,7 +258,7 @@ export const ART_STYLES: Record<ArtStyle, ArtStyleConfig> = {
   // === Early 3D Era ===
   n64: {
     era: 'Nintendo 64 (1996-2002)',
-    description: 'Pre-rendered 3D sprites, texture-filtered look, Paper Mario style',
+    description: 'Pre-rendered 3D sprites, texture-filtered look, 2D-3D hybrid aesthetic',
     baseSizes: { min: 96, max: 128 },
     colorDepth: 'True color',
     shadingStyle: 'detailed shading',
@@ -299,8 +299,8 @@ export const ART_STYLES: Record<ArtStyle, ArtStyleConfig> = {
 
   // === Modern Indie Pixel Art Styles ===
   celeste: {
-    era: 'Celeste (2018)',
-    description: 'Modern pixel art, smooth animations, rich detail like Celeste',
+    era: 'Modern Precision Platformer (2018)',
+    description: 'Modern pixel art, smooth animations, rich detail, precision platformer aesthetic',
     baseSizes: { min: 64, max: 96 },
     colorDepth: 'True color',
     shadingStyle: 'medium shading',
@@ -309,7 +309,7 @@ export const ART_STYLES: Record<ArtStyle, ArtStyleConfig> = {
   },
 
   undertale: {
-    era: 'Undertale (2015)',
+    era: 'Minimalist Indie (2015)',
     description: 'Minimalist sprites, expressive animations, indie charm',
     baseSizes: { min: 32, max: 64 },
     colorDepth: 'Limited palette',

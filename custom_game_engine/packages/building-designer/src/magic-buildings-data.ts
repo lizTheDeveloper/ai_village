@@ -60,7 +60,7 @@ export const ANIMUS_SANCTUM = buildingMap.get('animus_sanctum')!;
 export const ABSORPTION_CHAMBER = buildingMap.get('absorption_chamber')!;
 export const TALENT_REGISTRY = buildingMap.get('talent_registry')!;
 export const STORY_CIRCLE = buildingMap.get('story_circle')!;
-export const LIBRARY_OF_BABEL = buildingMap.get('library_of_babel')!;
+export const INFINITE_ARCHIVE = buildingMap.get('infinite_archive')!;
 export const AWAKENING_WORKSHOP = buildingMap.get('awakening_workshop')!;
 export const CRIMSON_ALTAR = buildingMap.get('crimson_altar')!;
 
@@ -155,7 +155,7 @@ export const SEASONAL_BUILDINGS = buildings.filter(b =>
   b.paradigmAffinity?.includes('seasonal')
 );
 
-export const DAEMON_BUILDINGS = buildings.filter(b =>
+export const ANIMUS_BUILDINGS = buildings.filter(b =>
   b.paradigmAffinity?.includes('animus')
 );
 

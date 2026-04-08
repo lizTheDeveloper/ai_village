@@ -13,7 +13,7 @@ interface PartSpec {
 }
 
 // Style specification for ALL parts
-const STYLE = "16-bit SNES era pixel art, RPG style like Chrono Trigger or Final Fantasy VI";
+const STYLE = "16-bit SNES era pixel art, detailed RPG aesthetic with smooth gradient shading";
 
 const PARTS_TO_GENERATE: PartSpec[] = [
   // HEADS (64x64) - All use reference

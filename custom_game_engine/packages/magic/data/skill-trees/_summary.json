@@ -2,9 +2,9 @@
   "totalTrees": 25,
   "totalNodes": 532,
   "trees": {
-    "daemon": {
+    "animus": {
       "nodeCount": 27,
-      "file": "daemon.json"
+      "file": "animus.json"
     },
     "architecture": {
       "nodeCount": 26,
@@ -26,13 +26,13 @@
       "nodeCount": 23,
       "file": "pact.json"
     },
-    "allomancy": {
+    "ferromancy": {
       "nodeCount": 32,
-      "file": "allomancy.json"
+      "file": "ferromancy.json"
     },
-    "sympathy": {
+    "tethermancy": {
       "nodeCount": 24,
-      "file": "sympathy.json"
+      "file": "tethermancy.json"
     },
     "rune": {
       "nodeCount": 19,

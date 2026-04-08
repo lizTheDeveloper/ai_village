@@ -275,7 +275,7 @@ export const ACADEMIC_ENCHANTMENT: EnchantmentSystem = {
   alternativeMethods: ['forging', 'inscription'],
 
   enchantableCategories: ['weapons', 'armor', 'jewelry', 'tools', 'clothing', 'books', 'containers'],
-  enhancingMaterials: ['mithril', 'dragon_bone', 'phoenix_feather', 'moonstone'],
+  enhancingMaterials: ['starweave', 'dragon_bone', 'phoenix_feather', 'moonstone'],
   resistantMaterials: ['cold_iron', 'lead'],
 
   requiredChannels: ['verbal', 'somatic', 'glyph'],
@@ -332,7 +332,7 @@ export const BREATH_ENCHANTMENT: EnchantmentSystem = {
 
   enchantableCategories: ['any'],  // Anything can be Awakened
   enhancingMaterials: ['organic_materials', 'dyed_cloth', 'colored_objects'],
-  resistantMaterials: ['grey_objects', 'drab_materials'],  // Color-drained items resist
+  resistantMaterials: ['grey_objects', 'hollow_materials'],  // Color-drained items resist
 
   requiredChannels: ['verbal', 'will', 'touch'],
 

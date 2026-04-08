@@ -39,7 +39,7 @@ import {
 
 import {
   ANIMUS_SKILL_TREE,
-  DAEMON_FORM_CATEGORIES,
+  ANIMUS_FORM_CATEGORIES,
   getFormBonuses,
   isFormInCategory,
   getFormCategory,
@@ -338,19 +338,19 @@ describe('AnimusSkillTree', () => {
   });
 
   describe('constants', () => {
-    it('DAEMON_FORM_CATEGORIES should have form types', () => {
-      expect(DAEMON_FORM_CATEGORIES.predator).toBeDefined();
-      expect(DAEMON_FORM_CATEGORIES.companion).toBeDefined();
-      expect(DAEMON_FORM_CATEGORIES.wisdom).toBeDefined();
-      expect(DAEMON_FORM_CATEGORIES.power).toBeDefined();
-      expect(DAEMON_FORM_CATEGORIES.stealth).toBeDefined();
-      expect(DAEMON_FORM_CATEGORIES.exotic).toBeDefined();
+    it('ANIMUS_FORM_CATEGORIES should have form types', () => {
+      expect(ANIMUS_FORM_CATEGORIES.predator).toBeDefined();
+      expect(ANIMUS_FORM_CATEGORIES.companion).toBeDefined();
+      expect(ANIMUS_FORM_CATEGORIES.wisdom).toBeDefined();
+      expect(ANIMUS_FORM_CATEGORIES.power).toBeDefined();
+      expect(ANIMUS_FORM_CATEGORIES.stealth).toBeDefined();
+      expect(ANIMUS_FORM_CATEGORIES.exotic).toBeDefined();
     });
 
     it('each form category should have animal forms', () => {
-      expect(DAEMON_FORM_CATEGORIES.predator.length).toBeGreaterThan(0);
-      expect(DAEMON_FORM_CATEGORIES.predator).toContain('wolf');
-      expect(DAEMON_FORM_CATEGORIES.companion).toContain('dog');
+      expect(ANIMUS_FORM_CATEGORIES.predator.length).toBeGreaterThan(0);
+      expect(ANIMUS_FORM_CATEGORIES.predator).toContain('wolf');
+      expect(ANIMUS_FORM_CATEGORIES.companion).toContain('dog');
     });
   });
 

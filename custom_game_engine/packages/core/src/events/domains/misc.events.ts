@@ -81,6 +81,29 @@ export interface MiscEvents {
     reason: string;
   };
 
+  // === Emotional Contagion Events ===
+  'emotion:cascade_detected': {
+    epicentreEntityId: EntityId;
+    dominantState: string;
+    cascadeSize: number;
+    tick: number;
+  };
+
+  'emotion:dreamer_failure': {
+    entityId: EntityId;
+    contagionLevel: number;
+    cascadeState: string;
+    tick: number;
+  };
+
+  'emotion:norn_defense_activated': {
+    entityId: EntityId;
+    nurtureScore: number;
+    oxytocin: number;
+    ticksInDreamer: number;
+    tick: number;
+  };
+
   // === Skill Events ===
   'skill:xp_gain': {
     agentId: EntityId;

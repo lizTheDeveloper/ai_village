@@ -14,7 +14,7 @@
  * voice to the cosmic song and shaping reality through resonance.
  *
  * Inspired by:
- * - Tolkien's Music of the Ainur (world sung into being)
+ * - The cosmogonic song traditions — worlds sung into being
  * - Bardic magic traditions
  * - Pythagorean music of the spheres
  * - Aboriginal Australian songlines
@@ -424,7 +424,7 @@ const STRING_MASTERY_NODE = createSkillNode(
   ],
   {
     description: 'Master string instruments for emotional magic',
-    lore: `Strings vibrate in sympathy with the human heart. A skilled player can
+    lore: `Strings vibrate in tethermancy with the human heart. A skilled player can
 pluck emotions as easily as strings - drawing out sorrow, inspiring joy,
 kindling love or rage.`,
     prerequisites: ['instrument-attunement'],

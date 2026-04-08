@@ -77,8 +77,8 @@ export const EMOTION_THEATER_SYSTEM_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) =>
 export const MEMORY_HALL_ARCHIVE_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.id === 'memory_hall_archive')!;
 export const MEDITATION_CHAMBER_UNIT_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.id === 'meditation_chamber_unit')!;
 export const VR_IMMERSION_POD_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.id === 'vr_immersion_pod')!;
-export const GLEISNER_BODY_FRAME_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.id === 'gleisner_body_frame')!;
-export const SVETZ_RETRIEVAL_ENGINE_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.id === 'svetz_retrieval_engine')!;
+export const SYNTHETIC_BODY_FRAME_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.id === 'synthetic_body_frame')!;
+export const CHRONO_SALVAGE_ENGINE_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.id === 'chrono_salvage_engine')!;
 export const PROBABILITY_DRIVE_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.id === 'probability_drive')!;
 export const TIMELINE_MERGER_CORE_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.id === 'timeline_merger_core')!;
 
@@ -87,8 +87,8 @@ export const THRESHOLD_HULL_KIT_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.i
 export const COURIER_HULL_KIT_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.id === 'courier_hull_kit')!;
 export const BRAINSHIP_HULL_KIT_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.id === 'brainship_hull_kit')!;
 export const STORYSHIP_HULL_KIT_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.id === 'storyship_hull_kit')!;
-export const GLEISNER_HULL_KIT_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.id === 'gleisner_hull_kit')!;
-export const SVETZ_HULL_KIT_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.id === 'svetz_hull_kit')!;
+export const SYNTHETIC_HULL_KIT_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.id === 'synthetic_hull_kit')!;
+export const CHRONO_SALVAGE_HULL_KIT_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.id === 'chrono_salvage_hull_kit')!;
 export const PROBABILITY_SCOUT_HULL_KIT_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.id === 'probability_scout_hull_kit')!;
 export const TIMELINE_MERGER_HULL_KIT_RECIPE = ALL_SPACEFLIGHT_RECIPES.find((r) => r.id === 'timeline_merger_hull_kit')!;
 
@@ -152,8 +152,8 @@ export const TIER_6_SPACEFLIGHT_RECIPES: Recipe[] = [
   MEMORY_HALL_ARCHIVE_RECIPE,
   MEDITATION_CHAMBER_UNIT_RECIPE,
   VR_IMMERSION_POD_RECIPE,
-  GLEISNER_BODY_FRAME_RECIPE,
-  SVETZ_RETRIEVAL_ENGINE_RECIPE,
+  SYNTHETIC_BODY_FRAME_RECIPE,
+  CHRONO_SALVAGE_ENGINE_RECIPE,
   PROBABILITY_DRIVE_RECIPE,
   TIMELINE_MERGER_CORE_RECIPE,
 ];
@@ -164,8 +164,8 @@ export const SHIP_HULL_KIT_RECIPES: Recipe[] = [
   COURIER_HULL_KIT_RECIPE,
   BRAINSHIP_HULL_KIT_RECIPE,
   STORYSHIP_HULL_KIT_RECIPE,
-  GLEISNER_HULL_KIT_RECIPE,
-  SVETZ_HULL_KIT_RECIPE,
+  SYNTHETIC_HULL_KIT_RECIPE,
+  CHRONO_SALVAGE_HULL_KIT_RECIPE,
   PROBABILITY_SCOUT_HULL_KIT_RECIPE,
   TIMELINE_MERGER_HULL_KIT_RECIPE,
 ];

@@ -12,7 +12,7 @@
  *
  * Inspired by:
  * - Traditional demon pacts (Faust, etc.)
- * - Warlock mechanics from D&D and fantasy
+ * - Warlock mechanics from classic fantasy traditions
  * - Fae bargains from folklore (be careful what you promise)
  * - The concept that words bind reality
  * - The user's note about demons being angels serving evil gods

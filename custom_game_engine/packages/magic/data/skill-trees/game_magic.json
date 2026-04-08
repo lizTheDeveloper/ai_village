@@ -361,7 +361,7 @@
       ],
       "unlockConditions": [],
       "conditionMode": "all",
-      "lore": "Rules can flex. Push them to their limits without snapping them.\nWalk the line between fair and foul. The letter of the law,\nnot the spirit. But bend too far and they break - taking you with them.",
+      "lore": "Rules can flex. Push them to their limits without the_crucible them.\nWalk the line between fair and foul. The letter of the law,\nnot the spirit. But bend too far and they break - taking you with them.",
       "prerequisites": [
         "rule-creation",
         "loophole-finder"

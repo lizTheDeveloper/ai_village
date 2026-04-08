@@ -201,18 +201,18 @@ describe('Numeric Overflow and Accumulation', () => {
     expect(sideEffects.dangerLevel).toBeGreaterThan(0.8);
   });
 
-  it('should handle breath count going to exactly 1 (Drab threshold)', () => {
+  it('should handle breath count going to exactly 1 (Hollow threshold)', () => {
     const caster = createTestCaster({
       resourcePools: {
         health: { type: 'health', current: 1, maximum: 50000, regenRate: 0, locked: 0 },
       },
       paradigmState: {
-        breath: { breathCount: 1, heighteningTier: 0 },
+        breath: { breathCount: 1, pneumanticTier: 0 },
       },
     });
 
-    const warning = checkDrabWarning(caster);
-    expect(warning.isDrabWarning).toBe(true);
+    const warning = checkHollowWarning(caster);
+    expect(warning.isHollowWarning).toBe(true);
     expect(warning.message).toContain('last Breath');
   });
 });
@@ -660,15 +660,15 @@ function checkAttentionSideEffects(caster: MagicComponent): AttentionSideEffects
   };
 }
 
-interface DrabWarning {
-  isDrabWarning: boolean;
+interface HollowWarning {
+  isHollowWarning: boolean;
   message: string;
 }
 
-function checkDrabWarning(caster: MagicComponent): DrabWarning {
+function checkHollowWarning(caster: MagicComponent): HollowWarning {
   const breathCount = caster.paradigmState?.breath?.breathCount || 0;
   return {
-    isDrabWarning: breathCount === 1,
+    isHollowWarning: breathCount === 1,
     message: breathCount === 1 ? 'Warning: Using your last Breath' : '',
   };
 }

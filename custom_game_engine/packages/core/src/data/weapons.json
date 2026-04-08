@@ -3901,8 +3901,8 @@
       }
     },
     {
-      "id": "oblivion_hammer",
-      "name": "Oblivion Hammer",
+      "id": "void_hammer",
+      "name": "Void Hammer",
       "category": "weapon",
       "weight": 6.0,
       "stackSize": 1,

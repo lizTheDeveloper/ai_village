@@ -111,7 +111,7 @@ export interface ChroniclerComponent {
 // ============================================================================
 
 /**
- * Chronicle opening lines (Pratchett/Adams/Gaiman style)
+ * Chronicle opening lines (satirical style)
  */
 // Reserved for future use when generating chronicle content (exported for extensibility)
 export const CHRONICLE_OPENINGS: Record<WritingTechLevel, string[]> = {

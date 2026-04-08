@@ -207,7 +207,7 @@ This ensures only highly developed civilizations with extensive educational infr
 
 **Technologies** (3):
 1. **Detect Rainbow Planets** (5/14) → Quantum Planet Scanner, Detect Superposition Planets
-2. **Planetary Archaeology** (9/14) → **Svetz Retrieval Ship**, Retrieve from Extinct Timelines
+2. **Planetary Archaeology** (9/14) → **Chrono Salvage Ship**, Retrieve from Extinct Timelines
 3. **Controlled Collapse** (12/14) → Collapse Planetary History, Decohere to Superposition
 
 ---
@@ -221,13 +221,13 @@ This ensures only highly developed civilizations with extensive educational infr
 
 **Key Papers**:
 - Extinct Branch Detection, Temporal Retrieval Theory
-- Svetz Protocols, Entity Extraction
+- Chrono Salvage Protocols, Entity Extraction
 - Timeline Contamination Risks, Contamination Quarantine
 - Paradox Avoidance, Retrieval Ethics
 
 **Technologies** (3):
 1. **Basic Temporal Retrieval** (4/12) → Temporal Archive, Detect Extinct Branches
-2. **Svetz Operations** (7/12) → **Svetz Ship**, Retrieve Extinct Entities
+2. **Chrono Salvage Operations** (7/12) → **Chrono Salvage Ship**, Retrieve Extinct Entities
 3. **Contamination Management** (10/12) → Quarantine Facility, Manage Timeline Contamination
 
 ---
@@ -237,7 +237,7 @@ This ensures only highly developed civilizations with extensive educational infr
 ### Advanced Timeline Engineering
 
 **Field**: `dimensional_awareness`
-**Prerequisite**: Advanced Beta Navigation + Svetz Operations
+**Prerequisite**: Advanced Beta Navigation + Chrono Salvage Operations
 
 **Key Papers**:
 - Probability Space Mapping, Solo Navigation Theory
@@ -261,13 +261,13 @@ This ensures only highly developed civilizations with extensive educational infr
 
 **Key Papers**:
 - Consciousness Mapping, Neural Pattern Extraction
-- Gleisner Architecture, Digital Coherence Advantages
+- Synthetic Architecture, Digital Coherence Advantages
 - Substrate Independence, Consciousness Merging
 - Digital Immortality, Self-Editing Protocols
 
 **Technologies** (3):
 1. **Consciousness Upload** (4/11) → Upload Facility, Upload Consciousness
-2. **Gleisner Vessels** (7/11) → **Gleisner Vessel**, Digital Beta Navigation
+2. **Synthetic Vessels** (7/11) → **Synthetic Vessel**, Digital Beta Navigation
 3. **Digital Transcendence** (10/11) → Substrate Independence, Merge Digital Consciousnesses
 
 ---
@@ -348,7 +348,7 @@ Civilizations cannot skip these prerequisite technologies:
 
 ### Gate 6: Advanced β-Navigation (10/12 + 10/14 papers)
 **Required**: Advanced Beta Navigation + Brainship Construction
-**Unlocks**: Stage 3 ship research (Gleisner, Svetz, Scout, Merger)
+**Unlocks**: Stage 3 ship research (Synthetic, Chrono Salvage, Scout, Merger)
 **Minimum Building**: Theoretical Physics Institute + Coherence Training Facility
 
 ---
@@ -441,4 +441,4 @@ This ensures Clarke Tech is truly **earned** through extensive educational devel
 
 **Generated**: 2026-01-03
 **Research Division**: Physics & Temporal Sciences
-**Based on**: Larry Niven's "Rainbow Mars" + Hard Physics Constraints
+**Based on**: Temporal archaeology + Hard Physics Constraints

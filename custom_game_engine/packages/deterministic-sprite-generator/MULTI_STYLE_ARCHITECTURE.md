@@ -8,7 +8,7 @@ Each planet/universe has a unique visual art style tied to gaming console eras. 
 
 ### Planet A: 8-bit NES Era (1985-1990)
 - **Aesthetic**: Chunky pixels, limited palette (56 colors), simple shading
-- **Examples**: Super Mario Bros, Mega Man, Dragon Quest
+- **Examples**: 8-bit platformers, side-scrollers, early JRPGs
 - **Characteristics**:
   - 2-3 colors per sprite max
   - Hard edges, no gradients
@@ -17,7 +17,7 @@ Each planet/universe has a unique visual art style tied to gaming console eras. 
 
 ### Planet B: 16-bit SNES Era (1991-1996)
 - **Aesthetic**: Detailed pixels, rich palette, smooth shading
-- **Examples**: Chrono Trigger, Final Fantasy VI, Secret of Mana
+- **Examples**: 16-bit SNES-era RPGs, action-RPGs, tactical games
 - **Characteristics**:
   - 16+ colors per sprite
   - Smooth gradients and highlights
@@ -27,7 +27,7 @@ Each planet/universe has a unique visual art style tied to gaming console eras. 
 
 ### Planet C: 32-bit PS1/Saturn Era (1995-2000)
 - **Aesthetic**: Pre-rendered 3D sprites, dithered shading, high detail
-- **Examples**: Final Fantasy Tactics, Disgaea, Grandia
+- **Examples**: 32-bit tactical RPGs, isometric strategy, pre-rendered 3D sprites
 - **Characteristics**:
   - Hundreds of colors
   - Dithering for shadows/gradients
@@ -36,7 +36,7 @@ Each planet/universe has a unique visual art style tied to gaming console eras. 
 
 ### Planet D: Game Boy Advance Era (2001-2008)
 - **Aesthetic**: Bright vibrant colors, clean outlines, portable-friendly
-- **Examples**: Golden Sun, Advance Wars, Fire Emblem
+- **Examples**: GBA-era portable RPGs, tactical strategy, adventure games
 - **Characteristics**:
   - Saturated palette
   - Strong outlines
@@ -45,7 +45,7 @@ Each planet/universe has a unique visual art style tied to gaming console eras. 
 
 ### Planet E: Game Boy Classic (1989-1998)
 - **Aesthetic**: 4-shade monochrome (green tint)
-- **Examples**: Pokemon Red/Blue, Link's Awakening
+- **Examples**: Game Boy-era handheld RPGs, top-down adventures
 - **Characteristics**:
   - ONLY 4 shades: white, light green, dark green, black
   - High contrast for readability
@@ -54,7 +54,7 @@ Each planet/universe has a unique visual art style tied to gaming console eras. 
 
 ### Planet F: Neo Geo Era (1990-2004)
 - **Aesthetic**: Arcade quality, massive sprites, fluid animation
-- **Examples**: Metal Slug, King of Fighters, Samurai Shodown
+- **Examples**: Neo Geo-era arcade fighters, run-and-gun shooters, fighting games
 - **Characteristics**:
   - Extremely detailed
   - Large sprite sizes (128x128+)

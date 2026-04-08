@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -106,7 +106,7 @@ The integration of these methods requires what the Institute for Agricultural Co
 
 **The Agricultural Archives of Çatalhöyük suggest that Neolithic farmers understood insect predation, but were too busy inventing farming to write it down. Or possibly they wrote it down and it was eaten by insects. History is unclear on this point.
 
-††The Coccinellidae Deployment Strategy was first formally documented by Professor Hieronymus Beetle-Wrangler of the The Invisible College of Applied Entomology in 1873. Professor Beetle-Wrangler later disappeared under mysterious circumstances†.
+††The Coccinellidae Deployment Strategy was first formally documented by Professor Hieronymus Beetle-Wrangler of the Invisible College of Applied Entomology in 1873. Professor Beetle-Wrangler later disappeared under mysterious circumstances†.
 
 †His laboratory was found empty except for approximately 40,000 well-fed ladybugs and a note reading "they were hungrier than anticipated." The Occupational Safety Board ruled it a "workplace miscalculation."
 
@@ -175,7 +175,7 @@ The adjustment of soil chemistry to achieve optimal growing conditions represent
 
 ---
 
-*Popular belief, in this context, refers to the approximately 6,000-year period between the development of agriculture and the invention of soil science, during which farming was conducted according to principles best described as "vigorously optimistic." See Pratchett-Boyle, T. & Thornhaven Agricultural Extension Service (1887), "How We Survived Despite Ourselves: A History."
+*Popular belief, in this context, refers to the approximately 6,000-year period between the development of agriculture and the invention of soil science, during which farming was conducted according to principles best described as "vigorously optimistic." See Thornhaven-Boyle, T. & Thornhaven Agricultural Extension Service (1887), "How We Survived Despite Ourselves: A History."
 
 **This method, while charmingly direct, produces success rates comparable to determining one's fortune by reading cheese mold—occasionally accurate, frequently disappointing, and prone to spectacular misinterpretation. The Heathglen Agricultural College reports that this approach yields positive results approximately 23.4% of the time, and "character-building experiences" the remainder.
 
@@ -205,7 +205,7 @@ The adjustment of soil chemistry to achieve optimal growing conditions represent
 
 **The Ancient Babylonians, despite their impressive achievements in mathematics and astronomy, apparently never noticed that plants needed anything beyond water, sun, and "the favor of Ishtar." This oversight may explain why Babylonian agricultural texts contain extensive prayers but notably sparse fertilization schedules. The Epic of Gilgamesh contains exactly zero references to nitrogen deficiency, despite being quite thorough about other matters.
 
-†The Guild maintained these volumes in the Great Library of Agricultural Mysteries in Quirm until its unfortunate destruction in 1673‡. Surviving fragments suggest that Volume 23 alone covered "Thirty-Seven Distinct Shades of Yellowish-Brown and Their Mineral Implications," while Volume 44 was entirely devoted to zinc deficiency in legumes, running to 1,247 pages. Modern agronomists`,
+†The Guild maintained these volumes in the Great Library of Agricultural Mysteries in Vintara until its unfortunate destruction in 1673‡. Surviving fragments suggest that Volume 23 alone covered "Thirty-Seven Distinct Shades of Yellowish-Brown and Their Mineral Implications," while Volume 44 was entirely devoted to zinc deficiency in legumes, running to 1,247 pages. Modern agronomists`,
   abstract: 'Research paper on Testing soil to determine nutrient levels and pH',
   published: false
 };
@@ -239,7 +239,7 @@ Disease resistance through grafting has transformed commercial fruit production,
 
 *The ancient Babylonians were grafting date palms around 2000 BCE, a full 3,900 years before Gregor Mendel would figure out why some pea plants were wrinkly. The Babylonians would have found Mendel's peas deeply unimpressive.
 
-†And occasionally its relationship with reality itself, as documented in the infamous case of the Philosophica Rootstock, which refused to accept that gravity applied to roots. The resulting trees grew upside-down until someone thought to turn the pots over. See: Weatherwax, A., "On Trees That Don't Know Which Way Is Up," Journal of Improbable Botany, Vol 3.
+†And occasionally its relationship with reality itself, as documented in the infamous case of the Philosophica Rootstock, which refused to accept that gravity applied to roots. The resulting trees grew upside-down until someone thought to turn the pots over. See: Ashworth, A., "On Trees That Don't Know Which Way Is Up," Journal of Improbable Botany, Vol 3.
 
 ‡This statistic comes from the Royal Horticultural Society's decade-long study of amateur grafting attempts, which catalogued 47,392 grafts performed by home gardeners. The study was discontinued after researchers developed what they termed "compassion fatigue."
 

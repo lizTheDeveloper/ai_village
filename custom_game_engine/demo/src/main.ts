@@ -95,7 +95,7 @@ import {
 import { saveLoadService, IndexedDBStorage, migrateLocalSaves, checkMigrationStatus, planetClient, multiverseClient, creationStateManager, EntityPersistenceStream, type PlanetMetadata, type CreationState, type SettlementData } from '@ai-village/persistence';
 import { LiveEntityAPI } from '@ai-village/metrics';
 import { SpellRegistry } from '@ai-village/magic';
-import { GameIntrospectionAPI, ComponentRegistry, MutationService, getSelfImplicationPrompt } from '@ai-village/introspection';
+import { GameIntrospectionAPI, ComponentRegistry, MutationService, getSelfImplicationPrompt, buildPersonalizedInsight, type TraitSnapshot } from '@ai-village/introspection';
 // Injection function removed - use world.spatialQuery instead
 // Plant systems from @ai-village/botany (completes the extraction from core)
 import {
@@ -844,7 +844,7 @@ function setupWindowManager(
     defaultX: 10,
     defaultY: 10,
     defaultWidth: 360,
-    defaultHeight: 530,
+    defaultHeight: Math.min(530, Math.max(400, window.innerHeight - 120)),
     isDraggable: true,
     isResizable: true,
     minWidth: 300,
@@ -858,7 +858,7 @@ function setupWindowManager(
     defaultX: logicalWidth - 320,
     defaultY: 10,
     defaultWidth: 300,
-    defaultHeight: 400,
+    defaultHeight: Math.min(450, Math.max(300, window.innerHeight - 150)),
     isDraggable: true,
     isResizable: true,
     minWidth: 250,
@@ -6072,6 +6072,7 @@ async function main() {
   // === Eighth Child: self-implication injection into agent prompts (MUL-4527) ===
   // When presence-over-power is detected, inject a self-reflective insight component
   // into all agent entities so the PromptRenderer includes it in their next LLM call.
+  // The insight is personalized to each agent's actual personality traits and goals.
   gameLoop.world.eventBus.subscribe('eighth_child_moment' as any, (event: any) => {
     const data = event?.data ?? event ?? {};
     const presenceRatio: number = typeof data.presenceRatio === 'number' ? data.presenceRatio : 0.7;
@@ -6083,8 +6084,27 @@ async function main() {
       // Skip agents that already have an active insight (avoid stacking)
       if (agent.hasComponent('eighth_child_insight' as any)) continue;
 
+      // Read this agent's actual personality traits for personalized self-implication
+      const personality = agent.getComponent('personality') as any;
+      const traits: TraitSnapshot | undefined = personality ? {
+        openness: personality.openness,
+        conscientiousness: personality.conscientiousness,
+        extraversion: personality.extraversion,
+        agreeableness: personality.agreeableness,
+        neuroticism: personality.neuroticism,
+        creativity: personality.creativity,
+        leadership: personality.leadership,
+        spirituality: personality.spirituality,
+        generosity: personality.generosity,
+      } : undefined;
+
+      // Read first active goal for additional self-reflection tension
+      const goalsComp = agent.getComponent('goals') as any;
+      const activeGoal = goalsComp?.goals?.find?.((g: any) => g.progress < 1.0);
+      const goalDescription: string | undefined = activeGoal?.description;
+
       const seed = currentTick + (agent.id?.charCodeAt?.(0) ?? 0);
-      const insightText = getSelfImplicationPrompt(seed);
+      const insightText = buildPersonalizedInsight(seed, traits, goalDescription);
 
       (agent as any).addComponent({
         type: 'eighth_child_insight',

@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -183,9 +183,9 @@ FOOTNOTES
 
 ** Dr. Clockwise is reportedly not her birth name, but she refuses to confirm or deny this. She claims her research into time perception gave her "certain insights into causality" that make the question of her original name "temporally ambiguous." Her colleagues have learned not to ask follow-up questions.
 
-†† The dream-state substrate must maintain remarkable stability during extended dilation. The required consistency is measured in what the field calls "Sandman Units," named after the dream-entity who, according to myth, never once in several billion years forgot to show up for work‡. One Sandman Unit equals approximately 10^-12 temporal drift per subjective hour.
+†† The dream-state substrate must maintain remarkable stability during extended dilation. The required consistency is measured in what the field calls "Morphean Units," named after the ancient dream-keeper who, according to myth, never once in several billion years forgot to show up for work‡. One Morphean Unit equals approximately 10^-12 temporal drift per subjective hour.
 
-    ‡ The Sandman, according to various mythological traditions, was responsible for bringing sleep to humanity for approximately four million years before he was granted a sabbatical. During his absence, humanity invented insomnia, late-night infomercials, and the concept of "just one more episode." The gods are reportedly still filing the incident reports.
+    ‡ The dream-keeper, according to various mythological traditions, was responsible for bringing sleep to humanity for approximately four million years before being granted a sabbatical. During his absence, humanity invented insomnia, late-night infomercials, and the concept of "just one more episode." The gods are reportedly still filing the incident reports.
 
 ‡‡ Early testers described the sensation as "living through all four seasons, two complete cultural epochs, and three existential crises before breakfast." The research team considered this a success, though they noted the increased coffee consumption upon emergence§.
 
@@ -1041,7 +1041,7 @@ FOOTNOTES
 
 * The author's own mobile device dropped seventeen calls while writing this sentence, despite being in a major metropolitan area with allegedly "excellent coverage." The device was not enchanted at the time. This feels relevant.
 
-† Professor Emmeline Darkweather of the The Invisible College's Department of Applied Impossibilities notes that "we spent three thousand years perfecting magical communication across any distance, then invented technology and had to start over." She sounded tired when she said this.
+† Professor Emmeline Darkweather of the Invisible College's Department of Applied Impossibilities notes that "we spent three thousand years perfecting magical communication across any distance, then invented technology and had to start over." She sounded tired when she said this.
 
 ‡ A seventh-century runecrafter, upon being shown a modern smartphone through a complicated temporal viewing spell, reportedly said, "Obviously you'd carve runes into it. What else would you do?" before asking why it was so sad-looking and flat. This account comes from the Journal of Anachronistic Conversations, Vol. 23, and may be entirely fabricated.
 

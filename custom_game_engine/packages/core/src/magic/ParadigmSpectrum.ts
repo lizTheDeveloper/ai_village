@@ -16,7 +16,7 @@
  * 4. **Animism Level** - How ensouled is the world? (Kami or no Kami)
  *    only humans conscious → animals too → plants too → objects have spirits → everything has kami
  *
- * These axes are independent - you can have high magic with low animism (D&D wizards),
+ * These axes are independent - you can have high magic with low animism (rule-based wizards),
  * or low magic with high animism (mundane world where everything has a spirit but
  * magic is rare), etc.
  */
@@ -181,7 +181,7 @@ export const SPECTRUM_PRESETS: Record<string, MagicSpectrumConfig> = {
   },
 
   /**
-   * Low Fantasy - Rare, subtle magic (Game of Thrones early seasons)
+   * Low Fantasy - Rare, subtle magic
    */
   low_fantasy: {
     intensity: 'low',
@@ -198,7 +198,7 @@ export const SPECTRUM_PRESETS: Record<string, MagicSpectrumConfig> = {
   },
 
   /**
-   * Classic Fantasy - D&D style magic (Forgotten Realms)
+   * Classic Fantasy - Rule-based systems
    */
   classic_fantasy: {
     intensity: 'high',
@@ -282,7 +282,7 @@ export const SPECTRUM_PRESETS: Record<string, MagicSpectrumConfig> = {
   },
 
   /**
-   * Wild Magic - Chaotic, unpredictable (Xanth-style)
+   * Wild Magic - Chaotic, unpredictable
    */
   wild_magic: {
     intensity: 'high',
@@ -715,10 +715,10 @@ export const CONFIGURATION_QUESTIONS = {
       { value: 'null', label: 'No Magic', description: 'Magic doesn\'t exist at all' },
       { value: 'anti', label: 'Anti-Magic', description: 'Magic is actively suppressed' },
       { value: 'dead', label: 'Dead Magic', description: 'Magic used to exist but is gone' },
-      { value: 'low', label: 'Low Magic', description: 'Rare and subtle magic (Game of Thrones)' },
+      { value: 'low', label: 'Low Magic', description: 'Rare and subtle magic' },
       { value: 'medium', label: 'Medium Magic', description: 'Magic is present but not dominant' },
-      { value: 'high', label: 'High Magic', description: 'Multiple powerful magic systems (D&D)' },
-      { value: 'saturated', label: 'Saturated', description: 'Magic is everywhere (Discworld)' },
+      { value: 'high', label: 'High Magic', description: 'Multiple powerful magic systems — polyparadigm worlds' },
+      { value: 'saturated', label: 'Saturated', description: 'Magic is everywhere — ambient and narrative' },
       { value: 'reality_is_magic', label: 'Reality IS Magic', description: 'No mundane exists' },
     ],
   },

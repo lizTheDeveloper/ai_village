@@ -50,6 +50,9 @@ export interface PassageRestrictions {
 
   /** Which ship types can traverse (empty = all allowed) */
   allowedShipTypes: SpaceshipType[];
+
+  /** Rune category required for traversal (undefined = no rune gate) */
+  requiredRune?: string;
 }
 
 /**

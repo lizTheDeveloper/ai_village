@@ -1413,7 +1413,7 @@
         "grants": [
           {
             "type": "building",
-            "buildingId": "svetz_retrieval_ship"
+            "buildingId": "chrono_salvage_ship"
           },
           {
             "type": "ability",
@@ -1449,7 +1449,7 @@
     "allPapers": [
       "extinct_branch_detection",
       "temporal_retrieval_theory",
-      "svetz_protocols",
+      "chrono_salvage_protocols",
       "entity_extraction",
       "timeline_contamination_risks",
       "preservation_techniques",
@@ -1480,16 +1480,16 @@
         ]
       },
       {
-        "technologyId": "svetz_operations",
+        "technologyId": "chrono_salvage_operations",
         "papersRequired": 7,
         "mandatoryPapers": [
-          "svetz_protocols",
+          "chrono_salvage_protocols",
           "entity_extraction"
         ],
         "grants": [
           {
             "type": "building",
-            "buildingId": "svetz_retrieval_ship"
+            "buildingId": "chrono_salvage_ship"
           },
           {
             "type": "ability",
@@ -1604,7 +1604,7 @@
       "consciousness_mapping",
       "neural_pattern_extraction",
       "digital_substrate_design",
-      "gleisner_architecture",
+      "synthetic_architecture",
       "consciousness_verification",
       "digital_coherence_advantages",
       "self_editing_protocols",
@@ -1633,16 +1633,16 @@
         ]
       },
       {
-        "technologyId": "gleisner_vessels",
+        "technologyId": "synthetic_vessels",
         "papersRequired": 7,
         "mandatoryPapers": [
-          "gleisner_architecture",
+          "synthetic_architecture",
           "digital_coherence_advantages"
         ],
         "grants": [
           {
             "type": "building",
-            "buildingId": "gleisner_vessel"
+            "buildingId": "synthetic_vessel"
           },
           {
             "type": "ability",
@@ -2409,7 +2409,7 @@
       "dust_beta_space_correspondence",
       "animus_quantum_coupling",
       "cross_timeline_dust_flow",
-      "spectres_and_timeline_contamination",
+      "void_parasites_and_timeline_contamination",
       "veridex_truth_navigation"
     ],
     "unlocks": [

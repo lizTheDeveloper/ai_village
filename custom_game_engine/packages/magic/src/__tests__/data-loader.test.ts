@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { loadCoreParadigms, loadExampleKami, loadAllomanticMetals } from '../data-loader.js';
+import { loadCoreParadigms, loadExampleKami, loadFerromancyMetals } from '../data-loader.js';
 
 describe('DataLoader', () => {
   describe('loadCoreParadigms', () => {
@@ -56,16 +56,16 @@ describe('DataLoader', () => {
     });
   });
 
-  describe('loadAllomanticMetals', () => {
-    it('should load allomantic metals from JSON', () => {
-      const metals = loadAllomanticMetals();
+  describe('loadFerromancyMetals', () => {
+    it('should load ferromancy metals from JSON', () => {
+      const metals = loadFerromancyMetals();
 
       expect(metals).toBeInstanceOf(Array);
       expect(metals.length).toBe(12);
     });
 
     it('should have valid metal structure', () => {
-      const metals = loadAllomanticMetals();
+      const metals = loadFerromancyMetals();
       const steel = metals.find(m => m.id === 'steel');
 
       expect(steel).toBeDefined();

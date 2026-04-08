@@ -2,8 +2,8 @@
   "id": "breath-tree",
   "paradigmId": "breath",
   "name": "The Art of Awakening",
-  "description": "Collect Breath, Awaken objects with Commands, and ascend through the Heightenings.",
-  "lore": "Everyone is born with one Breath - the divine spark that animates life. Most\npeople live their entire lives with just that single Breath, never knowing its\npotential. But Breath can be given, taken, and used.\n\nAn Awakener learns to collect Breath from others and use it to Awaken inanimate\nobjects - giving them motion, purpose, even sentience. The process is simple in\nconcept: touch the object, visualize what you want it to do, drain color from\nnearby objects to fuel the Command, and speak the Command phrase.\n\nBut mastery takes lifetimes. Different Awakening types have different costs and\ncomplexities. Type I (simple motion) is easy. Type IV (creating Lifeless) requires\nhundreds of Breaths and perfect technique.\n\nAs you accumulate Breath, you pass through Heightenings - thresholds that grant\npassive abilities. The First Heightening (50 Breaths) gives perfect pitch. The\nFifth Heightening (2000 Breaths) grants agelessness. The Tenth Heightening\n(50,000 Breaths) allows your Awakenings to spontaneously gain sentience.\n\nThe God King himself is said to hold over 50,000 Breaths. The Returned are born\nwith thousands. Common Awakeners might have 50-500. And most people? Just the\none they were born with, given away for a handful of coins to those who would\nuse it.",
+  "description": "Collect Breath, Awaken objects with Commands, and ascend through the Pneumantic Tiers.",
+  "lore": "Everyone is born with one Breath - the divine spark that animates life. Most\npeople live their entire lives with just that single Breath, never knowing its\npotential. But Breath can be given, taken, and used.\n\nAn Awakener learns to collect Breath from others and use it to Awaken inanimate\nobjects - giving them motion, purpose, even sentience. The process is simple in\nconcept: touch the object, visualize what you want it to do, drain color from\nnearby objects to fuel the Command, and speak the Command phrase.\n\nBut mastery takes lifetimes. Different Awakening types have different costs and\ncomplexities. Type I (simple motion) is easy. Type IV (creating Lifeless) requires\nhundreds of Breaths and perfect technique.\n\nAs you accumulate Breath, you pass through Pneumantic Tiers - thresholds that grant\npassive abilities. The First Pneumantic Tier (50 Breaths) gives perfect pitch. The\nFifth Pneumantic Tier (2000 Breaths) grants agelessness. The Tenth Pneumantic Tier\n(50,000 Breaths) allows your Awakenings to spontaneously gain sentience.\n\nThe God King himself is said to hold over 50,000 Breaths. The Returned are born\nwith thousands. Common Awakeners might have 50-500. And most people? Just the\none they were born with, given away for a handful of coins to those who would\nuse it.",
   "nodes": [
     {
       "id": "breath-sense",
@@ -82,9 +82,9 @@
       ]
     },
     {
-      "id": "first-heightening",
-      "name": "First Heightening",
-      "description": "Reach the First Heightening - perfect pitch",
+      "id": "first-pneumantic-tier",
+      "name": "First Pneumantic Tier",
+      "description": "Reach the First Pneumantic Tier - perfect pitch",
       "paradigmId": "breath",
       "category": "foundation",
       "tier": 1,
@@ -102,16 +102,16 @@
       ],
       "unlockConditions": [],
       "conditionMode": "all",
-      "lore": "At 50 Breaths, you reach the First Heightening. Sounds become crystal clear.\nYou can identify any note, any voice, any rhythm with perfect accuracy. This\nis the first sign that you are no longer quite baseline.",
+      "lore": "At 50 Breaths, you reach the First Pneumantic Tier. Sounds become crystal clear.\nYou can identify any note, any voice, any rhythm with perfect accuracy. This\nis the first sign that you are no longer quite baseline.",
       "prerequisites": [
         "breath-sense"
       ],
       "icon": "🎵"
     },
     {
-      "id": "second-heightening",
-      "name": "Second Heightening",
-      "description": "Reach the Second Heightening - perfect color",
+      "id": "second-pneumantic-tier",
+      "name": "Second Pneumantic Tier",
+      "description": "Reach the Second Pneumantic Tier - perfect color",
       "paradigmId": "breath",
       "category": "resource",
       "tier": 2,
@@ -140,14 +140,14 @@
       "conditionMode": "all",
       "lore": "At 200 Breaths, colors explode in clarity. You can identify the exact hue\nof any color instantly, distinguish between shades that others cannot perceive.\nThis is useful for Awakening - color is power.",
       "prerequisites": [
-        "first-heightening"
+        "first-pneumantic-tier"
       ],
       "icon": "🌈"
     },
     {
-      "id": "third-heightening",
-      "name": "Third Heightening",
-      "description": "Reach the Third Heightening - life sense",
+      "id": "third-pneumantic-tier",
+      "name": "Third Pneumantic Tier",
+      "description": "Reach the Third Pneumantic Tier - life sense",
       "paradigmId": "breath",
       "category": "resource",
       "tier": 3,
@@ -176,13 +176,13 @@
       "conditionMode": "all",
       "lore": "At 600 Breaths, you gain perfect life sense. You can feel the auras of\nliving things nearby - their vitality, their health, their Breath. People\nglow with inner light that only you can see.",
       "prerequisites": [
-        "second-heightening"
+        "second-pneumantic-tier"
       ]
     },
     {
-      "id": "fourth-heightening",
-      "name": "Fourth Heightening",
-      "description": "Reach the Fourth Heightening - perfect instinct",
+      "id": "fourth-pneumantic-tier",
+      "name": "Fourth Pneumantic Tier",
+      "description": "Reach the Fourth Pneumantic Tier - perfect instinct",
       "paradigmId": "breath",
       "category": "resource",
       "tier": 3,
@@ -211,14 +211,14 @@
       "conditionMode": "all",
       "lore": "At 1000 Breaths, your instincts become supernatural. You sense danger before\nit strikes, feel hostile intent like a physical force. Ambushes are nearly\nimpossible - your body knows to move before your mind understands why.",
       "prerequisites": [
-        "third-heightening"
+        "third-pneumantic-tier"
       ],
       "icon": "⚡"
     },
     {
-      "id": "fifth-heightening",
-      "name": "Fifth Heightening",
-      "description": "Reach the Fifth Heightening - agelessness",
+      "id": "fifth-pneumantic-tier",
+      "name": "Fifth Pneumantic Tier",
+      "description": "Reach the Fifth Pneumantic Tier - agelessness",
       "paradigmId": "breath",
       "category": "resource",
       "tier": 4,
@@ -244,7 +244,7 @@
       "conditionMode": "all",
       "lore": "At 2000 Breaths, you stop aging. Disease cannot touch you. You become\nfunctionally immortal, as long as you maintain your Breath. This is why\nthe God King and Returned are what they are - Breath sustains life itself.",
       "prerequisites": [
-        "fourth-heightening"
+        "fourth-pneumantic-tier"
       ],
       "icon": "♾️"
     },
@@ -360,7 +360,7 @@
       "lore": "Awakening requires color as fuel - drained from nearby objects. The more\nvibrant the colors, the better. You learn to pull color efficiently, to\nsense which objects have the most to give.",
       "prerequisites": [
         "basic-awakening",
-        "second-heightening"
+        "second-pneumantic-tier"
       ]
     },
     {
@@ -572,7 +572,7 @@
       "lore": "Giving away Breath is harder than receiving it. Your body fights the loss.\nReturning Breath to its original owner is even harder - it must recognize\nthem, flow back willingly. Few Awakeners ever manage it.",
       "prerequisites": [
         "willing-transfer",
-        "fifth-heightening"
+        "fifth-pneumantic-tier"
       ],
       "icon": "↩️"
     },
@@ -602,11 +602,11 @@
             "resourceType": "breath",
             "resourceAmountRequired": 10000
           },
-          "description": "Requires Eighth Heightening (10,000 Breaths)"
+          "description": "Requires Eighth Pneumantic Tier (10,000 Breaths)"
         }
       ],
       "conditionMode": "all",
-      "lore": "At the Eighth Heightening, you can break Commands - unraveling the Breath\nthat animates an Awakened object, returning it to stillness. This is both\ndefensive (stopping enemy Awakenings) and offensive (wasting their Breath).",
+      "lore": "At the Eighth Pneumantic Tier, you can break Commands - unraveling the Breath\nthat animates an Awakened object, returning it to stillness. This is both\ndefensive (stopping enemy Awakenings) and offensive (wasting their Breath).",
       "prerequisites": [
         "type-iii-awakening"
       ]
@@ -637,11 +637,11 @@
             "resourceType": "breath",
             "resourceAmountRequired": 20000
           },
-          "description": "Requires Ninth Heightening (20,000 Breaths)"
+          "description": "Requires Ninth Pneumantic Tier (20,000 Breaths)"
         }
       ],
       "conditionMode": "all",
-      "lore": "At the Ninth Heightening, you can Awaken anything regardless of color. No\nneed to drain colors from the environment. Your Breath is so vast it provides\nits own fuel. This is mastery of the art.",
+      "lore": "At the Ninth Pneumantic Tier, you can Awaken anything regardless of color. No\nneed to drain colors from the environment. Your Breath is so vast it provides\nits own fuel. This is mastery of the art.",
       "prerequisites": [
         "command-breaking",
         "type-iv-awakening"
@@ -651,7 +651,7 @@
     {
       "id": "spontaneous-sentience",
       "name": "Spontaneous Sentience",
-      "description": "Achieve the Tenth Heightening - spontaneous sentience",
+      "description": "Achieve the Tenth Pneumantic Tier - spontaneous sentience",
       "paradigmId": "breath",
       "category": "mastery",
       "tier": 5,
@@ -674,11 +674,11 @@
             "resourceType": "breath",
             "resourceAmountRequired": 50000
           },
-          "description": "Requires Tenth Heightening (50,000 Breaths)"
+          "description": "Requires Tenth Pneumantic Tier (50,000 Breaths)"
         }
       ],
       "conditionMode": "all",
-      "lore": "At the Tenth Heightening, your Awakenings can spontaneously become sentient.\nNot just following Commands, but thinking, choosing, becoming. You create\nlife itself from lifeless matter. This is the power of gods.",
+      "lore": "At the Tenth Pneumantic Tier, your Awakenings can spontaneously become sentient.\nNot just following Commands, but thinking, choosing, becoming. You create\nlife itself from lifeless matter. This is the power of gods.",
       "prerequisites": [
         "perfect-awakening"
       ],
@@ -727,9 +727,9 @@
       "description": "Break another Awakener's Command"
     },
     {
-      "eventType": "heightening_reached",
+      "eventType": "pneumantic_tier_reached",
       "xpAmount": 150,
-      "description": "Reach a new Heightening level"
+      "description": "Reach a new Pneumantic Tier level"
     }
   ],
   "rules": {

@@ -790,7 +790,7 @@ who carry the genes.`,
   powerScaling: 'linear',
   powerCeiling: 100,  // Flaring can exceed temporarily
   allowsGroupCasting: false,
-  allowsEnchantment: false,  // That's Feruchemy
+  allowsEnchantment: false,  // That's Resonant Storage
   persistsAfterDeath: false,
   allowsTeaching: false,  // Can't teach genetic powers
   allowsScrolls: false,
@@ -1468,7 +1468,7 @@ lose themselves in symbols.`,
   resonantCombinations: [
     { technique: 'perceive', form: 'spirit', bonusEffect: 'Veridex reading - can ask any question', powerMultiplier: 2.5 },
     { technique: 'perceive', form: 'mind', bonusEffect: 'Read intentions through animus-watching', powerMultiplier: 1.5 },
-    { technique: 'control', form: 'space', bonusEffect: 'Subtle knife - cut between worlds', powerMultiplier: 3.0 },
+    { technique: 'control', form: 'space', bonusEffect: 'Rift Edge - cut between worlds', powerMultiplier: 3.0 },
   ],
 
   powerScaling: 'threshold',  // Abilities unlock at certain points

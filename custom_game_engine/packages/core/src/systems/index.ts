@@ -121,6 +121,7 @@ export * from './UniversitySystem.js';
 export * from './UniversityResearchManagementSystem.js';
 // Mood System
 export * from './MoodSystem.js';
+export * from './EmotionalContagionSystem.js';
 // Deep Conversation System - Phase 1-6
 export * from './InterestsSystem.js';
 // Phase 6: Emergent Social Dynamics - RE-ENABLED
@@ -258,6 +259,9 @@ export type {
 // Tile-Based Building - Door System
 export * from './DoorSystem.js';
 
+// Rune Gate System - Rune comprehension learning + gate enforcement
+export * from './RuneGateSystem.js';
+
 // Automation & Production Systems (Phase 38)
 export * from './PowerGridSystem.js';
 export { PowerGridSystem } from './PowerGridSystem.js';
@@ -377,3 +381,9 @@ export * from './InterVillageCaravanSystem.js';
 export { InterVillageCaravanSystem } from './InterVillageCaravanSystem.js';
 export * from './NewsPropagationSystem.js';
 export { NewsPropagationSystem } from './NewsPropagationSystem.js';
+
+// Fleet Communication & Dialect Drift
+export * from './CrossShipCommunicationSystem.js';
+export { CrossShipCommunicationSystem } from './CrossShipCommunicationSystem.js';
+export * from './DialectalDriftSystem.js';
+export { DialectalDriftSystem } from './DialectalDriftSystem.js';

@@ -74,13 +74,13 @@ export type MoralAlignment =
  * Angel Species Definition - Custom naming for a deity's angels
  *
  * When the player creates their first angel, they name what their
- * divine servants are called (Nazgul, fae, seraphim, etc.).
+ * divine servants are called (Herald, fae, seraphim, etc.).
  * This enables lore-appropriate theming.
  */
 export interface AngelSpeciesDefinition {
   // Basic naming
-  singularName: string;       // e.g., "Seraph", "Nazgul", "Fae"
-  pluralName: string;         // e.g., "Seraphim", "Nazgul", "Fae"
+  singularName: string;       // e.g., "Seraph", "Herald", "Fae"
+  pluralName: string;         // e.g., "Seraphim", "Heralds", "Fae"
 
   // Tier names (player can customize)
   tierNames: {

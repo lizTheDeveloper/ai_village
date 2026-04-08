@@ -122,6 +122,51 @@ export class AgentRenderer {
   }
 
   /**
+   * Draw a floating emote glyph above the agent.
+   * Shows an emoji that fades in and drifts upward, similar to sleep ZZZ pattern.
+   * @param screenX - Screen X position of the agent
+   * @param screenY - Screen Y position of the agent
+   * @param glyph - The emoji/glyph string to display
+   * @param progress - Animation progress 0..1 (0=just appeared, 1=about to expire)
+   */
+  drawEmoteGlyph(screenX: number, screenY: number, glyph: string, progress: number): void {
+    if (this.camera.zoom < 0.5) return;
+
+    const centerX = screenX + (this.tileSize * this.camera.zoom) / 2;
+    // Position above thinking indicator area
+    const baseY = screenY - 50 * this.camera.zoom;
+
+    // Animate: rise upward and fade out
+    const rise = progress * 15 * this.camera.zoom;
+    // Pop-in scale during first 15%, then hold, then shrink during last 20%
+    let scale = 1.0;
+    if (progress < 0.15) {
+      scale = 1.4 - 0.4 * (progress / 0.15);
+    } else if (progress > 0.8) {
+      scale = 1.0 - ((progress - 0.8) / 0.2);
+    }
+
+    // Fade: full opacity for most of duration, fade out in last 30%
+    const alpha = progress > 0.7 ? 1.0 - ((progress - 0.7) / 0.3) : 1.0;
+
+    const fontSize = 20 * this.camera.zoom * scale;
+    if (fontSize < 4) return; // Too small to render
+
+    this.ctx.save();
+    this.ctx.font = `${fontSize}px Arial`;
+    this.ctx.textAlign = 'center';
+    this.ctx.globalAlpha = alpha;
+
+    // Subtle glow effect
+    this.ctx.shadowBlur = 6 * this.camera.zoom;
+    this.ctx.shadowColor = 'rgba(255, 255, 200, 0.5)';
+
+    this.ctx.fillText(glyph, centerX, baseY - rise);
+
+    this.ctx.restore();
+  }
+
+  /**
    * Draw agent behavior label above the agent.
    * Shows what the agent is currently doing.
    */

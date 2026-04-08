@@ -4,7 +4,7 @@
 
 ## Overview
 
-The **Magic Package** (`@ai-village/magic`) implements a comprehensive multi-paradigm magic system where magical traditions vary fundamentally across universes. The system supports 25+ unique magic paradigms (Academic, Divine, Blood, Allomancy, Rune Magic, Shinto, etc.), each with distinct rules, costs, channels, and risks.
+The **Magic Package** (`@ai-village/magic`) implements a comprehensive multi-paradigm magic system where magical traditions vary fundamentally across universes. The system supports 25+ unique magic paradigms (Academic, Divine, Blood, Ferromancy, Rune Magic, Shinto, etc.), each with distinct rules, costs, channels, and risks.
 
 **What it does:**
 - Defines universe-specific magic paradigms with unique laws and costs
@@ -49,19 +49,19 @@ packages/magic/
 │   │       ├── AcademicCostCalculator.ts
 │   │       ├── DivineCostCalculator.ts
 │   │       ├── BloodCostCalculator.ts
-│   │       ├── AllomancyCostCalculator.ts
+│   │       ├── FerromancyCostCalculator.ts
 │   │       ├── RuneCostCalculator.ts
 │   │       ├── ShintoCostCalculator.ts
 │   │       ├── DaemonCostCalculator.ts
 │   │       ├── DreamCostCalculator.ts
-│   │       ├── SympathyCostCalculator.ts
+│   │       ├── TethermancyCostCalculator.ts
 │   │       ├── SongCostCalculator.ts
 │   │       └── registerAll.ts        # Register all calculators
 │   │
 │   ├── skillTrees/                   # Paradigm-specific skill trees
 │   │   ├── AcademicSkillTree.ts
 │   │   ├── DivineSkillTree.ts
-│   │   ├── AllomancySkillTree.ts
+│   │   ├── FerromancySkillTree.ts
 │   │   ├── RuneSkillTree.ts
 │   │   ├── ShintoSkillTree.ts
 │   │   ├── DaemonSkillTree.ts
@@ -141,7 +141,7 @@ interface MagicParadigm {
 **Example paradigms:**
 
 ```typescript
-// Academic Magic - Traditional D&D-style
+// Academic Magic - Traditional school-based
 const academicParadigm: MagicParadigm = {
   id: 'academic',
   sources: [{ type: 'internal', regeneration: 'rest' }],
@@ -163,9 +163,9 @@ const bloodParadigm: MagicParadigm = {
   foreignMagicPolicy: 'absorbs',
 };
 
-// Allomancy (Mistborn) - Metal-burning system
-const allomancyParadigm: MagicParadigm = {
-  id: 'allomancy',
+// Ferromancy (CrucibleBorn) - Metal-burning system
+const ferromancyParadigm: MagicParadigm = {
+  id: 'ferromancy',
   sources: [{ type: 'material', regeneration: 'consumption' }],
   costs: [
     { type: 'metal_iron' }, { type: 'metal_steel' },
@@ -321,8 +321,8 @@ interface MagicSkillNode {
 
 type UnlockConditionType =
   | 'bloodline'       // Must have specific lineage
-  | 'snapping'        // Must have experienced awakening trauma
-  | 'metal_consumed'  // Must have consumed the metal (Allomancy)
+  | 'the_crucible'        // Must have experienced awakening trauma
+  | 'metal_consumed'  // Must have consumed the metal (Ferromancy)
   | 'rune_discovered' // Must have discovered the rune
   | 'kami_met'        // Must have met a kami (Shinto)
   | 'skill_level'     // Must have mundane skill at level X
@@ -331,23 +331,23 @@ type UnlockConditionType =
   // ... 30+ more condition types
 ```
 
-**Example skill tree (Allomancy):**
+**Example skill tree (Ferromancy):**
 
 ```typescript
-const allomancyTree: MagicSkillTree = {
-  id: 'allomancy_tree',
-  paradigmId: 'allomancy',
+const ferromancyTree: MagicSkillTree = {
+  id: 'ferromancy_tree',
+  paradigmId: 'ferromancy',
   nodes: [
     {
-      id: 'mistborn_bloodline',
+      id: 'crucible_born_bloodline',
       category: 'foundation',
       unlockConditions: [
-        { type: 'bloodline', params: { bloodlineId: 'mistborn' } },
-        { type: 'snapping', params: { traumaType: 'awakening' } }
+        { type: 'bloodline', params: { bloodlineId: 'crucible_born' } },
+        { type: 'the_crucible', params: { traumaType: 'awakening' } }
       ],
       xpCost: 0,  // Granted at birth
       effects: [
-        { type: 'unlock_ability', baseValue: 1, target: { abilityId: 'allomancy' } }
+        { type: 'unlock_ability', baseValue: 1, target: { abilityId: 'ferromancy' } }
       ]
     },
     {
@@ -376,13 +376,13 @@ const allomancyTree: MagicSkillTree = {
   ],
   xpSources: [
     { eventType: 'metal_burned', xpAmount: 1, description: 'Burn a metal' },
-    { eventType: 'combat_won', xpAmount: 10, description: 'Win combat using Allomancy' }
+    { eventType: 'combat_won', xpAmount: 10, description: 'Win combat using Ferromancy' }
   ],
   rules: {
     allowRespec: false,
     permanentProgress: true,
     requiresInnateAbility: true,
-    innateCondition: { type: 'bloodline', params: { bloodlineId: 'allomancy' } }
+    innateCondition: { type: 'bloodline', params: { bloodlineId: 'ferromancy' } }
   }
 };
 ```
@@ -1085,7 +1085,7 @@ Entity (Caster)
 │   │   ├── academic?: { /* academic state */ }
 │   │   ├── divine?: { deityId, deityStanding }
 │   │   ├── blood?: { corruption }
-│   │   ├── allomancy?: { metals: Record<string, MetalReserve> }
+│   │   ├── ferromancy?: { metals: Record<string, MetalReserve> }
 │   │   └── ... (25+ paradigms)
 │   ├── paradigmProgress → Record<string, MagicSkillProgress>
 │   ├── corruption?: number
@@ -1444,10 +1444,10 @@ npm test -- MagicSkillTree.test.ts
 - **Academic**: Simple mana cost, standard mishaps
 - **Divine**: Faith-based cost reduction, favor system
 - **Blood**: Health costs, corruption accumulation, can be terminal
-- **Allomancy**: Metal consumption, bloodline requirement, flaring
+- **Ferromancy**: Metal consumption, bloodline requirement, flaring
 - **Rune**: Inscription time, material costs, precision requirements
 - **Shinto**: Purity requirements, kami favor, pollution mechanics
 - **Daemon**: Separation distance, dust affinity, settling mechanics
 - **Dream**: Lucidity requirements, realm access, nightmare risks
-- **Sympathy**: Alar strength, slippage, link quality
+- **Tethermancy**: Attunement strength, drift, link quality
 - **Song**: Voice capacity, harmony bonuses, discord risks

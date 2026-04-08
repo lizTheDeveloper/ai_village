@@ -1,7 +1,7 @@
 /**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with Thornhaven-school humor style
  */
 
 import type { ResearchPaper } from './types.js';
@@ -169,7 +169,7 @@ The ethical considerations surrounding soul interrogation have generated more co
 
 ‡We are not permitted to discuss the Incident of 1893. The University's legal counsel has been extremely clear on this point. Suffice it to say that it involved a misread ritual, seventeen accidentally interrogated faculty members, and revelations about the Dean's expense account that are still being litigated.
 
-††The Department of Philosophy at the University of Pseudopolis attempted to organize a symposium on the ethics of soul interrogation. The symposium itself became so mired in ethical considerations that they spent four years debating whether it was ethical to hold the symposium at all, eventually concluding that they should interrogate the dead philosophers to ask their opinion, which created a paradox that collapsed the entire department into a singularity of recursive moral deliberation. The building is still standing but should not be approached without proper philosophical shielding‡.
+††The Department of Philosophy at the University of Clockhaven attempted to organize a symposium on the ethics of soul interrogation. The symposium itself became so mired in ethical considerations that they spent four years debating whether it was ethical to hold the symposium at all, eventually concluding that they should interrogate the dead philosophers to ask their opinion, which created a paradox that collapsed the entire department into a singularity of recursive moral deliberation. The building is still standing but should not be approached without proper philosophical shielding‡.
 
 ‡‡‡Available from Metaphysical Safety Supply, catalogue number PSY-SHIELD-009. Not effective against nihilists.
 
@@ -183,13 +183,13 @@ The ethical considerations surrounding soul interrogation have generated more co
 
 ‡‡‡The Paradox of Relative Importance, as this phenomenon is known, has caused significant frustration among inheritance lawyers. The firm of Dewey, Deceased & Done maintains a special department staffed with seventeen certified soul-speakers, whose primary function is coaxing property information from souls who would much rather discuss their favorite recipes or that one time they saw a really impressive sunset#.
 
-#The sunset in question, interrogated across 400+ souls, appears to have occurred on the evening of March 15th, 1774, over the bay of Quirm. Meteorological records confirm it was, indeed, "quite nice."
+#The sunset in question, interrogated across 400+ souls, appears to have occurred on the evening of March 15th, 1774, over the bay of Vintara. Meteorological records confirm it was, indeed, "quite nice."
 
 §The Mortuary Academy's Statistical Analysis Division tracks these numbers with unsettling precision. Their latest report, "Degradation Metrics in Post-Mortem Consciousness: A 500-Year Longitudinal Study," runs to 1,247 pages and includes sixteen appendices of raw data that the Academy admits "probably no one will ever read, but we felt thorough."
 
 §§At this stage, interrogation typically yields responses along the lines of "There was light, then darkness, then more darkness, then you showed up and that's annoying." The record for Least Helpful Soul Interrogation belongs to the former Lord Marchwell, deceased 437 years at time of questioning, who responded to every query with "Eh?" followed by spectral snoring.
 
-¶This misconception has resulted in more investigative failures than perhaps any other aspect of the practice. The Criminal Investigation Manual of the City Watch (revised edition, post-Incident) now includes a full chapter titled "Dead People Are Still People, Unfortunately"¶.
+¶This misconception has resulted in more investigative failures than perhaps any other aspect of the practice. The Criminal Investigation Manual of the Thornhaven Municipal Guard (revised edition, post-Incident) now includes a full chapter titled "Dead People Are Still People, Unfortunately"¶.
 
 ¶¶The opening paragraph reads: "Just because someone has shuffled off this mortal coil does not mean they have shuffled off their mortal personality, their grudges, their sense of humor, or their profound desire to mess with you. Proceed accordingly."
 

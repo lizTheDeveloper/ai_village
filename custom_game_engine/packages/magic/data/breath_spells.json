@@ -91,14 +91,14 @@
   },
   {
     "id": "breath_heighten_first",
-    "name": "First Heightening",
+    "name": "First Pneumantic Tier",
     "paradigmId": "breath",
     "technique": "enhance",
     "form": "body",
     "source": "psionic",
     "effectId": "heal_effect",
     "description": "Accumulate fifty Breaths and reality notices. Your aura becomes visible\u2014subtle, but there\u2014radiating vitality. Colors seem brighter near you. People unconsciously defer. This isn't a spell you cast; it's a state of being. The first step toward something more than human.",
-    "school": "heightening",
+    "school": "pneumantic_tier",
     "icon": "\u2728",
     "manaCost": 0,
     "castTime": 0,
@@ -109,7 +109,7 @@
     "baseMishapChance": 0.0,
     "tags": [
       "breath",
-      "heightening",
+      "pneumantic_tier",
       "passive"
     ],
     "creatorDetection": {
@@ -121,14 +121,14 @@
   },
   {
     "id": "breath_heighten_second",
-    "name": "Second Heightening",
+    "name": "Second Pneumantic Tier",
     "paradigmId": "breath",
     "technique": "enhance",
     "form": "body",
     "source": "psionic",
     "effectId": "heal_effect",
     "description": "Two hundred Breaths grants perfect pitch and color recognition. Your senses sharpen\u2014not superhuman, but perfectly calibrated. You hear harmonics others miss. See color gradations invisible to normal sight. Useful for Awakening, where precision matters. The world becomes more vivid.",
-    "school": "heightening",
+    "school": "pneumantic_tier",
     "icon": "\ud83c\udfa8",
     "manaCost": 0,
     "castTime": 0,
@@ -139,7 +139,7 @@
     "baseMishapChance": 0.0,
     "tags": [
       "breath",
-      "heightening",
+      "pneumantic_tier",
       "senses"
     ],
     "creatorDetection": {
