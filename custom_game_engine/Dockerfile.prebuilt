@@ -9,7 +9,16 @@ WORKDIR /app
 COPY packages/ packages/
 
 COPY package.json package-lock.json ./
-RUN npm install --omit=dev --ignore-scripts 2>/dev/null || npm install --ignore-scripts
+
+# Stub folkfork-bridge: it's a file: dep pointing outside the repo,
+# so npm install fails in Docker. Create a minimal stub before install.
+RUN mkdir -p node_modules/@multiverse-studios/folkfork-bridge && \
+    echo '{"name":"@multiverse-studios/folkfork-bridge","version":"0.0.0","types":"index.d.ts","main":"index.js"}' \
+      > node_modules/@multiverse-studios/folkfork-bridge/package.json && \
+    echo 'module.exports = {};' > node_modules/@multiverse-studios/folkfork-bridge/index.js && \
+    cp packages/core/src/typings/folkfork-bridge.d.ts node_modules/@multiverse-studios/folkfork-bridge/index.d.ts
+
+RUN npx -y npm@11 install --omit=dev --ignore-scripts
 
 COPY data/ data/
 COPY demo/dist/ demo/dist/
