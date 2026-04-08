@@ -18,6 +18,12 @@ RUN mkdir -p node_modules/@multiverse-studios/folkfork-bridge && \
     echo 'module.exports = {};' > node_modules/@multiverse-studios/folkfork-bridge/index.js && \
     cp packages/core/src/typings/folkfork-bridge.d.ts node_modules/@multiverse-studios/folkfork-bridge/index.d.ts
 
+# Strip folkfork-bridge from lockfile so npm doesn't chase the missing file: target
+RUN node -e "\
+  const pj = JSON.parse(require('fs').readFileSync('package-lock.json','utf8'));\
+  if(pj.packages) { for(const k of Object.keys(pj.packages)) { if(k.includes('folkfork-bridge')) delete pj.packages[k]; } }\
+  require('fs').writeFileSync('package-lock.json', JSON.stringify(pj,null,2));"
+
 RUN npx -y npm@11 install --omit=dev --ignore-scripts
 
 COPY data/ data/
