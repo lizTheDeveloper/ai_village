@@ -51,22 +51,22 @@ export class TethermancyCostCalculator extends BaseCostCalculator {
     // Attunement Cost (Mental focus)
     // =========================================================================
 
-    let alarCost = Math.ceil(spell.manaCost * 0.4);
+    let attunementCost = Math.ceil(spell.manaCost * 0.4);
 
     // Multiple bindings divide concentration
     if (activeBindings > 0) {
-      alarCost = Math.ceil(alarCost * (1 + activeBindings * 0.3));
+      attunementCost = Math.ceil(attunementCost * (1 + activeBindings * 0.3));
     }
 
     // Some techniques require more focus
     // 'control' encompasses binding operations in tethermancy magic
     if (spell.technique === 'control') {
-      alarCost = Math.ceil(alarCost * 1.3);
+      attunementCost = Math.ceil(attunementCost * 1.3);
     }
 
     costs.push({
       type: 'attunement',
-      amount: alarCost,
+      amount: attunementCost,
       source: 'mental_binding',
       terminal: true,
     });
@@ -118,13 +118,13 @@ export class TethermancyCostCalculator extends BaseCostCalculator {
     options?: ResourceInitOptions
   ): void {
     // Attunement pool - mental focus capacity
-    const alarMax = options?.maxOverrides?.attunement ?? 100;
-    const alarStart = options?.currentOverrides?.attunement ?? 80;
+    const attunementMax = options?.maxOverrides?.attunement ?? 100;
+    const attunementStart = options?.currentOverrides?.attunement ?? 80;
 
     caster.resourcePools.attunement = {
       type: 'attunement',
-      current: alarStart,
-      maximum: alarMax,
+      current: attunementStart,
+      maximum: attunementMax,
       regenRate: 1, // Moderate recovery
       locked: 0,
     };
@@ -152,7 +152,7 @@ export class TethermancyCostCalculator extends BaseCostCalculator {
       activeBindings: 0,
       currentLinks: [],
       custom: {
-        alarStrength: 50, // Base mental strength
+        attunementStrength: 50, // Base mental strength
         bindingExperience: 0,
         knownBindingPrinciples: [],
       },
