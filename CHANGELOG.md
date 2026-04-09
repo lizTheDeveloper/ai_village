@@ -6,6 +6,22 @@ Format: [Semantic Versioning](https://semver.org/). Newest first.
 
 ---
 
+## v0.4.0 — 2026-04-09
+
+### What's New
+- **Building construction works** — fixed double wiring bug where `startTask()` was never called and behaviorState was incomplete, causing all construction attempts to silently fail at 0%
+- **Farming autonomic trigger** — agents now proactively farm when hunger drops below 50%, preventing starvation spirals
+- **Farming fallback in food-seeking** — when no food is available, agents switch to farming (till/plant/harvest) instead of wandering into the wilderness
+- **IP remediation complete** — all franchise references replaced with original Multiverse Chorus canon across 99 files
+
+### Fixes
+- **BuildingSystem construction time** — added missing building types that threw on `getConstructionTime()`
+- **AutonomicSystem world parameter** — `processAutonomic()` now passes `world` to farming trigger checks
+- **SeekFoodBehavior functional version** — the runtime-registered version now has the farming fallback (was only in the unused class-based version)
+- **Pre-commit stale .js check** — excludes dist/ and node_modules/ from false positives
+
+---
+
 ## v0.3.1 — 2026-03-29
 
 ### Fixes
