@@ -116,7 +116,7 @@ export const GNOME_BURROW: VoxelBuildingDefinition = {
 export const HALFLING_HOLE: VoxelBuildingDefinition = {
   id: 'halfling_hole',
   name: 'Green Door Smial',
-  description: 'A comfortable hobbit hole with round door.',
+  description: 'A cozy Burrow Den with a round door, carved into a grassy hillside.',
   category: 'residential',
   tier: 2,
   species: 'small',

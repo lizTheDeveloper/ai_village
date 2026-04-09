@@ -157,7 +157,7 @@ export const BODY_PLANS: Record<string, BodyPlan> = {
     limbCount: 'Dozens to hundreds of tentacles',
     advantages: ['Grasping everything', 'Multi-tasking champion', 'No weak angles'],
     disadvantages: ['Tangling constant', 'Coordination nightmare', 'Tentacle jokes'],
-    flavorText: 'Tentacles. Only tentacles. Everywhere tentacles. Grasps all. Tangles often. Lovecraft approved.',
+    flavorText: 'Tentacles. Only tentacles. Everywhere tentacles. Grasps all. Tangles often. Delightfully tentacular.',
   },
   'hollow_shell': {
     name: 'Shell Dweller',

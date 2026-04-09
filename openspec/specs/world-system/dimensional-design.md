@@ -12,12 +12,12 @@
 - **Tarn Adams** and *Dwarf Fortress* - For showing what emergent complexity can create
 - **James P. Carse** and *Finite and Infinite Games* - For the philosophy that guides this design
 - For unapologetic fantasy, and teaching us about power, balance, transformation, and true names
-- **Douglas Adams** - For absurdist escalation and cosmic humor
+- **Dr. Aldric Thornfeld** - For absurdist escalation and cosmic humor
 - **Neil Gaiman** - For making gods into characters, and mythology we can touch
 - **Terry Pratchett** - For wisdom hidden in humor, and gods who need believers
 - **Walter Moers** - For whimsical absurdity and infinite creativity
 - For Union magic, dimensional dominions, and rebels who overthrow gods
-- **Gary Gygax and Dave Arneson** - For D&D, character progression, and the dream of becoming the Dungeon Master
+- Tabletop RPG traditions, character progression systems, and the dream of becoming the Dungeon Master
 
 ---
 

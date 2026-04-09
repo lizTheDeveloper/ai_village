@@ -43,116 +43,116 @@
   ],
   "species": [
     {
-      "id": "alien_xenoform_zybx6j_1768798384532",
-      "name": "Test Creature 395",
-      "scientificName": "Xenoform zybx6j",
+      "id": "alien_xenoform_o3t4n_1774650259219",
+      "name": "Test Creature 821",
+      "scientificName": "Xenoform o3t4n",
       "description": "A fascinating alien organism adapted to its niche.",
-      "bodyPlan": "crystalline_lattice",
-      "locomotion": "dimensional_stepping",
-      "sensorySystem": "crystalline_resonance",
-      "diet": "hematophage",
-      "socialStructure": "caste_system",
+      "bodyPlan": "colonial_swarm",
+      "locomotion": "bipedal_walking",
+      "sensorySystem": "sound_texture",
+      "diet": "nectarivore",
+      "socialStructure": "matriarchy",
       "defense": "teleportation_escape",
-      "reproduction": "death_spawning",
-      "intelligence": "problem_solver",
-      "discovered": "2026-01-19T04:53:04.532Z",
+      "reproduction": "symbiotic_merger",
+      "intelligence": "instinctual_only",
+      "discovered": "2026-03-27T22:24:19.219Z",
       "nativeWorld": "Wanderer-7",
       "domesticationPotential": "poor",
       "dangerLevel": "harmless",
-      "spritePrompt": "Pixel art alien creature: crystalline geometric body structure, geometric crystal appendages. Environmental context: earthy natural colors, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
-      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: death spawning.",
-      "behaviorNotes": "Social Behavior: caste system. Feeding Strategy: hematophage. Defense Mechanism: teleportation escape.",
+      "spritePrompt": "Pixel art alien creature: asymmetric irregular body form, swarm of tiny units. Environmental context: earthy natural colors, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: symbiotic merger.",
+      "behaviorNotes": "Social Behavior: matriarchy. Feeding Strategy: nectarivore. Defense Mechanism: teleportation escape.",
       "nicheId": "decomposer_general",
       "sizeClass": "tiny"
     },
     {
-      "id": "alien_xenoform_9epcw_1768798384532",
-      "name": "Test Creature 759",
-      "scientificName": "Xenoform 9epcw",
+      "id": "alien_xenoform_xehl0o_1774650259219",
+      "name": "Test Creature 358",
+      "scientificName": "Xenoform xehl0o",
       "description": "A fascinating alien organism adapted to its niche.",
-      "bodyPlan": "wheel_form",
-      "locomotion": "electromagnetic_rail",
-      "sensorySystem": "collective_mind",
-      "diet": "piscivore",
-      "socialStructure": "territorial_city",
-      "defense": "toxic_secretion",
-      "reproduction": "viral_replication",
-      "intelligence": "basic_learning",
-      "discovered": "2026-01-19T04:53:04.532Z",
-      "nativeWorld": "Wanderer-7",
-      "domesticationPotential": "poor",
-      "dangerLevel": "harmless",
-      "spritePrompt": "Pixel art alien creature: spokes radiating from hub, magnetic field generators, visible poison glands. Environmental context: earthy natural colors, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
-      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: viral replication.",
-      "behaviorNotes": "Social Behavior: territorial city. Feeding Strategy: piscivore. Defense Mechanism: toxic secretion.",
-      "nicheId": "decomposer_general",
-      "sizeClass": "tiny"
-    },
-    {
-      "id": "alien_xenoform_uij4hf_1768798384532",
-      "name": "Test Creature 816",
-      "scientificName": "Xenoform uij4hf",
-      "description": "A fascinating alien organism adapted to its niche.",
-      "bodyPlan": "radial_symmetry",
-      "locomotion": "gravity_manipulation",
-      "sensorySystem": "cosmic_ray",
-      "diet": "herbivore_standard",
-      "socialStructure": "memory_collective",
-      "defense": "probability_alteration",
+      "bodyPlan": "modular_segments",
+      "locomotion": "gliding",
+      "sensorySystem": "dimensional_awareness",
+      "diet": "scavenger",
+      "socialStructure": "hive_mind",
+      "defense": "ink_cloud",
       "reproduction": "asexual_budding",
-      "intelligence": "problem_solver",
-      "discovered": "2026-01-19T04:53:04.532Z",
+      "intelligence": "basic_learning",
+      "discovered": "2026-03-27T22:24:19.219Z",
       "nativeWorld": "Wanderer-7",
       "domesticationPotential": "poor",
       "dangerLevel": "harmless",
-      "spritePrompt": "Pixel art alien creature: radial symmetry with limbs radiating from center, 5-12 radiating appendages, grinding mouthparts. Environmental context: earthy natural colors, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "spritePrompt": "Pixel art alien creature: bilateral symmetry body, modular segmented body with variable limbs. Environmental context: earthy natural colors, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
       "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: asexual budding.",
-      "behaviorNotes": "Social Behavior: memory collective. Feeding Strategy: herbivore standard. Defense Mechanism: probability alteration.",
+      "behaviorNotes": "Social Behavior: hive mind. Feeding Strategy: scavenger. Defense Mechanism: ink cloud.",
+      "nicheId": "decomposer_general",
+      "sizeClass": "tiny"
+    },
+    {
+      "id": "alien_xenoform_or1wv_1774650259219",
+      "name": "Test Creature 732",
+      "scientificName": "Xenoform or1wv",
+      "description": "A fascinating alien organism adapted to its niche.",
+      "bodyPlan": "fractal_branching",
+      "locomotion": "jet_propulsion",
+      "sensorySystem": "emotional_detection",
+      "diet": "scavenger",
+      "socialStructure": "void_communion",
+      "defense": "ink_cloud",
+      "reproduction": "metamorphosis",
+      "intelligence": "basic_learning",
+      "discovered": "2026-03-27T22:24:19.219Z",
+      "nativeWorld": "Wanderer-7",
+      "domesticationPotential": "poor",
+      "dangerLevel": "harmless",
+      "spritePrompt": "Pixel art alien creature: fractal branching structure with intricate patterns, branching limbs at multiple scales, jet propulsion vents. Environmental context: earthy natural colors, non-threatening appearance, gentle features. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.",
+      "biologyNotes": "Body Structure: Unknown structure. Locomotion: Unknown movement. Sensory Capabilities: Unknown senses. Reproduction: metamorphosis.",
+      "behaviorNotes": "Social Behavior: void communion. Feeding Strategy: scavenger. Defense Mechanism: ink cloud.",
       "nicheId": "decomposer_general",
       "sizeClass": "tiny"
     }
   ],
   "foodWeb": {
-    "alien_xenoform_zybx6j_1768798384532": {
+    "alien_xenoform_o3t4n_1774650259219": {
       "preys": [],
       "predators": [],
       "competitors": [
-        "alien_xenoform_9epcw_1768798384532",
-        "alien_xenoform_uij4hf_1768798384532"
+        "alien_xenoform_xehl0o_1774650259219",
+        "alien_xenoform_or1wv_1774650259219"
       ],
       "mutualists": []
     },
-    "alien_xenoform_9epcw_1768798384532": {
+    "alien_xenoform_xehl0o_1774650259219": {
       "preys": [],
       "predators": [],
       "competitors": [
-        "alien_xenoform_zybx6j_1768798384532",
-        "alien_xenoform_uij4hf_1768798384532"
+        "alien_xenoform_o3t4n_1774650259219",
+        "alien_xenoform_or1wv_1774650259219"
       ],
       "mutualists": []
     },
-    "alien_xenoform_uij4hf_1768798384532": {
+    "alien_xenoform_or1wv_1774650259219": {
       "preys": [],
       "predators": [],
       "competitors": [
-        "alien_xenoform_zybx6j_1768798384532",
-        "alien_xenoform_9epcw_1768798384532"
+        "alien_xenoform_o3t4n_1774650259219",
+        "alien_xenoform_xehl0o_1774650259219"
       ],
       "mutualists": []
     }
   },
   "nicheFilling": {
     "decomposer_general": [
-      "alien_xenoform_zybx6j_1768798384532",
-      "alien_xenoform_9epcw_1768798384532",
-      "alien_xenoform_uij4hf_1768798384532"
+      "alien_xenoform_o3t4n_1774650259219",
+      "alien_xenoform_xehl0o_1774650259219",
+      "alien_xenoform_or1wv_1774650259219"
     ]
   },
   "sapientSpecies": [],
   "artStyle": "gba",
   "metadata": {
-    "generatedAt": 1768798384533,
-    "generationTimeMs": 2,
+    "generatedAt": 1774650259219,
+    "generationTimeMs": 0,
     "totalSpecies": 3,
     "sapientCount": 0,
     "trophicLevels": 1,

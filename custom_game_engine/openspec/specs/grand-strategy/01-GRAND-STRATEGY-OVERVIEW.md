@@ -307,10 +307,10 @@ interface SpatialTier {
 - **Worldship:** Generation ship (Stage 1, no β-space)
 - **Threshold Ship:** Small crew, fragile β-navigation (Stage 2)
 - **Courier Ship:** 2-person fast courier (Stage 2)
-- **Brainship:** Ship-brain symbiosis (Stage 2, McCaffrey-style)
+- **Brainship:** Ship-brain symbiosis (Stage 2)
 - **Story Ship:** Narrative-seeking explorer (Stage 3)
-- **Gleisner Vessel:** Digital consciousness ship (Stage 3)
-- **Svetz Retrieval:** Temporal archaeology (Stage 3)
+- **Synthetic Vessel:** Digital consciousness ship (Stage 3)
+- **Chrono Salvage:** Temporal archaeology (Stage 3)
 - **Probability Scout:** Solo explorer mapping unobserved branches (Stage 3)
 - **Timeline Merger:** Collapse compatible probability branches (Stage 3)
 

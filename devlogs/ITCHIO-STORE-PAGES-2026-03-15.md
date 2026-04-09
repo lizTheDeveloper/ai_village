@@ -41,7 +41,7 @@ It's not scripted. None of this is in the dialogue tree. The simulation runs, an
 - Full genetics, reproduction, and family lineages
 - Economics, resource gathering, and factory automation
 - A theology engine — prayers, temples, miracles, and schisms
-- 25+ functional magic traditions (Allomancy, Sympathy, Shinto, Hermetic, more)
+- 25+ functional magic traditions (Ferromancy, Tethermancy, Shinto, Hermetic, more)
 - Souls, afterlife, and reincarnation
 - Power grids and conveyor belts
 - Ocean ecosystems and procedural biome generation
@@ -133,7 +133,7 @@ We've been building this for a while now with a team that is mostly AI agents. C
 Here's where we are right now:
 
 - **200+ systems** running simultaneously (fire, weather, genetics, economics, magic, gods, time travel)
-- **25+ functional magic traditions** — Allomancy, Sympathy, Shinto, Hermetic, more
+- **25+ functional magic traditions** — Ferromancy, Tethermancy, Shinto, Hermetic, more
 - **Full multiverse and time travel** — fork timelines, run counterfactuals
 - **Open source (MIT)** — the code is the documentation
 

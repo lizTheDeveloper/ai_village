@@ -66,7 +66,7 @@ const CREATURES: Record<string, CreatureTemplate> = {
     ],
   },
   tentacle_book_monster: {
-    name: 'The Necronomicon Amalgam',
+    name: 'The Forbidden Codex Amalgam',
     type: 'tentacle_book_monster',
     combatSkill: 7,
     weapon: 'appendage',

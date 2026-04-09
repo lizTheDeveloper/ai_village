@@ -70,7 +70,7 @@ echo ""
 
 # --- Gate 4: Stale .js in src ---
 echo "Gate 4: Stale .js files in src/..."
-STALE_JS=$(find packages -path "*/src/*.js" -type f 2>/dev/null || true)
+STALE_JS=$(find packages -path "*/src/*.js" -not -path "*/dist/*" -not -path "*/node_modules/*" -type f 2>/dev/null || true)
 if [[ -n "$STALE_JS" ]]; then
   echo -e "${RED}FAILED${NC} — stale .js files found in src/:"
   echo "$STALE_JS"

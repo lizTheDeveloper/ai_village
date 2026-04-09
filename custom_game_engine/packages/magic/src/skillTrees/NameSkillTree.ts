@@ -10,7 +10,7 @@
  * - The deeper the understanding, the more complete the name
  *
  * Inspired by:
- * - Earthsea-tradition true speech and naming (public domain concept)
+ * - Folklore-tradition true speech and naming (Rumpelstiltskin, Egyptian ren, Norse rune-naming)
  * - Multiverse Chorus canon's Chorus of Resonance (though that's more tethermancy)
  * - Various folklore about names having power
  * - The concept that to name something is to know it completely

@@ -41,7 +41,7 @@ All 7 implementation phases complete. The Grand Strategy Abstraction Layer is fu
 
 **Phase 3 Completion:**
 - ✅ All 6 tiers: Crew → Ship → Squadron → Fleet → Armada → Navy
-- ✅ 9 ship types (worldship, threshold, story, gleisner, courier, svetz, probability_scout, timeline_merger, brainship)
+- ✅ 9 ship types (worldship, threshold, story, synthetic, courier, chrono_salvage, probability_scout, timeline_merger, brainship)
 - ✅ β-space navigation with Heart Chamber synchronization
 - ✅ Formation mechanics (6 types with bonuses)
 - ✅ Fleet combat with Lanchester's Laws

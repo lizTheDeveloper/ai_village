@@ -31,7 +31,7 @@ export type CityType =
   | 'grid'           // Planned human city with orthogonal streets
   | 'organic'        // Medieval organic growth
   | 'flying'         // Vertical city for flying creatures
-  | 'non_euclidean'  // R'lyeh-style impossible geometry
+  | 'non_euclidean'  // impossible geometry
   | 'dwarven'        // Underground vertical fortress (Dwarf Fortress homage)
   | 'literary'       // Underground literary realm (The Footnotes, Libraries)
   // Alien & Fantastical
@@ -1508,7 +1508,7 @@ function generateFlyingCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
 }
 
 // =============================================================================
-// NON-EUCLIDEAN CITY GENERATOR (R'lyeh)
+// NON-EUCLIDEAN CITY GENERATOR (Abyssal Geometrica)
 // =============================================================================
 
 interface NonEuclideanPlot extends Plot {
@@ -1519,7 +1519,7 @@ interface NonEuclideanPlot extends Plot {
 }
 
 /**
- * Generate a non-Euclidean R'lyeh-style city.
+ * Generate a non-Euclidean Abyssal Geometrica-style city.
  * Impossible geometry, phase-shifting blocks, sanity-draining architecture.
  */
 function generateNonEuclideanCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
@@ -1706,7 +1706,7 @@ function generateNonEuclideanCity(spec: CitySpec, rng: SeededRandom): GeneratedC
         }
         break;
 
-      case 3: // Blob (organic, Cthulhu-esque)
+      case 3: // Blob (organic, eldritch)
         for (let dy = 0; dy < structHeight; dy++) {
           for (let dx = 0; dx < structWidth; dx++) {
             const distFromCenter = Math.sqrt(
@@ -3025,7 +3025,7 @@ function generateAquaticCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     spec,
     layout: { width, height, grid, districts: [], streets: [], plots },
     buildings: [],
-    ascii: gridToString(grid) + '\n\n[In the depths, the old ones dream]',
+    ascii: gridToString(grid) + '\n\n[In the depths, the ancient ones dream]',
     stats: {
       totalBuildings: 0,
       totalPlots: plots.length,
@@ -4355,7 +4355,7 @@ if (require.main === module) {
     { type: 'grid' as const, size: 'small' as const, species: 'medium' as const, name: 'New Haven', seed: 12345 },
     { type: 'organic' as const, size: 'small' as const, species: 'medium' as const, name: 'Old Millbrook', seed: 54321 },
     { type: 'flying' as const, size: 'small' as const, species: 'medium' as const, name: 'Skyreach Aerie', seed: 11111 },
-    { type: 'non_euclidean' as const, size: 'small' as const, species: 'medium' as const, name: "R'lyeh", seed: 66666 },
+    { type: 'non_euclidean' as const, size: 'small' as const, species: 'medium' as const, name: "Abyssal Geometrica", seed: 66666 },
     { type: 'dwarven' as const, size: 'small' as const, species: 'medium' as const, name: 'Irondeep Hold', seed: 77777 },
     { type: 'literary' as const, size: 'small' as const, species: 'medium' as const, name: 'The Footnotes', seed: 88888 },
   ];

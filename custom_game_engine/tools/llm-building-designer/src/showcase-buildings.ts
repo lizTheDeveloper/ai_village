@@ -314,11 +314,11 @@ const ELEMENTAL_TEMPLE: VoxelBuildingDefinition = {
 };
 
 // =============================================================================
-// 6. COZY HOBBIT HOLE - Underground dwelling
+// 6. COZY BURROW DEN - Underground dwelling
 // =============================================================================
 
-const HOBBIT_HOLE: VoxelBuildingDefinition = {
-  id: 'hobbit_hole',
+const BURROW_DEN: VoxelBuildingDefinition = {
+  id: 'burrow_den',
   name: 'Underhill Burrow',
   description: 'A comfortable underground home built into a hillside.',
   category: 'residential',
@@ -593,7 +593,7 @@ const ALL_BUILDINGS = [
   FAIRY_MUSHROOM,
   MARKET_HALL,
   ELEMENTAL_TEMPLE,
-  HOBBIT_HOLE,
+  BURROW_DEN,
   GIANT_HALL,
   APOTHECARY,
   WATCHTOWER,

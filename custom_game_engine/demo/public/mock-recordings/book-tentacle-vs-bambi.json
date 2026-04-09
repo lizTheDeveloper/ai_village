@@ -4797,7 +4797,7 @@
     {
       "tick": 19,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "slashes wildly at",
       "weapon": "vengeful hooves",
       "bodyPart": "binding core",
@@ -4807,14 +4807,14 @@
         "actorType": "weaponized_deer",
         "action": "slashes wildly at",
         "weapon": "vengeful hooves",
-        "target": "The Necronomicon Amalgam's binding core",
+        "target": "The Forbidden Codex Amalgam's binding core",
         "spritePrompt": "weaponized deer slashes wildly at with vengeful hooves, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 39,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "tramples savagely",
       "weapon": "sharpened antlers",
       "bodyPart": "binding core",
@@ -4824,20 +4824,20 @@
         "actorType": "weaponized_deer",
         "action": "tramples savagely",
         "weapon": "sharpened antlers",
-        "target": "The Necronomicon Amalgam's binding core",
+        "target": "The Forbidden Codex Amalgam's binding core",
         "spritePrompt": "weaponized deer tramples savagely with sharpened antlers, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 59,
-      "attacker": "The Necronomicon Amalgam",
+      "attacker": "The Forbidden Codex Amalgam",
       "defender": "Bambi the Unhinged",
       "action": "devours knowledge from",
       "weapon": "writhing page tentacles",
       "bodyPart": "antlers",
       "damage": "rending muscle fibers",
       "renderableOperation": {
-        "actor": "The Necronomicon Amalgam",
+        "actor": "The Forbidden Codex Amalgam",
         "actorType": "tentacle_book_monster",
         "action": "devours knowledge from",
         "weapon": "writhing page tentacles",
@@ -4848,7 +4848,7 @@
     {
       "tick": 79,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "gouges",
       "weapon": "vengeful hooves",
       "bodyPart": "binding core",
@@ -4858,20 +4858,20 @@
         "actorType": "weaponized_deer",
         "action": "gouges",
         "weapon": "vengeful hooves",
-        "target": "The Necronomicon Amalgam's binding core",
+        "target": "The Forbidden Codex Amalgam's binding core",
         "spritePrompt": "weaponized deer gouges with vengeful hooves, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 99,
-      "attacker": "The Necronomicon Amalgam",
+      "attacker": "The Forbidden Codex Amalgam",
       "defender": "Bambi the Unhinged",
       "action": "lashes tentacle-pages at",
       "weapon": "forbidden knowledge beam",
       "bodyPart": "neck",
       "damage": "tearing through fur and flesh",
       "renderableOperation": {
-        "actor": "The Necronomicon Amalgam",
+        "actor": "The Forbidden Codex Amalgam",
         "actorType": "tentacle_book_monster",
         "action": "lashes tentacle-pages at",
         "weapon": "forbidden knowledge beam",
@@ -4882,7 +4882,7 @@
     {
       "tick": 119,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "tramples savagely",
       "weapon": "rusty machete",
       "bodyPart": "binding core",
@@ -4892,20 +4892,20 @@
         "actorType": "weaponized_deer",
         "action": "tramples savagely",
         "weapon": "rusty machete",
-        "target": "The Necronomicon Amalgam's binding core",
+        "target": "The Forbidden Codex Amalgam's binding core",
         "spritePrompt": "weaponized deer tramples savagely with rusty machete, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 139,
-      "attacker": "The Necronomicon Amalgam",
+      "attacker": "The Forbidden Codex Amalgam",
       "defender": "Bambi the Unhinged",
       "action": "annotates suffering onto",
       "weapon": "forbidden knowledge beam",
       "bodyPart": "neck",
       "damage": "rending muscle fibers",
       "renderableOperation": {
-        "actor": "The Necronomicon Amalgam",
+        "actor": "The Forbidden Codex Amalgam",
         "actorType": "tentacle_book_monster",
         "action": "annotates suffering onto",
         "weapon": "forbidden knowledge beam",
@@ -4916,7 +4916,7 @@
     {
       "tick": 159,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "tramples savagely",
       "weapon": "vengeful hooves",
       "bodyPart": "ink sac",
@@ -4926,14 +4926,14 @@
         "actorType": "weaponized_deer",
         "action": "tramples savagely",
         "weapon": "vengeful hooves",
-        "target": "The Necronomicon Amalgam's ink sac",
+        "target": "The Forbidden Codex Amalgam's ink sac",
         "spritePrompt": "weaponized deer tramples savagely with vengeful hooves, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 179,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "gouges",
       "weapon": "vengeful hooves",
       "bodyPart": "spine tentacle",
@@ -4943,14 +4943,14 @@
         "actorType": "weaponized_deer",
         "action": "gouges",
         "weapon": "vengeful hooves",
-        "target": "The Necronomicon Amalgam's spine tentacle",
+        "target": "The Forbidden Codex Amalgam's spine tentacle",
         "spritePrompt": "weaponized deer gouges with vengeful hooves, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 199,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "gouges",
       "weapon": "sharpened antlers",
       "bodyPart": "page cluster",
@@ -4960,20 +4960,20 @@
         "actorType": "weaponized_deer",
         "action": "gouges",
         "weapon": "sharpened antlers",
-        "target": "The Necronomicon Amalgam's page cluster",
+        "target": "The Forbidden Codex Amalgam's page cluster",
         "spritePrompt": "weaponized deer gouges with sharpened antlers, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 219,
-      "attacker": "The Necronomicon Amalgam",
+      "attacker": "The Forbidden Codex Amalgam",
       "defender": "Bambi the Unhinged",
       "action": "devours knowledge from",
       "weapon": "forbidden knowledge beam",
       "bodyPart": "antlers",
       "damage": "severing vital arteries",
       "renderableOperation": {
-        "actor": "The Necronomicon Amalgam",
+        "actor": "The Forbidden Codex Amalgam",
         "actorType": "tentacle_book_monster",
         "action": "devours knowledge from",
         "weapon": "forbidden knowledge beam",
@@ -4984,7 +4984,7 @@
     {
       "tick": 239,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "eviscerates",
       "weapon": "sharpened antlers",
       "bodyPart": "cover plates",
@@ -4994,20 +4994,20 @@
         "actorType": "weaponized_deer",
         "action": "eviscerates",
         "weapon": "sharpened antlers",
-        "target": "The Necronomicon Amalgam's cover plates",
+        "target": "The Forbidden Codex Amalgam's cover plates",
         "spritePrompt": "weaponized deer eviscerates with sharpened antlers, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 259,
-      "attacker": "The Necronomicon Amalgam",
+      "attacker": "The Forbidden Codex Amalgam",
       "defender": "Bambi the Unhinged",
       "action": "inscribes pain upon",
       "weapon": "forbidden knowledge beam",
       "bodyPart": "flank",
       "damage": "rending muscle fibers",
       "renderableOperation": {
-        "actor": "The Necronomicon Amalgam",
+        "actor": "The Forbidden Codex Amalgam",
         "actorType": "tentacle_book_monster",
         "action": "inscribes pain upon",
         "weapon": "forbidden knowledge beam",
@@ -5018,7 +5018,7 @@
     {
       "tick": 279,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "slashes wildly at",
       "weapon": "sharpened antlers",
       "bodyPart": "page cluster",
@@ -5028,14 +5028,14 @@
         "actorType": "weaponized_deer",
         "action": "slashes wildly at",
         "weapon": "sharpened antlers",
-        "target": "The Necronomicon Amalgam's page cluster",
+        "target": "The Forbidden Codex Amalgam's page cluster",
         "spritePrompt": "weaponized deer slashes wildly at with sharpened antlers, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 299,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "eviscerates",
       "weapon": "rusty machete",
       "bodyPart": "ink sac",
@@ -5045,20 +5045,20 @@
         "actorType": "weaponized_deer",
         "action": "eviscerates",
         "weapon": "rusty machete",
-        "target": "The Necronomicon Amalgam's ink sac",
+        "target": "The Forbidden Codex Amalgam's ink sac",
         "spritePrompt": "weaponized deer eviscerates with rusty machete, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 319,
-      "attacker": "The Necronomicon Amalgam",
+      "attacker": "The Forbidden Codex Amalgam",
       "defender": "Bambi the Unhinged",
       "action": "inscribes pain upon",
       "weapon": "reality-rending bookmark",
       "bodyPart": "flank",
       "damage": "rending muscle fibers",
       "renderableOperation": {
-        "actor": "The Necronomicon Amalgam",
+        "actor": "The Forbidden Codex Amalgam",
         "actorType": "tentacle_book_monster",
         "action": "inscribes pain upon",
         "weapon": "reality-rending bookmark",
@@ -5069,7 +5069,7 @@
     {
       "tick": 339,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "eviscerates",
       "weapon": "rusty machete",
       "bodyPart": "page cluster",
@@ -5079,14 +5079,14 @@
         "actorType": "weaponized_deer",
         "action": "eviscerates",
         "weapon": "rusty machete",
-        "target": "The Necronomicon Amalgam's page cluster",
+        "target": "The Forbidden Codex Amalgam's page cluster",
         "spritePrompt": "weaponized deer eviscerates with rusty machete, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 359,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "gouges",
       "weapon": "rusty machete",
       "bodyPart": "cover plates",
@@ -5096,20 +5096,20 @@
         "actorType": "weaponized_deer",
         "action": "gouges",
         "weapon": "rusty machete",
-        "target": "The Necronomicon Amalgam's cover plates",
+        "target": "The Forbidden Codex Amalgam's cover plates",
         "spritePrompt": "weaponized deer gouges with rusty machete, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 379,
-      "attacker": "The Necronomicon Amalgam",
+      "attacker": "The Forbidden Codex Amalgam",
       "defender": "Bambi the Unhinged",
       "action": "inscribes pain upon",
       "weapon": "forbidden knowledge beam",
       "bodyPart": "chest",
       "damage": "tearing through fur and flesh",
       "renderableOperation": {
-        "actor": "The Necronomicon Amalgam",
+        "actor": "The Forbidden Codex Amalgam",
         "actorType": "tentacle_book_monster",
         "action": "inscribes pain upon",
         "weapon": "forbidden knowledge beam",
@@ -5120,7 +5120,7 @@
     {
       "tick": 399,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "slashes wildly at",
       "weapon": "rusty machete",
       "bodyPart": "spine tentacle",
@@ -5130,14 +5130,14 @@
         "actorType": "weaponized_deer",
         "action": "slashes wildly at",
         "weapon": "rusty machete",
-        "target": "The Necronomicon Amalgam's spine tentacle",
+        "target": "The Forbidden Codex Amalgam's spine tentacle",
         "spritePrompt": "weaponized deer slashes wildly at with rusty machete, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 419,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "eviscerates",
       "weapon": "sharpened antlers",
       "bodyPart": "binding core",
@@ -5147,20 +5147,20 @@
         "actorType": "weaponized_deer",
         "action": "eviscerates",
         "weapon": "sharpened antlers",
-        "target": "The Necronomicon Amalgam's binding core",
+        "target": "The Forbidden Codex Amalgam's binding core",
         "spritePrompt": "weaponized deer eviscerates with sharpened antlers, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 439,
-      "attacker": "The Necronomicon Amalgam",
+      "attacker": "The Forbidden Codex Amalgam",
       "defender": "Bambi the Unhinged",
       "action": "lashes tentacle-pages at",
       "weapon": "reality-rending bookmark",
       "bodyPart": "antlers",
       "damage": "tearing through fur and flesh",
       "renderableOperation": {
-        "actor": "The Necronomicon Amalgam",
+        "actor": "The Forbidden Codex Amalgam",
         "actorType": "tentacle_book_monster",
         "action": "lashes tentacle-pages at",
         "weapon": "reality-rending bookmark",
@@ -5171,7 +5171,7 @@
     {
       "tick": 459,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "eviscerates",
       "weapon": "vengeful hooves",
       "bodyPart": "cover plates",
@@ -5181,14 +5181,14 @@
         "actorType": "weaponized_deer",
         "action": "eviscerates",
         "weapon": "vengeful hooves",
-        "target": "The Necronomicon Amalgam's cover plates",
+        "target": "The Forbidden Codex Amalgam's cover plates",
         "spritePrompt": "weaponized deer eviscerates with vengeful hooves, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 479,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "tramples savagely",
       "weapon": "rusty machete",
       "bodyPart": "spine tentacle",
@@ -5198,20 +5198,20 @@
         "actorType": "weaponized_deer",
         "action": "tramples savagely",
         "weapon": "rusty machete",
-        "target": "The Necronomicon Amalgam's spine tentacle",
+        "target": "The Forbidden Codex Amalgam's spine tentacle",
         "spritePrompt": "weaponized deer tramples savagely with rusty machete, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 499,
-      "attacker": "The Necronomicon Amalgam",
+      "attacker": "The Forbidden Codex Amalgam",
       "defender": "Bambi the Unhinged",
       "action": "lashes tentacle-pages at",
       "weapon": "reality-rending bookmark",
       "bodyPart": "antlers",
       "damage": "crushing bone and cartilage",
       "renderableOperation": {
-        "actor": "The Necronomicon Amalgam",
+        "actor": "The Forbidden Codex Amalgam",
         "actorType": "tentacle_book_monster",
         "action": "lashes tentacle-pages at",
         "weapon": "reality-rending bookmark",
@@ -5222,7 +5222,7 @@
     {
       "tick": 519,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "eviscerates",
       "weapon": "sharpened antlers",
       "bodyPart": "cover plates",
@@ -5232,20 +5232,20 @@
         "actorType": "weaponized_deer",
         "action": "eviscerates",
         "weapon": "sharpened antlers",
-        "target": "The Necronomicon Amalgam's cover plates",
+        "target": "The Forbidden Codex Amalgam's cover plates",
         "spritePrompt": "weaponized deer eviscerates with sharpened antlers, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 539,
-      "attacker": "The Necronomicon Amalgam",
+      "attacker": "The Forbidden Codex Amalgam",
       "defender": "Bambi the Unhinged",
       "action": "annotates suffering onto",
       "weapon": "forbidden knowledge beam",
       "bodyPart": "chest",
       "damage": "rending muscle fibers",
       "renderableOperation": {
-        "actor": "The Necronomicon Amalgam",
+        "actor": "The Forbidden Codex Amalgam",
         "actorType": "tentacle_book_monster",
         "action": "annotates suffering onto",
         "weapon": "forbidden knowledge beam",
@@ -5255,14 +5255,14 @@
     },
     {
       "tick": 559,
-      "attacker": "The Necronomicon Amalgam",
+      "attacker": "The Forbidden Codex Amalgam",
       "defender": "Bambi the Unhinged",
       "action": "lashes tentacle-pages at",
       "weapon": "forbidden knowledge beam",
       "bodyPart": "antlers",
       "damage": "severing vital arteries",
       "renderableOperation": {
-        "actor": "The Necronomicon Amalgam",
+        "actor": "The Forbidden Codex Amalgam",
         "actorType": "tentacle_book_monster",
         "action": "lashes tentacle-pages at",
         "weapon": "forbidden knowledge beam",
@@ -5273,7 +5273,7 @@
     {
       "tick": 579,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "tramples savagely",
       "weapon": "vengeful hooves",
       "bodyPart": "cover plates",
@@ -5283,14 +5283,14 @@
         "actorType": "weaponized_deer",
         "action": "tramples savagely",
         "weapon": "vengeful hooves",
-        "target": "The Necronomicon Amalgam's cover plates",
+        "target": "The Forbidden Codex Amalgam's cover plates",
         "spritePrompt": "weaponized deer tramples savagely with vengeful hooves, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 599,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "slashes wildly at",
       "weapon": "rusty machete",
       "bodyPart": "binding core",
@@ -5300,14 +5300,14 @@
         "actorType": "weaponized_deer",
         "action": "slashes wildly at",
         "weapon": "rusty machete",
-        "target": "The Necronomicon Amalgam's binding core",
+        "target": "The Forbidden Codex Amalgam's binding core",
         "spritePrompt": "weaponized deer slashes wildly at with rusty machete, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 619,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "slashes wildly at",
       "weapon": "vengeful hooves",
       "bodyPart": "spine tentacle",
@@ -5317,20 +5317,20 @@
         "actorType": "weaponized_deer",
         "action": "slashes wildly at",
         "weapon": "vengeful hooves",
-        "target": "The Necronomicon Amalgam's spine tentacle",
+        "target": "The Forbidden Codex Amalgam's spine tentacle",
         "spritePrompt": "weaponized deer slashes wildly at with vengeful hooves, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 639,
-      "attacker": "The Necronomicon Amalgam",
+      "attacker": "The Forbidden Codex Amalgam",
       "defender": "Bambi the Unhinged",
       "action": "annotates suffering onto",
       "weapon": "forbidden knowledge beam",
       "bodyPart": "chest",
       "damage": "crushing bone and cartilage",
       "renderableOperation": {
-        "actor": "The Necronomicon Amalgam",
+        "actor": "The Forbidden Codex Amalgam",
         "actorType": "tentacle_book_monster",
         "action": "annotates suffering onto",
         "weapon": "forbidden knowledge beam",
@@ -5341,7 +5341,7 @@
     {
       "tick": 659,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "slashes wildly at",
       "weapon": "sharpened antlers",
       "bodyPart": "page cluster",
@@ -5351,20 +5351,20 @@
         "actorType": "weaponized_deer",
         "action": "slashes wildly at",
         "weapon": "sharpened antlers",
-        "target": "The Necronomicon Amalgam's page cluster",
+        "target": "The Forbidden Codex Amalgam's page cluster",
         "spritePrompt": "weaponized deer slashes wildly at with sharpened antlers, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     },
     {
       "tick": 679,
-      "attacker": "The Necronomicon Amalgam",
+      "attacker": "The Forbidden Codex Amalgam",
       "defender": "Bambi the Unhinged",
       "action": "annotates suffering onto",
       "weapon": "forbidden knowledge beam",
       "bodyPart": "chest",
       "damage": "rending muscle fibers",
       "renderableOperation": {
-        "actor": "The Necronomicon Amalgam",
+        "actor": "The Forbidden Codex Amalgam",
         "actorType": "tentacle_book_monster",
         "action": "annotates suffering onto",
         "weapon": "forbidden knowledge beam",
@@ -5374,14 +5374,14 @@
     },
     {
       "tick": 699,
-      "attacker": "The Necronomicon Amalgam",
+      "attacker": "The Forbidden Codex Amalgam",
       "defender": "Bambi the Unhinged",
       "action": "annotates suffering onto",
       "weapon": "forbidden knowledge beam",
       "bodyPart": "chest",
       "damage": "tearing through fur and flesh",
       "renderableOperation": {
-        "actor": "The Necronomicon Amalgam",
+        "actor": "The Forbidden Codex Amalgam",
         "actorType": "tentacle_book_monster",
         "action": "annotates suffering onto",
         "weapon": "forbidden knowledge beam",
@@ -5392,7 +5392,7 @@
     {
       "tick": 719,
       "attacker": "Bambi the Unhinged",
-      "defender": "The Necronomicon Amalgam",
+      "defender": "The Forbidden Codex Amalgam",
       "action": "tramples savagely",
       "weapon": "vengeful hooves",
       "bodyPart": "cover plates",
@@ -5402,14 +5402,14 @@
         "actorType": "weaponized_deer",
         "action": "tramples savagely",
         "weapon": "vengeful hooves",
-        "target": "The Necronomicon Amalgam's cover plates",
+        "target": "The Forbidden Codex Amalgam's cover plates",
         "spritePrompt": "weaponized deer tramples savagely with vengeful hooves, brown-red coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
       }
     }
   ],
   "combatants": [
     {
-      "name": "The Necronomicon Amalgam",
+      "name": "The Forbidden Codex Amalgam",
       "type": "tentacle_book_monster",
       "color": "parchment-black",
       "weapons": [
@@ -5460,7 +5460,7 @@
     "color": "#0d1117"
   },
   "ecsMetadata": {
-    "winner": "The Necronomicon Amalgam",
+    "winner": "The Forbidden Codex Amalgam",
     "outcome": "attacker_victory",
     "usedRealCombatSystem": true
   }

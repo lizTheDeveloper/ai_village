@@ -57,7 +57,7 @@ dimensional.grantMagic('agent-id', 50)  // 50 power level
   - Requires transcendent perception
   - 20% phase lock risk, 5% temporal rift risk
 
-- **Weave Pocket Realm** - TARDIS-like building (200 mana, 50 sanity)
+- **Weave Pocket Realm** - Spatial fold building (200 mana, 50 sanity)
   - 5x5 exterior, 21x21 interior
   - 10x time dilation inside
   - Clarke Tech Tier 6 (Post-Scarcity)
@@ -284,7 +284,7 @@ From `DimensionalParadigms.ts`:
 - Gravity Falls (dimensional rifts, Bill Cipher)
 - Dark Forest (dimensional collapse weapons)
 - Flatland (dimensional perception)
-- Doctor Who (TARDIS realm pockets)
+- Spatial fold architecture (realm pockets)
 - Interstellar (tesseract navigation)
 
 ## Status Checklist

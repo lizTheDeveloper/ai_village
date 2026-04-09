@@ -85,7 +85,7 @@ The existing 5-stage spaceflight research tree maps to later eras:
 - Duration: ~3,000 years (includes HARD STEPS breakthrough)
 
 **Stage 3: Advanced β-Space** (Late Interstellar)
-- Unlocks: Story Ships, Gleisner Ships, Svetz Ships, Probability Scouts, Timeline Mergers
+- Unlocks: Story Ships, Synthetic Ships, Chrono Salvage Ships, Probability Scouts, Timeline Mergers
 - Requirements: Advanced navigation, temporal manipulation
 - Duration: ~5,000 years of refinement
 
@@ -959,8 +959,8 @@ const ERA_10_SHIP_REQUIREMENTS = {
 
 Advanced β-Space → Probability Scouts → Timeline Mapping (Stage 3a)
   → Story Ships → Narrative Navigation (Stage 3b)
-  → Gleisner Ships → Distributed Consciousness (Stage 3c)
-  → Svetz Ships → Timeline Editing (Stage 3d)
+  → Synthetic Ships → Distributed Consciousness (Stage 3c)
+  → Chrono Salvage Ships → Timeline Editing (Stage 3d)
 
 Alien Contact → Exobiology → Comparative Evolution
   → Xenosociology → Cultural Exchange
@@ -1007,7 +1007,7 @@ This era gates access to resources required for inter-universe ship construction
  * These are required to build Stage 3 ships (inter-universe capable)
  *
  * CRITICAL: Without these resources, civilizations cannot build
- * probability scouts, timeline mergers, or svetz ships - they are
+ * probability scouts, timeline mergers, or chrono salvage ships - they are
  * locked out of inter-universe travel entirely.
  */
 const ERA_11_GATED_RESOURCES = {
@@ -1016,7 +1016,7 @@ const ERA_11_GATED_RESOURCES = {
     locations: ['black_hole_accretion', 'void_rift', 'dark_matter_halo'],
     stellarPhenomena: ['black_hole', 'collapsed_star', 'cosmic_void'],
     usedFor: ['probability_lens', 'timeline_anchor', 'reality_stabilizer'],
-    gatesShips: ['probability_scout', 'timeline_merger', 'svetz_retrieval'],
+    gatesShips: ['probability_scout', 'timeline_merger', 'chrono_salvage'],
     note: 'CRITICAL - required for ALL inter-universe ship types',
   },
 
@@ -1024,8 +1024,8 @@ const ERA_11_GATED_RESOURCES = {
   temporal_dust: {
     locations: ['pulsar_emission', 'time_dilation_zone', 'neutron_star_surface'],
     stellarPhenomena: ['pulsar', 'magnetar', 'time_anomaly'],
-    usedFor: ['temporal_crystal', 'chronometer', 'svetz_retrieval_core'],
-    gatesShips: ['svetz_retrieval', 'timeline_merger'],
+    usedFor: ['temporal_crystal', 'chronometer', 'chrono_salvage_core'],
+    gatesShips: ['chrono_salvage', 'timeline_merger'],
     note: 'Only forms in extreme gravitational environments',
   },
 
@@ -1043,7 +1043,7 @@ const ERA_11_GATED_RESOURCES = {
     locations: ['spacetime_distortion', 'gravitational_wave_source', 'planck_boundary'],
     stellarPhenomena: ['merging_black_holes', 'cosmic_string', 'primordial_anomaly'],
     usedFor: ['quantum_processor', 'observation_array', 'probability_calculator'],
-    gatesShips: ['probability_scout', 'gleisner_ship'],
+    gatesShips: ['probability_scout', 'synthetic_ship'],
     note: 'Fundamental for probability manipulation and timeline observation',
   },
 };
@@ -1066,7 +1066,7 @@ const ERA_11_SHIP_REQUIREMENTS = {
     note: 'Requires exotic matter for passage stabilization',
   },
 
-  svetz_retrieval: {
+  chrono_salvage: {
     home_planet: ['timeline_anchor', 'probability_lens'],
     system_planets: ['stellarite_ore'],
     other_stars: ['temporal_dust', 'quantum_foam', 'exotic_matter'],  // GATED
@@ -1123,7 +1123,7 @@ Binary Systems:    gravitational_lens, orbital_resonance
 **Stage 3: Advanced β-Space (24,000-29,000 years)**
 - Duration: ~5,000 years
 - Requirements: Probability manipulation, timeline observation
-- Unlocks: Story, Gleisner, Svetz, Probability Scout, Timeline Merger classes
+- Unlocks: Story, Synthetic, Chrono Salvage, Probability Scout, Timeline Merger classes
 
 **Stage 3a: Probability Scouts**
 - Speed: Varies wildly (quantum uncertainty)
@@ -1137,13 +1137,13 @@ Binary Systems:    gravitational_lens, orbital_resonance
 - Mechanics: Navigate by following narrative causality
 - Limitations: Requires compelling story, can be trapped in plot loops
 
-**Stage 3c: Gleisner Ships**
+**Stage 3c: Synthetic Ships**
 - Speed: 20-100 ly/year
 - Range: ~10,000 light-years
 - Mechanics: Distributed consciousness across ship components
 - Limitations: Crew becomes ship, irreversible integration
 
-**Stage 3d: Svetz Ships**
+**Stage 3d: Chrono Salvage Ships**
 - Speed: 1-50 ly/year (plus temporal)
 - Range: Spatial + temporal
 - Mechanics: Timeline editing, temporal rescue missions
@@ -2082,7 +2082,7 @@ The existing 5-stage spaceflight research system (`packages/core/src/research/Sp
 
 2. **Timeline Physics:**
    - Temporal observation (seeing other timelines)
-   - Timeline editing (Svetz Ship capability)
+   - Timeline editing (Chrono Salvage Ship capability)
    - Paradox prevention (reality anchors)
 
 3. **Narrative Causality:**
@@ -2091,7 +2091,7 @@ The existing 5-stage spaceflight research system (`packages/core/src/research/Sp
    - Plot loop hazards (trapped in recurring events)
 
 4. **Consciousness Distribution:**
-   - Gleisner Ship design (crew becomes ship)
+   - Synthetic Ship design (crew becomes ship)
    - Distributed minds (components think independently)
    - Irreversible integration (ethical concerns)
 
@@ -2103,8 +2103,8 @@ The existing 5-stage spaceflight research system (`packages/core/src/research/Sp
 **Unlocks:**
 - Probability Scouts (quantum navigation, Stage 3a)
 - Story Ships (narrative navigation, Stage 3b)
-- Gleisner Ships (distributed consciousness, Stage 3c)
-- Svetz Ships (timeline editing, Stage 3d)
+- Synthetic Ships (distributed consciousness, Stage 3c)
+- Chrono Salvage Ships (timeline editing, Stage 3d)
 - Timeline Mergers (multiverse manipulation, Stage 3e)
 
 **Production Requirements:**
@@ -2392,8 +2392,8 @@ Era advancement unlocks production tiers from `SpaceflightItems.ts`:
 - Civilization series (era progression, tech trees)
 - Sid Meier's Alpha Centauri (transcendence endgame)
 - Eclipse Phase (transhumanism, uploading, post-scarcity)
-- Greg Egan's novels (Gleisner robots, Permutation City)
-- Larry Niven's stories (Svetz, timeline editing)
+- Digital consciousness fiction (distributed minds, virtual existence)
+- Temporal archaeology fiction (timeline recovery, temporal editing)
 - Vernor Vinge (Singularity, intelligence explosion)
 - Arthur C. Clarke (Clarketech, sufficiently advanced magic)
 

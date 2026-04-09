@@ -60,7 +60,7 @@ const WEIRD_COMBATS = [
       color: '#0d1117',
     },
     combatant1: {
-      name: 'The Necronomicon Amalgam',
+      name: 'The Forbidden Codex Amalgam',
       type: 'tentacle_book_monster',
       color: 'parchment-black',
       weapons: [

@@ -145,7 +145,7 @@
       "door": "iron"
     },
     "functionality": [
-      { "type": "smithing", "params": { "qualityBonus": 1.8, "metalTypes": ["iron", "steel", "mithril"] } },
+      { "type": "smithing", "params": { "qualityBonus": 1.8, "metalTypes": ["iron", "steel", "starweave"] } },
       { "type": "storage", "params": { "capacity": 50, "itemTypes": ["metal", "tools"] } }
     ],
     "capacity": 3,
@@ -404,7 +404,7 @@
     "materials": {
       "wall": "obsidian",
       "floor": "darksteel",
-      "door": "stygian_iron"
+      "door": "abyssal_iron"
     },
     "functionality": [
       { "type": "defense", "params": { "armor": 100 } },

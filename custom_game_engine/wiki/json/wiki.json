@@ -662,9 +662,9 @@
               "itemData": {}
             },
             {
-              "id": "mithril_ingot",
-              "summary": "Mithril Ingot - A material item",
-              "description": "Mithril Ingot is a material item.",
+              "id": "starweave_ingot",
+              "summary": "Starweave Ingot - A material item",
+              "description": "Starweave Ingot is a material item.",
               "category": "items",
               "subcategory": "material",
               "tags": [
@@ -2917,9 +2917,9 @@
               "itemData": {}
             },
             {
-              "id": "oblivion_hammer",
-              "summary": "Oblivion Hammer - A equipment item",
-              "description": "Oblivion Hammer is a equipment item.",
+              "id": "void_hammer",
+              "summary": "Void Hammer - A equipment item",
+              "description": "Void Hammer is a equipment item.",
               "category": "items",
               "subcategory": "equipment",
               "tags": [

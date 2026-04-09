@@ -65,7 +65,7 @@ A merger of **Stellaris** (grand strategy, galactic scale), **RimWorld** (indivi
 **Status**: Just implemented (this session)
 
 **What it does**:
-- Ship types: Worldship, Threshold, Courier, Brainship, Storyship, Gleisner, Svetz, Probability Scout, Timeline Merger
+- Ship types: Worldship, Threshold, Courier, Brainship, Storyship, Synthetic, Chrono Salvage, Probability Scout, Timeline Merger
 - β-space emotional navigation (Heart Chamber, coherence thresholds)
 - Ship components: EmotionTheater, MemoryHall, MeditationChamber
 - Construction system with shipyards

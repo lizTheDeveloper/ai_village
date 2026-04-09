@@ -62,7 +62,7 @@ Pay what you can
 
 **This is not a game you win. It's a world you watch unfold.**
 
-Agents form opinions. Hold grudges. Fall in love. Build temples to gods they invented. Cast spells from 25 different magical traditions — Elemental, Allomancy, Sympathy, Shinto, Alchemy, Kabbalah, and more. Each system is fully functional and composable. Gods emerge from collective belief and answer prayers with real in-world effects. Souls persist after death, face judgment, enter afterlives, and reincarnate with memory bleeds from past lives.
+Agents form opinions. Hold grudges. Fall in love. Build temples to gods they invented. Cast spells from 25 different magical traditions — Elemental, Ferromancy, Tethermancy, Shinto, Alchemy, Kabbalah, and more. Each system is fully functional and composable. Gods emerge from collective belief and answer prayers with real in-world effects. Souls persist after death, face judgment, enter afterlives, and reincarnate with memory bleeds from past lives.
 
 When everything goes wrong — rewind time. Every auto-save is a branch point. Fork the universe. Run both timelines. See what happens differently.
 

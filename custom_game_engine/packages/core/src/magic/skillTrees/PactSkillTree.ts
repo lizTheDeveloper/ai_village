@@ -40,7 +40,7 @@ export const PATRON_TYPES = {
   spirit: 'Spirits - local entities, offer modest power for simple tasks',
   ancestor: 'Ancestor spirits - family ghosts, protective but demanding respect',
   elemental: 'Elementals - living forces of nature, offer raw power for freedom',
-  elder: 'Elder Things - cosmic entities beyond morality, offer forbidden knowledge',
+  elder: 'Primordial Architects - cosmic entities beyond morality, offer forbidden knowledge',
   archfey: 'Archfey - fae nobility, offer transformation for eternal loyalty',
   devil: 'Devils - lawful evil, offer precise contracts with hidden clauses',
   celestial: 'Celestials - lawful good, offer blessings for holy quests',
@@ -319,13 +319,13 @@ const ELDER_PACTS_NODE = createSkillNode(
   350,
   [
     createSkillEffect('unlock_ability', 1, {
-      description: 'Make contracts with Elder Things',
+      description: 'Make contracts with Primordial Architects',
       target: { abilityId: 'elder_pact' },
     }),
   ],
   {
     description: 'Learn to contract with cosmic entities',
-    lore: `Elder Things exist beyond morality, beyond comprehension. They offer
+    lore: `Primordial Architects exist beyond morality, beyond comprehension. They offer
 forbidden knowledge and reality-warping power. But their costs are
 equally incomprehensible - fragments of your sanity, pieces of your
 humanity, changes to your very existence. Proceed with extreme caution.`,
@@ -845,7 +845,7 @@ The entities you can pact with are many and varied:
 - Angels (servants of good gods) offer protection for righteous service
 - Fae delight in clever wordplay and exploit ambiguity
 - Spirits want simple things: respect, offerings, help
-- Elder Things offer forbidden knowledge at incomprehensible cost
+- Primordial Architects offer forbidden knowledge at incomprehensible cost
 
 Every pact is a binding magical contract enforced by reality itself. Break your
 word and face immediate consequences - loss of power, curses, hunts, even

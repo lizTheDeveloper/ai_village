@@ -143,8 +143,8 @@ Agents learn magic through:
 The game features **25+ magic systems**, including:
 - **Elemental** - Fire, water, earth, air manipulation
 - **Divine** - Channel power from gods
-- **Sympathy** - Link objects to affect them at distance
-- **Allomancy** - Burn metals for powers (inspired by Brandon Sanderson)
+- **Tethermancy** - Link objects to affect them at distance
+- **Ferromancy** - Burn metals for powers (inspired by Multiverse Chorus canon)
 - **Shinto** - Spirit magic and kami worship
 - **Alchemy** - Transform materials
 - Many more!

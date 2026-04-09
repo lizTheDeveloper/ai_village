@@ -276,7 +276,7 @@ const CHARACTER_DESCRIPTIONS: Record<string, (color: string) => string> = {
     `divine angel with large golden feathered wings and glowing halo, radiant white robes with ${color} trim, holy warrior, celestial being`,
 
   'tentacle_book_monster': (color) =>
-    `eldritch horror made of ancient leather-bound books with writhing tentacle pages, ink dripping, glowing ${color} runes, dark magical tome creature, Lovecraftian`,
+    `eldritch horror made of ancient leather-bound books with writhing tentacle pages, ink dripping, glowing ${color} runes, dark magical tome creature, eldritch`,
 
   'weaponized_deer': (color) =>
     `fierce battle deer with ${color} fur, holding a rusty machete in its mouth, battle scars, wild determined eyes, antlers decorated with trophies`,

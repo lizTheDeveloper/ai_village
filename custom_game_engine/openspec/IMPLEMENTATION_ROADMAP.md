@@ -689,7 +689,7 @@
 ### 6.2 Exotic Ship Types (Week 13-14) ⭐
 
 **Why Important:**
-- Probability Scout, Timeline Merger, Svetz Retrieval ships specified but not implemented
+- Probability Scout, Timeline Merger, Chrono Salvage ships specified but not implemented
 - Key multiverse ship functionality
 
 **Tasks:**
@@ -697,7 +697,7 @@
   - View alternate timelines without contamination
   - Low probability of timeline collapse
   - Scouting mission mechanics
-- [ ] Svetz Retrieval ship (`svetz_retrieval` type)
+- [ ] Chrono Salvage ship (`chrono_salvage` type)
   - Fetch items/entities from alternate timelines
   - Object anchoring mechanics
   - Cross-timeline inventory management
@@ -707,13 +707,13 @@
   - Consciousness integration
 
 **Files:**
-- `packages/core/src/navigation/SpaceshipComponent.ts` (add probability_scout, svetz_retrieval)
+- `packages/core/src/navigation/SpaceshipComponent.ts` (add probability_scout, chrono_salvage)
 - `packages/core/src/systems/ProbabilityScoutSystem.ts` (NEW)
-- `packages/core/src/systems/SvetzRetrievalSystem.ts` (NEW)
+- `packages/core/src/systems/ChronoSalvageSystem.ts` (NEW)
 
 **Test Success:**
 - Probability Scout explores timeline → View alternate future without fork
-- Svetz ship retrieves artifact → Item transferred from Universe B to Universe A
+- Chrono salvage ship retrieves artifact → Item transferred from Universe B to Universe A
 - Brainship bonded → Ship consciousness emerges
 
 ---
@@ -730,7 +730,7 @@
 **Tasks:**
 - [x] Write tests for Phase 6 exotic ship systems
   - [x] ProbabilityScoutSystem.test.ts (12 tests)
-  - [x] SvetzRetrievalSystem.test.ts (15 tests)
+  - [x] ChronoSalvageSystem.test.ts (15 tests)
 - [ ] Write tests for remaining Phase 1-6 systems
   - Unit tests for all new systems (80%+ coverage)
   - Integration tests for cross-system workflows

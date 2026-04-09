@@ -21,7 +21,7 @@
    Dominion) cut off from the others
   - Reconciliation - a powerful ritual to reconnect all five worlds
   - Velari - a shapeshifting being who serves as both lover and guide
-  - Hapexamendios - the tyrannical god who rules the Dominions
+  - The Unmoved Architect - the tyrannical god who rules the Dominions
   - Themes of transformation, sexuality, identity, and cosmic rebellion
   against divine authority
 
@@ -47,7 +47,7 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
 
   1. Sex magic - the Chorus multiverse has sophisticated transformative magic tied to sexuality 
   and physical union
-  2. Cosmic rebellion narrative - The rebellion against Hapexamendios (the 
+  2. Cosmic rebellion narrative - The rebellion against The Unmoved Architect (the 
   tyrannical god)
   3. Deity hierarchy - They already have Creator gods and magical beings, want to 
   expand on this
@@ -201,7 +201,7 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
 
   2. Cosmic Rebellion Narrative
 
-  - Rebellion against Hapexamendios (tyrannical creator god)
+  - Rebellion against The Unmoved Architect (tyrannical creator god)
   - Deities opposing the supreme creator
   - Could integrate with:
     - DeityRelations (add "rebellion" relationship type)
@@ -220,7 +220,7 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
 
   4. Deity Hierarchy Expansion
 
-  - Hapexamendios (Supreme Creator - tyrannical)
+  - The Unmoved Architect (Supreme Creator - tyrannical)
   - Gods of individual dominions
   - Velari and other transformative beings
 
@@ -325,7 +325,7 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
   // custom_game_engine/packages/core/src/divinity/DeityTiers.ts
 
   export type DeityTier =
-    | 'supreme_creator'    // Hapexamendios - tyrannical prime mover (1 only)
+    | 'supreme_creator'    // The Unmoved Architect - tyrannical prime mover (1 only)
     | 'dominion_ruler'     // Gods who rule individual realms
     | 'pantheon_god'       // Your existing deities
     | 'rebel_god'          // Gods actively opposing the Creator
@@ -401,7 +401,7 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
     id: 'first_dominion',
     name: 'Yzordderrex',  // First Dominion
     category: 'material',
-    parentUniverseId: 'imajica',
+    parentUniverseId: 'dimensional_ascension',
     size: 'continental',
     topology: 'alien_landscape',
     timeFlow: 'normal',
@@ -435,7 +435,7 @@ narrative. So yeah, I'd like to find ways to incorporate some of those ideas.
     id: 'fifth_dominion_earth',
     name: 'Earth (Fifth Dominion)',
     category: 'material',
-    parentUniverseId: 'imajica',
+    parentUniverseId: 'dimensional_ascension',
     size: 'planetary',
     topology: 'earthlike',
     timeFlow: 'normal',

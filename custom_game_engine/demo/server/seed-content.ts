@@ -19,6 +19,7 @@ import { MAGICAL_SPECIES_REGISTRY } from '../../packages/core/src/species/Magica
 import { FOLKLORIST_SPECIES_REGISTRY } from '../../packages/core/src/species/FolkloristSpeciesRegistry.js';
 import { SPRINT13_FOLKLORIST_SPECIES_REGISTRY } from '../../packages/core/src/species/Sprint13FolkloristSpeciesRegistry.js';
 import { SPRINT14_FOLKLORIST_SPECIES_REGISTRY } from '../../packages/core/src/species/Sprint14FolkloristSpeciesRegistry.js';
+import { SPRINT15_FOLKLORIST_SPECIES_REGISTRY } from '../../packages/core/src/species/Sprint15FolkloristSpeciesRegistry.js';
 
 // Songs
 import { MVEE_SONG_CATALOGUE } from '../../packages/core/src/data/mvee-songs.js';
@@ -66,6 +67,7 @@ async function seedSpecies(client: pg.Client): Promise<number> {
     { registry: FOLKLORIST_SPECIES_REGISTRY,       source: 'folklorist' },
     { registry: SPRINT13_FOLKLORIST_SPECIES_REGISTRY, source: 'sprint13' },
     { registry: SPRINT14_FOLKLORIST_SPECIES_REGISTRY, source: 'sprint14' },
+    { registry: SPRINT15_FOLKLORIST_SPECIES_REGISTRY, source: 'sprint15' },
   ];
 
   let count = 0;

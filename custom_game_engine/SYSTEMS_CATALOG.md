@@ -1891,12 +1891,12 @@ This document catalogs every system in the game engine. Systems are organized by
 
 ---
 
-### SvetzRetrievalSystem
-**Purpose:** Handles Svetz retrieval ship cross-timeline item recovery
-**Components:** `spaceship`, `svetz_retrieval_mission`
+### ChronoSalvageSystem
+**Purpose:** Handles Chrono salvage ship cross-timeline item recovery
+**Components:** `spaceship`, `chrono_salvage_mission`
 **Priority:** 97
 **Throttle:** Every 100 ticks (~5 seconds)
-**File:** `systems/SvetzRetrievalSystem.ts`
+**File:** `systems/ChronoSalvageSystem.ts`
 
 **Responsibilities:**
 - Phase management: navigating → searching → retrieving → anchoring → returning → complete
@@ -1913,7 +1913,7 @@ This document catalogs every system in the game engine. Systems are organized by
 - `BASE_CONTAMINATION`: 0.05 (5% per item)
 - `BASE_RETRIEVAL_SUCCESS`: 0.7 (70%)
 
-**Named After:** Larry Niven's time-traveling character Svetz
+**Named After:** Temporal archaeology concept (chrono-salvage operations)
 
 **Status:** ✅ Implemented
 
@@ -2085,7 +2085,7 @@ Many systems don't need to run every tick (50ms). Throttled systems use an updat
 | ShipCombatSystem | 20 ticks | ~1 second |
 | TimelineMergerSystem | 100 ticks | ~5 seconds |
 | ProbabilityScoutSystem | 100 ticks | ~5 seconds |
-| SvetzRetrievalSystem | 100 ticks | ~5 seconds |
+| ChronoSalvageSystem | 100 ticks | ~5 seconds |
 | InvasionSystem | 200 ticks | ~10 seconds |
 | UpliftDiplomacySystem | 200 ticks | ~10 seconds |
 | CollapseSystem | 500 ticks | ~25 seconds |

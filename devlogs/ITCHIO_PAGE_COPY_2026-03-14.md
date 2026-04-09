@@ -45,7 +45,7 @@ This is not a god game. You are not omnipotent. The agents have their own goals,
 
 **Emergent history.** No two playthroughs unfold the same way. Alliances form and collapse. Technologies get reinvented. Civilizations rise — and fall — on the strength of their people's choices.
 
-**Magic, divinity, and genetics.** 25+ magic paradigms (from Shinto animism to Allomancy), a fully emergent religion system where gods arise from worship, genetics and inheritance, reincarnation, and family dynasties.
+**Magic, divinity, and genetics.** 25+ magic paradigms (from Shinto animism to Ferromancy), a fully emergent religion system where gods arise from worship, genetics and inheritance, reincarnation, and family dynasties.
 
 **Time and consequence.** Decisions ripple across generations. What your founders built (or burned) shapes what their descendants inherit. Fork the multiverse to explore "what if" scenarios — or watch parallel timelines diverge.
 

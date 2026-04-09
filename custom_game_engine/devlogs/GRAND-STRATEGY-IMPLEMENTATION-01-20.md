@@ -32,8 +32,8 @@ Completed exotic ship types with dedicated systems:
 - Very low contamination (0.001 per branch)
 - 1% base collapse risk, reduced by observation precision
 
-#### SvetzRetrievalSystem (Priority 97)
-- Named after Larry Niven's time-traveling character
+#### ChronoSalvageSystem (Priority 97)
+- Temporal archaeology ships for cross-timeline recovery
 - Fetches items from extinct timelines (temporal archaeology)
 - Mission phases: navigating → searching → retrieving → anchoring → returning → complete
 - 5% contamination per item, 70% base retrieval success
@@ -68,7 +68,7 @@ Ship → Squadron (3-10 ships) → Fleet (3-10 squadrons) → Armada (3-10 fleet
 ### Exotic Ship Types (Era 14)
 - **brainship**: Ship-brain symbiosis, perfect coherence
 - **probability_scout**: Maps unobserved timeline branches
-- **svetz_retrieval**: Temporal archaeology from extinct timelines
+- **chrono_salvage**: Temporal archaeology from extinct timelines
 - **timeline_merger**: Combines compatible probability branches
 
 ## Component Additions
@@ -76,7 +76,7 @@ Ship → Squadron (3-10 ships) → Fleet (3-10 squadrons) → Armada (3-10 fleet
 ### New ComponentTypes Added
 ```typescript
 ProbabilityScoutMission = 'probability_scout_mission'
-SvetzRetrievalMission = 'svetz_retrieval_mission'
+ChronoSalvageMission = 'chrono_salvage_mission'
 Projectile = 'projectile'  // Auto-added by linter
 ```
 
@@ -87,14 +87,14 @@ Scout events:
 - `multiverse:scout_triggered_collapse`
 - `multiverse:scout_mission_complete`
 
-Svetz events:
-- `multiverse:svetz_arrived`
-- `multiverse:svetz_target_found`
-- `multiverse:svetz_search_failed`
-- `multiverse:svetz_item_retrieved`
-- `multiverse:svetz_retrieval_failed`
-- `multiverse:svetz_anchoring_complete`
-- `multiverse:svetz_mission_complete`
+Chrono salvage events:
+- `multiverse:chrono_salvage_arrived`
+- `multiverse:chrono_salvage_target_found`
+- `multiverse:chrono_salvage_search_failed`
+- `multiverse:chrono_salvage_item_retrieved`
+- `multiverse:chrono_salvage_failed`
+- `multiverse:chrono_salvage_anchoring_complete`
+- `multiverse:chrono_salvage_mission_complete`
 
 ## Testing
 
@@ -107,7 +107,7 @@ Svetz events:
   - Observation precision configuration
   - System metadata verification
 
-- **SvetzRetrievalSystem.test.ts** - 15 tests covering:
+- **ChronoSalvageSystem.test.ts** - 15 tests covering:
   - Mission initialization
   - Anchoring capacity calculation (mass / 200)
   - Target specification types (item, entity, technology)
@@ -143,7 +143,7 @@ Svetz events:
 Systems registered as disabled, enabled when technology requirements met:
 ```typescript
 registerDisabled(new ProbabilityScoutSystem());  // Priority 96
-registerDisabled(new SvetzRetrievalSystem());    // Priority 97
+registerDisabled(new ChronoSalvageSystem());    // Priority 97
 ```
 
 ### GC Optimization
@@ -162,7 +162,7 @@ private readonly workingObservation: BranchObservation = {
 ### Event-Driven Architecture
 Systems emit typed events, other systems listen:
 ```typescript
-ctx.emit('multiverse:svetz_item_retrieved', {
+ctx.emit('multiverse:chrono_salvage_item_retrieved', {
   shipId: entity.id,
   itemId: item.itemId,
   itemName: item.name,

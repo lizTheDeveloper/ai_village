@@ -28,7 +28,7 @@
 
 ## Category 1: Legendary Metals (Combat/Crafting)
 
-### 1. Mithril
+### 1. Starweave
 - **Tier**: 7-8
 - **Rarity**: Legendary
 - **Base Value**: 2500
@@ -418,7 +418,7 @@
 
 ### Legendary (Tier 7-9)
 - **Existing**: Eternal Flame, Shadow Essence, Dream Crystal, Memory Crystal, Diamond, Quantum Foam
-- **New**: Mithril, Adamantine, Starlight Essence, Voidstone, Aetherium, Gravity Stone, Chronium
+- **New**: Starweave, Adamantine, Starlight Essence, Voidstone, Aetherium, Gravity Stone, Chronium
 
 ### Epic (Tier 6-7)
 - **New**: Starmetal, Dragonscale, Null Crystal, Phase Quartz
@@ -440,7 +440,7 @@
 ## Implementation Priority
 
 ### Phase 1: Core Gaps (Immediate)
-1. **Mithril** - Classic legendary metal for endgame equipment
+1. **Starweave** - Classic legendary metal for endgame equipment
 2. **Dragonscale** - Creature-derived, ties to ecology
 3. **Chitin** - Low-mid tier armor, creature integration
 4. **Obsidian** - Early-game volcanic material
@@ -473,7 +473,7 @@
 
 **New diets possible**:
 - `celestial_feeding` → Eats Starlight Essence, Moonstone, Sunstone
-- `metal_consumption` → Eats Mithril, Adamantine, Orichalcum (rare in metal-rich realms)
+- `metal_consumption` → Eats Starweave, Adamantine, Orichalcum (rare in metal-rich realms)
 - `void_consumption` → UN-DEPRECATE with Voidstone (0.8 in void realm)
 - `ectoplasmic_feeding` → Eats Ectoplasm (0.8 in spirit realm)
 - `gravity_feeding` → UN-DEPRECATE with Gravity Stone (0.8 in gravity wells)
@@ -515,7 +515,7 @@
 ```typescript
 craftedFrom: [
   { itemId: 'material:starmetal', amount: 5 },
-  { itemId: 'material:mithril', amount: 3 },
+  { itemId: 'material:starweave', amount: 3 },
   { itemId: 'material:starlight_essence', amount: 1 },
 ]
 // Effects: +100 damage, anti-magic 50%, glows in darkness

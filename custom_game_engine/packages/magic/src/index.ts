@@ -464,7 +464,7 @@ export {
   hasPowerWords,
 } from './skillTrees/SongSkillTree.js';
 
-// Name (Earthsea-inspired true names)
+// Name (folklore-inspired true names)
 export {
   NAME_CATEGORIES,
   NAME_MASTERY_LEVELS,

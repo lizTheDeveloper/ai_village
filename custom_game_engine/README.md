@@ -236,7 +236,7 @@ The engine features **220+ systems** organized into these categories:
 - **Automation & Factories** (5 systems) - AutomationSystem, FactorySystem, etc.
 - **Governance & Metrics** (8 systems) - GovernanceSystem, MetricsSystem, etc.
 - **Consciousness** (5 systems) - ConsciousnessSystem, QualiaMappingSystem, etc.
-- **Space & Multiverse** (5 systems) - ShipCombatSystem, TimelineMergerSystem, ProbabilityScoutSystem, SvetzRetrievalSystem, InvasionSystem
+- **Space & Multiverse** (5 systems) - ShipCombatSystem, TimelineMergerSystem, ProbabilityScoutSystem, ChronoSalvageSystem, InvasionSystem
 - **Civilization & Archaeology** (4 systems) - UpliftDiplomacySystem, CollapseSystem, KnowledgePreservationSystem, ArchaeologySystem
 - **Utility** (4 systems) - AutoSaveSystem, DebugSystem, etc.
 
@@ -275,13 +275,13 @@ Era 11-14: Interstellar → Post-Scarcity → Galactic → Transcendent (Space)
 
 **Late Game (Era 7-10):** The nation industrializes. Population explodes to millions. EmpireExpansionSystem enables conquest and diplomacy. Research unlocks electricity, computing, and early space flight.
 
-**Endgame (Era 11-14):** Interstellar colonies spread across the galaxy. β-space navigation enables faster-than-light travel. ProbabilityScoutSystem maps alternate timelines. SvetzRetrievalSystem fetches artifacts from extinct branches. The civilization approaches transcendence.
+**Endgame (Era 11-14):** Interstellar colonies spread across the galaxy. β-space navigation enables faster-than-light travel. ProbabilityScoutSystem maps alternate timelines. ChronoSalvageSystem fetches artifacts from extinct branches. The civilization approaches transcendence.
 
 ### Exotic Ship Types (Era 14)
 
 - **Brainship**: Ship-brain symbiosis with perfect coherence for delicate β-space navigation
 - **Probability Scout**: Solo explorers mapping unobserved timeline branches
-- **Svetz Retrieval**: Temporal archaeology ships fetching items from extinct timelines
+- **Chrono Salvage**: Temporal archaeology ships fetching items from extinct timelines
 - **Timeline Merger**: Ships that collapse compatible probability branches into one
 
 See [GRAND_STRATEGY_GUIDE.md](GRAND_STRATEGY_GUIDE.md) for complete mechanics reference.

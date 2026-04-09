@@ -364,7 +364,7 @@ interface MentorshipOpportunity {
 │  TOP PERFORMERS                                                             │
 │  ─────────────────────────────────────────────────────────────────────────  │
 │                                                                             │
-│  🥇 Farming:     Aelindra (78)  |  🥇 Crafting:    Thorin (82)             │
+│  🥇 Farming:     Aelindra (78)  |  🥇 Crafting:    Haldrek (82)             │
 │  🥈 Farming:     Giles (71)     |  🥈 Crafting:    Mira (67)               │
 │  🥉 Farming:     Willow (68)    |  🥉 Crafting:    Aelindra (65)           │
 │                                                                             │
@@ -381,7 +381,7 @@ interface MentorshipOpportunity {
 │  ─────────────────────────────────────────────────────────────────────────  │
 │                                                                             │
 │  Aelindra (Farming 78) → Young Pip (Farming 12)  Potential: +15 levels     │
-│  Thorin (Crafting 82) → Mira (Crafting 67)       Potential: +8 levels      │
+│  Haldrek (Crafting 82) → Mira (Crafting 67)       Potential: +8 levels      │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -417,7 +417,7 @@ interface AgentSkillProfile {
 │  📊 SKILL COMPARISON                                                [X]    │
 │  ─────────────────────────────────────────────────────────────────────────  │
 │                                                                             │
-│  Comparing: 🔵 Aelindra (Elf)  vs  🟠 Thorin (Dwarf)                       │
+│  Comparing: 🔵 Aelindra (Elf)  vs  🟠 Haldrek (Dwarf)                       │
 │                                                                             │
 │                        Farming                                              │
 │                          78│56                                              │
@@ -439,7 +439,7 @@ interface AgentSkillProfile {
 │                                                                             │
 │  INSIGHTS                                                                   │
 │  • Aelindra excels at: Farming (+22), Foraging (+22)                       │
-│  • Thorin excels at: Crafting (+17), Construction (+45), Combat (+14)      │
+│  • Haldrek excels at: Crafting (+17), Construction (+45), Combat (+14)      │
 │  • Good team: Complementary skill sets                                      │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘

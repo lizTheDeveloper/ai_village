@@ -83,6 +83,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
+import { checkSpriteApprovalGate } from './sprite-approval-gate.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1078,7 +1079,36 @@ async function runDaemon(): Promise<void> {
       }
 
       // Process sprite generation jobs
-      const queueJob = spriteJobs.find((job: any) => job.status === 'queued');
+      let queueJob: any | undefined;
+      let queueMutatedByGate = false;
+      const queuedSpriteJobs = spriteJobs.filter((job: any) => job.status === 'queued');
+
+      for (const candidate of queuedSpriteJobs) {
+        const gateDecision = checkSpriteApprovalGate({
+          folderId: candidate.folderId,
+          traits: candidate.traits as Record<string, unknown>,
+          allowRegeneration: Boolean(candidate.regenerate),
+        });
+
+        if (gateDecision.allowed) {
+          queueJob = candidate;
+          if (gateDecision.claimedPending || gateDecision.approved) {
+            log(`[SpriteGate] ${gateDecision.reason}`);
+          }
+          break;
+        }
+
+        if (candidate.blockedReason !== gateDecision.reason) {
+          candidate.blockedReason = gateDecision.reason;
+          candidate.blockedAt = Date.now();
+          queueMutatedByGate = true;
+          log(`[SpriteGate] Blocked ${candidate.folderId}: ${gateDecision.reason}`);
+        }
+      }
+
+      if (queueMutatedByGate) {
+        saveQueue(spriteJobs, animJobs, soulSpriteJobs);
+      }
 
       if (queueJob) {
         // Process on-demand sprite generation request

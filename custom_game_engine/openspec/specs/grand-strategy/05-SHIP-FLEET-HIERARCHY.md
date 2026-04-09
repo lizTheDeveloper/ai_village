@@ -224,8 +224,8 @@ Ships are the atomic unit of β-space navigation. Each ship uses the existing **
 
 **Stage 3 (Advanced β-Navigation):**
 - **Story Ship:** 2,000 mass, narrative-seeking, can target specific branches (0.7 observation precision)
-- **Gleisner Vessel:** 500 mass, digital consciousness, can edit self for coherence
-- **Svetz Retrieval:** 800 mass, temporal archaeology, retrieve from extinct timelines
+- **Synthetic Vessel:** 500 mass, digital consciousness, can edit self for coherence
+- **Chrono Salvage:** 800 mass, temporal archaeology, retrieve from extinct timelines
 - **Probability Scout:** 50 mass, solo explorer, maps unobserved branches (0.9 observation precision)
 - **Timeline Merger:** 5,000 mass, collapse compatible branches (50+ crew, 0.75 threshold)
 
@@ -1098,7 +1098,7 @@ Allocation:
 - New construction: 40% = 60,000 (build 6 threshold_ships)
 - Maintenance: 30% = 45,000 (maintain 450 ships @ 100 credits each)
 - Personnel: 20% = 30,000 (pay 3,000 crew @ 10 credits each)
-- R&D: 10% = 15,000 (research gleisner_vessel, 30% progress this year)
+- R&D: 10% = 15,000 (research synthetic_vessel, 30% progress this year)
 
 Navy has 450 ships, 3,000 crew, building 6 new ships.
 Political power: HIGH (15% of GDP is significant)

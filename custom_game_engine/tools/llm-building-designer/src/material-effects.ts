@@ -463,12 +463,12 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     elementalStrength: 50,
     paradigmAffinities: { ferromancy: 30 },
     specialEffects: [
-      { type: 'metal_burning_boost', magnitude: 20, description: 'Enhances Ferromancy copper (Smoker)' },
+      { type: 'metal_burning_boost', magnitude: 20, description: 'Enhances Ferromancy copper (Copper-Shroud)' },
     ],
     moodModifier: 0,
     atmosphere: 'neutral',
     description: 'Reddish copper metal',
-    lore: 'Copper clouds Ferromancy pulses. Smokers prize pure copper.',
+    lore: 'Copper clouds Ferromancy pulses. Copper-Shrouds prize pure copper.',
   },
 
   bronze: {
@@ -481,12 +481,12 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     elementalStrength: 55,
     paradigmAffinities: { ferromancy: 25, rune: 10 },
     specialEffects: [
-      { type: 'metal_burning_boost', magnitude: 15, description: 'Enhances Ferromancy bronze (Seeker)' },
+      { type: 'metal_burning_boost', magnitude: 15, description: 'Enhances Ferromancy bronze (Bronze-Finder)' },
     ],
     moodModifier: 5,
     atmosphere: 'neutral',
     description: 'Bronze alloy',
-    lore: 'Bronze detects Ferromancy pulses. Seekers can sense magic through bronze.',
+    lore: 'Bronze detects Ferromancy pulses. Bronze-Finders can sense magic through bronze.',
   },
 
   iron: {
@@ -526,7 +526,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     lore: 'Steel pushes. Iron-Pullers hurl steel through the air.',
   },
 
-  mithril: {
+  starweave: {
     ...DEFAULT_PROPERTIES,
     durability: 95,
     density: 30,
@@ -541,8 +541,8 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     costModifier: -10,
     moodModifier: 15,
     atmosphere: 'calming',
-    description: 'Silvery elven metal, light as air',
-    lore: 'Mithril is stronger than steel yet light as silk. Magic flows through it like water.',
+    description: 'Ultra-light metallic ore with innate magical conductivity',
+    lore: 'Found only in meteorite impact sites. When drawn into wire, it sings at frequencies only magical beings can hear. Weighs one-fifth of equivalent steel yet resists dragon-fire.',
   },
 
   adamantine: {
@@ -1569,7 +1569,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     ...DEFAULT_PROPERTIES,
     durability: 20,
     weirdness: 35,
-    paradigmAffinities: { echo: 30, daemon: 20 },
+    paradigmAffinities: { echo: 30, animus: 20 },
     specialEffects: [
       { type: 'memory_enhancement', magnitude: 15, description: 'Dust of ages' },
     ],
@@ -1826,7 +1826,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
   },
 
   // ===========================================================================
-  // ALLOMANTIC METALS
+  // FERROMANTIC METALS
   // ===========================================================================
 
   pewter: {
@@ -2290,7 +2290,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     durability: 60,
     weirdness: 70,
     glows: true,
-    paradigmAffinities: { pact: 80, daemon: 60, name: 40 },
+    paradigmAffinities: { pact: 80, animus: 60, name: 40 },
     manaRegen: 1.3,
     spellPower: 35,
     element: 'fire',
@@ -2309,7 +2309,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     weirdness: 80,
     glows: true,
     flammable: false,
-    paradigmAffinities: { academic: 100, literary: 70, daemon: 40 },
+    paradigmAffinities: { academic: 100, literary: 70, animus: 40 },
     manaRegen: 2.0,
     spellPower: 50,
     element: 'fire',
@@ -2458,7 +2458,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     ...DEFAULT_PROPERTIES,
     durability: 45,
     weirdness: 90,
-    paradigmAffinities: { emotional: 80, dream: 50, daemon: 30 },
+    paradigmAffinities: { emotional: 80, dream: 50, animus: 30 },
     manaRegen: 1.4,
     protection: 30,
     element: null,
@@ -2618,7 +2618,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     ...DEFAULT_PROPERTIES,
     durability: 80,
     weirdness: 90,
-    paradigmAffinities: { daemon: 80, blood: 50, pact: 40 },
+    paradigmAffinities: { animus: 80, blood: 50, pact: 40 },
     manaRegen: 1.8,
     spellPower: 40,
     protection: 30,
@@ -2719,13 +2719,13 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     lore: 'Etherium flows with the essence of pure magic.',
   },
 
-  wraithbone: {
+  resonite: {
     ...DEFAULT_PROPERTIES,
     durability: 70,
     weirdness: 85,
     alive: true,
     glows: true,
-    paradigmAffinities: { daemon: 60, craft: 50, echo: 40 },
+    paradigmAffinities: { animus: 60, craft: 50, echo: 40 },
     manaRegen: 1.7,
     spellPower: 35,
     element: null,
@@ -2735,8 +2735,8 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
       { type: 'psychic_resonance', magnitude: 55, description: 'Mental magic enhanced' },
       { type: 'spirit_housing', magnitude: 70, description: 'Contains ancestor spirits' },
     ],
-    description: 'Psychically-shaped wraithbone',
-    lore: 'Grown from the psychic emanations of ancient spirits.',
+    description: 'Psycho-responsive crystalline growth',
+    lore: 'Resonite is not mined but cultivated — it grows in response to sustained emotional output. Ancient species used Resonite architecture that literally shaped itself to the inhabitants\' moods.',
   },
 
   blackite: {
@@ -2755,7 +2755,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     lore: 'Blackstone remembers the silence before creation.',
   },
 
-  gromril: {
+  urdmetal: {
     ...DEFAULT_PROPERTIES,
     durability: 95,
     weirdness: 30,
@@ -2767,11 +2767,11 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     specialEffects: [
       { type: 'dwarven_craft', magnitude: 50, description: 'Dwarven runes stronger' },
     ],
-    description: 'Dwarven master-metal',
-    lore: 'The finest metal in dwarven holds, hoarded jealously.',
+    description: 'Deep-planetary alloy from Urd Prime\'s mantle',
+    lore: 'Extraordinary density and thermal resistance. The name literally means "world-metal" in proto-Norn. Ettin smiths consider working it a sacred act.',
   },
 
-  ithilmar: {
+  lunaril: {
     ...DEFAULT_PROPERTIES,
     durability: 60,
     weirdness: 45,
@@ -2784,8 +2784,8 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     specialEffects: [
       { type: 'elven_grace', magnitude: 50, description: 'Elven magic enhanced' },
     ],
-    description: 'Elven sea-silver',
-    lore: 'Light as silk, strong as steel, blessed by the sea.',
+    description: 'Light-reactive alloy that shifts color with ambient light',
+    lore: 'Weighs one-third of equivalent steel. Spriggan artisans weave it into fabric-thin armor that rings like a bell when struck.',
   },
 
   hihi_irokane: {
@@ -2806,12 +2806,12 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     lore: 'Metal of the gods, said to be fragments of the sun.',
   },
 
-  celestial_bronze: {
+  astral_bronze: {
     ...DEFAULT_PROPERTIES,
     durability: 75,
     weirdness: 55,
     glows: true,
-    paradigmAffinities: { divine: 80, daemon: 40 },
+    paradigmAffinities: { divine: 80, animus: 40 },
     spellPower: 25,
     protection: 30,
     element: 'fire',
@@ -2820,15 +2820,15 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     specialEffects: [
       { type: 'monster_bane', magnitude: 70, description: 'Harms divine monsters' },
     ],
-    description: 'Bronze blessed by the gods',
-    lore: 'Forged by divine smiths for heroes to wield.',
+    description: 'Bronze alloy forged under starlight',
+    lore: 'Infused with ambient celestial energy during the cooling process. Effective against extraplanar entities. The Valkyr traditionally temper it during meteor showers.',
   },
 
-  stygian_iron: {
+  abyssal_iron: {
     ...DEFAULT_PROPERTIES,
     durability: 80,
     weirdness: 70,
-    paradigmAffinities: { daemon: 80, blood: 40, pact: 30 },
+    paradigmAffinities: { animus: 80, blood: 40, pact: 30 },
     protection: 35,
     element: null,
     moodModifier: -25,
@@ -2836,11 +2836,11 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     specialEffects: [
       { type: 'soul_touch', magnitude: 60, description: 'Damages souls directly' },
     ],
-    description: 'Iron from the underworld',
-    lore: 'Cooled in the River Styx, it touches more than flesh.',
+    description: 'Iron quenched in the deep Underflow waters',
+    lore: 'Quenched in the Underflow — the subterranean river connecting all underground biomes. Carries a chill that never fully dissipates. Affects incorporeal beings as though they were solid.',
   },
 
-  imperial_gold: {
+  sovereign_gold: {
     ...DEFAULT_PROPERTIES,
     durability: 70,
     weirdness: 50,
@@ -2851,10 +2851,10 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     moodModifier: 15,
     atmosphere: 'neutral',
     specialEffects: [
-      { type: 'roman_blessing', magnitude: 50, description: 'Jupiter\'s favor' },
+      { type: 'divine_resonance', magnitude: 50, description: 'Divine favor' },
     ],
-    description: 'Gold consecrated to the gods',
-    lore: 'Sacred to Roman gods, deadly to their enemies.',
+    description: 'Gold alloyed with trace Fateite',
+    lore: 'Sacred to sky-domain deities. Weapons forged from Sovereign Gold carry a faint golden glow visible only to those with divine heritage.',
   },
 
   enchanted_wood: {
@@ -2876,15 +2876,15 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
   },
 
   // ==========================================================================
-  // WARHAMMER/40K MATERIALS
+  // EXOTIC DIMENSIONAL MATERIALS
   // ==========================================================================
 
-  warpstone: {
+  voidite: {
     ...DEFAULT_PROPERTIES,
     durability: 50,
     weirdness: 100,
     glows: true,
-    paradigmAffinities: { wild: 100, dimensional: 70, daemon: 50 },
+    paradigmAffinities: { wild: 100, dimensional: 70, animus: 50 },
     manaRegen: 3.0,
     spellPower: 70,
     element: null,
@@ -2894,11 +2894,11 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
       { type: 'mutation_risk', magnitude: 80, description: 'Causes mutations' },
       { type: 'chaos_affinity', magnitude: 100, description: 'Chaos magic vastly enhanced' },
     ],
-    description: 'Solidified chaos energy',
-    lore: 'Pure crystallized chaos. Incredibly powerful, utterly dangerous.',
+    description: 'Crystallized void-resonance ore',
+    lore: 'Forms where dimensional boundaries thin. Emits a low hum detectable by sensitive species. Unstable — prolonged exposure causes hallucinations mirroring the holder\'s deepest fears.',
   },
 
-  wyrdstone: {
+  fateite: {
     ...DEFAULT_PROPERTIES,
     durability: 45,
     weirdness: 95,
@@ -2912,11 +2912,11 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     specialEffects: [
       { type: 'fate_warping', magnitude: 60, description: 'Probability shifts' },
     ],
-    description: 'Meteoric chaos-touched stone',
-    lore: 'Wyrdstone fell with the comet, and nothing was the same.',
+    description: 'Meteoric mineral from the Convergence of Threads',
+    lore: 'Each fragment contains a frozen moment of probability — smelting it releases the stored potential as heat and light. Diviners prize it above gold.',
   },
 
-  promethium: {
+  ignium: {
     ...DEFAULT_PROPERTIES,
     durability: 40,
     weirdness: 20,
@@ -2928,11 +2928,11 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     specialEffects: [
       { type: 'eternal_flame', magnitude: 50, description: 'Burns indefinitely' },
     ],
-    description: 'Refined fuel of war',
-    lore: 'The lifeblood of the Imperium\'s war machine.',
+    description: 'Self-sustaining combustion gel',
+    lore: 'Refined from deep-vent thermal blooms. Burns without oxygen. The Ven\'thari discovered it can be stabilized with salt-crystal lattices for controlled release.',
   },
 
-  ceramite: {
+  aegisite: {
     ...DEFAULT_PROPERTIES,
     durability: 95,
     weirdness: 15,
@@ -2944,11 +2944,11 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     specialEffects: [
       { type: 'heat_resistance', magnitude: 80, description: 'Immune to heat' },
     ],
-    description: 'Heat-resistant armor plating',
-    lore: 'The ceramite of power armor, proof against plasma.',
+    description: 'Layered ceramic-mineral composite',
+    lore: 'Each layer is fired at a different resonant frequency, creating interference patterns that dissipate kinetic and thermal energy. First developed by Ettin forge-singers.',
   },
 
-  plasteel: {
+  synthalloy: {
     ...DEFAULT_PROPERTIES,
     durability: 85,
     weirdness: 10,
@@ -2958,8 +2958,8 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     moodModifier: 0,
     atmosphere: 'neutral',
     specialEffects: [],
-    description: 'Composite metal-plastic alloy',
-    lore: 'Standard construction material of the far future.',
+    description: 'Programmable metallic composite',
+    lore: 'Internal grain structure can be realigned by applying specific harmonic frequencies. Standard construction material for post-industrial civilizations.',
   },
 
   // ==========================================================================
@@ -3092,7 +3092,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     durability: 75,
     weirdness: 80,
     glows: true,
-    paradigmAffinities: { daemon: 100, blood: 50, pact: 40 },
+    paradigmAffinities: { animus: 100, blood: 50, pact: 40 },
     manaRegen: 1.7,
     spellPower: 40,
     element: 'fire',
@@ -3181,7 +3181,7 @@ export const MATERIAL_EFFECTS: Record<Material, MaterialEffectProperties> = {
     ...DEFAULT_PROPERTIES,
     durability: 10,
     weirdness: 65,
-    paradigmAffinities: { literary: 70, dream: 50, daemon: 30 },
+    paradigmAffinities: { literary: 70, dream: 50, animus: 30 },
     manaRegen: 1.4,
     spellPower: 25,
     element: 'water',

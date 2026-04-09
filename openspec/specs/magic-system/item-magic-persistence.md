@@ -82,7 +82,7 @@ interface MaterialTemplate {
   magicAffinity: number;         // 0-100, how well it holds enchantments
   resonantForms?: Form[];        // Magic forms this material resonates with
 
-  // Inherent effects (mithril glows, etc.)
+  // Inherent effects (Starweave glows, etc.)
   inherentEffects?: EffectExpression[];
 
   // Categories for recipe matching

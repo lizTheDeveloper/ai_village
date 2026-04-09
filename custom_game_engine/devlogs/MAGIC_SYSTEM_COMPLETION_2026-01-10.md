@@ -104,7 +104,7 @@ These failures existed before today's work and are not blockers for gameplay.
 **Paradigms (55 total):**
 - Core: Academic, Divine, Void, Blood, Emotion, Stellar, Nature
 - Dimensional: Dimension, Escalation, Corruption, Travel
-- Creative: Sympathy, Allomancy, Dream, Song, Rune, Debt, Bureaucratic, Luck, Threshold, Belief, Consumption, Silence, Paradox, Echo, Game, Craft, Commerce, Lunar, Seasonal, Age
+- Creative: Tethermancy, Ferromancy, Dream, Song, Rune, Debt, Bureaucratic, Luck, Threshold, Belief, Consumption, Silence, Paradox, Echo, Game, Craft, Commerce, Lunar, Seasonal, Age
 - Animist: Shinto, Daemon
 - Surrealism: Literary Surrealism
 - Whimsical: Narrative, Music, Art, Culinary, Dance, Athletics, Theater, Comedy, Philosophy, History, Architecture, Engineering, Medicine, Law

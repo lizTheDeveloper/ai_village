@@ -33,7 +33,7 @@
   - [cloth](#cloth)
   - [rope](#rope)
   - [plank](#plank)
-  - [mithril_ingot](#mithril-ingot)
+  - [starweave_ingot](#starweave-ingot)
   - [adamantine_ingot](#adamantine-ingot)
   - [leather](#leather)
 - [Equipment](#equipment)
@@ -804,11 +804,11 @@ Wooden Plank is a material item.
 
 ---
 
-### mithril_ingot
+### starweave_ingot
 
-**Mithril Ingot - A material item**
+**Starweave Ingot - A material item**
 
-Mithril Ingot is a material item.
+Starweave Ingot is a material item.
 
 *Tags: `material`*
 

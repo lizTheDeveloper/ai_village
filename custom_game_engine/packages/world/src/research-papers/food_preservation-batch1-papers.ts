@@ -286,7 +286,7 @@ The integration of cold smoking into contemporary culinary practice represents a
 
 ††A virtue allegedly possessed by the legendary smoke-master Bjørn Tålmodigson, who once maintained a smoking operation for three consecutive months without once opening the chamber door, only to discover at the end that he had forgotten to put any fish in. The incident is commemorated annually at the Oslo Institute of Culinary Patience.
 
-‡The IBSCI maintains the world's most extensive database of smoking-related mishaps, catalogued with the sort of bureaucratic thoroughness that would impress the Vogons. Categories include "Premature Temperature Elevation" (43.7% of incidents), "Inadequate Smoke Pathway" (22.1%), "Complete Misunderstanding of the Entire Concept" (18.9%), and "Other" (15.3%, a category that includes the subcategory "Really, We're Not Sure What They Were Attempting").
+‡The IBSCI maintains the world's most extensive database of smoking-related mishaps, catalogued with the sort of bureaucratic thoroughness that would impress the Regulators of Thornhaven. Categories include "Premature Temperature Elevation" (43.7% of incidents), "Inadequate Smoke Pathway" (22.1%), "Complete Misunderstanding of the Entire Concept" (18.9%), and "Other" (15.3%, a category that includes the subcategory "Really, We're Not Sure What They Were Attempting").
 
 ‡‡Or four components if one counts "restraint," though this is generally considered a prerequisite rather than equipment. The absence of restraint has led to what historians call the Great Smoke-Taste Arms Race of 1823, wherein competing fishmongers in Aberdeen kept increasing smoking times until fish emerged so thoroughly smoked they had achieved a texture reminiscent of teak furniture.
 

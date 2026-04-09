@@ -1115,7 +1115,7 @@ export class SteeringComponent extends ComponentBase {
 **Fields:**
 ```typescript
 {
-  ship_type: 'probability_scout' | 'svetz_retrieval' | 'timeline_merger' | 'brainship';
+  ship_type: 'probability_scout' | 'chrono_salvage' | 'timeline_merger' | 'brainship';
   hull: {
     mass: number;              // Ship mass for anchoring capacity
     integrity: number;         // 0.0 to 1.0
@@ -1171,9 +1171,9 @@ interface BranchObservation {
 
 ---
 
-### SvetzRetrievalMissionComponent
-**Type:** `svetz_retrieval_mission`
-**Purpose:** Tracks Svetz retrieval missions for cross-timeline item recovery
+### ChronoSalvageMissionComponent
+**Type:** `chrono_salvage_mission`
+**Purpose:** Tracks Chrono salvage missions for cross-timeline item recovery
 
 **Fields:**
 ```typescript
@@ -1208,9 +1208,9 @@ interface RetrievedItem {
 }
 ```
 
-**Named After:** Larry Niven's time-traveling character Svetz
+**Named After:** Temporal archaeology concept (chrono-salvage operations)
 
-**Usage:** Svetz retrieval ships with active missions
+**Usage:** Chrono salvage ships with active missions
 
 ---
 

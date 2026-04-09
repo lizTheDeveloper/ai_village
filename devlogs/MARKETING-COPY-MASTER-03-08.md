@@ -56,7 +56,7 @@ Agents have needs, memories, personalities, and relationships. They make decisio
 **What's under the hood:**
 
 - **200+ simulated systems** — fire propagation, fluid dynamics, temperature, biomes, weather, disease, genetics, economics, power grids, and more
-- **25+ magic paradigms** — Elemental, Allomancy, Sympathy, Shinto, Alchemy, Divine, Kabbalah, and many more — each fully functional, composable
+- **25+ magic paradigms** — Elemental, Ferromancy, Tethermancy, Shinto, Alchemy, Divine, Kabbalah, and many more — each fully functional, composable
 - **Real genetics and reproduction** — Traits pass from parent to child. Personality is genetic and environmental. Families form dynasties.
 - **Gods that emerge from belief** — Agents develop religious convictions. Collective belief generates divine entities. Gods answer prayers with real in-world effects.
 - **Souls and afterlife** — Every agent has a soul. They're judged after death, enter an afterlife, and can reincarnate with memory bleeds from past lives.

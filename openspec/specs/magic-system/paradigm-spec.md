@@ -211,7 +211,7 @@ type MagicLawType =
   | 'true_names'           // Names have power over things
   | 'belief'               // Collective faith makes real
   | 'equivalent_exchange'  // Must give equal value to receive
-  | 'sympathy'             // Linked things share fate
+  | 'tethermancy'             // Linked things share fate
   | 'paradox'              // Reality fights impossible changes
   | 'iron_vulnerability'   // Magic weakened by cold iron
   | 'threshold'            // Permission/invitation required
@@ -867,7 +867,7 @@ const breathMagic: MagicParadigm = {
 
   sources: [{
     id: 'breath',
-    name: 'BioChromatic Breath',
+    name: 'Pneumantic Breath',
     type: 'internal',
     regeneration: 'none',  // Breaths don't regenerate
     storable: true,        // Can be stored in objects
@@ -1187,7 +1187,7 @@ interface MagicComponent extends Component {
 - ✅ ACADEMIC_PARADIGM (scholarly wizard magic)
 - ✅ PACT_PARADIGM (warlock/patron magic)
 - ✅ NAME_PARADIGM (true name magic, Earthsea-style)
-- ✅ BREATH_PARADIGM (life-force magic, Warbreaker-style)
+- ✅ BREATH_PARADIGM (life-force magic, Animus-style)
 - ✅ DIVINE_PARADIGM (prayer and divine favor)
 - ✅ BLOOD_PARADIGM (hemomancy, life-force sacrifice)
 - ✅ EMOTIONAL_PARADIGM (feeling-based magic)
@@ -1195,12 +1195,12 @@ interface MagicComponent extends Component {
 #### Extended Paradigms (100%)
 - ✅ **Animist Paradigms** (7 paradigms):
   - SHINTO_PARADIGM (Kami worship)
-  - SYMPATHY_PARADIGM (Name of the Wind style)
-  - ALLOMANCY_PARADIGM (Mistborn metal-burning)
+  - TETHERMANCY_PARADIGM (Chorus of Resonance style)
+  - FERROMANCY_PARADIGM (CrucibleBorn metal-burning)
   - DREAM_PARADIGM (lucid dreaming, oneiromancy)
   - SONG_PARADIGM (musical/bardic magic)
   - RUNE_PARADIGM (written symbol magic)
-  - DAEMON_PARADIGM (His Dark Materials style)
+  - ANIMUS_PARADIGM (Animus tradition style)
 
 - ✅ **Creative Paradigms** (10 paradigms):
   - COMMERCE_PARADIGM (buying/selling magic)
@@ -1274,10 +1274,10 @@ interface MagicComponent extends Component {
 - ✅ MagicSkillTreeEvaluator for condition checking
 - ✅ MagicSkillTreeRegistry for centralized management
 - ✅ **Paradigm-specific skill trees** (6 trees):
-  - ALLOMANCY_SKILL_TREE (metal burning progression)
+  - FERROMANCY_SKILL_TREE (metal burning progression)
   - SHINTO_SKILL_TREE (Kami relationship building)
-  - SYMPATHY_SKILL_TREE (binding and slippage mastery)
-  - DAEMON_SKILL_TREE (daemon form settling)
+  - TETHERMANCY_SKILL_TREE (binding and slippage mastery)
+  - ANIMUS_SKILL_TREE (animus form settling)
   - DREAM_SKILL_TREE (dream realm navigation)
   - SONG_SKILL_TREE (musical mastery and choir coordination)
 

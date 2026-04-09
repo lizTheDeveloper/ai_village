@@ -1661,7 +1661,7 @@ function generateNonEuclideanCity(spec: CitySpec, rng: SeededRandom): GeneratedC
         }
         break;
 
-      case 3: // Blob (organic, Cthulhu-esque)
+      case 3: // Blob (organic, eldritch)
         for (let dy = 0; dy < structHeight; dy++) {
           for (let dx = 0; dx < structWidth; dx++) {
             const distFromCenter = Math.sqrt(
@@ -2980,7 +2980,7 @@ function generateAquaticCity(spec: CitySpec, rng: SeededRandom): GeneratedCity {
     spec,
     layout: { width, height, grid, districts: [], streets: [], plots },
     buildings: [],
-    ascii: gridToString(grid) + '\n\n[In the depths, the old ones dream]',
+    ascii: gridToString(grid) + '\n\n[In the depths, the ancient ones dream]',
     stats: {
       totalBuildings: 0,
       totalPlots: plots.length,

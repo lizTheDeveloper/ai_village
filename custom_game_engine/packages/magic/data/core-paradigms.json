@@ -240,7 +240,7 @@
     "id": "names",
     "name": "The Deep Grammar",
     "description": "Magic through knowing and speaking the true names of things",
-    "universeIds": ["naming_realms", "earthsea"],
+    "universeIds": ["naming_realms", "true_speech"],
     "lore": "In the beginning was the Word, and the Word was power. Everything that\nexists has a true name in the Deep Grammar - the language reality itself\nis written in. To know something's name is to have power over it. To know\nyour own name is to know yourself truly.",
     "chorusOrigin": {
       "civilizationId": "seekers",
@@ -716,7 +716,7 @@
     "id": "emotional",
     "name": "The Passionate",
     "description": "Magic powered by intense emotions and feelings",
-    "universeIds": ["passion_realms", "stormlight"],
+    "universeIds": ["passion_realms", "radiant_tradition"],
     "lore": "Emotion is the raw stuff of magic. Rage becomes fire. Grief becomes ice.\nLove heals wounds. Fear protects. Those who feel deeply can channel these\nfeelings into power - but to do so, one must feel truly, and risk being\nconsumed by the very emotions that give strength.",
     "chorusOrigin": {
       "civilizationId": "dreamers",

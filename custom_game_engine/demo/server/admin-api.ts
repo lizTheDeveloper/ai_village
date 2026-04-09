@@ -22,7 +22,8 @@ import { MAGICAL_SPECIES_REGISTRY } from '../../packages/core/src/species/Magica
 import { FOLKLORIST_SPECIES_REGISTRY } from '../../packages/core/src/species/FolkloristSpeciesRegistry.js';
 import { SPRINT13_FOLKLORIST_SPECIES_REGISTRY } from '../../packages/core/src/species/Sprint13FolkloristSpeciesRegistry.js';
 import { SPRINT14_FOLKLORIST_SPECIES_REGISTRY } from '../../packages/core/src/species/Sprint14FolkloristSpeciesRegistry.js';
-import { MVEE_SONG_CATALOGUE } from '../../packages/core/src/data/mvee-songs.js';
+import { SPRINT15_FOLKLORIST_SPECIES_REGISTRY } from '../../packages/core/src/species/Sprint15FolkloristSpeciesRegistry.js';
+import { MVEE_SONG_CATALOGUE} from '../../packages/core/src/data/mvee-songs.js';
 import { NORN_SONG_CATALOGUE, type SongEntry } from '../../packages/core/src/lore/SongSystem.js';
 import * as contentDb from './content-db.js';
 
@@ -87,6 +88,7 @@ function getAllSpecies(): Record<string, SpeciesTemplate> {
     ...FOLKLORIST_SPECIES_REGISTRY,
     ...SPRINT13_FOLKLORIST_SPECIES_REGISTRY,
     ...SPRINT14_FOLKLORIST_SPECIES_REGISTRY,
+    ...SPRINT15_FOLKLORIST_SPECIES_REGISTRY,
   };
 }
 

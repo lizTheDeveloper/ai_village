@@ -132,8 +132,8 @@ function setupMockSkillTrees() {
 
   (registry as any).trees = new Map([
     ['shinto', shintoTree],
-    ['allomancy', allomancyTree],
-    ['sympathy', sympathyTree],
+    ['ferromancy', ferromancyTree],
+    ['tethermancy', tethermancyTree],
   ]);
 }
 ```
@@ -172,7 +172,7 @@ vi.spyOn(ParadigmTreeView.prototype, 'findNodeAtPosition').mockImplementation((t
 **Solution**: Adjusted click coordinates to account for 120px tab width:
 
 ```typescript
-// Click on Allomancy tab (second tab at x=120-239, y < 30)
+// Click on Ferromancy tab (second tab at x=120-239, y < 30)
 const clicked = panel.handleClick(150, 15, mockWorld); // x=150 is in second tab
 ```
 

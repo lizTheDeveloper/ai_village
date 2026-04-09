@@ -125,7 +125,7 @@ type TradeScope =
 ```typescript
 interface SpaceshipComponent {
   type: 'spaceship';
-  ship_type: SpaceshipType;  // Includes: probability_scout, timeline_merger, svetz_retrieval
+  ship_type: SpaceshipType;  // Includes: probability_scout, timeline_merger, chrono_salvage
   navigation: {
     can_navigate_beta_space: boolean;
     contamination_cargo: Array<{
@@ -858,7 +858,7 @@ const RESOURCE_SPAWN_GATING = {
     },
     'temporal_dust': {
       spawnLocations: ['pulsar_emission', 'time_dilation_zone', 'neutron_star_surface'],
-      usedFor: ['temporal_crystal', 'chronometer', 'svetz_retrieval_core'],
+      usedFor: ['temporal_crystal', 'chronometer', 'chrono_salvage_core'],
       note: 'Only forms in extreme gravitational environments',
     },
     'exotic_matter': {
@@ -892,7 +892,7 @@ const RESOURCE_SPAWN_GATING = {
     'timeline_fragment': {
       spawnLocations: ['extinct_universe', 'collapsed_branch'],
       usedFor: ['resurrection_matrix', 'universe_seed'],
-      note: 'Only retrievable via Svetz ships',
+      note: 'Only retrievable via chrono salvage ships',
     },
   },
 };
@@ -965,7 +965,7 @@ const SHIP_RESOURCE_REQUIREMENTS = {
     note: 'Collapses compatible timelines',
   },
 
-  svetz_retrieval: {
+  chrono_salvage: {
     stage: 3,
     resources: {
       home_planet: ['timeline_anchor', 'probability_lens'],
@@ -1482,20 +1482,20 @@ function resolveConflict(
 }
 ```
 
-### 4. Svetz Retrieval Ships
+### 4. Chrono Salvage Ships
 
-**Ship Type:** `svetz_retrieval` (from SpaceshipComponent)
+**Ship Type:** `chrono_salvage` (from SpaceshipComponent)
 
 **Purpose:** Temporal archaeology from extinct timelines
 
 **Mechanics:**
 ```typescript
 /**
- * Svetz retrieval operation
+ * Chrono salvage operation
  * Extract entities/items from extinct timelines
  */
-function performSvetzRetrieval(
-  svetzShip: SpaceshipComponent,
+function performChronoSalvage(
+  salvageShip: SpaceshipComponent,
   extinctBranchId: string,
   targetEntityId: string
 ): RetrievalResult {
@@ -1537,7 +1537,7 @@ function performSvetzRetrieval(
   // Mark as contaminated (from extinct timeline)
   const contaminationLevel = 0.8; // High contamination from extinct branch
 
-  svetzShip.navigation.contamination_cargo.push({
+  salvageShip.navigation.contamination_cargo.push({
     entity_id: retrievedEntity.id,
     source_timeline: extinctBranchId,
     contamination_level: contaminationLevel,
@@ -1786,7 +1786,7 @@ function getFleetTechLevel(fleet: FleetTier): number {
   }
 
   // Stage 3 ships = tech level 3
-  if (shipTypes.probability_scout > 0 || shipTypes.timeline_merger > 0 || shipTypes.svetz_retrieval > 0) {
+  if (shipTypes.probability_scout > 0 || shipTypes.timeline_merger > 0 || shipTypes.chrono_salvage > 0) {
     return 3;
   }
 
@@ -3835,7 +3835,7 @@ This spec defines **multiverse mechanics** for universe forking, travel, and inv
 - Passages (thread, bridge, gate, confluence) with stability/cost
 - Probability scouts observe branches without entering
 - Timeline mergers collapse compatible forks
-- Svetz retrievals extract from extinct timelines
+- Chrono salvages extract from extinct timelines
 - Ships navigate via emotional distance and coherence
 
 **Invasion Scenarios:**

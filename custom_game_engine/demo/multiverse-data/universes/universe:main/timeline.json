@@ -1738,7 +1738,33 @@
       "decayPolicy": {
         "decayAfterTicks": 1728000
       }
+    },
+    {
+      "tick": 620,
+      "timestamp": 1774542496843,
+      "day": 1,
+      "type": "canonical",
+      "fileSize": 1472376,
+      "checksum": "-726fb4da",
+      "filename": "620.json.gz",
+      "decayPolicy": {
+        "neverDecay": true,
+        "preservationReason": "canonical event"
+      }
+    },
+    {
+      "tick": 596,
+      "timestamp": 1774613511090,
+      "day": 1,
+      "type": "canonical",
+      "fileSize": 1746299,
+      "checksum": "-6707b94b",
+      "filename": "596.json.gz",
+      "decayPolicy": {
+        "neverDecay": true,
+        "preservationReason": "canonical event"
+      }
     }
   ],
-  "lastUpdated": 1769980168155
+  "lastUpdated": 1774613511091
 }

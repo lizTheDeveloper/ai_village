@@ -122,8 +122,8 @@ Agents learn spells through skill trees. Spells are composed of verbs and nouns 
 25+ paradigms including:
 - Elemental magic
 - Divine magic (channeling gods)
-- Allomancy (Brandon Sanderson-inspired)
-- Sympathy (linking objects)
+- Ferromancy (Multiverse Chorus canon-inspired)
+- Tethermancy (linking objects)
 - Shinto spirit magic
 - Alchemy
 - And many more!

@@ -81,11 +81,11 @@ Each magic paradigm can exist in one of three states:
 ║                                                                      ║
 ║  ▶ THE BREATH (Life Force Magic)                         [ON ] [OFF]║
 ║                                                                      ║
-║  ▶ ALLOMANCY (Metallic Arts)                             [OFF] [OFF]║
+║  ▶ FERROMANCY (Metallic Arts)                             [OFF] [OFF]║
 ║                                                                      ║
 ║  ▶ SHINTO (Kami Spirit Magic)                            [ON ] [ON ]║
 ║                                                                      ║
-║  ▶ SYMPATHY (Linking Magic)                              [OFF] [OFF]║
+║  ▶ TETHERMANCY (Linking Magic)                              [OFF] [OFF]║
 ║                                                                      ║
 ║  ─────────────────────────────────────────────────────────────────  ║
 ║                                                                      ║

@@ -23,7 +23,7 @@ export const ART_STYLE_PROMPTS: Record<string, {
 }> = {
   nes: {
     era: '8-bit NES (1985-1990)',
-    prompt: 'chunky pixels, limited color palette, simple shading like Super Mario Bros, classic NES aesthetic',
+    prompt: 'chunky pixels, limited color palette, simple flat shading, classic 8-bit platformer aesthetic',
     colorPalette: '56 colors maximum',
     shadingStyle: 'flat shading',
     outlineStyle: 'single color outline',
@@ -31,7 +31,7 @@ export const ART_STYLE_PROMPTS: Record<string, {
   },
   snes: {
     era: '16-bit SNES (1991-1996)',
-    prompt: 'detailed pixels, rich 256-color palette, smooth gradient shading like Chrono Trigger or Secret of Mana',
+    prompt: 'detailed pixels, rich 256-color palette, smooth gradient shading, 16-bit SNES-era RPG aesthetic',
     colorPalette: '256 colors',
     shadingStyle: 'medium shading',
     outlineStyle: 'selective outline',
@@ -39,7 +39,7 @@ export const ART_STYLE_PROMPTS: Record<string, {
   },
   genesis: {
     era: 'Sega Genesis (1988-1997)',
-    prompt: 'bold vibrant colors, dithered gradients, detailed sprites like Sonic the Hedgehog, Sega Genesis style',
+    prompt: 'bold vibrant colors, dithered gradients, detailed sprites, Sega Genesis fast-action aesthetic',
     colorPalette: '512 colors',
     shadingStyle: 'medium shading',
     outlineStyle: 'selective outline',
@@ -47,7 +47,7 @@ export const ART_STYLE_PROMPTS: Record<string, {
   },
   gba: {
     era: 'Game Boy Advance (2001-2008)',
-    prompt: 'bright vibrant colors, clean outlines, polished sprites like Golden Sun or Fire Emblem GBA',
+    prompt: 'bright vibrant colors, clean outlines, polished sprites, portable RPG aesthetic',
     colorPalette: '32,768 colors',
     shadingStyle: 'medium shading',
     outlineStyle: 'single color outline',
@@ -55,7 +55,7 @@ export const ART_STYLE_PROMPTS: Record<string, {
   },
   gameboy: {
     era: 'Game Boy Classic (1989-1998)',
-    prompt: 'monochrome 4-shade green tint palette, simple sprites like Pokemon Red/Blue, Game Boy aesthetic',
+    prompt: 'monochrome 4-shade green tint palette, simple 2-color sprites, 8-bit handheld aesthetic',
     colorPalette: '4 shades of green',
     shadingStyle: 'basic shading',
     outlineStyle: 'single color outline',
@@ -63,7 +63,7 @@ export const ART_STYLE_PROMPTS: Record<string, {
   },
   ps1: {
     era: '32-bit PS1 (1995-2000)',
-    prompt: 'pre-rendered 3D sprites, dithered shading, high detail like Final Fantasy Tactics',
+    prompt: 'pre-rendered 3D sprites, dithered shading, isometric tactical aesthetic',
     colorPalette: 'thousands of colors',
     shadingStyle: 'detailed shading',
     outlineStyle: 'selective outline',
@@ -71,7 +71,7 @@ export const ART_STYLE_PROMPTS: Record<string, {
   },
   neogeo: {
     era: 'Neo Geo Arcade (1990-2004)',
-    prompt: 'massive detailed sprites, hand-drawn quality, bold colors like Metal Slug',
+    prompt: 'massive detailed sprites, hand-drawn quality, bold colors, run-and-gun arcade aesthetic',
     colorPalette: '65,536 colors',
     shadingStyle: 'detailed shading',
     outlineStyle: 'selective outline',

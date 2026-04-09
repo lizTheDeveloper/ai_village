@@ -328,7 +328,7 @@
             "metalTypes": [
               "iron",
               "steel",
-              "mithril"
+              "starweave"
             ]
           }
         },
@@ -980,7 +980,7 @@
       "materials": {
         "wall": "obsidian",
         "floor": "darksteel",
-        "door": "stygian_iron"
+        "door": "abyssal_iron"
       },
       "capacity": 5
     },

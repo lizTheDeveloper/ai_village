@@ -7,9 +7,9 @@
 ## Paradigm-Specific Progression with Discovery and Relationships
 
 > *Dedicated to:*
-> - **Brandon Sanderson** - For magic systems with rules and costs
-> - **Philip Pullman** - For daemons and external souls (*His Dark Materials*)
-> - **Patrick Rothfuss** - For sympathy and the Alar (*The Name of the Wind*)
+> - **Multiverse Chorus canon** - For magic systems with rules and costs
+> - **Animus tradition** - For animus and external souls
+> - **Multiverse Chorus canon** - For tethermancy and the Attunement (*The Chorus of Resonance*)
 > - **Hayao Miyazaki** - For kami and spirits (*Princess Mononoke*, *Spirited Away*)
 > - **Tarn Adams** and *Dwarf Fortress* - For emergent skill progression
 
@@ -17,11 +17,11 @@
 
 ## Overview
 
-Design a **paradigm-specific skill tree system** that integrates with the existing `SkillsComponent` and `MagicComponent`. Each magic paradigm (Shinto, Allomancy, Sympathy, etc.) has its own unique progression path with custom unlock conditions.
+Design a **paradigm-specific skill tree system** that integrates with the existing `SkillsComponent` and `MagicComponent`. Each magic paradigm (Shinto, Ferromancy, Tethermancy, etc.) has its own unique progression path with custom unlock conditions.
 
 ### Core Philosophy
 
-**Magic is not learned—it is discovered, unlocked, and earned.** Some magic comes from bloodline (Allomancy), some from trauma (Snapping), some from relationships (Kami favor), some from pure skill (Sympathy). The skill tree reflects this diversity with flexible unlock conditions that go beyond simple XP gates.
+**Magic is not learned—it is discovered, unlocked, and earned.** Some magic comes from bloodline (Ferromancy), some from trauma (The Crucible), some from relationships (Kami favor), some from pure skill (Tethermancy). The skill tree reflects this diversity with flexible unlock conditions that go beyond simple XP gates.
 
 ### Key Innovations
 
@@ -45,14 +45,14 @@ Magic abilities unlock through diverse conditions, not just XP:
 
 export type UnlockConditionType =
   // Inherent: Born with it or fundamental transformation
-  | 'bloodline'              // Must have specific bloodline (e.g., Allomancer)
-  | 'snapping'               // Must experience trauma (Mistborn)
-  | 'daemon_settled'         // Daemon settles at adulthood (His Dark Materials)
+  | 'bloodline'              // Must have specific bloodline (e.g., Ferromancer)
+  | 'the_crucible'               // Must experience trauma (CrucibleBorn)
+  | 'animus_settled'         // Animus settles at adulthood
   | 'witch_birth'            // Born a witch (rare)
 
   // Discovery: Find something in the world
   | 'kami_met'               // Met a specific kami
-  | 'metal_consumed'         // Consumed a specific metal (Allomancy)
+  | 'metal_consumed'         // Consumed a specific metal (Ferromancy)
   | 'rune_discovered'        // Discovered a rune
   | 'song_learned'           // Learned a song from someone
   | 'name_learned'           // Learned the true name of something
@@ -92,25 +92,25 @@ export interface UnlockCondition {
 
 // Example conditions:
 
-// Allomancy: Must be born Allomancer
-const allomancyBloodline: UnlockCondition = {
+// Ferromancy: Must be born Ferromancer
+const ferromancyBloodline: UnlockCondition = {
   type: 'bloodline',
-  params: { bloodlineId: 'allomancer' },
-  description: 'Must be born an Allomancer',
+  params: { bloodlineId: 'ferromancer' },
+  description: 'Must be born an Ferromancer',
   hidden: false,
   bypassable: false  // Cannot bypass bloodline requirement
 };
 
-// Allomancy: Must experience Snapping trauma
-const snappingTrauma: UnlockCondition = {
-  type: 'snapping',
+// Ferromancy: Must experience The Crucible trauma
+const the_crucibleTrauma: UnlockCondition = {
+  type: 'the_crucible',
   params: { traumaType: 'near_death' },
   description: 'Must experience a near-death trauma to Snap',
   hidden: false,
   bypassable: false
 };
 
-// Allomancy: Discover tin metal
+// Ferromancy: Discover tin metal
 const tinDiscovery: UnlockCondition = {
   type: 'metal_consumed',
   params: { metalId: 'tin' },
@@ -137,11 +137,11 @@ const kamiFavor: UnlockCondition = {
   bypassable: true  // Could bypass with offering/ritual
 };
 
-// Sympathy: Skill requirement
+// Tethermancy: Skill requirement
 const alarStrength: UnlockCondition = {
   type: 'skill_level',
-  params: { skill: 'sympathy', minLevel: 5 },
-  description: 'Reach Sympathy skill level 5',
+  params: { skill: 'tethermancy', minLevel: 5 },
+  description: 'Reach Tethermancy skill level 5',
   hidden: false,
   bypassable: false
 };
@@ -190,17 +190,17 @@ export type MagicSkillEffect =
   | { type: 'modify_cost'; costType: string; multiplier: number }
   ;
 
-// Example: Allomancy Tin Burning
+// Example: Ferromancy Tin Burning
 const tinBurning: MagicSkillNode = {
-  id: 'allomancy_tin',
-  paradigmId: 'allomancy',
+  id: 'ferromancy_tin',
+  paradigmId: 'ferromancy',
   name: 'Tin (Enhanced Senses)',
   description: 'Burn tin to enhance all five senses dramatically',
   category: 'discovery',
   unlockConditions: [
     {
       type: 'node_unlocked',
-      params: { nodeId: 'allomancy_snapped' },
+      params: { nodeId: 'ferromancy_snapped' },
       description: 'Must have Snapped',
       hidden: false,
       bypassable: false
@@ -297,7 +297,7 @@ export interface MagicSkillProgress {
   // State tracking
   purityLevel?: number;                // 0-100
   corruptionLevel?: number;            // 0-100
-  traumaHistory?: TraumaEvent[];       // Past traumas (for Snapping, etc.)
+  traumaHistory?: TraumaEvent[];       // Past traumas (for The Crucible, etc.)
 }
 
 export interface TraumaEvent {
@@ -375,7 +375,7 @@ export class MagicSkillTreeEvaluator {
         return { met: false, reason: `Requires ${bloodlineId} bloodline` };
       }
 
-      case 'snapping': {
+      case 'the_crucible': {
         const requiredType = condition.params.traumaType as string;
         const traumas = progress.traumaHistory || [];
         const hasTrauma = traumas.some(t => t.type === requiredType && t.severity >= 70);
@@ -643,13 +643,13 @@ These systems build on top of this spec:
 **Dependencies:** Existing `SkillsComponent`, `MagicComponent`
 **Integration Points:** `packages/core/src/components/SkillsComponent.ts`
 
-### Phase 2: Allomancy Tree (Bloodline + Discovery)
-- [ ] Define Allomancy bloodline system
+### Phase 2: Ferromancy Tree (Bloodline + Discovery)
+- [ ] Define Ferromancy bloodline system
 - [ ] Create "Snapped" foundation node (trauma unlock)
 - [ ] Create metal discovery nodes (tin, pewter, iron, steel, etc.)
 - [ ] Implement `metal_consumed` discovery tracking
-- [ ] Create advanced nodes (flaring, duralumin)
-- [ ] Distinguish Misting vs Mistborn via bloodline params
+- [ ] Create advanced nodes (flaring, amplium)
+- [ ] Distinguish OreAttuned vs CrucibleBorn via bloodline params
 - [ ] Write integration tests
 
 **Dependencies:** Phase 1
@@ -667,8 +667,8 @@ These systems build on top of this spec:
 **Dependencies:** Phase 1
 **Integration Points:** `PresenceSpectrum`, `AnimistTypes`, deity system
 
-### Phase 4: Sympathy Tree (Skill + Knowledge)
-- [ ] Create foundation nodes (Alar training)
+### Phase 4: Tethermancy Tree (Skill + Knowledge)
+- [ ] Create foundation nodes (Attunement training)
 - [ ] Create link type nodes (heat, kinetic, etc.)
 - [ ] Create slippage reduction nodes
 - [ ] Implement skill-based progression
@@ -676,17 +676,17 @@ These systems build on top of this spec:
 - [ ] Write integration tests
 
 **Dependencies:** Phase 1
-**Integration Points:** Existing sympathy magic system
+**Integration Points:** Existing tethermancy magic system
 
-### Phase 5: Daemon Tree (External Soul)
-- [ ] Create daemon settlement mechanic (adulthood event)
-- [ ] Create form nodes (animal forms daemon can take)
+### Phase 5: Animus Tree (External Soul)
+- [ ] Create animus settlement mechanic (adulthood event)
+- [ ] Create form nodes (animal forms animus can take)
 - [ ] Create separation nodes (painful but powerful)
 - [ ] Add Dust sensitivity mechanics
 - [ ] Write integration tests
 
 **Dependencies:** Phase 1
-**Integration Points:** Daemon component system (if exists)
+**Integration Points:** Animus component system (if exists)
 
 ### Phase 6: Discovery Systems
 - [ ] Create song learning system (hear from others)
@@ -726,13 +726,13 @@ These systems build on top of this spec:
 ## Research Questions
 
 1. **Should XP be paradigm-specific or global?**
-   - **Proposal:** Paradigm-specific. Earning XP in Allomancy doesn't help with Shinto. Prevents "master of all" characters.
+   - **Proposal:** Paradigm-specific. Earning XP in Ferromancy doesn't help with Shinto. Prevents "master of all" characters.
 
 2. **Can a character have multiple paradigms active?**
    - **Proposal:** Yes, but limit to 2-3. Some paradigms conflict (purity-based vs corruption-based).
 
 3. **How do we handle bloodline inheritance?**
-   - **Proposal:** Reproduction system checks both parents. If one is Allomancer, 50% chance child is Allomancer (or use Mendel's genetics).
+   - **Proposal:** Reproduction system checks both parents. If one is Ferromancer, 50% chance child is Ferromancer (or use Mendel's genetics).
 
 4. **Can discoveries be shared between agents?**
    - **Proposal:** Yes! Songs, names, runes can be taught. Metals must be consumed individually. Kami relationships are personal.
@@ -750,12 +750,12 @@ These systems build on top of this spec:
 
 ## Example Skill Trees
 
-### Allomancy Tree (Simplified)
+### Ferromancy Tree (Simplified)
 
 ```
 Foundation:
-  - "Allomancer Heritage" (bloodline: allomancer)
-    └─> "Snapped" (snapping trauma)
+  - "Ferromancer Heritage" (bloodline: ferromancer)
+    └─> "Snapped" (the_crucible trauma)
         ├─> "Tin Burning" (metal_consumed: tin)
         ├─> "Pewter Burning" (metal_consumed: pewter)
         ├─> "Iron Pulling" (metal_consumed: iron)
@@ -763,8 +763,8 @@ Foundation:
         └─> ...
 
 Mastery:
-  - "Flaring" (node_unlocked: any 3 metals, skill_level: allomancy >= 5)
-  - "Duralumin Compounding" (metal_consumed: duralumin, node_unlocked: flaring)
+  - "Flaring" (node_unlocked: any 3 metals, skill_level: ferromancy >= 5)
+  - "Amplium Compounding" (metal_consumed: amplium, node_unlocked: flaring)
 ```
 
 ### Shinto Tree (Simplified)
@@ -785,21 +785,21 @@ Mastery:
   - "Kami Channeling" (node_unlocked: 3+ kami nodes, purity_level: 70)
 ```
 
-### Sympathy Tree (Simplified)
+### Tethermancy Tree (Simplified)
 
 ```
 Foundation:
-  - "Alar Training" (no prerequisites)
-    └─> "Basic Link" (skill_level: sympathy >= 3)
+  - "Attunement Training" (no prerequisites)
+    └─> "Basic Link" (skill_level: tethermancy >= 3)
 
 Technique:
   - "Heat Link" (node_unlocked: basic_link)
   - "Kinetic Link" (node_unlocked: basic_link)
-  - "Slippage Reduction I" (skill_level: sympathy >= 5)
-    └─> "Slippage Reduction II" (skill_level: sympathy >= 8)
+  - "Slippage Reduction I" (skill_level: tethermancy >= 5)
+    └─> "Slippage Reduction II" (skill_level: tethermancy >= 8)
 
 Mastery:
-  - "Binding Creation" (skill_level: sympathy >= 10, node_unlocked: 5+ technique nodes)
+  - "Binding Creation" (skill_level: tethermancy >= 10, node_unlocked: 5+ technique nodes)
 ```
 
 ---
@@ -809,9 +809,9 @@ Mastery:
 1. `packages/core/src/magic/MagicSkillTree.ts` - Core types
 2. `packages/core/src/magic/MagicSkillTreeEvaluator.ts` - Condition logic
 3. `packages/core/src/magic/MagicSkillTreeRegistry.ts` - Registry
-4. `packages/core/src/magic/skillTrees/AllomancyTree.ts` - Allomancy definitions
+4. `packages/core/src/magic/skillTrees/FerromancyTree.ts` - Ferromancy definitions
 5. `packages/core/src/magic/skillTrees/ShintoTree.ts` - Shinto definitions
-6. `packages/core/src/magic/skillTrees/SymPathyTree.ts` - Sympathy definitions
+6. `packages/core/src/magic/skillTrees/TethermancyTree.ts` - Tethermancy definitions
 7. `packages/core/src/magic/skillTrees/DaemonTree.ts` - Daemon definitions
 8. `packages/core/src/systems/MagicProgressionSystem.ts` - XP and unlock handling
 9. `packages/core/src/magic/__tests__/MagicSkillTree.test.ts` - Tests
@@ -843,8 +843,8 @@ Mastery:
 ## Inspiration
 
 This system draws from:
-- **Brandon Sanderson** - Magic with rules and costs (*Mistborn*, *Stormlight*)
-- **Philip Pullman** - Daemons and external souls (*His Dark Materials*)
-- **Patrick Rothfuss** - Sympathy and naming (*The Kingkiller Chronicle*)
+- **Multiverse Chorus canon** - Magic with rules and costs (*CrucibleBorn*, *Stormlight*)
+- **Animus tradition** - Animus and external souls
+- **Multiverse Chorus canon** - Tethermancy and naming (*The resonance_realms Chronicle*)
 - **Hayao Miyazaki** - Kami and spirits (*Studio Ghibli films*)
 - **Dwarf Fortress** - Emergent skill progression and discovery

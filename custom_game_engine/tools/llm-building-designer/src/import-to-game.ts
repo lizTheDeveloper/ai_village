@@ -82,7 +82,7 @@ function calculateResourceCost(
     starlight: 'magic',
     enchanted_wood: 'wood',
     darksteel: 'metal',
-    stygian_iron: 'metal',
+    abyssal_iron: 'metal',
   };
 
   // Get resource for wall material

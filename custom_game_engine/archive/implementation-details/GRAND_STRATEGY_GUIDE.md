@@ -130,12 +130,12 @@ The ship's consciousness is integrated with a biological brain, enabling perfect
 **Contamination:** Very low (0.001 per branch)
 **Collapse Risk:** 1% base, reduced by precision
 
-#### Svetz Retrieval Ship
+#### Chrono Salvage Ship
 **Crew:** Variable
 **Anchoring Capacity:** Based on mass (mass/200 slots)
 **Role:** Recover items from extinct timelines
 
-Named after Larry Niven's time-traveling character, these ships perform "temporal archaeology" - retrieving items that no longer exist in the current timeline.
+These ships perform "temporal archaeology" - retrieving items that no longer exist in the current timeline.
 
 **Mission Phases:**
 1. **Navigating** - Travel to target branch (~67 ticks)

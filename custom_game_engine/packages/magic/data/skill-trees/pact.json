@@ -3,7 +3,7 @@
   "paradigmId": "pact",
   "name": "The Art of Pacts",
   "description": "Make binding contracts with supernatural entities to gain power in exchange for service.",
-  "lore": "Power comes at a price. Always. The art of pacts is about negotiating that\nprice - finding entities willing to bargain, crafting contracts that bind both\nparties, managing obligations without being destroyed by them.\n\nThe entities you can pact with are many and varied:\n- Demons (angels serving dark gods) offer great power for terrible prices\n- Angels (servants of good gods) offer protection for righteous service\n- Fae delight in clever wordplay and exploit ambiguity\n- Spirits want simple things: respect, offerings, help\n- Elder Things offer forbidden knowledge at incomprehensible cost\n\nEvery pact is a binding magical contract enforced by reality itself. Break your\nword and face immediate consequences - loss of power, curses, hunts, even\nunmaking. But fulfill your obligations and the power is yours.\n\nThe greatest pact-makers don't just serve entities - they bind the entities\nthemselves. Through perfect contract wording, overwhelming magical power, or\ntrue name knowledge, you can reverse the relationship entirely. The demon serves\nYOU. The angel obeys YOUR commands.\n\nBut this is dangerous ground. Cosmic forces notice when mortals bind their\nservants. And entities don't forgive such presumption easily.",
+  "lore": "Power comes at a price. Always. The art of pacts is about negotiating that\nprice - finding entities willing to bargain, crafting contracts that bind both\nparties, managing obligations without being destroyed by them.\n\nThe entities you can pact with are many and varied:\n- Demons (angels serving dark gods) offer great power for terrible prices\n- Angels (servants of good gods) offer protection for righteous service\n- Fae delight in clever wordplay and exploit ambiguity\n- Spirits want simple things: respect, offerings, help\n- Primordial Architects offer forbidden knowledge at incomprehensible cost\n\nEvery pact is a binding magical contract enforced by reality itself. Break your\nword and face immediate consequences - loss of power, curses, hunts, even\nunmaking. But fulfill your obligations and the power is yours.\n\nThe greatest pact-makers don't just serve entities - they bind the entities\nthemselves. Through perfect contract wording, overwhelming magical power, or\ntrue name knowledge, you can reverse the relationship entirely. The demon serves\nYOU. The angel obeys YOUR commands.\n\nBut this is dangerous ground. Cosmic forces notice when mortals bind their\nservants. And entities don't forgive such presumption easily.",
   "nodes": [
     {
       "id": "entity-sense",
@@ -250,7 +250,7 @@
         {
           "type": "unlock_ability",
           "baseValue": 1,
-          "description": "Make contracts with Elder Things",
+          "description": "Make contracts with Primordial Architects",
           "target": {
             "abilityId": "elder_pact"
           }
@@ -266,7 +266,7 @@
         }
       ],
       "conditionMode": "all",
-      "lore": "Elder Things exist beyond morality, beyond comprehension. They offer\nforbidden knowledge and reality-warping power. But their costs are\nequally incomprehensible - fragments of your sanity, pieces of your\nhumanity, changes to your very existence. Proceed with extreme caution.",
+      "lore": "Primordial Architects exist beyond morality, beyond comprehension. They offer\nforbidden knowledge and reality-warping power. But their costs are\nequally incomprehensible - fragments of your sanity, pieces of your\nhumanity, changes to your very existence. Proceed with extreme caution.",
       "prerequisites": [
         "demon-pacts",
         "angel-pacts"

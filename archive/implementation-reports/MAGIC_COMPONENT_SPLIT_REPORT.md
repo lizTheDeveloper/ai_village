@@ -86,8 +86,8 @@ All new components created in `custom_game_engine/packages/core/src/components/`
 - Dream magic (sleeping, inNightmare, currentDreamDepth)
 - Song magic (hasInstrument, inChoir, currentSong)
 - Rune magic (preparedRunes, knownRunes, activeBindrunes)
-- Sympathy magic (linkQuality, alarSplits, activeBindings)
-- Allomancy (burnRate, metalReserves, mistingType, savantLevels)
+- Tethermancy magic (linkQuality, alarSplits, activeBindings)
+- Ferromancy (burnRate, metalReserves, ore_attunedType, savantLevels)
 - Daemon magic (daemonId, daemonSettled, settlementStatus)
 
 ---

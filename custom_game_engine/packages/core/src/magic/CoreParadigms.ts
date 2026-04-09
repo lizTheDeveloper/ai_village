@@ -317,7 +317,7 @@ export const NAME_PARADIGM: MagicParadigm = {
   id: 'names',
   name: 'The Deep Grammar',
   description: 'Magic through knowing and speaking the true names of things',
-  universeIds: ['naming_realms', 'earthsea'],
+  universeIds: ['naming_realms'],
 
   lore: `In the beginning was the Word, and the Word was power. Everything that
 exists has a true name in the Deep Grammar - the language reality itself
@@ -906,7 +906,7 @@ export const EMOTIONAL_PARADIGM: MagicParadigm = {
   id: 'emotional',
   name: 'The Passionate',
   description: 'Magic powered by intense emotions and feelings',
-  universeIds: ['passion_realms', 'stormlight'],
+  universeIds: ['passion_realms', 'radiant_tradition'],
 
   lore: `Emotion is the raw stuff of magic. Rage becomes fire. Grief becomes ice.
 Love heals wounds. Fear protects. Those who feel deeply can channel these

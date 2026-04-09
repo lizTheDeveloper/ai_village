@@ -1822,7 +1822,7 @@ const TRAVEL_PROGRESSION = {
   // Stage 3: Multi-Universe (inter-universe travel)
   multiversal: {
     requiredTech: ['probability_theory', 'timeline_mechanics', 'passage_navigation'],
-    requiredShips: ['probability_scout', 'timeline_merger', 'svetz_retrieval'],
+    requiredShips: ['probability_scout', 'timeline_merger', 'chrono_salvage'],
     prerequisites: ['interstellar'],  // Must master multi-star first
     unlocksResources: [
       // Resources ONLY found via inter-universe travel
@@ -2484,7 +2484,7 @@ const INTER_UNIVERSE_EXCLUSIVE_RESOURCES = {
     },
   },
 
-  // From extinct timelines (no longer reachable except via Svetz ships)
+  // From extinct timelines (no longer reachable except via chrono salvage ships)
   extinct_timeline_salvage: {
     'final_moment_essence': {
       rarity: 'legendary',
@@ -3285,7 +3285,7 @@ const SPECTRUM_TO_PLANETS: Record<string, UniversePlanetConfig> = {
   },
 
   /**
-   * LOW_FANTASY - Rare, subtle magic (Game of Thrones early seasons)
+   * LOW_FANTASY - Rare, subtle magic
    * Mostly scientific + corrupted (rare, distant threats)
    */
   low_fantasy: {
@@ -3308,7 +3308,7 @@ const SPECTRUM_TO_PLANETS: Record<string, UniversePlanetConfig> = {
   },
 
   /**
-   * CLASSIC_FANTASY - D&D style (Forgotten Realms)
+   * CLASSIC_FANTASY - Rule-based systems
    * All planet types available, fantasy planets common
    */
   classic_fantasy: {
@@ -3387,7 +3387,7 @@ const SPECTRUM_TO_PLANETS: Record<string, UniversePlanetConfig> = {
   },
 
   /**
-   * HARD_MAGIC - Systematic, rule-based (Mistborn, Name of the Wind)
+   * HARD_MAGIC - Systematic, rule-based (CrucibleBorn, Chorus of Resonance)
    * Scientific planets + crystal (magic as systematic science)
    */
   hard_magic: {
@@ -3396,7 +3396,7 @@ const SPECTRUM_TO_PLANETS: Record<string, UniversePlanetConfig> = {
       'terrestrial', 'super_earth', 'desert', 'ice', 'ocean',
       'volcanic', 'carbon', 'iron', 'tidally_locked', 'hycean',
       'rogue', 'gas_dwarf', 'moon',
-      'crystal',  // Allomancy metals, sympathy sources
+      'crystal',  // Ferromancy metals, tethermancy sources
     ],
     excludedPlanetTypes: ['magical', 'corrupted', 'fungal'],  // Too "soft"
     rarityCurve: {
@@ -3437,7 +3437,7 @@ const SPECTRUM_TO_PLANETS: Record<string, UniversePlanetConfig> = {
   },
 
   /**
-   * WILD_MAGIC - Chaotic, unpredictable (Xanth-style)
+   * WILD_MAGIC - Chaotic, unpredictable
    * Everything possible, chaos reigns
    */
   wild_magic: {

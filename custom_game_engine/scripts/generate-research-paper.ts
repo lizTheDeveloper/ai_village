@@ -2,11 +2,12 @@
 /**
  * Research Paper Generator
  *
- * Uses Anthropic API to generate research papers in the style of:
- * - Terry Pratchett (witty, observational humor)
- * - Walter Moers (fantastical elaborations)
- * - Douglas Adams (bureaucratic absurdity)
- * - Neil Gaiman (mythological weight)
+ * Uses Anthropic API to generate research papers in a witty, footnote-heavy
+ * academic parody style combining:
+ * - Witty, observational humor with practical wisdom
+ * - Fantastical elaborations and invented details
+ * - Bureaucratic absurdity and precise statistics
+ * - Mythological weight and ancient history
  */
 
 import Anthropic from '@anthropic-ai/sdk';
@@ -31,31 +32,31 @@ interface PaperSpec {
   keyPoints: string[]; // Main points to cover
 }
 
-const PAPER_GENERATION_PROMPT = `You are an expert at writing academic research papers in the distinctive combined style of Terry Pratchett, Walter Moers, Douglas Adams, and Neil Gaiman.
+const PAPER_GENERATION_PROMPT = `You are an expert at writing academic research papers in a witty, footnote-heavy academic parody style.
 
 Your task is to write a research paper about a technical/magical topic, but infused with:
 
-**Terry Pratchett Style:**
+**Observational Humor Style:**
 - Witty footnotes that are as entertaining as the main text
 - Observational humor about the absurdity of the subject
 - Practical wisdom wrapped in comedy
 - References to historical incidents that sound plausible but are ridiculous
 - Use asterisks: *, **, ***, etc.
 
-**Walter Moers Style:**
+**Fantastical Elaboration Style:**
 - Fantastical elaborations and invented details
 - Made-up creatures, places, and incidents
 - Elaborate digressions that add flavor
 - Nested footnotes (footnotes within footnotes)
 - Use symbols: †, ††, †††, ‡, ‡‡, ‡‡‡, etc.
 
-**Douglas Adams Style:**
+**Bureaucratic Absurdity Style:**
 - Bureaucratic absurdity and precise statistics
 - Overly specific measurements and percentages
 - Commentary on institutional dysfunction
 - The contrast between cosmic importance and mundane detail
 
-**Neil Gaiman Style:**
+**Mythological Weight Style:**
 - Mythological weight and ancient history
 - References to old gods, forgotten knowledge
 - A sense of things older and stranger than understood
@@ -120,7 +121,7 @@ ${spec.contributesTo.map(c => `- ${c.type}: ${c.id}`).join('\n')}
 
 Write the paper with:
 - 3-5 paragraphs of main text
-- 15-20+ footnotes in the mixed Pratchett/Moers/Adams/Gaiman style
+- 15-20+ footnotes in the witty, footnote-heavy academic parody style
 - An abstract (1-2 sentences)
 - Extensive humor and absurdity
 - Cautionary tales and historical incidents
@@ -240,7 +241,7 @@ async function generatePaperFile(
   const fileContent = `/**
  * Generated Research Papers
  *
- * Auto-generated using AI with Pratchett/Moers/Adams/Gaiman style
+ * Auto-generated using AI with witty, footnote-heavy academic parody style
  */
 
 import type { ResearchPaper } from './types.js';

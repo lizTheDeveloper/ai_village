@@ -179,7 +179,7 @@ When branches are merged:
 2. Original branches are marked as `merged`
 3. Original snapshots are preserved for:
    - Time travel (can still load old saves)
-   - Temporal archaeology (Svetz retrieval ships)
+   - Temporal archaeology (Chrono salvage ships)
    - Recovery/debugging
 
 **Implementation:** `markBranchAsMerged()` in MergeHelpers.ts

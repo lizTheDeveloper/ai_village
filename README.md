@@ -40,7 +40,7 @@ Built on an ECS architecture with 200+ systems across 19 packages.
 
 | Category | Highlights |
 |----------|-----------|
-| **Magic** | 25+ paradigms (Shinto, Allomancy, Sympathy...), skill trees, spell composition |
+| **Magic** | 25+ paradigms (Shinto, Ferromancy, Tethermancy...), skill trees, spell composition |
 | **Divinity** | Gods, temples, prayers, miracles, theology |
 | **Life** | Reproduction, genetics, families, souls, reincarnation |
 | **Environment** | Fire propagation, fluid dynamics, temperature, weather |

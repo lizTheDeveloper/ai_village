@@ -326,7 +326,7 @@ Time estimates are LEARNED, not innate. An agent only knows how long something t
 | 2 | rope, cloth, plank, fishing_rod |
 | 3 | iron_tools, leather_armor, furniture |
 | 4 | steel_items, fine_clothing, machinery |
-| 5 | mithril_items, enchanted_gear, master_crafts |
+| 5 | starweave_items, enchanted_gear, master_crafts |
 
 **Buildings Visible:**
 | Level | Crafting Buildings |

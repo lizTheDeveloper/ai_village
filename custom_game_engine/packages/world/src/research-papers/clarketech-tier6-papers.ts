@@ -42,7 +42,7 @@ FOOTNOTES:
 
 †† Primarily located in the vestibular system, proprioceptive feedback networks, and what neuroscientist Dr. Henrietta Marks calls "that bit in the back that gets annoyed when physics stops working properly." Dr. Marks received a Nobel Prize for this description. The committee noted it was "refreshingly honest."
 
-‡ The brain's surrender is accompanied by a measurable change in neural activity, specifically a decrease in what researchers call "reality interrogation signals." This is the neural equivalent of the brain sighing and saying, "Fine. We're in Narnia now. Whatever."
+‡ The brain's surrender is accompanied by a measurable change in neural activity, specifically a decrease in what researchers call "reality interrogation signals." This is the neural equivalent of the brain sighing and saying, "Fine. We're in uncharted territory now. Whatever."
 
 ‡‡ A phrase which emerged from a legal settlement requiring the Institute to stop using terms like "vomit scenario," "reality rejection event," and "the bad thing that happened to Jenkins."
 
@@ -175,7 +175,7 @@ The crowning achievement of haptic research remains the Virtual Pet Interface***
 
 ******Some objects have never existed for very good reasons. Attempting to simulate their resistance through haptic feedback has occasionally caused those reasons to become temporarily corporeal, leading to Form 47-B ("Incident Report: Manifestation of Previously Theoretical Danger").
 
-†††††The margin of error for simulating the resistance of objects that exist in other dimensions cannot be expressed in Newtons and must instead be measured in Lovecrafts, a unit describing the amount of existential unease generated per second of contact.
+†††††The margin of error for simulating the resistance of objects that exist in other dimensions cannot be expressed in Newtons and must instead be measured in Abyssos, a unit describing the amount of existential unease generated per second of contact.
 
 ‡‡‡‡Mechanical actuators remain the preferred method because they actually exist, which provides a comforting ontological foundation for the entire endeavor. The haptics research community values this foundation more than outsiders might expect.
 
@@ -1217,7 +1217,7 @@ The uncomfortable truth, whispered in the corridors of the Institute for Artific
 
 † This method was attempted by Professor Emeritus Wendell Cragglesworth III in 1867, working with Charles Babbage's Analytical Engine. The project was abandoned after 847 pages of whisker specifications and still had not addressed the tail. The manuscripts are preserved in the British Museum's Department of Promising Ideas That Went Nowhere Fast.
 
-‡ The Symposium, held at a particularly unfortunate location halfway between Yale and the Miskatonic University†, concluded that most mathematical problems could be solved by having a drink and thinking about something else for a while. This turned out to be more prophetic than intended.
+‡ The Symposium, held at a particularly unfortunate location halfway between Yale and the Meridian Institute†, concluded that most mathematical problems could be solved by having a drink and thinking about something else for a while. This turned out to be more prophetic than intended.
 
 †† One AI trained to classify images famously learned to detect the presence of grass in the background as a reliable indicator that an image contained a sheep. This worked brilliantly until someone photographed a sheep indoors. The Guild of Ovine Recognition Studies has never recovered from the embarrassment.
 

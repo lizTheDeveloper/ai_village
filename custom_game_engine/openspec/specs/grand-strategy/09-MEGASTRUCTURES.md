@@ -95,7 +95,7 @@ The existing production chain already includes high-tier materials for megastruc
 **Tier 6 Ship Modules** (repurposable for megastructures):
 - `timeline_merger_core` - Ultimate clarketech (200,000 value, 1200 crafting time)
 - `probability_drive` - Probability navigation (80,000 value)
-- `svetz_retrieval_engine` - Temporal engineering (60,000 value)
+- `chrono_salvage_engine` - Temporal engineering (60,000 value)
 
 **This spec defines HOW these materials scale from hand-crafting (shipyard) to mega-industry (Dyson-powered forge).**
 

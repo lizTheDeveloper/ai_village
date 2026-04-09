@@ -98,7 +98,7 @@ const SNES_PARTS: PartSpec[] = [
   { id: 'head_demon', category: 'head', description: `${STYLE}, demon head, red skin with horns, glowing eyes, menacing`, width: 64, height: 64, tags: ['demon', 'horns', 'evil'] },
   { id: 'head_skull', category: 'head', description: `${STYLE}, skeleton skull head, bone white, empty eye sockets`, width: 64, height: 64, tags: ['skull', 'undead', 'bone'] },
   { id: 'head_cat', category: 'head', description: `${STYLE}, cat head, feline features with whiskers and ears, furry`, width: 64, height: 64, tags: ['cat', 'feline', 'furry'] },
-  { id: 'head_octopus', category: 'head', description: `${STYLE}, octopus head, tentacle face like Cthulhu, aquatic`, width: 64, height: 64, tags: ['octopus', 'tentacles', 'lovecraft'] },
+  { id: 'head_octopus', category: 'head', description: `${STYLE}, octopus head, tentacle face, abyssal elder, aquatic`, width: 64, height: 64, tags: ['octopus', 'tentacles', 'eldritch'] },
   { id: 'head_robot', category: 'head', description: `${STYLE}, robot head, metal with glowing visor, mechanical`, width: 64, height: 64, tags: ['robot', 'metal', 'visor'] },
   { id: 'head_slime', category: 'head', description: `${STYLE}, slime head, gelatinous blob with eyes, translucent`, width: 64, height: 64, tags: ['slime', 'blob', 'eyes'] },
   { id: 'head_bird', category: 'head', description: `${STYLE}, bird head, eagle-like with beak and feathers`, width: 64, height: 64, tags: ['bird', 'eagle', 'beak'] },

@@ -6,6 +6,13 @@ Format: [Semantic Versioning](https://semver.org/). Newest first.
 
 ---
 
+## v0.3.1 — 2026-03-29
+
+### Fixes
+- **Hand pickup lore discovery wiring** — context-menu `Pick Up (Hand)` now emits `hand:carry`, and `hand:carry` emits `lore:discovery` species encounter events, so pickup interactions are exported to the Akashic lore pipeline instead of only affecting biochemistry
+
+---
+
 ## v0.3.0 — 2026-03-28
 
 ### What's New

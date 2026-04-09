@@ -52,9 +52,9 @@ Each paradigm has a fully populated skill tree with unlock conditions:
 - `DivineSkillTree.ts` - Domains, clerical ranks, miracles
 - `BloodSkillTree.ts` - Bloodlines, sacrifice scales
 - `EmotionalSkillTree.ts` - Emotion categories, storage methods
-- `AllomancySkillTree.ts` - Metal types, Mistborn abilities
+- `FerromancySkillTree.ts` - Metal types, CrucibleBorn abilities
 - `ShintoSkillTree.ts` - Kami types, purity states
-- `SympathySkillTree.ts` - Links, binding principles
+- `TethermancySkillTree.ts` - Links, binding principles
 - `DaemonSkillTree.ts` - Forms, Dust interactions
 - `DreamSkillTree.ts` - Realms, time dilation
 - `SongSkillTree.ts` - Song types, harmony

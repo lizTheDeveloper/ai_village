@@ -84,7 +84,7 @@ const tabText = ctx.fillText.mock.calls.filter((call: any[]) => call[2] < 50);
 
 // After: Check for specific paradigm names
 const tabText = ctx.fillText.mock.calls.filter((call: any[]) =>
-  ['Shinto', 'Allomancy', 'Sympathy'].includes(call[0])
+  ['Shinto', 'Ferromancy', 'Tethermancy'].includes(call[0])
 );
 ```
 
