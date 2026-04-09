@@ -110,6 +110,14 @@ rm -rf demo/dist/assets/sprites/pixellab
 cp -r packages/renderer/assets/sprites/pixellab demo/dist/assets/sprites/pixellab
 log "Sprite assets copied (pixellab: $(ls demo/dist/assets/sprites/pixellab | wc -l) folders)"
 
+# Copy sprite-manifest.json — the renderer needs it to resolve species→sprite mappings
+if [ -f packages/renderer/assets/sprites/sprite-manifest.json ]; then
+    cp packages/renderer/assets/sprites/sprite-manifest.json demo/dist/assets/sprites/pixellab/sprite-manifest.json
+    log "Sprite manifest copied."
+else
+    warn "sprite-manifest.json not found — sprites may not load in production."
+fi
+
 # --- Step 4: Sync to Hetzner ---
 log "Syncing build artifacts to $DEPLOY_HOST:$DEPLOY_PATH..."
 
