@@ -663,24 +663,40 @@ export class PlanetStorage {
 
   /**
    * Read and decompress data from file
+   * Uses explicit error handlers on both streams to prevent unhandled error events
+   * from crashing the process (Node.js streams can emit errors after pipeline rejects).
    */
   private async decompressAndRead(filePath: string): Promise<string> {
-    const chunks: Buffer[] = [];
+    return new Promise((resolve, reject) => {
+      const chunks: Buffer[] = [];
+      let rejected = false;
 
-    try {
       const readable = createReadStream(filePath);
       const gunzip = createGunzip();
 
+      const fail = (err: Error) => {
+        if (rejected) return;
+        rejected = true;
+        readable.destroy();
+        gunzip.destroy();
+        const code = (err as NodeJS.ErrnoException).code;
+        console.error(`[PlanetStorage] Failed to decompress ${filePath} (${code ?? 'unknown'}): ${err}`);
+        reject(new Error(`Corrupted gz file: ${filePath}`));
+      };
+
+      readable.on('error', fail);
+      gunzip.on('error', fail);
+
       gunzip.on('data', (chunk: Buffer) => chunks.push(chunk));
 
-      await pipeline(readable, gunzip);
+      gunzip.on('end', () => {
+        if (!rejected) {
+          resolve(Buffer.concat(chunks).toString('utf-8'));
+        }
+      });
 
-      return Buffer.concat(chunks).toString('utf-8');
-    } catch (err: unknown) {
-      const code = (err as NodeJS.ErrnoException).code;
-      console.error(`[PlanetStorage] Failed to decompress ${filePath} (${code ?? 'unknown'}): ${err}`);
-      throw new Error(`Corrupted gz file: ${filePath}`);
-    }
+      readable.pipe(gunzip);
+    });
   }
 
   /**
