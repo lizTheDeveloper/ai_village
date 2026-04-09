@@ -176,6 +176,14 @@ export class CreatureImportFactory {
     // Step 2: Integrity Verification
     // -----------------------------------------------------------------------
 
+    // Validate provenance exists before accessing checksum.
+    if (!payload.provenance) {
+      throw new CreatureImportError(
+        'schema_invalid',
+        'Payload missing provenance section; cannot verify integrity',
+      );
+    }
+
     // Validate checksum field exists and is a non-empty string.
     // Full SHA-256 verification is deferred — field presence is enforced here.
     const checksum = payload.provenance.checksum;
