@@ -39,6 +39,7 @@ jobs:
       - name: Stub external file deps (folkfork-bridge lives outside this repo)
         run: |
           PKG=node_modules/@multiverse-studios/folkfork-bridge
+          rm -rf "$PKG"
           mkdir -p "$PKG"
           cp packages/core/src/typings/folkfork-bridge.d.ts "$PKG/index.d.ts"
           echo '{"name":"@multiverse-studios/folkfork-bridge","version":"0.0.0","types":"index.d.ts","main":"index.js"}' > "$PKG/package.json"
