@@ -26,6 +26,11 @@ export class ThreatIndicatorRenderer {
   // Track active threats
   private threats: Map<string, { entityId: string; severity: string; timestamp: number }> = new Map();
 
+  // Bound handler references for correct event unsubscription
+  private boundHandleConflictStarted: (event: any) => void;
+  private boundHandleConflictResolved: (event: any) => void;
+  private boundHandleDeath: (event: any) => void;
+
   // PERFORMANCE: Cache player entity to avoid O(n) search every frame (90% reduction)
   private cachedPlayerEntity: Entity | null = null;
 
@@ -79,10 +84,15 @@ export class ThreatIndicatorRenderer {
     }
     this.ctx = ctx;
 
+    // Store bound handlers so the same references can be used in cleanup()
+    this.boundHandleConflictStarted = this.handleConflictStarted.bind(this);
+    this.boundHandleConflictResolved = this.handleConflictResolved.bind(this);
+    this.boundHandleDeath = this.handleDeath.bind(this);
+
     // Subscribe to conflict events
-    this.eventBus.on('conflict:started', this.handleConflictStarted.bind(this));
-    this.eventBus.on('conflict:resolved', this.handleConflictResolved.bind(this));
-    this.eventBus.on('death:occurred', this.handleDeath.bind(this));
+    this.eventBus.on('conflict:started', this.boundHandleConflictStarted);
+    this.eventBus.on('conflict:resolved', this.boundHandleConflictResolved);
+    this.eventBus.on('death:occurred', this.boundHandleDeath);
   }
 
   /**
@@ -401,8 +411,8 @@ export class ThreatIndicatorRenderer {
    * Cleanup event listeners
    */
   public cleanup(): void {
-    this.eventBus.off('conflict:started', this.handleConflictStarted.bind(this));
-    this.eventBus.off('conflict:resolved', this.handleConflictResolved.bind(this));
-    this.eventBus.off('death:occurred', this.handleDeath.bind(this));
+    this.eventBus.off('conflict:started', this.boundHandleConflictStarted);
+    this.eventBus.off('conflict:resolved', this.boundHandleConflictResolved);
+    this.eventBus.off('death:occurred', this.boundHandleDeath);
   }
 }

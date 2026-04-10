@@ -112,6 +112,8 @@ export class SongSystem extends BaseSystem {
   private audioUnlocked = false;
   /** Queued crossfade request if one arrives while fading */
   private queuedCrossfade: { url: string; occasion: SongOccasion } | null = null;
+  /** Unsubscribe functions for all event subscriptions */
+  private unsubscribers: (() => void)[] = [];
   /** Bound handler so we can remove it after first gesture */
   private readonly onUserGesture = (): void => {
     this.audioUnlocked = true;
@@ -171,29 +173,39 @@ export class SongSystem extends BaseSystem {
 
   private subscribeToEvents(): void {
     // Birth: agent:birth, agent:born
-    this.events.on('agent:birth', () => this.onGameEvent('birth'));
-    this.events.on('agent:born', () => this.onGameEvent('birth'));
+    this.unsubscribers.push(this.events.on('agent:birth', () => this.onGameEvent('birth')));
+    this.unsubscribers.push(this.events.on('agent:born', () => this.onGameEvent('birth')));
 
     // Hearth: courtship:romance, courtship:consent, conception
-    this.events.on('courtship:romance', () => this.onGameEvent('hearth'));
-    this.events.on('courtship:consent', () => this.onGameEvent('hearth'));
-    this.events.on('conception', () => this.onGameEvent('hearth'));
+    this.unsubscribers.push(this.events.on('courtship:romance', () => this.onGameEvent('hearth')));
+    this.unsubscribers.push(this.events.on('courtship:consent', () => this.onGameEvent('hearth')));
+    this.unsubscribers.push(this.events.on('conception', () => this.onGameEvent('hearth')));
 
     // Elder: agent:age_milestone (filter for elder)
-    this.events.on('agent:age_milestone', (data: { newCategory?: string }) => {
+    this.unsubscribers.push(this.events.on('agent:age_milestone', (data: { newCategory?: string }) => {
       if (data.newCategory === 'elder') {
         this.onGameEvent('elder');
       }
-    });
+    }));
 
     // Warning: combat:attack, predator:attack, combat:started
-    this.events.on('combat:attack', () => this.onGameEvent('warning'));
-    this.events.on('predator:attack', () => this.onGameEvent('warning'));
-    this.events.on('combat:started', () => this.onGameEvent('warning'));
+    this.unsubscribers.push(this.events.on('combat:attack', () => this.onGameEvent('warning')));
+    this.unsubscribers.push(this.events.on('predator:attack', () => this.onGameEvent('warning')));
+    this.unsubscribers.push(this.events.on('combat:started', () => this.onGameEvent('warning')));
 
     // Grief: agent:died, agent:death (overrides cooldown)
-    this.events.on('agent:died', () => this.onGameEvent('grief'));
-    this.events.on('agent:death', () => this.onGameEvent('grief'));
+    this.unsubscribers.push(this.events.on('agent:died', () => this.onGameEvent('grief')));
+    this.unsubscribers.push(this.events.on('agent:death', () => this.onGameEvent('grief')));
+  }
+
+  protected onCleanup(): void {
+    for (const unsub of this.unsubscribers) {
+      unsub();
+    }
+    this.unsubscribers = [];
+    this.removeGestureListeners();
+    this.stopCurrent();
+    this.initialized = false;
   }
 
   // ============================================================================

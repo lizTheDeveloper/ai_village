@@ -178,6 +178,9 @@ export class LLMScheduler {
   private metrics: SchedulerMetrics;
   private planetZoneRegistry: Map<string, CognitionZone> = new Map();
 
+  private lastCleanupTick = 0;
+  private readonly CLEANUP_INTERVAL = 6000; // ~5 minutes at 20 TPS
+
   constructor(
     queue: LLMDecisionQueue,
     config?: Partial<Record<DecisionLayer, Partial<LayerConfig>>>
@@ -440,6 +443,12 @@ export class LLMScheduler {
         return null;
       }
       // Otherwise, afterlife soul can speak
+    }
+
+    // Periodic cleanup of stale agent states to prevent unbounded Map growth
+    if (world.tick - this.lastCleanupTick >= this.CLEANUP_INTERVAL) {
+      this.cleanupOldStates();
+      this.lastCleanupTick = world.tick;
     }
 
     const selection = this.selectLayer(agent, world);
