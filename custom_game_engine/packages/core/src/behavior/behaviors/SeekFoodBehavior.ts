@@ -162,7 +162,7 @@ export class SeekFoodBehavior extends BaseBehavior {
       }
     }
 
-    // No food and no farming opportunity — wander to explore
+    // No food and no farming opportunity — wander toward home with bias
     const movement = entity.getComponent(ComponentType.Movement);
     if (movement && agentPosition) {
       let wanderAngle = agent.behaviorState?.wanderAngle as number | undefined;
@@ -170,6 +170,39 @@ export class SeekFoodBehavior extends BaseBehavior {
         wanderAngle = Math.random() * Math.PI * 2;
       }
       wanderAngle += (Math.random() - 0.5) * (Math.PI / 18);
+
+      // Apply home bias to prevent agents from drifting into wilderness
+      const homeRadius = agent.homePreferences?.homeRadius ?? 20;
+      // Use assigned bed or origin as home anchor
+      let homeX = 0, homeY = 0;
+      if (agent.assignedBed) {
+        const bedEntity = world.getEntity(agent.assignedBed);
+        if (bedEntity) {
+          const bedPos = bedEntity.getComponent(ComponentType.Position);
+          if (bedPos) {
+            homeX = bedPos.x;
+            homeY = bedPos.y;
+          }
+        }
+      }
+
+      const dx = agentPosition.x - homeX;
+      const dy = agentPosition.y - homeY;
+      const distSq = dx * dx + dy * dy;
+      const homeRadiusSq = homeRadius * homeRadius;
+
+      if (distSq > homeRadiusSq) {
+        // Outside home radius — bias toward home
+        const dist = Math.sqrt(distSq);
+        const angleToHome = Math.atan2(-dy, -dx);
+        const bias = Math.min(0.8, (dist - homeRadius) / homeRadius);
+        // Blend wander angle toward home
+        let angleDiff = angleToHome - wanderAngle;
+        while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+        while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+        wanderAngle = wanderAngle + angleDiff * bias;
+      }
+
       const speed = movement.speed;
       this.setVelocity(entity, Math.cos(wanderAngle) * speed, Math.sin(wanderAngle) * speed);
       this.updateState(entity, { wanderAngle });

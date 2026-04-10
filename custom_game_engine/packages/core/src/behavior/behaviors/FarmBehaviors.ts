@@ -56,21 +56,41 @@ const MAX_TILL_DISTANCE_SQ = 2; // sqrt(2)^2 = 2
 /**
  * FarmBehavior - Base farming state
  *
- * Agent stops moving and waits for farming action to complete.
- * The actual farming actions (till, plant, water, harvest) are handled by:
- * 1. ActionQueue processes queued actions each tick
- * 2. TillActionHandler, PlantActionHandler, etc. validate and execute
- * 3. Agent remains in 'farm' behavior until action completes
+ * Delegates to the appropriate farming sub-behavior or completes immediately
+ * so the agent is never stuck waiting indefinitely in an inert state.
  */
 export class FarmBehavior extends BaseBehavior {
   readonly name = 'farm' as const;
 
   execute(entity: EntityImpl, _world: World): BehaviorResult | void {
-    // Stop moving - agent is working on farming task
     this.stopMovement(entity);
 
-    // The ActionQueue handles the actual farming work
-    // This behavior just holds the agent in a farming state
+    const inventory = entity.getComponent(ComponentType.Inventory);
+
+    // If agent already has food, no need to farm
+    const hasFood = inventory?.slots?.some((slot) =>
+      slot.itemId &&
+      (slot.itemId.includes('food') ||
+        slot.itemId.includes('berry') ||
+        slot.itemId.includes('meat') ||
+        slot.itemId.includes('fish') ||
+        slot.itemId.includes('carrot') ||
+        slot.itemId.includes('wheat'))
+    );
+    if (hasFood) {
+      return { complete: true, reason: 'Has food, farming not needed', nextBehavior: 'seek_food' };
+    }
+
+    // If agent has seeds, switch to till so they can plant
+    const hasSeeds = inventory?.slots?.some(
+      (slot) => slot.itemId && slot.itemId.includes('seed')
+    );
+    if (hasSeeds) {
+      return { complete: true, reason: 'Has seeds, switching to till', nextBehavior: 'till' };
+    }
+
+    // Nothing actionable — let the agent move on rather than freeze
+    return { complete: true, reason: 'Nothing to farm with, switching to gather', nextBehavior: 'gather_seeds' };
   }
 }
 

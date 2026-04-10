@@ -631,19 +631,6 @@ export class BuildBehavior extends BaseBehavior {
 }
 
 /**
- * Minimal World interface for delegating to BuildBehavior from BehaviorContext
- */
-interface MinimalWorldAdapter {
-  tick: number;
-  getEntity(id: string): EntityImpl | undefined;
-  eventBus: {
-    emit<T extends EventType>(
-      event: Omit<GameEvent<T>, 'tick' | 'timestamp'>
-    ): void;
-  };
-}
-
-/**
  * Modern version using BehaviorContext.
  * @example registerBehaviorWithContext('build', buildBehaviorWithContext);
  */
@@ -742,22 +729,6 @@ export function buildBehaviorWithContext(ctx: import('../BehaviorContext.js').Be
   }
 
   // Delegate to class for complex building logic
-  // Create minimal World adapter for BuildBehavior compatibility
   const behavior = new BuildBehavior();
-  const worldAdapter: MinimalWorldAdapter = {
-    tick: ctx.tick,
-    getEntity: (id: string) => {
-      const entity = ctx.getEntity(id);
-      if (!entity) return undefined;
-      // BehaviorContext.getEntity returns Entity interface, cast to EntityImpl for implementation access
-      return entity as EntityImpl;
-    },
-    eventBus: {
-      emit: (e) => ctx.emit(e),
-    },
-  };
-
-  // Delegate to BuildBehavior class - it only uses tick/getEntity/eventBus from world
-  // Using world adapter to avoid exposing full World interface to behaviors
-  return behavior.execute(ctx.entity, worldAdapter as unknown as World);
+  return behavior.execute(ctx.entity, ctx.world);
 }

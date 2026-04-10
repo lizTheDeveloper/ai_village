@@ -45,10 +45,10 @@ const BEHAVIOR_PRIORITIES: Record<string, BehaviorPriorityConfig> = {
   // Important tasks (50-79)
   deposit_items: { base: 60, canBeInterrupted: true, interruptsOthers: true },
   build: { base: 55, canBeInterrupted: true, interruptsOthers: true },
-  farm: { base: 50, canBeInterrupted: true, interruptsOthers: true },
-  till: { base: 50, canBeInterrupted: true, interruptsOthers: true },
-  plant: { base: 50, canBeInterrupted: true, interruptsOthers: true },
-  harvest: { base: 50, canBeInterrupted: true, interruptsOthers: true },
+  farm: { base: 35, canBeInterrupted: true, interruptsOthers: true },
+  till: { base: 35, canBeInterrupted: true, interruptsOthers: true },
+  plant: { base: 35, canBeInterrupted: true, interruptsOthers: true },
+  harvest: { base: 38, canBeInterrupted: true, interruptsOthers: true },
 
   // Moderate priority (20-49)
   seek_sleep: { base: 30, canBeInterrupted: true, interruptsOthers: true },
