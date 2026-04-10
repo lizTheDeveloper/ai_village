@@ -42,9 +42,9 @@ const MAP_OBJECT_SPRITES: Record<string, string> = {
   // Wild plants
   'grass': 'grass.png',
   'wildflower': 'wildflower.png',
-  'blueberry-bush': 'blueberry_bush.png',
-  'raspberry-bush': 'raspberry_bush.png',
-  'blackberry-bush': 'blackberry_bush.png',
+  'blueberry-bush': 'berry_bush.png',
+  'raspberry-bush': 'berry_bush.png',
+  'blackberry-bush': 'berry_bush.png',
   // Medicinal herbs
   'chamomile': 'chamomile.png',
   'lavender': 'lavender.png',
@@ -589,6 +589,7 @@ export function renderSprite(
     case 'dog':
     case 'cat':
     case 'rabbit':
+    case 'rabbit_white':
     case 'deer':
     case 'pig':
     case 'goat':
