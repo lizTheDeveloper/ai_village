@@ -2146,7 +2146,7 @@ export const BREATH_SPELLS: SpellDefinition[] = [
       detectionRisk: 'moderate',
       powerLevel: 3,
       leavesMagicalSignature: true,
-      detectionNotes: 'Breath magic: Basic awakening - animating objects through life essence',
+      detectionNotes: 'Pneumantic magic: Basic awakening - animating objects through life essence',
     },
   },
   {
@@ -2171,7 +2171,7 @@ export const BREATH_SPELLS: SpellDefinition[] = [
       detectionRisk: 'moderate',
       powerLevel: 3,
       leavesMagicalSignature: true,
-      detectionNotes: 'Breath magic: Cloth awakening - animating fabric through vital breath',
+      detectionNotes: 'Pneumantic magic: Cloth awakening - animating fabric through vital breath',
     },
   },
   {
@@ -2196,7 +2196,7 @@ export const BREATH_SPELLS: SpellDefinition[] = [
       detectionRisk: 'moderate',
       powerLevel: 4,
       leavesMagicalSignature: true,
-      detectionNotes: 'Breath magic: Advanced awakening - animating formless matter',
+      detectionNotes: 'Pneumantic magic: Advanced awakening - animating formless matter',
     },
   },
   {
@@ -2221,7 +2221,7 @@ export const BREATH_SPELLS: SpellDefinition[] = [
       detectionRisk: 'low',
       powerLevel: 2,
       leavesMagicalSignature: false,
-      detectionNotes: 'Breath magic: Passive pneumantic_tier - natural accumulation of life force',
+      detectionNotes: 'Pneumantic magic: Passive pneumantic_tier - natural accumulation of life force',
     },
   },
   {
@@ -2246,7 +2246,7 @@ export const BREATH_SPELLS: SpellDefinition[] = [
       detectionRisk: 'low',
       powerLevel: 3,
       leavesMagicalSignature: false,
-      detectionNotes: 'Breath magic: Passive pneumantic_tier - enhanced perception through accumulated breath',
+      detectionNotes: 'Pneumantic magic: Passive pneumantic_tier - enhanced perception through accumulated breath',
     },
   },
   {
@@ -2271,7 +2271,7 @@ export const BREATH_SPELLS: SpellDefinition[] = [
       detectionRisk: 'moderate',
       powerLevel: 3,
       leavesMagicalSignature: true,
-      detectionNotes: 'Breath magic: Defensive command - directing awakened objects to protect',
+      detectionNotes: 'Pneumantic magic: Defensive command - directing awakened objects to protect',
     },
   },
   {
@@ -2296,7 +2296,7 @@ export const BREATH_SPELLS: SpellDefinition[] = [
       detectionRisk: 'moderate',
       powerLevel: 3,
       leavesMagicalSignature: true,
-      detectionNotes: 'Breath magic: Offensive command - directing awakened objects to attack',
+      detectionNotes: 'Pneumantic magic: Offensive command - directing awakened objects to attack',
     },
   },
   {
@@ -2321,7 +2321,7 @@ export const BREATH_SPELLS: SpellDefinition[] = [
       detectionRisk: 'moderate',
       powerLevel: 3,
       leavesMagicalSignature: true,
-      detectionNotes: 'Breath magic: Utility command - basic awakened object manipulation',
+      detectionNotes: 'Pneumantic magic: Utility command - basic awakened object manipulation',
     },
   },
   {
@@ -2345,7 +2345,7 @@ export const BREATH_SPELLS: SpellDefinition[] = [
       detectionRisk: 'low',
       powerLevel: 2,
       leavesMagicalSignature: false,
-      detectionNotes: 'Breath magic: Breath recovery - reclaiming invested life force',
+      detectionNotes: 'Pneumantic magic: Breath recovery - reclaiming invested life force',
     },
   },
 ];

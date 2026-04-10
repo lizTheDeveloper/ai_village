@@ -57,7 +57,7 @@ export const SPELL_SCHOOLS = {
     spells: NAME_SPELLS,
   },
   breath: {
-    name: 'Breath Magic',
+    name: 'Pneumantic Magic',
     description: 'Magic channeled through breath, voice, and life essence',
     spells: BREATH_SPELLS,
   },

@@ -1,18 +1,14 @@
 /**
  * DimensionalParadigms - Magic systems dealing with spatial dimensions
  *
- * Inspired by:
- * - Gravity Falls (portals, Bill Cipher, Weirdmageddon, the Nightmare Realm)
- * - The Dark Forest (dimension flattening strikes, 2D collapse attacks)
- * - HyperRogue (hyperbolic geometry, dimensional navigation)
- * - Flatland (dimensional perception, 2D/3D/4D perspective)
- * - Interstellar (tesseracts, higher dimensional manipulation)
+ * Dimensional magic systems — portals, spatial perception, collapse weapons,
+ * hyperbolic geometry navigation, higher-dimensional entities.
  *
  * Key concepts:
  * - Beings perceive their "native" dimension count (Flatland Law)
  * - Higher dimensions project onto lower as "shadows" (Projection Law)
  * - Dimensional rifts attract each other (Weirdness Magnetism)
- * - Dimension reduction is a weapon (Dark Forest Deterrence)
+ * - Dimension reduction is a weapon (Quiet Sky Deterrence)
  * - 4D/5D universes can exist, rendered as scrollable 3D slices
  *
  * ==========================================================================
@@ -143,7 +139,7 @@ export interface DimensionalRift {
 /**
  * A dimensional collapse zone - area undergoing dimension reduction.
  *
- * Inspired by Dark Forest dimension strikes. Once started, these spread
+ * Dimensional collapse zone. Once started, these spread
  * outward, reducing everything to a lower dimension count permanently.
  */
 export interface DimensionalCollapse {
@@ -207,8 +203,8 @@ export interface WCrossSection {
 /**
  * An entity from a different dimension count than the local universe.
  *
- * Like Bill Cipher (exists in dimensions humans can't fully perceive)
- * or Flatland beings (2D creatures visiting 3D).
+ * Exists in dimensions locals can't fully perceive,
+ * or manifests from a different dimension count than the local universe.
  */
 export interface ExtradimensionalEntity {
   /** Entity ID */
@@ -226,7 +222,7 @@ export interface ExtradimensionalEntity {
   /** Can they survive if dimension-flattened? */
   flatResistant: boolean;
 
-  /** Are they hostile like Bill Cipher? */
+  /** Are they hostile? */
   hostile: boolean;
 
   /** What do they want? */
@@ -431,7 +427,7 @@ export const DIMENSIONAL_POWERS: DimensionalPower[] = [
     cooldown: 0, // Cannot be used again (too dangerous)
     category: 'forbidden',
     attractsAttention: true,
-    lore: 'The Dark Forest has one law: reduce or be reduced.',
+    lore: 'The Quiet Sky has one law: reduce or be reduced.',
   },
 
   // =========================================================================
@@ -485,13 +481,13 @@ export const DIMENSIONAL_POWERS: DimensionalPower[] = [
  * Portals, dimensional perception, flattening attacks, and entities
  * from higher/lower dimensional spaces.
  *
- * Inspired by Gravity Falls + Dark Forest + Flatland + HyperRogue
+ * Spatial dimensions beyond the normal three — portals, perception, flattening, higher-dimensional entities
  */
 export const DIMENSION_PARADIGM: MagicParadigm = {
   id: 'dimension',
   name: 'Dimensional Magic',
   description: 'Manipulate spatial dimensions - perceive, fold, flatten, and tear reality itself',
-  universeIds: ['gravity_falls', 'dark_forest', 'flatland', 'tesseract_realm', 'nightmare_realm'],
+  universeIds: ['mystery_tradition', 'quiet_sky', 'flatland', 'tesseract_realm', 'nightmare_realm'],
 
   lore: `Reality is a shadow of higher truths. What you see as a solid cube, a 4D being
 sees as a mere slice. Dimensional mages learn to perceive beyond their native
@@ -501,12 +497,12 @@ dimensions, fold space for travel, and - if desperate - reduce dimensions entire
 tesseracts (Tier 3), penteracts (Tier 4), and hexeracts (Tier 5). Realm pockets create
 spaces bigger on the inside. These structures are folded from geometry itself.
 
-The Nightmare Realm exists in the spaces between. Entities like the Triangle
-(DO NOT SUMMON) wait for moments when the barrier thins. Every portal is a door
-that swings both ways.
+The Nightmare Realm exists in the spaces between. Ancient practitioners left a
+single prohibition in every Geometry text: "Do not attempt to define a shape
+that defines itself." Nobody remembers who first broke the rule.
 
 The ultimate weapon is dimensional collapse - reducing a region from 3D to 2D
-permanently. The Dark Forest silence exists because everyone fears this deterrent.
+permanently. The Quiet Sky exists because everyone fears this deterrent.
 Use it, and you may win the battle. But the collapse spreads. Always.`,
 
   // =========================================================================

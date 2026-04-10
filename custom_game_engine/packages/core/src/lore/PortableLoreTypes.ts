@@ -26,6 +26,8 @@ export interface DeityPersonalityVector {
   mysteriousness: number;   // 0-1
   generosity: number;       // 0-1
   consistency: number;      // 0-1
+  seriousness?: number;     // 0-1 — Playful (0) to Stern (1). Optional until DeityComponent.PerceivedPersonality is unified with DeityTypes.PerceivedPersonality.
+  compassion?: number;      // 0-1 — Indifferent (0) to Caring deeply (1). Optional until DeityComponent.PerceivedPersonality is unified with DeityTypes.PerceivedPersonality.
 }
 
 // ============================================================================
