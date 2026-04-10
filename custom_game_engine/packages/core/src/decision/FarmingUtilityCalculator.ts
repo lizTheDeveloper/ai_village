@@ -363,11 +363,11 @@ export function getBestFarmingAction(
  */
 export function shouldFarm(utilities: FarmingUtilities): boolean {
   return (
-    utilities.till > 0.3 ||
-    utilities.plant > 0.3 ||
-    utilities.water > 0.3 ||
-    utilities.harvest > 0.3 ||
-    utilities.gather_seeds > 0.3
+    utilities.till >= 0.3 ||
+    utilities.plant >= 0.3 ||
+    utilities.water >= 0.3 ||
+    utilities.harvest >= 0.3 ||
+    utilities.gather_seeds >= 0.3
   );
 }
 

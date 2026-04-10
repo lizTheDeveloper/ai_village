@@ -45,10 +45,10 @@ const BEHAVIOR_PRIORITIES: Record<string, BehaviorPriorityConfig> = {
   // Important tasks (50-79)
   deposit_items: { base: 60, canBeInterrupted: true, interruptsOthers: true },
   build: { base: 55, canBeInterrupted: true, interruptsOthers: true },
-  farm: { base: 35, canBeInterrupted: true, interruptsOthers: true },
-  till: { base: 35, canBeInterrupted: true, interruptsOthers: true },
-  plant: { base: 35, canBeInterrupted: true, interruptsOthers: true },
-  harvest: { base: 38, canBeInterrupted: true, interruptsOthers: true },
+  farm: { base: 42, canBeInterrupted: true, interruptsOthers: true },
+  till: { base: 42, canBeInterrupted: true, interruptsOthers: true },
+  plant: { base: 42, canBeInterrupted: true, interruptsOthers: true },
+  harvest: { base: 43, canBeInterrupted: true, interruptsOthers: true },
 
   // Moderate priority (20-49)
   seek_sleep: { base: 30, canBeInterrupted: true, interruptsOthers: true },
@@ -57,7 +57,7 @@ const BEHAVIOR_PRIORITIES: Record<string, BehaviorPriorityConfig> = {
 
   // Low priority (0-19)
   gather: { base: 15, canBeInterrupted: true, interruptsOthers: false },
-  gather_seeds: { base: 15, canBeInterrupted: true, interruptsOthers: false },
+  gather_seeds: { base: 41, canBeInterrupted: true, interruptsOthers: true },
   work: { base: 15, canBeInterrupted: true, interruptsOthers: false },
   talk: { base: 18, canBeInterrupted: true, interruptsOthers: false }, // Raised to prioritize social
   follow_agent: { base: 10, canBeInterrupted: true, interruptsOthers: false },
