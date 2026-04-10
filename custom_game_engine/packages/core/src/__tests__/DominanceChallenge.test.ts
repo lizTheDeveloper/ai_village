@@ -158,18 +158,27 @@ describe('DominanceChallengeSystem', () => {
     it('should resolve follower theft challenge', () => {
       alpha.getComponent('dominance_rank').subordinates = [subordinate.id];
 
+      // Mock Math.random: first call for follower theft resolution (0.1 < 0.3 = challenger wins),
+      // remaining calls high to suppress cascade effects in the same tick
+      let callCount = 0;
+      const randomSpy = vi.spyOn(Math, 'random').mockImplementation(() => {
+        callCount++;
+        return callCount === 1 ? 0.1 : 0.99;
+      });
+
       createChallenge(challenger, alpha.id, 'follower_theft', { targetFollower: subordinate.id });
 
       system.update(world, Array.from(world.entities.values()), 1);
 
       const conflict = challenger.getComponent('conflict');
       expect(conflict.state).toBe('resolved');
+      expect(conflict.winner).toBe(challenger.id);
 
-      if (conflict.winner === challenger.id) {
-        // Subordinate should now follow challenger
-        expect(challenger.getComponent('dominance_rank').subordinates).toContain(subordinate.id);
-        expect(alpha.getComponent('dominance_rank').subordinates).not.toContain(subordinate.id);
-      }
+      // Subordinate should now follow challenger
+      expect(challenger.getComponent('dominance_rank').subordinates).toContain(subordinate.id);
+      expect(alpha.getComponent('dominance_rank').subordinates).not.toContain(subordinate.id);
+
+      randomSpy.mockRestore();
     });
 
     it('should update hierarchy on challenger victory', () => {
