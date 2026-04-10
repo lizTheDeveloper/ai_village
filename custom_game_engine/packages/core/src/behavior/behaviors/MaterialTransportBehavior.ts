@@ -274,7 +274,7 @@ export class MaterialTransportBehavior extends BaseBehavior {
     }
 
     // Remove from inventory
-    const removed = this.removeFromInventory(inventory, state.materialId, 1);
+    const removed = this.removeFromInventory(inventory, state.materialId, 1, entity);
     if (!removed) {
       // Something went wrong - we don't have the material
       this.updateTransportState(entity, {
@@ -483,12 +483,32 @@ export class MaterialTransportBehavior extends BaseBehavior {
   private removeFromInventory(
     inventory: InventoryComponent,
     itemId: string,
-    amount: number
+    amount: number,
+    entity?: EntityImpl
   ): boolean {
     const slot = inventory.slots.find(
       (s: InventorySlot) => s.itemId === itemId && s.quantity >= amount
     );
-    return slot !== undefined;
+    if (!slot) return false;
+
+    if (entity) {
+      entity.updateComponent<InventoryComponent>(ComponentType.Inventory, (current) => {
+        const newSlots = [...current.slots];
+        const targetSlot = newSlots.find(
+          (s: InventorySlot) => s.itemId === itemId && s.quantity >= amount
+        );
+        if (targetSlot) {
+          targetSlot.quantity -= amount;
+          if (targetSlot.quantity <= 0) {
+            targetSlot.itemId = undefined as unknown as string;
+            targetSlot.quantity = 0;
+          }
+        }
+        return { ...current, slots: newSlots };
+      });
+    }
+
+    return true;
   }
 
   /**

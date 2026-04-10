@@ -66,8 +66,9 @@ interface WorldWithBuilding extends World {
 }
 
 /**
- * Entity-based buildings (crafting benches, utility structures)
- * These use the old instant-placement system
+ * Entity-based buildings — all building types that have blueprints in
+ * BuildingBlueprintRegistry. Includes furniture, crafting stations, and
+ * residential/structural buildings.
  */
 const ENTITY_BASED_BUILDINGS: BuildingType[] = [
   BT.Workbench,
@@ -77,20 +78,27 @@ const ENTITY_BASED_BUILDINGS: BuildingType[] = [
   BT.StorageBox,
   BT.Bed,
   BT.Bedroll,
+  BT.Barn,
+  BT.Forge,
+  BT.Loom,
+  BT.Oven,
 ];
 
 /**
- * Tile-based structure types (mapped to TileBasedBlueprint IDs)
- * These use the voxel construction system with material transport
+ * Map of LLM-generated building names to BuildingBlueprintRegistry IDs.
+ * LLMs often say "tent", "house", "shelter" — these need mapping to real IDs.
  */
-const TILE_BASED_STRUCTURE_MAP: Record<string, string> = {
-  'tent': 'tile_simple_hut',        // tent → simple hut (3x3)
-  'lean-to': 'tile_simple_hut',     // lean-to → simple hut
-  'shelter': 'tile_simple_hut',     // generic shelter → simple hut
-  'house': 'tile_medium_house',     // house → medium house (5x4)
-  'barn': 'tile_barn',              // barn → barn (6x5)
-  'workshop': 'tile_workshop',      // workshop → workshop (4x4)
-  'storage': 'tile_storage_shed',   // storage → storage shed (3x2)
+const BUILDING_NAME_ALIASES: Record<string, string> = {
+  'tent': 'tent',
+  'lean-to': 'lean-to',
+  'shelter': 'tent',
+  'house': 'small_house',
+  'small_house': 'small_house',
+  'barn': 'barn',
+  'workshop': 'workshop',
+  'storage': 'storage-chest',
+  'storage_shed': 'storage-chest',
+  'hut': 'tent',
 };
 
 /**
@@ -221,17 +229,14 @@ export class BuildBehavior extends BaseBehavior {
       }
     }
 
-    // Route to tile-based construction if applicable
-    const tileBasedBlueprintId = TILE_BASED_STRUCTURE_MAP[buildingType];
-    if (tileBasedBlueprintId) {
-      return this.executeTileBasedConstruction(entity, world, tileBasedBlueprintId);
+    // Resolve LLM-generated building names to actual blueprint IDs
+    const aliasedType = BUILDING_NAME_ALIASES[buildingType];
+    if (aliasedType) {
+      buildingType = aliasedType as BuildingType;
     }
 
-    // Validate entity-based building type
-    if (!ENTITY_BASED_BUILDINGS.includes(buildingType)) {
-      // Unknown building type - default to tile-based simple hut
-      return this.executeTileBasedConstruction(entity, world, 'simple_hut');
-    }
+    // All building types route through entity-based construction
+    // (tile-based construction system has unregistered blueprint IDs)
 
     if (!inventory) {
       // No inventory - cannot build
