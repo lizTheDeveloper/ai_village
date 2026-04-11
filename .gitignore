@@ -86,6 +86,8 @@ custom_game_engine/test-*.sh
 !custom_game_engine/demo/public/pwyc.js
 !custom_game_engine/demo/public/support-prompt.js
 !custom_game_engine/.env.production
+!custom_game_engine/vendor/akashic-records/lib/*.js
+!custom_game_engine/vendor/akashic-records/lib/*.d.ts
 *.tsbuildinfo
 
 # Temporary files
