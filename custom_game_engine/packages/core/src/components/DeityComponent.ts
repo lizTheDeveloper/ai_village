@@ -58,6 +58,8 @@ export interface PerceivedPersonality {
   mysteriousness: number;   // 0 (clear) to 1 (inscrutable)
   generosity: number;       // 0 (demanding) to 1 (giving)
   consistency: number;      // 0 (capricious) to 1 (reliable)
+  seriousness: number;      // 0 (playful) to 1 (stern)
+  compassion: number;       // 0 (indifferent) to 1 (caring deeply)
 }
 
 /**
@@ -262,6 +264,8 @@ export class DeityComponent extends ComponentBase {
         mysteriousness: 0.5,
         generosity: 0.5,
         consistency: 0.5,
+        seriousness: 0.5,
+        compassion: 0.5,
       },
       perceivedAlignment: 'unknown',
       symbols: [],

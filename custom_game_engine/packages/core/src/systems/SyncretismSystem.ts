@@ -349,6 +349,8 @@ export class SyncretismSystem extends BaseSystem {
       mysteriousness: (deity1.identity.perceivedPersonality.mysteriousness + deity2.identity.perceivedPersonality.mysteriousness) / 2,
       generosity: (deity1.identity.perceivedPersonality.generosity + deity2.identity.perceivedPersonality.generosity) / 2,
       consistency: (deity1.identity.perceivedPersonality.consistency + deity2.identity.perceivedPersonality.consistency) / 2,
+      seriousness: (deity1.identity.perceivedPersonality.seriousness + deity2.identity.perceivedPersonality.seriousness) / 2,
+      compassion: (deity1.identity.perceivedPersonality.compassion + deity2.identity.perceivedPersonality.compassion) / 2,
     };
 
     // Combine belief
