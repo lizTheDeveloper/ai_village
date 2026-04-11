@@ -174,7 +174,7 @@ export class DecisionProcessor {
     const currentPriority = getBehaviorPriorityFn(agent.behavior);
 
     // Layer 1: Autonomic (highest priority)
-    const autonomicResult = this.autonomicSystem.check(entity);
+    const autonomicResult = this.autonomicSystem.check(entity, world);
     if (autonomicResult && autonomicResult.priority > currentPriority) {
       entity.updateComponent<AgentComponent>('agent', (current) => ({
         ...current,

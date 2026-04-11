@@ -104,7 +104,7 @@ export class ScheduledDecisionProcessor {
     const currentPriority = getBehaviorPriority(agent.behavior);
 
     // Layer 1: Autonomic (highest priority, synchronous)
-    const autonomicResult = this.autonomicSystem.check(entity);
+    const autonomicResult = this.autonomicSystem.check(entity, world);
     if (autonomicResult && autonomicResult.priority > currentPriority) {
       entity.updateComponent<AgentComponent>('agent', (current) => ({
         ...current,
@@ -210,7 +210,7 @@ export class ScheduledDecisionProcessor {
     const currentPriority = getBehaviorPriority(agent.behavior);
 
     // Layer 1: Autonomic (highest priority, synchronous)
-    const autonomicResult = this.autonomicSystem.check(entity);
+    const autonomicResult = this.autonomicSystem.check(entity, world);
     if (autonomicResult && autonomicResult.priority > currentPriority) {
       entity.updateComponent<AgentComponent>('agent', (current) => ({
         ...current,
