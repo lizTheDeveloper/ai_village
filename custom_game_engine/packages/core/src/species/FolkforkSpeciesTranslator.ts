@@ -1212,7 +1212,7 @@ export function translateToSpeciesTemplate(payload: FolkforkSpeciesPayload): Spe
     speciesId: `folkfork_${normalized.speciesId}`,
     speciesName: normalized.speciesName,
     commonName: normalized.commonName ?? normalized.speciesName,
-    description: `${lore.epithet}. Arrived via Folkfork from ${normalized.sourceGame}.`,
+    description: `${lore.epithet}. Arrived via Folkfork from ${normalized.sourceGame.charAt(0).toUpperCase() + normalized.sourceGame.slice(1)}.`,
     bodyPlanId,
 
     innateTraits,
