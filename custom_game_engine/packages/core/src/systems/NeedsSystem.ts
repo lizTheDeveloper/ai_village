@@ -10,6 +10,7 @@ import type { AgentComponent } from '../components/AgentComponent.js';
 import type { MovementComponent } from '../components/MovementComponent.js';
 import type { TemperatureComponent } from '../components/TemperatureComponent.js';
 import type { RealmLocationComponent } from '../components/RealmLocationComponent.js';
+import type { SpeciesComponent } from '../components/SpeciesComponent.js';
 import { setMutationRate, clearMutationRate } from '../components/MutationVectorComponent.js';
 
 /**
@@ -80,7 +81,18 @@ export class NeedsSystem extends BaseSystem {
 
         // Hunger decay rate (per GAME minute)
         // Per CLAUDE.md: Don't let hunger wake agents during minimum sleep period
-        const hungerDecayPerGameMinute = isSleeping ? 0 : -0.0008; // Negative = decay
+        const baseHungerDecay = -0.0008;
+        // Apply species-specific metabolic modifier from innate traits
+        const species = comps.optional<SpeciesComponent>(CT.Species);
+        let hungerModifier = 1.0;
+        if (species?.innateTraits) {
+          for (const trait of species.innateTraits) {
+            if (trait.needsModifier?.hunger !== undefined) {
+              hungerModifier *= trait.needsModifier.hunger;
+            }
+          }
+        }
+        const hungerDecayPerGameMinute = isSleeping ? 0 : baseHungerDecay * hungerModifier;
 
         // Energy decay based on activity level (per GAME minute)
         let energyDecayPerGameMinute = -0.0003; // Base rate: idle/walking
