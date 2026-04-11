@@ -20,7 +20,8 @@ import type { InventoryComponent } from '../../components/InventoryComponent.js'
 import type { ResourceComponent } from '../../components/ResourceComponent.js';
 import type { NeedsComponent } from '../../components/NeedsComponent.js';
 import type { PlantComponent } from '../../components/PlantComponent.js';
-import type { BuildingType } from '../../components/BuildingComponent.js';
+import type { BuildingComponent, BuildingType } from '../../components/BuildingComponent.js';
+import { BuildingType as BT } from '../../types/BuildingType.js';
 import type { ResourceCost } from '../../buildings/BuildingBlueprintRegistry.js';
 import type { GatheringStatsComponent } from '../../components/GatheringStatsComponent.js';
 import type { VoxelResourceComponent } from '../../components/VoxelResourceComponent.js';
@@ -1463,7 +1464,31 @@ export class GatherBehavior extends BaseBehavior {
       return;
     }
 
-    const stillMissing = this.getMissingResources(inventory, blueprint.resourceCost);
+    // Aggregate agent inventory + storage buildings (mirrors BuildBehavior logic)
+    const totalResources: Record<string, number> = {};
+    for (const slot of inventory.slots) {
+      if (slot.itemId) {
+        totalResources[slot.itemId] = (totalResources[slot.itemId] || 0) + slot.quantity;
+      }
+    }
+    const storageBuildings = world.query().with(ComponentType.Building).with(ComponentType.Inventory).executeEntities();
+    for (const storage of storageBuildings) {
+      const storageImpl = storage as EntityImpl;
+      const building = storageImpl.getComponent<BuildingComponent>(ComponentType.Building);
+      const storageInv = storageImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
+      if (!building || !storageInv || !building.isComplete) continue;
+      if (building.buildingType !== BT.StorageChest && building.buildingType !== BT.StorageBox) continue;
+      for (const slot of storageInv.slots) {
+        if (slot.itemId && slot.quantity > 0) {
+          totalResources[slot.itemId] = (totalResources[slot.itemId] || 0) + slot.quantity;
+        }
+      }
+    }
+
+    const stillMissing = blueprint.resourceCost.filter((cost) => {
+      const available = totalResources[cost.resourceId] || 0;
+      return available < cost.amountRequired;
+    });
 
     if (stillMissing.length === 0) {
       // We have everything! Emit goal achieved event for memory

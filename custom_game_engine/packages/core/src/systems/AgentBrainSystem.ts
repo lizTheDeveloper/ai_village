@@ -538,6 +538,8 @@ export class AgentBrainSystem extends BaseSystem {
               ...current,
               behavior: autonomicResult.behavior,
               behaviorState: {},
+              previousBehavior: current.behavior,
+              previousBehaviorState: current.behaviorState,
               queuePaused: true,
               queueInterruptedBy: autonomicResult.behavior,
             }));
@@ -546,6 +548,8 @@ export class AgentBrainSystem extends BaseSystem {
               ...current,
               behavior: autonomicResult.behavior,
               behaviorState: {},
+              previousBehavior: current.behavior,
+              previousBehaviorState: current.behaviorState,
             }));
           }
 
@@ -596,6 +600,34 @@ export class AgentBrainSystem extends BaseSystem {
     // When a productive behavior completes (sets behaviorCompleted: true) outside of a queue,
     // we need to reset to idle so the LLM can choose a new behavior
     if (agent.behaviorCompleted && !hasBehaviorQueue(agent)) {
+      const wasBuildInterrupted = agent.previousBehavior === 'build' && agent.previousBehaviorState?.['waitingForBuildingId'];
+      const wasGatherForBuild = agent.previousBehavior === 'gather' && agent.previousBehaviorState?.['returnToBuild'];
+
+      if (wasBuildInterrupted || wasGatherForBuild) {
+        entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
+          ...current,
+          behavior: current.previousBehavior!,
+          behaviorCompleted: false,
+          behaviorState: current.previousBehaviorState || {},
+          behaviorChangedAt: world.tick,
+          previousBehavior: current.behavior,
+          previousBehaviorState: undefined,
+        }));
+
+        world.eventBus.emit({
+          type: 'behavior:change',
+          source: entity.id,
+          data: {
+            agentId: entity.id,
+            from: agent.behavior,
+            to: agent.previousBehavior!,
+            reason: 'build_resumed',
+          },
+        });
+
+        return { behavior: agent.previousBehavior!, execute: true };
+      }
+
       // Clear the flag and reset to idle - this will trigger a new LLM decision
       entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
         ...current,
@@ -604,6 +636,7 @@ export class AgentBrainSystem extends BaseSystem {
         behaviorState: {},
         behaviorChangedAt: world.tick,
         previousBehavior: current.behavior,
+        previousBehaviorState: undefined,
       }));
 
       // Emit behavior change event

@@ -304,6 +304,7 @@ export interface AgentComponent extends Component {
   // Behavior timing instrumentation - tracks when behaviors change
   behaviorChangedAt?: number; // Tick when behavior was last changed
   previousBehavior?: AgentBehavior; // Previous behavior (for transition logging)
+  previousBehaviorState?: Record<string, unknown>; // Previous behavior state (for build resumption)
 
   // Strategic Priorities (LLM sets, scripted system uses)
   priorities?: StrategicPriorities; // Weights for automated behavior selection
