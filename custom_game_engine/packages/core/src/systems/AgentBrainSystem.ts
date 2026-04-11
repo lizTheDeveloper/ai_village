@@ -400,18 +400,49 @@ export class AgentBrainSystem extends BaseSystem {
             }));
           }
         }
+
+        // Successful think cycle: clear consecutive error tracking if present
+        if (agent.behaviorState?.['consecutiveBehaviorErrors']) {
+          impl.updateComponent<AgentComponent>(CT.Agent, (current) => {
+            const { consecutiveBehaviorErrors: _ce, errorCooldownUntilTick: _ec, ...rest } = current.behaviorState as Record<string, unknown>;
+            return { ...current, behaviorState: rest };
+          });
+        }
       } catch (error) {
         // Isolate per-agent errors: one agent's crash must not abort all other agents.
-        // Reset the crashing agent to idle to prevent repeated failures.
         const agentName = impl.id;
         const behavior = agent?.behavior ?? 'unknown';
         console.error(`[AgentBrainSystem] Error processing agent '${agentName}' (behavior=${behavior}): ${error}`);
         try {
+          const currentAgent = impl.getComponent<AgentComponent>(CT.Agent);
+          const prevErrors = (currentAgent?.behaviorState?.['consecutiveBehaviorErrors'] as number | undefined) ?? 0;
+          const newErrorCount = prevErrors + 1;
+          const COOLDOWN_THRESHOLD = 3;
+          const COOLDOWN_TICKS = 200; // 10 seconds at 20 TPS
+          const cooldownUntilTick = newErrorCount >= COOLDOWN_THRESHOLD
+            ? ctx.tick + COOLDOWN_TICKS
+            : ((currentAgent?.behaviorState?.['errorCooldownUntilTick'] as number | undefined) ?? 0);
+
           impl.updateComponent<AgentComponent>(CT.Agent, (current) => ({
             ...current,
             behavior: 'idle',
-            behaviorState: {},
+            behaviorState: {
+              consecutiveBehaviorErrors: newErrorCount,
+              errorCooldownUntilTick: cooldownUntilTick,
+            },
           }));
+
+          ctx.world.eventBus.emit({
+            type: 'agent:behavior_error',
+            source: agentName,
+            data: {
+              agentId: agentName,
+              behavior,
+              error: error instanceof Error ? error.message : String(error),
+              consecutiveErrors: newErrorCount,
+              cooldownUntilTick,
+            },
+          });
         } catch {
           // Entity may be in a bad state — skip recovery
         }
@@ -434,6 +465,13 @@ export class AgentBrainSystem extends BaseSystem {
    */
   private shouldThink(entity: EntityImpl, agent: AgentComponent, world: World): boolean {
     const currentTick = world.tick;
+
+    // Error cooldown: agent is in backoff after repeated crashes
+    const cooldownUntilTick = agent.behaviorState?.['errorCooldownUntilTick'] as number | undefined;
+    if (cooldownUntilTick !== undefined && currentTick < cooldownUntilTick) {
+      return false;
+    }
+
     const ticksSinceLastThink = currentTick - agent.lastThinkTick;
 
     // Handle save/load case where lastThinkTick is in the future (world tick reset to 0)

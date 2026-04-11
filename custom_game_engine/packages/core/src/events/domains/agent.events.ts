@@ -259,6 +259,13 @@ export interface AgentEvents {
   };
 
   // === Agent Behavior Events ===
+  'agent:behavior_error': {
+    agentId: EntityId;
+    behavior: string;
+    error: string;
+    consecutiveErrors: number;
+    cooldownUntilTick: number;
+  };
   'behavior:change': {
     agentId: EntityId;
     from: string;
