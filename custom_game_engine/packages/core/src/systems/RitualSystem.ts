@@ -6,6 +6,7 @@
 
 import { BaseSystem, type SystemContext } from '../ecs/SystemContext.js';
 import type { World } from '../ecs/World.js';
+import type { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import { THROTTLE } from '../ecs/SystemThrottleConfig.js';
@@ -92,6 +93,72 @@ export class RitualSystem extends BaseSystem {
     this.ritualIntervalLookup.set('blessing', 12000);
     this.ritualIntervalLookup.set('sacrifice', 48000);
     this.ritualIntervalLookup.set('pilgrimage', 480000);
+  }
+
+  protected onInitialize(_world: World, _eventBus: EventBus): void {
+    // When a myth becomes canonical, schedule a commemorative ritual
+    this.events.onGeneric('lore:myth_canonized', (data: unknown) => {
+        const mythData = data as {
+            deityId?: string;
+            mythTitle?: string;
+            sourceGame?: string;
+        };
+
+        // Only process MVEE myths
+        if (mythData.sourceGame && mythData.sourceGame !== 'mvee') return;
+
+        if (!mythData.deityId) return;
+
+        // Check if deity exists in our cache
+        const deity = this.deityCache.get(mythData.deityId);
+        if (!deity) return;
+
+        // Schedule a commemorative blessing ritual for myth canonization
+        const ritualId = `myth_commemoration_${Date.now()}`;
+        const ritual: RitualData = {
+            id: ritualId,
+            name: `Commemoration of "${mythData.mythTitle ?? 'a sacred myth'}"`,
+            deityId: mythData.deityId,
+            type: 'blessing',
+            beliefGenerated: this.config.baseBeliefGeneration * 1.5, // Canonization bonus
+            requiredParticipants: 1,
+            duration: 200, // ~10 seconds
+        };
+
+        // Schedule it for the next check interval
+        const nextTick = (this.lastCacheUpdate || 0) + this.config.checkInterval;
+        this.scheduleRitual(ritual, nextTick);
+    });
+
+    // When a legend forms, also consider ritual
+    this.events.onGeneric('mythology:legend_formed', (data: unknown) => {
+        const legendData = data as {
+            deityId?: string;
+            heroName?: string;
+            sourceGame?: string;
+        };
+
+        if (legendData.sourceGame && legendData.sourceGame !== 'mvee') return;
+        if (!legendData.deityId) return;
+
+        const deity = this.deityCache.get(legendData.deityId);
+        if (!deity) return;
+
+        // Schedule a ceremony for the legend
+        const ritualId = `legend_ceremony_${Date.now()}`;
+        const ritual: RitualData = {
+            id: ritualId,
+            name: `Ceremony for the legend of ${legendData.heroName ?? 'a hero'}`,
+            deityId: legendData.deityId,
+            type: 'weekly_ceremony',
+            beliefGenerated: this.config.baseBeliefGeneration * 2.0, // Legends generate more belief
+            requiredParticipants: 3,
+            duration: 400, // ~20 seconds
+        };
+
+        const nextTick = (this.lastCacheUpdate || 0) + this.config.checkInterval;
+        this.scheduleRitual(ritual, nextTick);
+    });
   }
 
   protected onUpdate(ctx: SystemContext): void {

@@ -8,6 +8,12 @@ import { DeityComponent } from '../../components/DeityComponent.js';
 import { createSpiritualComponent } from '../../components/SpiritualComponent.js';
 import { PersonalityComponent } from '../../components/PersonalityComponent.js';
 import { SpeciesComponent } from '../../components/SpeciesComponent.js';
+import {
+  createMythologyComponent,
+  getCanonicalTraits,
+  type Myth,
+  type MythologyComponent,
+} from '../../components/MythComponent.js';
 
 describe('BeliefGenerationSystem', () => {
   let world: World;
@@ -139,5 +145,154 @@ describe('BeliefGenerationSystem', () => {
     expect(unknownBelief).toBeGreaterThan(0);
     expect(missingBelief).toBeGreaterThan(0);
     expect(unknownBelief).toBeCloseTo(missingBelief, 12);
+  });
+
+  // ===========================================================================
+  // Myth Feedback Loop Tests (MUL-4698)
+  // ===========================================================================
+
+  function createTestMyth(deityId: string, traits: Array<{ trait: string; direction: 'positive' | 'negative'; strength: number }>): Myth {
+    return {
+      id: `myth_${Math.random().toString(36).slice(2)}`,
+      title: 'Test Myth',
+      fullText: 'A test myth for unit testing.',
+      summary: 'A test myth.',
+      currentVersion: 1,
+      knownBy: ['agent1'],
+      writtenIn: [],
+      carvedAt: [],
+      traitImplications: traits.map(t => ({
+        trait: t.trait,
+        direction: t.direction,
+        strength: t.strength,
+        extractedFrom: 'test',
+      })),
+      domainRelevance: new Map(),
+      creationTime: 0,
+      lastToldTime: 0,
+      tellingCount: 10,
+      status: 'canonical',
+      contestedBy: [],
+      deityId,
+    };
+  }
+
+  function addMythologyToDeity(deityEntity: Entity, myths: Myth[]): void {
+    const mythComp = createMythologyComponent();
+    for (const myth of myths) {
+      mythComp.myths.push(myth);
+      mythComp.canonicalMyths.push(myth.id);
+    }
+    mythComp.totalMythsCreated = myths.length;
+    (deityEntity as EntityImpl).addComponent(mythComp);
+  }
+
+  describe('myth feedback loop (MUL-4698)', () => {
+    it('getCanonicalTraits aggregates benevolence from canonical myths', () => {
+      const mythComp = createMythologyComponent();
+      const myth: Myth = createTestMyth('deity1', [
+        { trait: 'benevolence', direction: 'positive', strength: 0.2 },
+        { trait: 'wisdom', direction: 'positive', strength: 0.3 },
+      ]);
+      mythComp.myths.push(myth);
+      mythComp.canonicalMyths.push(myth.id);
+
+      const traits = getCanonicalTraits(mythComp);
+
+      expect(traits.get('benevolence')).toBe(0.2);
+      expect(traits.get('wisdom')).toBe(0.3);
+    });
+
+    it('canonical myth traits modulate belief generation', () => {
+      // Deity WITH benevolent canonical myths
+      const mythDeity = createDeity('Myth Deity');
+      const benevolentMyth = createTestMyth(mythDeity.id, [
+        { trait: 'benevolence', direction: 'positive', strength: 0.8 },
+        { trait: 'compassion', direction: 'positive', strength: 0.6 },
+      ]);
+      addMythologyToDeity(mythDeity, [benevolentMyth]);
+
+      // Deity WITHOUT mythology
+      const plainDeity = createDeity('Plain Deity');
+
+      // Create believers with high agreeableness + spirituality (resonates with benevolence)
+      const mythBeliever = world.createEntity('agent') as EntityImpl;
+      mythBeliever.addComponent(
+        new PersonalityComponent({
+          openness: 0.6,
+          conscientiousness: 0.5,
+          extraversion: 0.6,
+          agreeableness: 0.9,
+          neuroticism: 0.2,
+          spirituality: 0.9,
+        })
+      );
+      mythBeliever.addComponent(createSpiritualComponent(0.8, mythDeity.id));
+
+      const plainBeliever = world.createEntity('agent') as EntityImpl;
+      plainBeliever.addComponent(
+        new PersonalityComponent({
+          openness: 0.6,
+          conscientiousness: 0.5,
+          extraversion: 0.6,
+          agreeableness: 0.9,
+          neuroticism: 0.2,
+          spirituality: 0.9,
+        })
+      );
+      plainBeliever.addComponent(createSpiritualComponent(0.8, plainDeity.id));
+
+      runSystem();
+
+      const mythBelief = getTotalBeliefEarned(mythDeity);
+      const plainBelief = getTotalBeliefEarned(plainDeity);
+
+      // Benevolent myths + high agreeableness/spirituality should BOOST belief
+      expect(mythBelief).toBeGreaterThan(plainBelief);
+    });
+
+    it('myth multiplier is capped at [0.5, 1.5]', () => {
+      // Create deity with extreme myth traits
+      const extremeDeity = createDeity('Extreme Deity');
+      const extremeMyth = createTestMyth(extremeDeity.id, [
+        { trait: 'benevolence', direction: 'positive', strength: 1.0 },
+        { trait: 'compassion', direction: 'positive', strength: 1.0 },
+        { trait: 'mercy', direction: 'positive', strength: 1.0 },
+      ]);
+      addMythologyToDeity(extremeDeity, [extremeMyth]);
+
+      // Create deity with no myths for baseline
+      const baseDeity = createDeity('Base Deity');
+
+      // Max-resonance believer
+      createBeliever({ deityId: extremeDeity.id, faith: 0.8 });
+      createBeliever({ deityId: baseDeity.id, faith: 0.8 });
+
+      runSystem();
+
+      const extremeBelief = getTotalBeliefEarned(extremeDeity);
+      const baseBelief = getTotalBeliefEarned(baseDeity);
+
+      // Even with extreme traits, multiplier can't exceed 1.5x (allow float precision)
+      if (baseBelief > 0) {
+        expect(extremeBelief / baseBelief).toBeLessThanOrEqual(1.5 + 1e-10);
+      }
+    });
+
+    it('deities without mythology get neutral multiplier (no behavior change)', () => {
+      const deity1 = createDeity('No Myth Deity 1');
+      const deity2 = createDeity('No Myth Deity 2');
+
+      createBeliever({ deityId: deity1.id, faith: 0.8 });
+      createBeliever({ deityId: deity2.id, faith: 0.8 });
+
+      runSystem();
+
+      const belief1 = getTotalBeliefEarned(deity1);
+      const belief2 = getTotalBeliefEarned(deity2);
+
+      // Without myths, both should generate identical belief
+      expect(belief1).toBeCloseTo(belief2, 12);
+    });
   });
 });

@@ -25,6 +25,7 @@ import {
 } from '../../components/GeneticComponent.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import { recordPrayer } from '../../components/SpiritualComponent.js';
+import { getCanonicalTraits, type MythologyComponent } from '../../components/MythComponent.js';
 import type { BehaviorContext, BehaviorResult as ContextBehaviorResult } from '../BehaviorContext.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
 
@@ -84,6 +85,33 @@ const GROUP_PRAYERS = [
   'We gather as one to seek your guidance.',
   'Bless this community with your wisdom.',
   'Watch over us all, we pray.',
+];
+
+/** Myth-themed prayers for wrathful deities */
+const WRATHFUL_DEITY_PRAYERS = [
+  'We tremble before your righteous fury!',
+  'Spare us your wrath, O mighty one!',
+  'We offer our devotion to calm your storm!',
+  'Judge us worthy, O terrible and great!',
+  'Your anger shapes the world — we bow before it!',
+];
+
+/** Myth-themed prayers for benevolent deities */
+const BENEVOLENT_DEITY_PRAYERS = [
+  'Your mercy flows like water upon us!',
+  'We bask in your boundless compassion!',
+  'Guide us with your gentle wisdom!',
+  'Your love sustains all living things!',
+  'We give thanks for your endless grace!',
+];
+
+/** Myth-themed prayers for powerful deities */
+const POWERFUL_DEITY_PRAYERS = [
+  'Your power shapes the very earth beneath us!',
+  'We stand in awe of your dominion!',
+  'Grant us a fraction of your strength!',
+  'All creation bends to your will!',
+  'We honor the source of all power!',
 ];
 
 let groupPrayerIdCounter = 0;
@@ -364,7 +392,7 @@ export class GroupPrayBehavior extends BaseBehavior {
     if (state.isLeader) {
       const lastUtterance = (state.lastUtterance as number) ?? 0;
       if (currentTick - lastUtterance > 100) {
-        const prayer = GROUP_PRAYERS[Math.floor(Math.random() * GROUP_PRAYERS.length)]!;
+        const prayer = this._selectMythAwarePrayer(entity, world);
         entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
           ...current,
           lastThought: prayer,
@@ -409,6 +437,29 @@ export class GroupPrayBehavior extends BaseBehavior {
     const amplification = GROUP_PRAYER_CONFIG.BASE_AMPLIFICATION +
       (participants.length * GROUP_PRAYER_CONFIG.PER_PARTICIPANT_AMPLIFICATION);
 
+    // Myth-aware amplification: canonical myth traits modulate prayer power
+    let mythAmplification = 1.0;
+    const deityId = entity.getComponent(ComponentType.Spiritual)?.believedDeity;
+    if (deityId) {
+      const deityEntity = world.getEntity(deityId);
+      if (deityEntity) {
+        const mythComp = deityEntity.getComponent(ComponentType.Mythology) as MythologyComponent | undefined;
+        if (mythComp) {
+          const traits = getCanonicalTraits(mythComp);
+          // More canonical myths = stronger prayer resonance
+          if (traits.size > 0) {
+            // Each canonical trait adds up to 10% prayer power
+            let traitBonus = 0;
+            for (const [, score] of traits) {
+              traitBonus += Math.abs(score) * 0.1;
+            }
+            mythAmplification = Math.min(1.5, 1.0 + traitBonus);
+          }
+        }
+      }
+    }
+    const finalAmplification = amplification * mythAmplification;
+
     // Create group prayer record
     const prayer: Prayer = {
       id: `group_prayer_${groupPrayerIdCounter++}`,
@@ -441,7 +492,7 @@ export class GroupPrayBehavior extends BaseBehavior {
         duration: participants.length * GROUP_PRAYER_CONFIG.PER_PARTICIPANT_BONUS + GROUP_PRAYER_CONFIG.BASE_DURATION,
         deityId: entity.getComponent(ComponentType.Spiritual)?.believedDeity,
         answered: false,
-        prayerPower: amplification,
+        prayerPower: finalAmplification,
       },
     });
 
@@ -454,7 +505,7 @@ export class GroupPrayBehavior extends BaseBehavior {
           participants,
           deityId: entity.getComponent(ComponentType.Spiritual)?.believedDeity,
           clarity: Math.min(1.0, 0.6 + (participants.length * 0.05)),
-          prayerPower: amplification,
+          prayerPower: finalAmplification,
         },
       });
 
@@ -476,6 +527,66 @@ export class GroupPrayBehavior extends BaseBehavior {
       complete: true,
       reason: 'group_prayer_complete',
     };
+  }
+
+  /**
+   * Select a prayer that reflects the deity's canonical myth traits
+   */
+  private _selectMythAwarePrayer(entity: EntityImpl, world: World): string {
+    const deityId = entity.getComponent(ComponentType.Spiritual)?.believedDeity;
+    if (!deityId) {
+      return GROUP_PRAYERS[Math.floor(Math.random() * GROUP_PRAYERS.length)]!;
+    }
+
+    const deityEntity = world.getEntity(deityId);
+    if (!deityEntity) {
+      return GROUP_PRAYERS[Math.floor(Math.random() * GROUP_PRAYERS.length)]!;
+    }
+
+    const mythComp = deityEntity.getComponent(ComponentType.Mythology) as MythologyComponent | undefined;
+    if (!mythComp) {
+      return GROUP_PRAYERS[Math.floor(Math.random() * GROUP_PRAYERS.length)]!;
+    }
+
+    const traits = getCanonicalTraits(mythComp);
+    if (traits.size === 0) {
+      return GROUP_PRAYERS[Math.floor(Math.random() * GROUP_PRAYERS.length)]!;
+    }
+
+    // Find dominant trait
+    let dominantTrait = '';
+    let maxScore = 0;
+    for (const [trait, score] of traits) {
+      if (Math.abs(score) > maxScore) {
+        maxScore = Math.abs(score);
+        dominantTrait = trait;
+      }
+    }
+
+    // Select prayer pool based on dominant trait
+    let prayerPool: string[];
+    switch (dominantTrait) {
+      case 'wrathfulness':
+      case 'vengeance':
+      case 'judgment':
+        prayerPool = WRATHFUL_DEITY_PRAYERS;
+        break;
+      case 'benevolence':
+      case 'compassion':
+      case 'mercy':
+        prayerPool = BENEVOLENT_DEITY_PRAYERS;
+        break;
+      case 'power':
+      case 'dominion':
+      case 'creation':
+        prayerPool = POWERFUL_DEITY_PRAYERS;
+        break;
+      default:
+        prayerPool = GROUP_PRAYERS;
+        break;
+    }
+
+    return prayerPool[Math.floor(Math.random() * prayerPool.length)]!;
   }
 
   /**
@@ -690,7 +801,7 @@ function handlePrayingPhaseWithContext(
   if (ctx.getState('isLeader')) {
     const lastUtterance = ctx.getState<number>('lastUtterance') ?? 0;
     if (ctx.tick - lastUtterance > 100) {
-      const prayer = GROUP_PRAYERS[Math.floor(Math.random() * GROUP_PRAYERS.length)]!;
+      const prayer = selectMythAwarePrayer(ctx.entity as EntityImpl, ctx.world);
       ctx.setThought(prayer);
       ctx.updateState({ lastUtterance: ctx.tick });
 
@@ -724,6 +835,29 @@ function completeGroupPrayerWithContext(
   const amplification = GROUP_PRAYER_CONFIG.BASE_AMPLIFICATION +
     (participants.length * GROUP_PRAYER_CONFIG.PER_PARTICIPANT_AMPLIFICATION);
 
+  // Myth-aware amplification: canonical myth traits modulate prayer power
+  let mythAmplification = 1.0;
+  const deityId = spiritual.believedDeity;
+  if (deityId) {
+    const deityEntity = ctx.world.getEntity(deityId);
+    if (deityEntity) {
+      const mythComp = (deityEntity as EntityImpl).getComponent(ComponentType.Mythology) as MythologyComponent | undefined;
+      if (mythComp) {
+        const traits = getCanonicalTraits(mythComp);
+        // More canonical myths = stronger prayer resonance
+        if (traits.size > 0) {
+          // Each canonical trait adds up to 10% prayer power
+          let traitBonus = 0;
+          for (const [, score] of traits) {
+            traitBonus += Math.abs(score) * 0.1;
+          }
+          mythAmplification = Math.min(1.5, 1.0 + traitBonus);
+        }
+      }
+    }
+  }
+  const finalAmplification = amplification * mythAmplification;
+
   // Create group prayer record
   const prayer: Prayer = {
     id: `group_prayer_${groupPrayerIdCounter++}`,
@@ -755,7 +889,7 @@ function completeGroupPrayerWithContext(
       duration: participants.length * GROUP_PRAYER_CONFIG.PER_PARTICIPANT_BONUS + GROUP_PRAYER_CONFIG.BASE_DURATION,
       deityId: spiritual.believedDeity,
       answered: false,
-      prayerPower: amplification,
+      prayerPower: finalAmplification,
     },
   });
 
@@ -767,7 +901,7 @@ function completeGroupPrayerWithContext(
         participants,
         deityId: spiritual.believedDeity,
         clarity: Math.min(1.0, 0.6 + (participants.length * 0.05)),
-        prayerPower: amplification,
+        prayerPower: finalAmplification,
       },
     });
 
@@ -794,6 +928,63 @@ function completeGroupPrayerWithContext(
   }
 
   return ctx.complete('group_prayer_complete');
+}
+
+function selectMythAwarePrayer(entity: EntityImpl, world: World): string {
+  const deityId = entity.getComponent(ComponentType.Spiritual)?.believedDeity;
+  if (!deityId) {
+    return GROUP_PRAYERS[Math.floor(Math.random() * GROUP_PRAYERS.length)]!;
+  }
+
+  const deityEntity = world.getEntity(deityId);
+  if (!deityEntity) {
+    return GROUP_PRAYERS[Math.floor(Math.random() * GROUP_PRAYERS.length)]!;
+  }
+
+  const mythComp = (deityEntity as EntityImpl).getComponent(ComponentType.Mythology) as MythologyComponent | undefined;
+  if (!mythComp) {
+    return GROUP_PRAYERS[Math.floor(Math.random() * GROUP_PRAYERS.length)]!;
+  }
+
+  const traits = getCanonicalTraits(mythComp);
+  if (traits.size === 0) {
+    return GROUP_PRAYERS[Math.floor(Math.random() * GROUP_PRAYERS.length)]!;
+  }
+
+  // Find dominant trait
+  let dominantTrait = '';
+  let maxScore = 0;
+  for (const [trait, score] of traits) {
+    if (Math.abs(score) > maxScore) {
+      maxScore = Math.abs(score);
+      dominantTrait = trait;
+    }
+  }
+
+  // Select prayer pool based on dominant trait
+  let prayerPool: string[];
+  switch (dominantTrait) {
+    case 'wrathfulness':
+    case 'vengeance':
+    case 'judgment':
+      prayerPool = WRATHFUL_DEITY_PRAYERS;
+      break;
+    case 'benevolence':
+    case 'compassion':
+    case 'mercy':
+      prayerPool = BENEVOLENT_DEITY_PRAYERS;
+      break;
+    case 'power':
+    case 'dominion':
+    case 'creation':
+      prayerPool = POWERFUL_DEITY_PRAYERS;
+      break;
+    default:
+      prayerPool = GROUP_PRAYERS;
+      break;
+  }
+
+  return prayerPool[Math.floor(Math.random() * prayerPool.length)]!;
 }
 
 function gatherParticipantsWithContext(ctx: BehaviorContext): EntityImpl[] {

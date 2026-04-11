@@ -9,6 +9,7 @@ import type { PersonalityComponent } from '../components/PersonalityComponent.js
 import type { SpeciesComponent } from '../components/SpeciesComponent.js';
 import { DeityComponent, type BeliefActivity } from '../components/DeityComponent.js';
 import type { BeliefEconomyConfig } from '../divinity/UniverseConfig.js';
+import { getCanonicalTraits, type MythologyComponent } from '../components/MythComponent.js';
 
 /**
  * Belief generation rates per hour (in-game time) by activity type
@@ -76,6 +77,10 @@ export class BeliefGenerationSystem extends BaseSystem {
     const deityComp = deityEntity.components.get(CT.Deity) as DeityComponent;
     if (!deityComp) return;
 
+    // Get canonical myth traits for this deity (computed once, shared across all believers)
+    const mythComp = deityEntity.components.get(CT.Mythology) as MythologyComponent | undefined;
+    const canonicalTraits = mythComp ? getCanonicalTraits(mythComp) : null;
+
     // Fix believers Set if it was corrupted by serialization
     if (!(deityComp.believers instanceof Set)) {
       // If believers was serialized, it's either an object {} or an array
@@ -109,7 +114,7 @@ export class BeliefGenerationSystem extends BaseSystem {
 
     // Generate belief from each believer
     for (const believerEntity of believers) {
-      const beliefAmount = this._generateBeliefFromAgent(believerEntity, currentTick, beliefConfig);
+      const beliefAmount = this._generateBeliefFromAgent(believerEntity, currentTick, beliefConfig, canonicalTraits);
       if (beliefAmount > 0) {
         totalBeliefGenerated += beliefAmount;
 
@@ -181,7 +186,8 @@ export class BeliefGenerationSystem extends BaseSystem {
   private _generateBeliefFromAgent(
     entity: Entity,
     currentTick: number,
-    beliefConfig?: BeliefEconomyConfig
+    beliefConfig?: BeliefEconomyConfig,
+    canonicalTraits?: Map<string, number> | null
   ): number {
     const spiritual = entity.components.get(CT.Spiritual) as SpiritualComponent;
     const personality = entity.components.get(CT.Personality) as PersonalityComponent;
@@ -209,6 +215,10 @@ export class BeliefGenerationSystem extends BaseSystem {
     const spiritualityMultiplier = personality.spirituality ?? 0.5; // 0-1
     const speciesMultiplier = this._getSpeciesBeliefMultiplier(entity, spiritual, personality);
 
+    // Myth-faith multiplier: canonical myth traits modulate belief generation
+    // Traits like 'benevolence' align with high spirituality; 'wrathfulness' with low openness
+    const mythMultiplier = this._getMythFaithMultiplier(canonicalTraits, personality);
+
     // Calculate belief generated this tick
     // Convert per-hour rate to per-second rate (divide by 3600)
     // Then adjust for update interval (20 ticks = 1 second)
@@ -219,9 +229,65 @@ export class BeliefGenerationSystem extends BaseSystem {
       spiritualityMultiplier *
       activityMultiplier *
       globalMultiplier *
-      speciesMultiplier;
+      speciesMultiplier *
+      mythMultiplier;
 
     return beliefThisUpdate;
+  }
+
+  /**
+   * Calculate myth-faith multiplier from canonical myth traits
+   * Myths that align with an agent's personality amplify belief generation.
+   * Capped to [0.5, 1.5] to prevent runaway amplification.
+   */
+  private _getMythFaithMultiplier(
+    canonicalTraits: Map<string, number> | null | undefined,
+    personality: PersonalityComponent
+  ): number {
+    if (!canonicalTraits || canonicalTraits.size === 0) return 1.0;
+
+    let alignmentScore = 0;
+    let traitCount = 0;
+
+    for (const [trait, score] of canonicalTraits) {
+      traitCount++;
+      // Map myth traits to personality dimensions
+      switch (trait) {
+        case 'benevolence':
+        case 'compassion':
+        case 'mercy':
+          // Benevolent myths resonate with agreeable, spiritual agents
+          alignmentScore += score * (personality.agreeableness + (personality.spirituality ?? 0.5)) / 2;
+          break;
+        case 'wrathfulness':
+        case 'vengeance':
+        case 'judgment':
+          // Wrathful myths resonate with neurotic, conscientious agents (fear-driven faith)
+          alignmentScore += score * (personality.neuroticism + personality.conscientiousness) / 2;
+          break;
+        case 'wisdom':
+        case 'knowledge':
+          // Wisdom myths resonate with open, curious agents
+          alignmentScore += score * personality.openness;
+          break;
+        case 'power':
+        case 'dominion':
+        case 'creation':
+          // Power myths resonate with extraverted, ambitious agents
+          alignmentScore += score * personality.extraversion;
+          break;
+        default:
+          // Generic trait: use spirituality as default resonance
+          alignmentScore += score * (personality.spirituality ?? 0.5);
+          break;
+      }
+    }
+
+    // Normalize by number of traits and convert to multiplier
+    const normalizedAlignment = traitCount > 0 ? alignmentScore / traitCount : 0;
+
+    // Clamp to [0.5, 1.5] — myths can halve or boost belief by 50%
+    return Math.max(0.5, Math.min(1.5, 1.0 + normalizedAlignment));
   }
 
   private _getSpeciesBeliefMultiplier(
