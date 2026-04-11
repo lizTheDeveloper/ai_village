@@ -349,6 +349,8 @@ export class BuildBehavior extends BaseBehavior {
         entity.id // Pass builder ID for memory tracking
       );
 
+      // Deduct consumed resources from actual inventories (agent + storage buildings)
+      this.deductResources(entity, world, blueprint.resourceCost);
 
       // Store the building ID and wait for construction to complete
       entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
@@ -598,6 +600,70 @@ export class BuildBehavior extends BaseBehavior {
     }));
 
     return { complete: true, reason: 'Switched to material_transport' };
+  }
+
+  /**
+   * Deduct consumed resources from agent inventory and storage buildings.
+   * Pulls from agent inventory first, then storage buildings for any remainder.
+   */
+  private deductResources(
+    entity: EntityImpl,
+    world: World,
+    costs: ResourceCost[]
+  ): void {
+    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
+    if (!inventory) return;
+
+    // Track how much of each resource still needs deducting after agent inventory
+    const remaining: Record<string, number> = {};
+    for (const cost of costs) {
+      remaining[cost.resourceId] = cost.amountRequired;
+    }
+
+    // Deduct from agent inventory first
+    const updatedSlots = inventory.slots.map(slot => {
+      if (!slot.itemId || !remaining[slot.itemId] || remaining[slot.itemId]! <= 0) return slot;
+      const deduct = Math.min(slot.quantity, remaining[slot.itemId]!);
+      remaining[slot.itemId]! -= deduct;
+      return { ...slot, quantity: slot.quantity - deduct };
+    });
+
+    entity.updateComponent<InventoryComponent>(ComponentType.Inventory, (current) => ({
+      ...current,
+      slots: updatedSlots,
+    }));
+
+    // Check if anything still needs deducting from storage
+    const needsMore = Object.entries(remaining).some(([, amt]) => amt > 0);
+    if (!needsMore) return;
+
+    // Deduct remainder from storage buildings
+    const storageBuildings = world.query().with(ComponentType.Building).with(ComponentType.Inventory).executeEntities();
+    for (const storage of storageBuildings) {
+      const storageImpl = storage as EntityImpl;
+      const building = storageImpl.getComponent<BuildingComponent>(ComponentType.Building);
+      const storageInv = storageImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
+      if (!building || !storageInv || !building.isComplete) continue;
+      if (building.buildingType !== BT.StorageChest && building.buildingType !== BT.StorageBox) continue;
+
+      let modified = false;
+      const newSlots = storageInv.slots.map(slot => {
+        if (!slot.itemId || !remaining[slot.itemId] || remaining[slot.itemId]! <= 0) return slot;
+        const deduct = Math.min(slot.quantity, remaining[slot.itemId]!);
+        remaining[slot.itemId]! -= deduct;
+        modified = true;
+        return { ...slot, quantity: slot.quantity - deduct };
+      });
+
+      if (modified) {
+        storageImpl.updateComponent<InventoryComponent>(ComponentType.Inventory, (current) => ({
+          ...current,
+          slots: newSlots,
+        }));
+      }
+
+      if (Object.entries(remaining).every(([, amt]) => amt <= 0)) break;
+    }
   }
 
   private aggregateAvailableResources(
